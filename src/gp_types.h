@@ -51,6 +51,7 @@ enum DATA_TYPES {
 			/* ARRAY subcategories are marked in array->value_array[0].type */
 	COLORMAP_ARRAY,	/*    Array containing packed ARGB values */
 	TEMP_ARRAY,	/*    Array with lifetime limited to evaluation stack */
+	LOCAL_ARRAY,	/*    Array declared local (function block or bracketed clause) */
 	VOXELGRID,
 	NOTDEFINED,	/* exists, but value is currently undefined */
 	INVALID_VALUE,	/* used only for error return by external functions */

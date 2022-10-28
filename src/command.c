@@ -1812,6 +1812,7 @@ void
 local_command()
 {
     int array_token = 0;
+    struct udvt_entry *udv = NULL;
 
     c_token++;
     if (equals(c_token,"array"))
@@ -1819,7 +1820,7 @@ local_command()
 
     /* Has no effect if encountered at the top level */
     if (lf_head) {
-	struct udvt_entry *udv = add_udv(c_token);
+	udv = add_udv(c_token);
 
 	/* Keep original value and clear it from its original location */
 	shadow_one_variable(udv);
@@ -1832,6 +1833,8 @@ local_command()
     if (array_token) {
 	c_token = array_token;
 	array_command();
+	if (udv && udv->udv_value.type == ARRAY)
+	    udv->udv_value.v.value_array[0].type = LOCAL_ARRAY;
     } else {
 	define();
     }
