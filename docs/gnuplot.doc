@@ -5504,7 +5504,7 @@ Ffigure_sparsematrix
  (see `sparse`) and it is also possible to mask out only a portion of the grid
  for display (see `masking`).  These pixel-based heat maps all have the property
  that each pixel in the map corresponds exactly to one original data value.
- Unless there are a large number of grid element, it is usually a good idea to
+ Unless there are a large number of grid elements, it is usually a good idea to
  render each rectangular element separately (`with image pixels`) so that
  smoothing or lossy compression is not applied to the resulting "image".
 
@@ -12598,14 +12598,18 @@ Ffigure_keyentry
  To construct a secondary key or place plot titles elsewhere, see
  `multiple keys`.
 
+#TeX \begin{minipage}{0.5\textwidth}
  To understand positioning, the best concept is to think of a region, i.e.,
  inside/outside, or one of the margins.  Along with the region, keywords
  `left/center/right` (l/c/r) and `top/center/bottom` (t/c/b) control where
  within the particular region the key should be placed.
-
- When in `inside` mode, the keywords `left` (l), `right` (r), `top` (t),
+ In `inside` mode, the keywords `left` (l), `right` (r), `top` (t),
  `bottom` (b), and `center` (c) push the key out toward the plot boundary as
- illustrated:
+ illustrated here:
+
+#TeX \end{minipage}
+#TeX \hspace{0.15\textwidth}
+#TeX \begin{minipage}{0.35\textwidth}
 
       t/l   t/c   t/r
 
@@ -12613,9 +12617,10 @@ Ffigure_keyentry
 
       b/l   b/c   b/r
 
+#TeX \end{minipage}
 
- When in `outside` mode, automatic placement is similar to the above
- illustration, but with respect to the view, rather than the graph boundary.
+ In `outside` mode, automatic placement is similar to the above illustration,
+ but with respect to the view, rather than the graph boundary.
  That is, a border is moved inward to make room for the key outside of
  the plotting area, although this may interfere with other labels and may
  cause an error on some devices.  The particular plot border that is moved
@@ -12625,10 +12630,18 @@ Ffigure_keyentry
  left or right border is moved inward appropriately.  When the stack direction
  is `horizontal`, the top or bottom border is moved inward appropriately.
 
+#TeX \begin{minipage}{0.5\textwidth}
  The margin syntax allows automatic placement of key regardless of stack
  direction.  When one of the margins `lmargin` (lm), `rmargin` (rm),
  `tmargin` (tm), and `bmargin` (bm) is combined with a single, non-conflicting
- direction keyword, the following illustrated positions may contain the key:
+ direction keyword, the key is positioned along the outside of the page
+ as shown here.
+ Keywords `above` and `over` are synonymous with `tmargin`.
+ Keywords `below` and `under` are synonymous with `bmargin`.
+
+#TeX \end{minipage}
+#TeX \hspace{0.1\textwidth}
+#TeX \begin{minipage}{0.4\textwidth}
 
            l/tm  c/tm  r/tm
 
@@ -12641,14 +12654,12 @@ Ffigure_keyentry
            l/bm  c/bm  r/bm
 
 
- Keywords `above` and `over` are synonymous with `tmargin`.  For version
- compatibility, `above` or `over` without an additional l/c/r or stack direction
- keyword uses `center` and `horizontal`.  Keywords `below` and `under` are
- synonymous with `bmargin`.  For compatibility, `below` or `under` without an
- additional l/c/r or stack  direction keyword uses `center` and `horizontal`.  A
- further compatibility issue is that `outside` appearing without an additional
- t/b/c or stack direction keyword uses `top`, `right` and `vertical` (i.e., the
- same as t/rm above).
+#TeX \end{minipage}
+
+ For version compatibility, `above`, `over`, `below`, or `under` without any
+ additional l/c/r or stack direction keyword uses `center` and `horizontal`.
+ The keyword `outside` without any additional t/b/c or stack direction keyword
+ uses `top`, `right` and `vertical` (i.e., the same as t/rm above).
 
  The <position> can be a simple x,y,z as in previous versions, but these can
  be preceded by one of five keywords (`first`, `second`, `graph`, `screen`,
