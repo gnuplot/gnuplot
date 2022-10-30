@@ -143,16 +143,18 @@ process_line( char *line, FILE *b)
                                 /* convert '?xxx' to '\label{xxx}' */
 	    if (line[1] == '?')
 		break;
+	    if (line[1] == '\0' || strlen(line)<3)
+		break;
 	    line[strlen(line)-1]=NUL;
             (void) fputs("\\label{",b);
 	    fputs(line+1, b);
-            (void) fputs("}\n",b);
+            (void) fputs("}%\n",b);
 	    if (!strpbrk(line+1," ")) {	/* Make an index entry also */
 		(void) fputs("\\index{",b);
 		while ((ind = strpbrk(line+1,"-_")))
 		    *ind = ' ';
 		fputs(line+1, b);
-		(void) fputs("}\n",b);
+		(void) fputs("}%\n",b);
 	    }
 	    break;		/* ignore */ /* <- don't ignore */
 
@@ -162,7 +164,7 @@ process_line( char *line, FILE *b)
 	    while ((ind = strpbrk(line+1,"-_")))
 		*ind = ' ';
 	    fputs(line+1, b);
-	    (void) fputs("}\n",b);
+	    (void) fputs("}%\n",b);
 	    break;
 
     case 'F':			/* embedded figure */
@@ -214,7 +216,7 @@ process_line( char *line, FILE *b)
 		}
 		else if (!strncmp(line+1,"TeX",3)) {
 		    /* Treat rest of line as LaTeX command */
-		    fprintf(b, "%s\n", line + 5);
+		    fprintf(b, "%s ", line + 5);
 		}
 		else {
 		    if (strchr(line, '\n'))
