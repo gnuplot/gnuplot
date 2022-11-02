@@ -61,6 +61,13 @@ f_faddeeva(union argument *arg)
     complex double z;
 
     pop(&a);
+
+    /* Avoid underflow FPE from the exp(-z^2) term */
+    if (imag(&a) == 0 && fabs(real(&a)) > 27.) {
+	push(Gcomplex(&a, 0.0, im_w_of_x(real(&a))));
+	return;
+    }
+
     z = real(&a) + I * imag(&a);	/* Convert gnuplot complex to C99 complex */
     z = w_of_z(z);			/* libcerf complex -> complex function */
     push(Gcomplex(&a, creal(z), cimag(z)));
