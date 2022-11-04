@@ -443,6 +443,10 @@ set_command()
 	case S_WALL:
 	    set_wall();
 	    break;
+	case S_WARNINGS:
+	    c_token++;
+	    suppress_warnings = FALSE;
+	    break;
 	case S_SAMPLES:
 	    set_samples();
 	    break;

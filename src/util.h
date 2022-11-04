@@ -68,6 +68,7 @@ extern char *micro_user;
 extern const char *current_prompt; /* needed by is_error() and friends */
 
 extern int debug;
+extern TBOOLEAN suppress_warnings;
 
 /* Functions exported by util.c: */
 

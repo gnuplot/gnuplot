@@ -79,6 +79,7 @@ const char *current_prompt = NULL; /* to be set by read_line() */
 TBOOLEAN screen_ok;
 
 int debug = 0;
+TBOOLEAN suppress_warnings = FALSE;
 
 /* internal prototypes */
 
@@ -1222,22 +1223,26 @@ int_warn(int t_num, const char str[], va_dcl)
     va_list args;
 #endif
 
-    /* reprint line if screen has been written to */
-    print_line_with_error(t_num);
+    if (!suppress_warnings) {
 
-    fputs("warning: ", stderr);
+	/* reprint line if screen has been written to */
+	print_line_with_error(t_num);
+
+	fputs("warning: ", stderr);
 #ifdef VA_START
-    VA_START(args, str);
+	VA_START(args, str);
 # if defined(HAVE_VFPRINTF) || _LIBC
-    vfprintf(stderr, str, args);
+	vfprintf(stderr, str, args);
 # else
-    _doprnt(str, args, stderr);
+	_doprnt(str, args, stderr);
 # endif
-    va_end(args);
+	va_end(args);
 #else  /* VA_START */
-    fprintf(stderr, str, a1, a2, a3, a4, a5, a6, a7, a8);
+	fprintf(stderr, str, a1, a2, a3, a4, a5, a6, a7, a8);
 #endif /* VA_START */
-    putc('\n', stderr);
+	putc('\n', stderr);
+
+    }
 
 #if defined(_WIN32) || defined(__KLIBC__)
     /* Check asynchronously for Ctrl-C */

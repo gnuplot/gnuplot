@@ -433,6 +433,9 @@ unset_command()
 	for (i=0; i<5; i++)
 	    unset_wall(i);
 	break;
+    case S_WARNINGS:
+	suppress_warnings = TRUE;
+	break;
     case S_RTICS:
 	unset_tics(&axis_array[POLAR_AXIS]);
 	break;

@@ -373,6 +373,7 @@ C
 #b The `load` and `call` commands can input commands from a datablock as an
 ## alternative to reading them from a file.
 #b New syntax  `if ... else if ... else ...`
+#b `unset warnings` suppresses output of warning messages to the console.
 #end
 
 3 New terminals and terminal options
@@ -18616,6 +18617,13 @@ Ffigure_sparsematrix
  It is equivalent to `set terminal GNUTERM`.  However if the string in GNUTERM
  contains terminal options in addition to the bare terminal name, you may want
  to instead use `set terminal @GNUTERM`.
+3 warnings
+?unset warnings
+?set warnings
+ Warning messages (non-fatal errors) are normally printed to stderr after
+ echoing the command line that triggered the warning.
+ Warnings may be suppressed by the command `unset warnings`, and remain
+ suppressed until explicitly reenabled by `set warnings`.
 2 update
 ?commands update
 ?update
