@@ -1248,11 +1248,9 @@ fit_show(int i, double chisq, double last_chisq, double* a, double lambda, FILE 
 	    i, chisq, chisq > NEARLY_ZERO ? (chisq - last_chisq) / chisq : 0.0,
 	    chisq - last_chisq, epsilon);
     if (fit_show_lambda)
-	fprintf(device, "\
- lambda	     : %g\n", lambda);
-	fprintf(device, "\n\
-%s parameter values\n\n",
-	    (i > 0 ? "resultant" : "initial set of free"));
+	fprintf(device, " lambda	     : %g\n", lambda);
+    fprintf(device, "\n %s parameter values\n\n",
+	(i > 0 ? "resultant" : "initial set of free"));
     for (k = 0; k < num_params; k++)
 	fprintf(device, "%-15.15s = %g\n", par_name[k], a[k] * scale_params[k]);
 }

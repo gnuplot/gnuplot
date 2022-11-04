@@ -2392,7 +2392,6 @@ show_palette_gradient()
 static void
 show_colornames(const struct gen_table *tbl)
 {
-    int i=0;
     while (tbl->key) {
 	/* Print color names and their rgb values, table with 1 column */
 	int r = ((tbl->value >> 16 ) & 255);
@@ -2402,7 +2401,6 @@ show_colornames(const struct gen_table *tbl)
 	fprintf( stderr, "\n  %-18s ", tbl->key );
 	fprintf(stderr, "#%02x%02x%02x = %3i %3i %3i", r,g,b, r,g,b);
 	++tbl;
-	++i;
     }
     fputs( "\n", stderr );
     ++c_token;
