@@ -1527,9 +1527,9 @@ apply_lighting_model( struct coordinate *v0, struct coordinate *v1,
     dot_prod = normal[0]*light[0] + normal[1]*light[1] + normal[2]*light[2];
     shade_fact = (dot_prod < 0) ? -dot_prod : 0;
 
-    tmp_r = r*(pm3d_shade.ambient-pm3d_shade.strength+shade_fact*pm3d_shade.strength);
-    tmp_g = g*(pm3d_shade.ambient-pm3d_shade.strength+shade_fact*pm3d_shade.strength);
-    tmp_b = b*(pm3d_shade.ambient-pm3d_shade.strength+shade_fact*pm3d_shade.strength);
+    tmp_r = r*(pm3d_shade.ambient - pm3d_shade.strength + shade_fact*pm3d_shade.strength);
+    tmp_g = g*(pm3d_shade.ambient - pm3d_shade.strength + shade_fact*pm3d_shade.strength);
+    tmp_b = b*(pm3d_shade.ambient - pm3d_shade.strength + shade_fact*pm3d_shade.strength);
 
     /* Specular highlighting */
     if (pm3d_shade.spec > 0.0) {
@@ -1553,9 +1553,41 @@ apply_lighting_model( struct coordinate *v0, struct coordinate *v1,
 	    tmp_g += pm3d_shade.spec * spec_fact;
 	    tmp_b += pm3d_shade.spec * spec_fact;
 	}
-	/* EXPERIMENTAL: Red spotlight from underneath */
-	if (dot_prod < 0 && pm3d_shade.spec2 > 0) {
-	    tmp_r += pm3d_shade.spec2 * spec_fact;
+    }
+
+    /* Optional extra light source
+     * The first spotlight was white and had fixed origin phi, psi.
+     * For this one "set pm3d spotlight ..." changes the color and origin,
+     * "set pm3d lighting spec2 <value>" controls the relative contribution.
+     */
+    if (pm3d_shade.spec2 > 0.0) {
+
+	double light2[3];
+	light2[0] = cos(-DEG2RAD*pm3d_shade.spec2_rot_x)*cos(-(DEG2RAD*pm3d_shade.spec2_rot_z));
+	light2[2] = cos(-DEG2RAD*pm3d_shade.spec2_rot_x)*sin(-(DEG2RAD*pm3d_shade.spec2_rot_z));
+	light2[1] = sin(-DEG2RAD*pm3d_shade.spec2_rot_x);
+
+	dot_prod = normal[0]*light2[0] + normal[1]*light2[1] + normal[2]*light2[2];
+
+	reflect[0] = -light2[0]+2*dot_prod*normal[0];
+	reflect[1] = -light2[1]+2*dot_prod*normal[1];
+	reflect[2] = -light2[2]+2*dot_prod*normal[2];
+	t = sqrt( reflect[0]*reflect[0] + reflect[1]*reflect[1] + reflect[2]*reflect[2] );
+	reflect[0] /= t;
+	reflect[1] /= t;
+	reflect[2] /= t;
+
+	dot_prod = -reflect[2];
+
+	spec_fact = pow(fabs(dot_prod), pm3d_shade.spec2_Phong);
+
+	if (dot_prod < 0) {
+	    tmp_r += pm3d_shade.spec2 * spec_fact
+			* ((pm3d_shade.spec2_rgb >> 16) & 0xff) / 255.;
+	    tmp_g += pm3d_shade.spec2 * spec_fact
+			* ((pm3d_shade.spec2_rgb >> 8) & 0xff) / 255.;
+	    tmp_b += pm3d_shade.spec2 * spec_fact
+			* ((pm3d_shade.spec2_rgb & 0xff)) / 255.;
 	}
     }
 

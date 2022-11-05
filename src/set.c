@@ -174,6 +174,7 @@ static void set_style_parallel(void);
 static void set_style_spiderplot(void);
 static void set_spiderplot(void);
 static void parse_lighting_options(void);
+static void parse_spotlight_options(void);
 
 static const struct position default_position
 	= {first_axes, first_axes, first_axes, 0., 0., 0.};
@@ -3765,6 +3766,10 @@ set_pm3d()
 		parse_lighting_options();
 		continue;
 
+	    case S_PM3D_SPOTLIGHT:
+		parse_spotlight_options();
+		continue;
+
 	    } /* switch over pm3d lookup table */
 	    int_error(c_token,"invalid pm3d option");
 	} /* end of while !end of command over pm3d options */
@@ -6416,6 +6421,45 @@ parse_lighting_options()
 	break;
     }
 
+    c_token--;
+}
+
+/*
+ * set pm3d spotlight {rot_x <phi>} {rot_z <psi>} {rgbcolor <color>}
+ * set pm3d spotlight default
+ */
+static void
+parse_spotlight_options()
+{
+    c_token++;
+    while (!END_OF_COMMAND) {
+	if (equals(c_token, "rot_x")) {
+	    c_token++;
+	    pm3d_shade.spec2_rot_x = real_expression();
+	    continue;
+	}
+	if (equals(c_token, "rot_z")) {
+	    c_token++;
+	    pm3d_shade.spec2_rot_z = real_expression();
+	    continue;
+	}
+	if (almost_equals(c_token, "rgb$color")) {
+	    c_token++;
+	    pm3d_shade.spec2_rgb = parse_color_name();
+	    continue;
+	}
+	if (almost_equals(c_token, "Phong")) {
+	    c_token++;
+	    pm3d_shade.spec2_Phong = fabs(real_expression());
+	    continue;
+	}
+	if (equals(c_token, "default")) {
+	    c_token++;
+	    reset_spotlight();
+	    continue;
+	}
+	break;
+    }
     c_token--;
 }
 

@@ -14732,6 +14732,14 @@ Ffigure_palette2
 ?pm3d lighting
 ?pm3d nolighting
 ?set pm3d lighting
+?spotlight
+?pm3d spotlight
+?set pm3d spotlight
+ Syntax:
+      set pm3d lighting {primary <frac>} {specular <frac>} {spec2 <frac>}
+      set pm3d spotlight {rgb <color>} {rot_x <angle>} {rot_z <angle>}
+                         {Phong <value>} {default}
+
  By default the colors assigned to pm3d objects are not dependent on orientation
  or viewing angle. This state corresponds to `set pm3d nolighting`.
  The command `set pm3d lighting` selects a simple lighting model consisting of a
@@ -14742,15 +14750,21 @@ Ffigure_palette2
       set pm3d lighting primary 0.50 specular 0.0   # no highlights
       set pm3d lighting primary 0.50 specular 0.6   # strong highlights
  Solid-color pm3d surfaces tend to look very flat without specular highlights.
- Since the highlights from a single source only affect one side of the surface,
- a second spotlight source may be desirable to add specular highlights from the
- opposite direction.  This is controlled by "spec2 <contribution>".
- EXPERIMENTAL (details may change in a future version): The second spotlight is
- a pure red light source that by default contributes nothing (spec2 0.0).
+
+ Since highlights the primary source only affect one side of the surface,
+ it may help to add illumination from a second spotlight shining from another
+ direction.  The strength of this second spotlight is set by "spec2 <fraction>".
+ The second spotlight is included in the lighting model only if spec2 is greater
+ than zero.  The direction, color, and specular model is controlled by
+ "set pm3d spotlight".  Use and positioning of this spotlight is illustrated
+ in the interactive demo `spotlight.dem`.
  See also hidden_compare.dem
-^ <a href="http://www.gnuplot.info/demo_5.4/hidden_compare.html">
+^ <a href="http://www.gnuplot.info/demo/hidden_compare.html">
  (comparison of hidden3d and pm3d treatment of solid-color surfaces)
 ^ </a>
+ Example:
+      set pm3d lighting primary 0.8 spec 0.4 spec2 0.4
+      set pm3d spot rgb "blue"
 4 position
 ?pm3d position
 ?set pm3d position

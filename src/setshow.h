@@ -65,5 +65,6 @@ extern struct text_label * new_text_label(int tag);
 extern void disp_value(FILE *, struct value *, TBOOLEAN);
 extern struct ticmark * prune_dataticks(struct ticmark *list);
 
+extern void reset_spotlight(void);
 
 #endif /* GNUPLOT_SETSHOW_H */

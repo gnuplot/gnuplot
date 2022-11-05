@@ -902,8 +902,7 @@ set origin %g,%g\n",
     if (pm3d_shade.strength <= 0)
 	fputs("set pm3d nolighting\n",fp);
     else
-	fprintf(fp, "set pm3d lighting primary %g specular %g spec2 %g\n",
-		pm3d_shade.strength, pm3d_shade.spec, pm3d_shade.spec2);
+	save_pm3d_lighting(fp,"");
 
     /*
      *  Save palette information
@@ -1404,6 +1403,17 @@ save_style_textbox(FILE *fp)
 	fprintf(fp, " linewidth %4.1f", textbox->linewidth);
 	fputs("\n",fp);
     }
+}
+
+void
+save_pm3d_lighting(FILE *fp, char *tab)
+{
+    fprintf(fp, "%sset pm3d lighting primary %g specular %g spec2 %g\n",
+		tab, pm3d_shade.strength, pm3d_shade.spec, pm3d_shade.spec2);
+    if (pm3d_shade.spec2 > 0)
+	fprintf(fp, "%sset pm3d spotlight rgb 0x%lx rot_x %.0f rot_z %.0f Phong %.1f\n",
+		tab, pm3d_shade.spec2_rgb, pm3d_shade.spec2_rot_x,
+		pm3d_shade.spec2_rot_z, pm3d_shade.spec2_Phong);
 }
 
 void

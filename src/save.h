@@ -55,6 +55,7 @@ void save_term(FILE *fp);
 void save_all(FILE *fp);
 void save_axis_label_or_title(FILE *fp, char *name, char *suffix,
 			struct text_label *label, TBOOLEAN savejust);
+void save_pm3d_lighting(FILE *, char *);
 void save_position(FILE *, struct position *, int, TBOOLEAN);
 void save_prange(FILE *, struct axis *);
 void save_link(FILE *, struct axis *);

@@ -2608,12 +2608,6 @@ show_pm3d()
 	save_linetype(stderr, &(pm3d.border), FALSE);
 	fprintf(stderr,"\n");
     }
-    if (pm3d_shade.strength > 0) {
-	fprintf(stderr,"\tlighting primary component %g specular component %g",
-		pm3d_shade.strength, pm3d_shade.spec);
-	fprintf(stderr," second spot contribution %g\n",
-		pm3d_shade.spec2);
-    }
     fprintf(stderr,"\tsteps for bilinear interpolation: %d,%d\n",
 	 pm3d.interp_i, pm3d.interp_j);
     fprintf(stderr,"\tquadrangle color according to ");
@@ -2626,6 +2620,10 @@ show_pm3d()
 	case PM3D_WHICHCORNER_MAX: fputs("maximum of 4 corners\n", stderr); break;
 	case PM3D_WHICHCORNER_RMS: fputs("root mean square of 4 corners\n", stderr); break;
 	default: fprintf(stderr, "corner %i\n", pm3d.which_corner_color - PM3D_WHICHCORNER_C1 + 1);
+    }
+    if (pm3d_shade.strength > 0) {
+	fprintf(stderr, "\tLighting model:\n");
+	save_pm3d_lighting(stderr, "\t");
     }
 }
 

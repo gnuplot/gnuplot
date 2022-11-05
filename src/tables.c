@@ -553,6 +553,7 @@ const struct gen_table set_pm3d_tbl[] =
     { "corners2c$olor",	S_PM3D_WHICH_CORNER },
     { "light$ing",	S_PM3D_LIGHTING_MODEL },
     { "nolight$ing",	S_PM3D_NOLIGHTING_MODEL },
+    { "spot$light",	S_PM3D_SPOTLIGHT },
     { NULL, S_PM3D_INVALID }
 };
 

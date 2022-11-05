@@ -1,0 +1,32 @@
+#
+# Illustrate use of secondary spotlight in pm3d lighting model
+#
+unset key
+unset colorbox
+unset tics
+unset border
+set parametric
+set dummy u, v
+set view  equal xyz
+set view 90., 0., 1.6
+set samples 95
+set isosamples 95
+set xyplane at 0
+set title "Hot keys x/X and y/Y move red spotlight"
+set pm3d depthorder 
+set pm3d lighting primary 0.5 specular 0.2 spec2 0.5
+set pm3d spotlight rgb 0xff0044 rot_x 35 rot_z 0 Phong 10.0
+
+# Bind hot keys to move spotlight origin phi/psi
+spot_x = 35
+spot_z = 0
+bind all 'x' "spot_x = spot_x+5.; set pm3d spotlight rot_x spot_x; replot"
+bind all 'X' "spot_x = spot_x-5.; set pm3d spotlight rot_x spot_x; replot"
+bind all 'Y' "spot_z = spot_z-5.; set pm3d spotlight rot_z spot_z; replot"
+bind all 'y' "spot_z = spot_z+5.; set pm3d spotlight rot_z spot_z; replot"
+
+splot cos(u)*cos(v),cos(u)*sin(v),sin(u) with pm3d fc "gray"
+
+pause -1 "Hot keys x/X y/Y move spotlight"
+
+reset
