@@ -47,7 +47,8 @@ breaders.c breaders.h bitmap.h  boundary.c boundary.h \
 color.c color.h command.c command.h contour.c contour.h \
 complexfun.c complexfun.h \
 datablock.c datablock.h datafile.c datafile.h dynarray.c dynarray.h \
-encoding.c encoding.h eval.c eval.h external.c external.h fit.c fit.h \
+encoding.c encoding.h eval.c eval.h external.c external.h \
+filters.c filters.h fit.c fit.h \
 gadgets.c gadgets.h getcolor.c getcolor.h gp_hist.h gp_time.h \
 gp_types.h gplt_x11.h graph3d.c graph3d.h graphics.c graphics.h \
 help.c help.h hidden3d.c hidden3d.h history.c internal.c internal.h \

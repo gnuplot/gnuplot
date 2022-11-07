@@ -40,6 +40,7 @@
 #include "datablock.h"
 #include "encoding.h"
 #include "eval.h"
+#include "filters.h"
 #include "fit.h"
 #include "graphics.h"
 #include "interpol.h"

@@ -41,6 +41,7 @@
 #include "datablock.h"
 #include "encoding.h"
 #include "eval.h"
+#include "filters.h"
 #include "getcolor.h"
 #include "graph3d.h"
 #include "hidden3d.h"

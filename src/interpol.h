@@ -37,36 +37,28 @@
 #include "graphics.h"
 #include "graph3d.h"
 
-/* Type definitions */
-
-/* If gnuplot ever gets a subsystem to do clustering, this would belong there.
- * As of now, however, the only clustering operations are outlier detection
- * and finding a convex hull, for which the code in in interpol.c.
- */
-typedef struct cluster {
-    int npoints;
-    double cx;		/* x coordinate of center-of-mass */
-    double cy;		/* y coordinate of center-of-mass */
-    double rmsd;	/* root mean square distance from center of mass */
-    double threshold;	/* criterion for outlier detection */
-} t_cluster;
-
 /* Variables of interpol.c needed by other modules: */
 
 /* Prototypes of functions exported by interpol.c */
 void gen_interp(struct curve_points *plot);
 void gen_interp_unwrap(struct curve_points *plot);
 void gen_interp_frequency(struct curve_points *plot);
-void mcs_interp(struct curve_points *plot);
 void sort_points(struct curve_points *plot);
 void zsort_points(struct curve_points *plot);
 void zrange_points(struct curve_points *plot);
 void cp_implode(struct curve_points *cp);
-void make_bins(struct curve_points *plot,
-		int nbins, double binlow, double binhigh, double binwidth, int binopt);
-void gen_3d_splines(struct surface_points *plot);
-void gen_2d_path_splines(struct curve_points *plot);
-void convex_hull(struct curve_points *plot);
-void expand_hull(struct curve_points *plot);
+int next_curve(struct curve_points * plot, int *curve_start);
+int num_curves(struct curve_points * plot);
+
+#define spline_coeff_size 4
+typedef double spline_coeff[spline_coeff_size];
+spline_coeff *cp_approx_spline(struct coordinate *first_point, int num_points,
+				int path_dim, int spline_dim, int w_dim);
+spline_coeff *cp_tridiag(struct coordinate *first_point, int num_points,
+			int path_dim, int spline_dim);
+
+int compare_x(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
+int compare_z(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
+int compare_xyz(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
 
 #endif /* GNUPLOT_INTERPOL_H */
