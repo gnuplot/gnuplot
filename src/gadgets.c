@@ -819,7 +819,7 @@ void
 default_arrow_style(struct arrow_style_type *arrow)
 {
     static const struct lp_style_type tmp_lp_style = 
-	{0, LT_DEFAULT, 0, DASHTYPE_SOLID, 0, 0, 1.0, 0.0, DEFAULT_P_CHAR,
+	{0, LT_SOLID, 0, DASHTYPE_SOLID, 0, 0, 1.0, 0.0, DEFAULT_P_CHAR,
 	DEFAULT_COLORSPEC, DEFAULT_DASHPATTERN};
 
     arrow->tag = -1;
