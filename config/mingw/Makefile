@@ -552,7 +552,6 @@ endif
 
 ifdef WATCHPOINTS
 	CFLAGS += -DUSE_WATCHPOINTS
-	WATCHPOINTS_OBJS = watch.$(O)
 endif
 
 ifdef POLAR_GRID
@@ -642,7 +641,7 @@ all: $(DEFAULT_TARGETS) $(TARGETS_PLAIN) $(TARGETS_PIPES) $(TARGETS_CONSOLE) $(H
 # include the 'core makefile template'
 include $(S)/makefile.all
 
-OBJS = $(COREOBJS) version.$(O) gpexecute.$(O) $(WX_OBJS) $(CAIRO_OBJS) $(QT_OBJS) $(WATCHPOINTS_OBJS)
+OBJS = $(COREOBJS) version.$(O) gpexecute.$(O) $(WX_OBJS) $(CAIRO_OBJS) $(QT_OBJS)
 WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) \
 	  wpause.$(O) wgdiplus.$(O) wd2d.$(O) 
 WINOBJS_WGNUPLOT = wtext.$(O) screenbuf.$(O) wmenu.$(O) wredirect.$(O)
@@ -735,12 +734,6 @@ term.po: term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
 term.co: term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
 	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) $(TERMFLAGS) -MMD -MT '$*.co' -MF $*.cd -o $@ $<
 
-watch.o: watch.c watch.h $(CORETERM)
-	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) $(TERMFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
-watch.po: watch.c watch.h  $(CORETERM)
-	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) $(TERMFLAGS) -MMD -MT '$*.po' -MF $*.pd -o $@ $<
-watch.co: watch.c watch.h $(CORETERM)
-	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) $(TERMFLAGS) -MMD -MT '$*.co' -MF $*.cd -o $@ $<
 
 ifndef RELEASE
 git_current := $(shell cut -c6- $(TOP)/.git/HEAD)
