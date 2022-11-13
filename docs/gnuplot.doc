@@ -6358,6 +6358,7 @@ Ffigure_xerrorbars
       4 columns:  x  y  xlow  xhigh
 
  An additional input column (4th or 5th) may be used to provide variable color.
+ This style does not permit variable point properties.
 
 2 xyerrorbars
 ?plotting styles xyerrorbars
@@ -6382,8 +6383,8 @@ Ffigure_xyerrorbars
 
        plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorbars
 
- An additional input column (5th or 7th) may be used to provide variable
- (per-datapoint) color information.
+ An additional input column (5th or 7th) may be used to provide variable color.
+ This style does not permit variable point properties.
 
 2 xerrorlines
 ?plotting styles xerrorlines
@@ -6402,6 +6403,7 @@ Ffigure_xerrorlines
       4 columns:  x  y  xlow  xhigh
 
  An additional input column (4th or 5th) may be used to provide variable color.
+ This style does not permit variable point properties.
 
 2 xyerrorlines
 ?plotting styles xyerrorlines
@@ -6427,8 +6429,8 @@ Ffigure_xyerrorlines
 
        plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorlines
 
- An additional input column (5th or 7th) may be used to provide variable
- (per-datapoint) color information.
+ An additional input column (5th or 7th) may be used to provide variable color.
+ This style does not permit variable point properties.
 
 2 yerrorbars
 ?plotting styles yerrorbars
@@ -6480,7 +6482,8 @@ Ffigure_yerrorlines
       3 columns:  x  y  ydelta
       4 columns:  x  y  ylow  yhigh
 
- An additional input column (4th or 5th) may be used to provide variable color.
+ Additional input columns may be used to provide information such as variable
+ point size, point type, or color.
 
  See also
 ^ <a href="http://www.gnuplot.info/demo/mgr.html">
