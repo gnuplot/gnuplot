@@ -920,48 +920,34 @@ get_data(struct curve_points *current_plot)
 	}
 
 	case YERRORLINES:
-	{   /* x y ydelta   or    x y ylow yhigh */
-	    coordval ylow  = (j > 3) ? v[2] : v[1] - v[2];
-	    coordval yhigh = (j > 3) ? v[3] : v[1] + v[2];
-	    store2d_point(current_plot, i++, v[0], v[1],
-			v[0], v[0], ylow, yhigh, -1.0);
-	    break;
-	}
-
 	case YERRORBARS:
 	{   /* NB: assumes CRD_PTSIZE == xlow CRD_PTTYPE == xhigh CRD_PTCHAR == ylow
 		   lc variable, if present, was already extracted and j reduced by 1
 	     */
-	    /* x y ydelta {lc variable} */
-	    if (j == 3) {
-		coordval ylow  = v[1] - v[2];
-		coordval yhigh = v[1] + v[2];
-		store2d_point(current_plot, i++, v[0], v[1],
-			v[0], v[0], ylow, yhigh, -1.0);
-
 	    /* x y ylow yhigh {var_ps} {var_pt} {lc variable} */
-	    } else {
-		int var = 4; /* column number for next variable spec */
-		coordval ylow  = v[2];
-		coordval yhigh = v[3];
-		coordval var_pt = current_plot->lp_properties.p_type;
-		coordval var_ps = current_plot->lp_properties.p_size;
+	    coordval ylow  = v[2];
+	    coordval yhigh = v[3];
+	    coordval var_pt = current_plot->lp_properties.p_type;
+	    coordval var_ps = current_plot->lp_properties.p_size;
 
-		if (var_ps == PTSZ_VARIABLE) {
-		    if (var >= j)
-			int_error(NO_CARET, "Not enough using specs");
-		    var_ps = v[var++];
-		}
-		if (var_pt == PT_VARIABLE) {
-		    if (var >= j)
-			int_error(NO_CARET, "Not enough using specs");
-		    var_pt = v[var++];
-		}
-		if (!(var_pt > 0)) /* Catches CRD_PTCHAR (NaN) also */
-		    var_pt = 0;
-		store2d_point(current_plot, i++, v[0], v[1],
-					    var_ps, var_pt, ylow, yhigh, -1.0);
+	    if (var_pt == PT_VARIABLE) {
+		if (j < 4)
+		    int_error(NO_CARET, "Not enough using specs");
+		var_pt = v[--j];
 	    }
+	    if (!(var_pt > 0)) /* Catches CRD_PTCHAR (NaN) also */
+		var_pt = 0;
+	    if (var_ps == PTSZ_VARIABLE) {
+		if (j < 4)
+		    int_error(NO_CARET, "Not enough using specs");
+		var_ps = v[--j];
+	    }
+	    if (j == 3) {
+		ylow = v[1] - v[2];
+		yhigh = v[1] + v[2];
+	    }
+	    store2d_point(current_plot, i++, v[0], v[1],
+					var_ps, var_pt, ylow, yhigh, -1.0);
 	    break;
 	}
 
@@ -1389,8 +1375,9 @@ store2d_point(
 	cp->yhigh = yhigh;
 	break;
     case YERRORBARS:		/* auto-scale ylow yhigh */
-	cp->xlow = xlow;
-	cp->xhigh = xhigh;
+    case YERRORLINES:		/* auto-scale ylow yhigh */
+	cp->CRD_PTSIZE = xlow;
+	cp->CRD_PTTYPE = xhigh;
 	STORE_AND_UPDATE_RANGE(cp->ylow, ylow, dummy_type, current_plot->y_axis,
 				current_plot->noautoscale, cp->ylow = -VERYLARGE);
 	STORE_AND_UPDATE_RANGE(cp->yhigh, yhigh, dummy_type, current_plot->y_axis,
