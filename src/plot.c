@@ -759,6 +759,7 @@ init_session()
 	/* Reset program variables not handled by 'reset' */
 	overflow_handling = INT64_OVERFLOW_TO_FLOAT;
 	suppress_warnings = FALSE;
+	reset_datafile();
 
 	/* Reset voxel data structures if supported */
 	init_voxelsupport();

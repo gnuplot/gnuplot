@@ -357,14 +357,7 @@ unset_command()
 	    c_token++;
 	    break;
 	}
-	df_fortran_constants = FALSE;
-	unset_missing();
-	free(df_separators);
-	df_separators = NULL;
-	free(df_commentschars);
-	df_commentschars = gp_strdup(DEFAULT_COMMENTS_CHARS);
-	df_unset_datafile_binary();
-	df_columnheaders = FALSE;
+	reset_datafile();
 	break;
     case S_MICRO:
 	unset_micro();
@@ -837,6 +830,20 @@ reset_bars()
     bar_size = 1.0;
     bar_layer = LAYER_FRONT;
     bar_lp.flags = 0;
+}
+
+/* reset to default datafile properties */
+void
+reset_datafile()
+{
+        df_fortran_constants = FALSE;
+        unset_missing();
+        free(df_separators);
+        df_separators = NULL;
+        free(df_commentschars);
+        df_commentschars = gp_strdup(DEFAULT_COMMENTS_CHARS);
+        df_unset_datafile_binary();
+        df_columnheaders = FALSE;
 }
 
 /* process 'unset border' command */
