@@ -1110,7 +1110,7 @@ DWORD WINAPI
 stdin_pipe_reader(LPVOID param)
 {
     do {
-	ssize_t n = read(_fileno(stdin), readbuf[rbuf_page], READBUFSIZE);
+	size_t n = read(_fileno(stdin), readbuf[rbuf_page], READBUFSIZE);
 	if (n < 0) /* This should not happen. */
 	    n = 0;
 	WaitForSingleObject(input_cont, INFINITE);
@@ -1202,7 +1202,7 @@ read_stdin_pipe(void *buf, size_t len)
 	copy_len = len - cnt;
 	if (copy_len > rbuf_len - rbuf_idx)
 	    copy_len = rbuf_len - rbuf_idx;
-	memcpy(buf + cnt, rbuf + rbuf_idx, copy_len);
+	memcpy((char *)buf + cnt, rbuf + rbuf_idx, copy_len);
 	rbuf_idx += copy_len;
 	cnt += copy_len;
 	if (rbuf_idx == rbuf_len) {
