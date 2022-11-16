@@ -176,7 +176,7 @@ void system_command(void);
 void test_command(void);
 void toggle_command(void);
 void update_command(void);
-void do_shell(void);
+void shell_command(void);
 void undefine_command(void);
 void while_command(void);
 

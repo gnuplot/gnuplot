@@ -86,7 +86,7 @@ const struct gen_ftable command_ftbl[] =
     { "sa$ve", save_command },
     { "scr$eendump", screendump_command },
     { "se$t", set_command },
-    { "she$ll", do_shell },
+    { "she$ll", shell_command },
     { "sh$ow", show_command },
     { "sp$lot", splot_command },
     { "st$ats", stats_command },

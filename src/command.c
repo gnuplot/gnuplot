@@ -156,6 +156,7 @@ static void if_else_command(ifstate if_state);
 static void old_if_command(struct at_type *expr);
 static int report_error(int ierr);
 static void load_or_call_command( TBOOLEAN call );
+       void do_shell(void);
 
 static int expand_1level_macros(void);
 
@@ -2625,11 +2626,16 @@ screendump_command()
 
 
 /* set_command() is in set.c */
-
-/* 'shell' command is processed by do_shell(), see below */
-
 /* show_command() is in show.c */
 
+/* 'shell' command is processed by do_shell(), see below */
+void
+shell_command()
+{
+    if (evaluate_inside_functionblock)
+	int_error(NO_CARET, "functionblocks are not permitted to spawn a shell");
+    do_shell();
+}
 
 /* process the 'splot' command */
 void
