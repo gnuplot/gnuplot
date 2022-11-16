@@ -14019,6 +14019,9 @@ Ffigure_multiple_keys
  Syntax:
        set style function <plotting-style>
        show style function
+4 set style histogram
+?commands set style histogram
+ See `histograms`.
 4 set style increment
 ?commands set style increment
 ?commands show style increment
@@ -14051,7 +14054,6 @@ Ffigure_multiple_keys
  If a user-defined line style is not found then the corresponding default
  linetype is used instead.  E.g. in the example above, f3(x) will be plotted
  using the default linetype 3.
-
 4 set style line
 ?commands set style line
 ?commands unset style line
