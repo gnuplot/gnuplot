@@ -5510,12 +5510,12 @@ Ffigure_sparsematrix
  smoothing or lossy compression is not applied to the resulting "image".
 
 Ffigure_mask
- If the data points do not constitue a regular rectangular grid, they can often
+ If the data points do not constitute a regular rectangular grid, they can often
  be used to fit a gridded surface by interpolation or by splines. Alternatively
  a point-density function can be mapped onto a gridded plane or smooth surface.
  See `set dgrid3d`.  The gridded surface can then be plotted as a pm3d surface
  (see `masking` example). In this case the points on the heat map do not retain
- a one-to-one correspondance with the input data.  I.e. the validity of the heat
+ a one-to-one correspondence with the input data.  I.e. the validity of the heat
  map represenation is only as good as the gridded approximation. 
  The demo collection has examples of generating 2D heatmaps from a set of points
 ^ <a href="http://www.gnuplot.info/demo/heatmap_points.html">
@@ -5754,7 +5754,7 @@ Ffigure_newhist
  truly parallel (i.e. some files contain incomplete data).  In other
  cases there may be additional properties of the data that could be
  visualized by, say, varying the intensity or saturation of their base
- color.  As an alternative to the automatic color assigmnent, you can
+ color.  As an alternative to the automatic color assignment, you can
  provide an explicit color value for each data value in a second `using`
  column via the `linecolor variable` or `rgb variable` mechanism. 
  See `colorspec`. Depending on the layout of your data, the color category
@@ -5809,8 +5809,8 @@ Ffigure_heatmap
 
 Ffigure_rgb3D
  Each pixel (data point) of the input 2D image will become a rectangle or
- parallelipiped in the plot. The coordinates of each data point will determine
- the center of the parallelipiped.  That is, an M x N set of data will form an
+ parallelepiped in the plot. The coordinates of each data point will determine
+ the center of the parallelepiped.  That is, an M x N set of data will form an
  image with M x N pixels.  This is different from the pm3d plotting style, where
  an M x N set of data will form a surface of (M-1) x (N-1) elements.  The scan
  directions for a binary image data grid can be further controlled by additional
@@ -7448,7 +7448,7 @@ Ffigure_zerror
  See `local` and `scope`.
 
  Once the function block is defined, you can invoke it by name anywhere that
- a normal function could be used.  If the return value is not relevent, the
+ a normal function could be used.  If the return value is not relevant, the
  function block may be invoked by an "evaluate" command rather than as part
  of an assignment expression.
 
@@ -8774,7 +8774,6 @@ Ffigure_convex_hull
  SIAM Journal on Numerical Analysis 17: 238–246.
 
 5 path
-?commands path datafile smooth path
 ?plot datafile smooth path
 ?plot smooth path
 ?smooth path
@@ -15638,6 +15637,9 @@ Ffigure_polar_grid
  Syntax:
        set style function <plotting-style>
        show style function
+4 set style histogram
+?commands set style histogram
+ See `histograms`.
 4 set style increment
 ?commands set style increment
 ?set style increment
@@ -16238,8 +16240,6 @@ Ffigure_polar_grid
  (default: bottom).  `rotate` writes the timestamp vertically. The constants
  <xoff> and <yoff> are offsets that let you adjust the position more finely.
  <font> is used to specify the font with which the time is to be written.
-
- The abbreviation `time` may be used in place of `timestamp`.
 
  Example:
        set timestamp "%d/%m/%y %H:%M" offset 80,-2 font "Helvetica"
