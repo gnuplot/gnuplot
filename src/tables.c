@@ -200,7 +200,7 @@ const struct gen_table set_tbl[] =
     { "dec$imalsign", S_DECIMALSIGN },
     { "errorbars", S_BARS },
     { "fit", S_FIT },
-    { "font$path", S_FONTPATH },
+    { "fontpath", S_FONTPATH },
     { "fo$rmat", S_FORMAT },
     { "fu$nction", S_FUNCTIONS },
     { "fu$nctions", S_FUNCTIONS },
