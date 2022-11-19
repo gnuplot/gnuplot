@@ -1323,6 +1323,7 @@ void
 f_concatenate(union argument *arg)
 {
     struct value a, b, result;
+    char *newstring;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
@@ -1338,11 +1339,16 @@ f_concatenate(union argument *arg)
     if (a.type != STRING || b.type != STRING)
 	int_error(NO_CARET, nonstring_error);
 
-    (void) Gstring(&result, gp_stradd(a.v.string_val, b.v.string_val));
+    newstring = gp_alloc(strlen(a.v.string_val)+strlen(b.v.string_val)+1,"gp_stradd");
+    strcpy(newstring, a.v.string_val);
+    strcat(newstring, b.v.string_val);
+
+    Gstring(&result, newstring);
+    push(&result);
+
     gpfree_string(&a);
     gpfree_string(&b);
-    push(&result);
-    gpfree_string(&result); /* free string allocated within gp_stradd() */
+    gpfree_string(&result);
 }
 
 void

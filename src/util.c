@@ -410,19 +410,6 @@ gp_strdup(const char *s)
     return d;
 }
 
-/*
- * Allocate a new string and initialize it by concatenating two
- * existing strings.
- */
-char *
-gp_stradd(const char *a, const char *b)
-{
-    char *new = gp_alloc(strlen(a)+strlen(b)+1,"gp_stradd");
-    strcpy(new,a);
-    strcat(new,b);
-    return new;
-}
-
 /*{{{  mant_exp - split into mantissa and/or exponent */
 /* HBB 20010121: added code that attempts to fix rounding-induced
  * off-by-one errors in 10^%T and similar output formats */
