@@ -1358,11 +1358,12 @@ set_cntrlabel()
 		safe_strncpy(contour_format,new,sizeof(contour_format));
 	    free(new);
 	} else if (equals(c_token, "font")) {
-	    char *ctmp;
+	    char *newfont;
 	    c_token++;
-	    if ((ctmp = try_to_get_string())) {
+	    newfont = try_to_get_string();
+	    if (newfont) {
 		free(clabel_font);
-		clabel_font = ctmp;
+		clabel_font = newfont;
 	    }
 	} else if (almost_equals(c_token, "one$color")) {
 	    c_token++;
@@ -2765,9 +2766,12 @@ set_loadpath()
 static void
 set_fontpath()
 {
+    char *newpath;
     c_token++;
-    free(PS_fontpath);
-    PS_fontpath = try_to_get_string();
+    if ((newpath = try_to_get_string())) {
+	free(PS_fontpath);
+	PS_fontpath = newpath;
+    }
 }
 
 
@@ -5524,14 +5528,15 @@ set_tic_prop(struct axis *this_axis)
 		this_axis->ticdef.rangelimited = FALSE;
 		++c_token;
 	    } else if (almost_equals(c_token, "f$ont")) {
+		char *newfont;
 		++c_token;
+		newfont = try_to_get_string();
 		/* Make sure they've specified a font */
-		if (!isstringvalue(c_token))
-		    int_error(c_token,"expected font");
-		else {
+		if (newfont) {
 		    free(this_axis->ticdef.font);
-		    this_axis->ticdef.font = NULL;
-		    this_axis->ticdef.font = try_to_get_string();
+		    this_axis->ticdef.font = newfont;
+		} else {
+		    int_error(c_token,"expected font");
 		}
 
 	    /* The geographic/timedate/numeric options are new in version 5 */

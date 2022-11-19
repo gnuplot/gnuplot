@@ -4035,10 +4035,11 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
 	     * data file rather than once per data set within the file.
 	     */
 	    } else if (isstring(c_token) && !equals(c_token+1,".")) {
+		char *tmp = try_to_get_string();
 		free_at(df_plot_title_at);
 		df_plot_title_at = NULL;
 		free(this_plot->title);
-		this_plot->title = try_to_get_string();
+		this_plot->title = tmp;
 
 	    /* Create an action table that can generate the title later */
 	    } else { 
