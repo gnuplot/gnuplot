@@ -3977,8 +3977,9 @@ plot_option_binary(TBOOLEAN set_matrix, TBOOLEAN set_default)
 	    c_token++;
 
 	    if (set_default) {
+		char *tmp = try_to_get_string();
 		free(df_binary_format);
-		df_binary_format = try_to_get_string();
+		df_binary_format = tmp;
 	    } else {
 		char *format_string = try_to_get_string();
 		if (!format_string)

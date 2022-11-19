@@ -359,6 +359,7 @@ m_quote_capture(char **str, int start, int end)
 
 /*
  * Wrapper for isstring + m_quote_capture or const_string_express
+ * Caveat: code may exit via int_error() if parsing fails in const_string_express()
  */
 char *
 try_to_get_string()
