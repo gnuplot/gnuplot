@@ -2020,6 +2020,7 @@ f_time(union argument *arg)
 	    push(&val); /* format string */
 	    push(Gcomplex(&val2, time_now, 0.0));
 	    f_strftime(arg);
+	    gpfree_string(&val);
 	    break;
 	default:
 	    int_error(NO_CARET,"internal error: invalid argument type");
