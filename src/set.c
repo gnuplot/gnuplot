@@ -3016,7 +3016,7 @@ set_missing()
 	int_error(c_token, "expected missing-value string");
 }
 
-/* (version 5) 'set monochrome' command */
+/* 'set monochrome' command */
 static void
 set_monochrome()
 {
@@ -5539,7 +5539,7 @@ set_tic_prop(struct axis *this_axis)
 		    int_error(c_token,"expected font");
 		}
 
-	    /* The geographic/timedate/numeric options are new in version 5 */
+	    /* geographic/timedate/numeric options */
 	    } else if (almost_equals(c_token,"geo$graphic")) {
 		++c_token;
 		this_axis->tictype = DT_DMS;

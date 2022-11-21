@@ -3725,9 +3725,7 @@ eval_plots()
     if (spiderplot)
 	spiderplot_range_fiddling(first_plot);
 
-    /* gnuplot version 5.0 always used x1 to track autoscaled range
-     * regardless of whether x1 or x2 was used to plot the data. 
-     * In version 5.2 we track the x1/x2 axis data limits separately.
+    /* We track the x1/x2 axis data limits separately.
      * However if x1 and x2 are linked to each other we must now
      * reconcile their data limits before plotting.
      */

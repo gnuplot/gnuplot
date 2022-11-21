@@ -102,8 +102,6 @@ gdysize(int yr)
  *		(tD tH tM tS).  The relative time in seconds is returned
  *		in reltime.
  * DT_BAD	time format could not be interpreted
- *
- * parameters and return values revised for gnuplot version 5.3
  */
 
 td_type

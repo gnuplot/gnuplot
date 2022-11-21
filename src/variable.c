@@ -148,14 +148,6 @@ loadpath_handler(int action, char *path)
 #ifdef GNUPLOT_SHARE_DIR
 	fprintf(stderr,"\tgnuplotrc is read from %s\n",GNUPLOT_SHARE_DIR);
 #endif
-#ifdef X11
-	{
-	char *appdir;
-	if ((appdir = getenv("XAPPLRESDIR")))
-	    fprintf(stderr,"\tenvironmental path for X11 application defaults: \"%s\"\n",
-		appdir);
-	}
-#endif
 	break;
     case ACTION_SAVE:
 	/* we don't save the load path taken from the

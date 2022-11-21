@@ -667,8 +667,7 @@ term_apply_lp_properties(struct lp_style_type *lp)
     } else /* All normal lines will be solid unless a dashtype is given */
 	(*term->linetype) (LT_SOLID);
 
-    /* Version 5.4.2
-     * If the line is not wanted at all, setting dashtype can only hurt.
+    /* If the line is not wanted at all, setting dashtype can only hurt.
      * But we might still want to set a color so that points can use it.
      */
     if (lt == LT_NODRAW) {
@@ -685,10 +684,9 @@ term_apply_lp_properties(struct lp_style_type *lp)
     else if (dt == DASHTYPE_SOLID)
 	(*term->dashtype) (dt, NULL);
     else if (dt >= 0)
-	/* The null_dashtype() routine or a version 5 terminal's private  */
-	/* dashtype routine converts this into a call to term->linetype() */
-	/* yielding the same result as in version 4 except possibly for a */
-	/* different line width.					  */
+	/* The null_dashtype() routine or a terminal's private
+	 * dashtype routine converts this into a call to term->linetype()
+	 */
 	(*term->dashtype) (dt, NULL);
 
     /* Finally adjust the color of the line */
