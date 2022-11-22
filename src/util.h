@@ -123,9 +123,6 @@ void common_error_exit();
 
 void squash_spaces(char *s, int remain);
 
-TBOOLEAN existdir(const char *);
-TBOOLEAN existfile(const char *);
-
 char *getusername(void);
 
 size_t gp_strlen(const char *s);

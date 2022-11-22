@@ -45,9 +45,6 @@
 #include "tabulate.h"		/* for table_mode */
 #include "voxelgrid.h"
 #include "encoding.h"
-#if defined(_MSC_VER) || defined(__WATCOMC__)
-# include <io.h>		/* for _access */
-#endif
 
 /* Exported (set-table) variables */
 
@@ -1349,36 +1346,6 @@ parse_esc(char *instr)
     *t = NUL;
 }
 
-
-/* This function does nothing if dirent.h and windows.h not available. */
-TBOOLEAN
-existdir(const char *name)
-{
-#if defined(HAVE_DIRENT)
-    DIR *dp;
-    if ((dp = opendir(name)) == NULL)
-	return FALSE;
-
-    closedir(dp);
-    return TRUE;
-#else
-    int_warn(NO_CARET,
-	     "Test on directory existence not supported\n\t('%s!')",
-	     name);
-    return FALSE;
-#endif
-}
-
-
-TBOOLEAN
-existfile(const char *name)
-{
-#ifdef _MSC_VER
-    return (_access(name, 0) == 0);
-#else
-    return (access(name, F_OK) == 0);
-#endif
-}
 
 
 char *
