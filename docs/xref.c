@@ -404,7 +404,7 @@ reftable( int l, FILE *f, char *start, char *end, char *format,
 		    }
 		}
 		if ((++entries >= maxrows) && (newcolumn != NULL)) {
-		    fprintf(f, newcolumn);
+		    fprintf(f, "%s", newcolumn);
 		    entries = 0;
 		}
 	    }
