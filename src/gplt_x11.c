@@ -5495,7 +5495,7 @@ static void
 pr_color(cmap_t * cmap_ptr)
 {
     unsigned long black = BlackPixel(dpy, scr), white = WhitePixel(dpy, scr);
-    char option[20], color[30], *v, *ctype;
+    char option[20], color[32], *v, *ctype;
     XColor xcolor;
     double intensity = -1;
     int n;
@@ -5862,8 +5862,7 @@ clear_used_font_list() {
 }
 
 static void
-pr_font( fontname )
-char *fontname;
+pr_font( char *fontname )
 {
     char fontspec[128];
     int  fontsize = 0;

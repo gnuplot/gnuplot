@@ -94,7 +94,7 @@ read_history(char *filename)
 #ifdef GNUPLOT_HISTORY
     gp_read_history(filename);
     return gp_read_history(filename);
-#elseif
+#else
     return 0;
 #endif
 }
