@@ -11280,6 +11280,7 @@ Ffigure_missing
 ?dgrid3d
 ?nodgrid3d
 =kdensity
+?nogrid
  The `set dgrid3d` command enables and sets parameters for mapping non-grid data
  onto a grid.  See `splot grid_data` for details about the grid data structure.
  Aside from its use in fitting 3D surfaces, this process can also be used to
@@ -11294,15 +11295,19 @@ Ffigure_missing
        unset dgrid3d
        show dgrid3d
 
- By default `dgrid3d` is disabled.  When enabled, 3D data read from a file
- are always treated as a scattered data set.  A grid with dimensions derived
- from a bounding box of the scattered data and size as specified by the
- row/col_size parameters is created for plotting and contouring.  The grid
- is equally spaced in x (rows) and in y (columns); the z values are computed
- as weighted averages or spline interpolations of the scattered points' z
- values. In other words, a regularly spaced grid is created and then a smooth
+ By default `dgrid3d` is disabled.  When enabled, 3D data points read from a
+ file are treated as a scattered data set used to fit a gridded surface.
+ The grid dimensions are derived from the bounding box of the scattered data
+ subdivided by the row/col_size parameters from the `set dgrid3d` statement.
+ The grid is equally spaced in x (rows) and in y (columns); the z values are
+ computed as weighted averages or spline interpolations of the scattered points'
+ z values. In other words, a regularly spaced grid is created and then a smooth
  approximation to the raw data is evaluated for each grid point.
- This approximation is plotted in place of the raw data.
+ This surface is then plotted in place of the raw data.
+
+ While dgrid3d mode is enabled, if you want to plot individual points or lines
+ without using them to create a gridded surface you must append the keyword
+ `nogrid` to the corresponding splot command.
 
  The number of columns defaults to the number of rows, which defaults to 10.
 
@@ -12059,7 +12064,6 @@ Ffigure_missing
 ?unset grid
 ?show grid
 ?grid
-?nogrid
  The `set grid` command allows grid lines to be drawn on the plot.
 
  Syntax:
