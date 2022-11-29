@@ -138,7 +138,8 @@ typedef struct cairo_params_t {
     TBOOLEAN enhanced;
     TBOOLEAN dashed;
     float dash_length;
-    rgb_color background;
+    rgb_color background;	/* struct with r/g/b [0.0:1.0] */
+    unsigned int rgb_bkgnd;	/* same thing packe into 24bits */
     TBOOLEAN mono;
     t_linecap linecap;		/* butt/rounded/square linecaps and linejoins */
     TBOOLEAN transparent;
@@ -156,7 +157,8 @@ typedef struct cairo_params_t {
 } cairo_params_t;
 
 #define CAIROEPS_PARAMS_DEFAULT { \
-    CAIROTERM_EPS, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, NULL, \
+    CAIROTERM_EPS, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, 0xffffff, \
+    FALSE, BUTT, TRUE, FALSE, NULL, \
     12, 0.5, 5*72., 3*72., 0.25, 1.0, 1.0, FALSE \
 }
 static cairo_params_t cairoeps_params = CAIROEPS_PARAMS_DEFAULT;
@@ -164,12 +166,14 @@ static const cairo_params_t cairoeps_params_default = CAIROEPS_PARAMS_DEFAULT;
 
 #ifdef HAVE_CAIROEPS
 #define CAIROLATEX_PARAMS_DEFAULT { \
-    CAIROTERM_LATEX, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, NULL, \
+    CAIROTERM_LATEX, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, 0xffffff, \
+    FALSE, BUTT, TRUE, FALSE, NULL, \
     11, 0.6, 5*72., 3*72., 0.25, 1.0, 1.0, FALSE, 300 \
 }
 #else
 #define CAIROLATEX_PARAMS_DEFAULT { \
-    CAIROTERM_LATEX, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, NULL, \
+    CAIROTERM_LATEX, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, 0xffffff, \
+    FALSE, BUTT, TRUE, FALSE, NULL, \
     11, 0.6, 5*72., 3*72., 0.25, 1.0, 1.0, TRUE, 300 \
 }
 #endif
@@ -177,14 +181,16 @@ static cairo_params_t cairolatex_params = CAIROLATEX_PARAMS_DEFAULT;
 static const cairo_params_t cairolatex_params_default = CAIROLATEX_PARAMS_DEFAULT;
 
 #define CAIROPDF_PARAMS_DEFAULT { \
-    CAIROTERM_PDF, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, NULL, \
+    CAIROTERM_PDF, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, 0xffffff, \
+    FALSE, BUTT, TRUE, FALSE, NULL, \
     12, 0.5, 5*72., 3*72., 0.25, 1.0, 1.0, FALSE \
 }
 static cairo_params_t cairopdf_params = CAIROPDF_PARAMS_DEFAULT;
 static const cairo_params_t cairopdf_params_default = CAIROPDF_PARAMS_DEFAULT;
 
 #define CAIROPNG_PARAMS_DEFAULT { \
-    CAIROTERM_PNG, PIXELS, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, FALSE, FALSE, NULL, \
+    CAIROTERM_PNG, PIXELS, FALSE, FALSE, 1.0, {1.,1.,1.}, 0xffffff, \
+    FALSE, BUTT, FALSE, FALSE, NULL, \
     12, 1.0, 640., 480., 1.0, 1.0, 1.0, FALSE \
 }
 static cairo_params_t cairopng_params = CAIROPNG_PARAMS_DEFAULT;
@@ -419,6 +425,7 @@ TERM_PUBLIC void cairotrm_options()
 			cairo_params->background.g = (double)((wxt_background >>  8) & 0xff) / 255.;
 			cairo_params->background.b = (double)( wxt_background        & 0xff) / 255.;
 			cairo_params->transparent = FALSE;
+			cairo_params->rgb_bkgnd = wxt_background & 0xffffff;
 			break;
 			}
 
@@ -943,7 +950,9 @@ cairopng_write_cropped_image(cairo_surface_t *surface)
   int  i, j, x1 = 0, y1 = 0, x2 = width, y2 = height;
 
   guint32 *row;
-  guint32 BG = (cairo_params->transparent) ? 0x0 : ~0x0;
+  guint32 BG = (cairo_params->transparent)
+		? 0x0
+		: cairo_params->rgb_bkgnd | 0xff000000;
 
   /* Row-wise, top-down iteration */
   for (i = 0; i < height; i++) {
