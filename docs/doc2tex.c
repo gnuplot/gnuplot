@@ -596,6 +596,7 @@ puttex( char *str, FILE *file)
 
 void finish(FILE *b)
 {
+    (void) fputs("\\newpage\n", b);
     (void) fputs("\\part{Index}\n", b);
     (void) fputs("\\printindex\n", b);
     (void) fputs("\\end{document}\n", b);
