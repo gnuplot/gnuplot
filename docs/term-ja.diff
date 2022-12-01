@@ -6249,36 +6249,6 @@ diff -ru term/tpic.trm.ORG term/tpic.trm
 +#endif /* JAPANESE_DOC */
  END_HELP(tpic)
  #endif /* TERM_TABLE */
-diff -ru term/vws.trm.ORG term/vws.trm
---- term/vws.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/vws.trm	2022-09-28 11:19:26.780932000 +0900
-@@ -474,6 +474,7 @@
- 
- #ifdef TERM_HELP
- START_HELP(VWS)
-+#ifndef JAPANESE_DOC
- "1 VWS",
- "?commands set terminal VWS",
- "?set terminal VWS",
-@@ -485,5 +486,18 @@
- " The `VWS` terminal driver supports the VAX Windowing System.  It has",
- " no options.  It will sense the display type (monochrome, gray scale,",
- " or color.)  All line styles are plotted as solid lines."
-+#else /* JAPANESE_DOC */
-+"1 VWS",
-+"?commands set terminal VWS",
-+"?set terminal VWS",
-+"?set term VWS",
-+"?terminal VWS",
-+"?term VWS",
-+"?VWS",
-+" 注意: 古い (legacy) 出力形式です。",
-+" `VWS` ドライバは VAX ウィンドウシステムをサポートします。オプションは",
-+" ありません。このドライバはディスプレイの状態 (白黒か、グレイスケールか",
-+" カラーか) を自動検知します。全ての線種は実線で描画されます。"
-+#endif /* JAPANESE_DOC */
- END_HELP(VWS)
- #endif /* TERM_HELP */
 diff -ru term/webp.trm.ORG term/webp.trm
 --- term/webp.trm	2022-09-27.ORG 12:19:27.000000000 +0900
 +++ term/webp.trm	2022-09-28 11:19:26.781009000 +0900

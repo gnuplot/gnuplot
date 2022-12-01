@@ -141,10 +141,8 @@
 /* Terminals for various Unix platforms                                    */
 /***************************************************************************/
 
-/* VAX Windowing System requires UIS libraries */
-#ifdef UIS
-# include "vws.trm"
-#endif
+/* none */
+
 
 /****************************************************************************/
 /* Terminals not relevant for MSDOS, MS-Windows */
