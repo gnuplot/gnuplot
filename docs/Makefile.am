@@ -56,7 +56,8 @@ gihdir = @GIHDIR@
 noinst_PROGRAMS = checkdoc doc2ipf doc2tex doc2gih doc2rnh doc2hlp	\
                   doc2rtf doc2ms alldoc2gih doc2wxhtml doc2web
 
-AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/term
+AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/term \
+              -I./ja/term
 
 # Documentation will be prepared for all terminals in CORETERM
 # even if the terminal itself is not included in the build.
@@ -80,6 +81,23 @@ $(T)corel.trm $(T)dxy.trm $(T)excl.trm $(T)kyo.trm $(T)mif.trm \
 $(T)metafont.trm $(T)metapost.trm \
 $(T)hp2648.trm $(T)hp26.trm $(T)hp500c.trm $(T)hpljii.trm $(T)hppj.trm \
 $(T)pc.trm $(T)pdf.trm $(T)qms.trm $(T)vws.trm
+
+# Same thing for the subset of terminals for which we have
+# Japanese documentation
+TJ = ja/term/
+JATERM = $(TJ)ai.trm $(TJ)aquaterm.trm $(TJ)be.trm $(TJ)block.trm $(TJ)caca.trm \
+$(TJ)cairo.trm $(TJ)canvas.trm $(TJ)cgm.trm $(TJ)context.trm \
+$(TJ)debug.trm $(TJ)djsvga.trm $(TJ)dumb.trm $(TJ)dxf.trm \
+$(TJ)emf.trm $(TJ)epson.trm \
+$(TJ)estimate.trm $(TJ)fig.trm $(TJ)gd.trm $(TJ)ggi.trm \
+$(TJ)gpic.trm $(TJ)grass.trm $(TJ)hpgeneric.h $(TJ)hpgl.trm $(TJ)imagen.trm \
+$(TJ)linux-vgagl.trm $(TJ)latex_old.h \
+$(TJ)lua.trm $(TJ)pbm.trm $(TJ)pict2e.trm \
+$(TJ)pm.trm $(TJ)post.trm $(TJ)pslatex.trm \
+$(TJ)pstricks.trm $(TJ)qt.trm $(TJ)regis.trm \
+$(TJ)svg.trm $(TJ)t410x.trm $(TJ)tek.trm $(TJ)texdraw.trm $(TJ)tgif.trm \
+$(TJ)tkcanvas.trm $(TJ)webp.trm $(TJ)win.trm $(TJ)wxt.trm $(TJ)x11.trm $(TJ)xlib.trm
+
 
 # DIST_COMMON = README
 
@@ -271,15 +289,29 @@ gnuplot.ps: gnuplot.dvi
 # Tested with TeX Live 2020
 # Known limitations:
 # - The title page is not completely translated.
-# - Only the original English keywords appear in the index.
-# - The internal hypertext links are not created (why?).
-# - I made no attempt to apply term-ja.diff so that terminal
-#   help text could be included in translation rather than
-#   in English.
+# - Only the original English keywords appear in the index and hyperlinks.
+# - gnuplot-tikz-ja.help is converted to utf8 but not actually included
+#   in the resulting *.tex file because this happens too late in the
+#   build process
+allterm-ja.h: $(CORETERM) $(LUA_HELP)
+	-mkdir ja
+	-mkdir ja/docs;
+	cp doc2rtf.c ja/docs
+	cp -r $(top_srcdir)/term $(TJ)
+	-( cd ja ; patch -p0 < ../term-ja.diff )
+	iconv -f EUC-JP -t UTF-8 < $(TJ)lua/gnuplot-tikz-ja.help > $(TJ)lua/gnuplot-tikz-ja.utf8
+	$(AM_V_GEN) for e in `grep -E "^[ 	]*START_HELP" $(JATERM) |\
+	     LC_ALL=C sort -f -t':' -k2` ; do \
+	  f=`echo $$e |cut -d\: -f1` ; s=`echo $$e | cut -d\: -f2` ;\
+	  sed -n "/^[ 	]*$$s/,/^[ 	]*END_HELP/p" $$f ; \
+	done >allterm.tmp
+	iconv -f EUC-JP -t UTF-8 < allterm.tmp >$@
+	rm allterm.tmp
+	rm -rf $(TJ)
 
-gnuplot-ja.pdf: gnuplot-ja.doc title-ja.tex pdf_figures allterm.h doc2tex$(EXEEXT)
+gnuplot-ja.pdf: gnuplot-ja.doc title-ja.tex pdf_figures allterm-ja.h doc2tex$(EXEEXT)
 	iconv -f EUC-JP -t UTF-8 gnuplot-ja.doc > ja.doc
-	./doc2tex$(EXEEXT) -figures ja.doc | sed 's/titlepag.tex/title-ja.tex/' > gnuplot-ja.tex
+	./doc2tex$(EXEEXT) -figures -japanese ja.doc | sed 's/titlepag.tex/title-ja.tex/' > gnuplot-ja.tex
 	lualatex gnuplot-ja
 	lualatex gnuplot-ja
 	makeindex gnuplot-ja
@@ -434,6 +466,7 @@ clean-local:
 	   fi \
 	 done
 	$(AM_V_at)rm -f pdf_figures
+	$(AM_V_at)rm -rf ja
 
 # for VMS only
 install-vms: gnuplot.hlp

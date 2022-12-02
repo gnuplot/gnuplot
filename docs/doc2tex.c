@@ -71,6 +71,7 @@ static TBOOLEAN see = FALSE;
 static TBOOLEAN ja_see = FALSE;
 static TBOOLEAN inhref = FALSE;
 static TBOOLEAN figures = FALSE;
+static TBOOLEAN japanese = FALSE;
 
 int
 main (int argc, char **argv)
@@ -79,16 +80,27 @@ main (int argc, char **argv)
     FILE *outfile;
 
     int inarg = 1;
+    int i = 0;
 
     infile = stdin;
     outfile = stdout;
 
-    if (argc > 1 && !strcmp(argv[1],"-figures")) {
-	figures = TRUE;
-	inarg = 2;
+    for (i=1; i<argc; i++) {
+	if (!strncmp(argv[i],"-japanese",3)) {
+	    japanese = TRUE;
+	    inarg++;
+	    termtext = termtext_ja;
+	}
     }
 
-    if (argc > (figures ? 4 : 3)) {
+    for (i=1; i<argc; i++) {
+	if (!strcmp(argv[i],"-figures")) {
+	    figures = TRUE;
+	    inarg++;
+	}
+    }
+
+    if (argc > (inarg + 2)) {
 	fprintf(stderr, "Usage: %s [-figures] [infile [outfile]]\n", argv[0]);
 	exit(EXIT_FAILURE);
     }

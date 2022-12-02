@@ -643,10 +643,10 @@ diff -ru term/block.trm.ORG term/block.trm
  "1 block",
  "?set terminal block",
  "?block",
-@@ -1352,5 +1353,75 @@
- " have to be drawn using ordinary numerals, though. Note that the bitmap",
- " resolution is still different and lines and symbols in general do not align",
- " exactly when using `charpoints` or `numpoints`."
+@@ -1446,5 +1446,75 @@
+ " screen rather than having earlier plots scroll off the top. This may be",
+ " desirable in order to create an in-place animation.",
+ ""
 +#else /* JAPANESE_DOC */
 +"1 block",
 +"?set terminal block",
@@ -3926,7 +3926,7 @@ diff -ru term/lua.trm.ORG term/lua.trm
  "1 lua",
  "?commands set terminal lua",
  "?set terminal lua",
-@@ -1506,12 +1507,45 @@
+@@ -1506,12 +1507,43 @@
  " All arguments will be provided to the selected script for further",
  " evaluation. E.g. 'set term lua tikz help' will cause the script itself",
  " to print additional help on options and choices for the script.",
@@ -3961,8 +3961,6 @@ diff -ru term/lua.trm.ORG term/lua.trm
  #ifdef HAVE_LUA
 +#ifndef JAPANESE_DOC
  #include "gnuplot-tikz.help"
-+#else
-+#include "lua/gnuplot-tikz-ja.help"
  #endif
 +#endif
  ""
