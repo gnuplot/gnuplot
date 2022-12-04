@@ -2444,6 +2444,16 @@ eval_plots()
 		    continue;
 		}
 
+		/* "sharpen" applies only to function plots */
+		if (equals(c_token, "sharpen")) {
+		    if (this_plot->plot_type == FUNC)
+			this_plot->plot_filter = FILTER_SHARPEN;
+		    else
+			int_warn(c_token, "only function plots can be sharpened");
+		    c_token++;
+		    continue;
+		}
+
 		/* "convexhull" is unsmoothed; "smooth convexhull is smoothed */
 		if (equals(c_token, "convexhull")) {
 		    this_plot->plot_filter = FILTER_CONVEX_HULL;
@@ -3509,8 +3519,10 @@ eval_plots()
 			    AXIS *vis = axis_array[SAMPLE_AXIS].linked_to_primary->linked_to_secondary;
 			    t = eval_link_function(vis, t_min + i * t_step);
 			} else {
-			    /* Zero is often a special point in a function domain. */
-			    /* Make sure we don't miss it due to round-off error.  */
+			    /* Zero is often a special point in a function domain.
+			     * Make sure we don't miss it due to round-off error.
+			     * See also the "sharpen" filter code.
+			     */
 			    if ((fabs(t) < 1.e-9) && (fabs(t_step) > 1.e-6))
 				t = 0.0;
 			}
@@ -3640,6 +3652,14 @@ eval_plots()
 
 		    }   /* loop over samples_1 */
 		    this_plot->p_count = i;     /* samples_1 */
+		}
+
+		/* Most filters apply only to data plots.
+		 * "sharpen" is an exception that applies only to functions.
+		 */
+		if (this_plot->plot_filter == FILTER_SHARPEN) {
+		    if (this_plot->plot_style == LINES)
+			sharpen(this_plot);
 		}
 
 		/* skip all modifiers func / whole of data plots */

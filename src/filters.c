@@ -62,11 +62,14 @@
 #include "filters.h"
 #include "interpol.h"
 #include "alloc.h"
+#include "plot2d.h"	/* for cp_extend() */
+#include "watch.h"	/* for bisect_target() */
 
 /* local prototypes */
 
 static int do_curve_cleanup(struct coordinate *point, int npoints);
 static void winnow_interior_points (struct curve_points *plot);
+static double fpp_SG5(struct coordinate *p);
 /*
  * EXPERIMENTAL
  * find outliers (distance from centroid > FOO * rmsd) in a cluster of points
@@ -987,3 +990,153 @@ find_cluster_outliers( struct coordinate *points, t_cluster *cluster )
     return outliers;
 }
 
+/*
+ * The "sharpen" filter looks for truncated extrema in the function being plotted.
+ * The true local extremum is found by bisection and added to the set of
+ * points being plotted.
+ *
+ * Motivation:
+ * If the function being plotted has a sharp extremum that lies between
+ * two of the sampled points, the resulting plot truncates the extremum.
+ * Increasing the number of samples would help, of course, but they are
+ * only really needed close to the extremum.  And no matter how many
+ * samples there are, the true peak may lie between two of them.
+ * Example:   plot lgamma(x)
+ *
+ * Method:
+ * - Approximate the second derivative of the function at each point using
+ *   a 5-term Savitsky-Golay filter.
+ * - Inspect a moving window centered on point i
+ *   Truncation is suspected if either
+ *	f(i) is a minimum and f''(i-2) > 0 and/or f''(i+2) > 0
+ *   or
+ *	f(i) is a maximum and f''(i-2) < 0 and/or f''(i+2) < 0
+ * - Use bisection to find the true local extremum
+ * - Add the new point next to the original point i
+ *
+ * Ethan A Merritt Dec 2022
+ *
+ * TODO:
+ * - Diagnose and warn that finer sampling might help?
+ */
+void
+sharpen(struct curve_points *plot)
+{
+    struct axis *y_axis = &axis_array[plot->y_axis];
+    int newcount = plot->p_count;
+    struct coordinate *p;
+
+    /* Restrictions */
+    if (parametric || polar)
+	return;
+
+    /* Make more than enough room for new points */
+    cp_extend(plot, 1.5 * plot->p_count);
+    p = plot->points;
+
+    /* DEBUG FIXME
+     * A more general solution is needed!
+     * We expect that sharpened peaks may go to +/- Infinity
+     * and in fact the plot may already contain such points.
+     * Because these were tagged UNDEFINED in store_and_update_range()
+     * they will be lost when the points are sorted.
+     * As a work-around we look for these and flag them OUTRANGE instead.
+     * If there are other UNDEFINED points we set y to 0 so that they
+     * do not cause the f'' approximation to blow up.
+     */
+    for (int i = 0; i < plot->p_count; i++) {
+	if (p[i].type == UNDEFINED) {
+	    if (p[i].y >= VERYLARGE) {
+		p[i].type = OUTRANGE;
+		p[i].y = VERYLARGE;
+	    } else if (p[i].y <= -VERYLARGE) {
+		p[i].type = OUTRANGE;
+		p[i].y = -VERYLARGE;
+	    } else
+		p[i].y = 0;
+	}
+    }
+
+    /* Look for minima in a sliding window */
+    /* This is a very simple test; it may not be sufficient
+     *   f(i) is lower than its neighbors
+     *   f''(x) is negative on at least one side
+     */
+    for (int i = 4; i < plot->p_count-4; i++) {
+	TBOOLEAN criterion = FALSE;
+	criterion = (fpp_SG5(&p[i-2]) < 0 || fpp_SG5(&p[i+2]) < 0);
+
+	if (p[i].y <= p[i-1].y && p[i].y <= p[i+1].y
+	&&  p[i].y <= p[i-2].y && p[i].y <= p[i+2].y
+	&&  criterion)
+	{
+	    double hit_x = p[i].x;
+	    double hit_y = p[i].y;
+	    bisect_hit( plot, BISECT_MINIMIZE, &hit_x, &hit_y, p[i-1].x, p[i+1].x );
+	    p[newcount] = p[i];	/* copy any other properties */
+	    p[newcount].x = hit_x;
+	    p[newcount].y = hit_y;
+	    if (!inrange(hit_y, y_axis->min, y_axis->max))
+		p[newcount].type = OUTRANGE;
+	    else
+		p[newcount].type = INRANGE;
+	    if (debug)
+		FPRINTF((stderr, "\tbisect min [%4g %g]\tto [%4g %4g]\n",
+			p[i].x, p[i].y, hit_x, hit_y));
+	    newcount++;
+	}
+    }
+    
+    /* Equivalent search for maxima */
+    for (int i = 4; i < plot->p_count-4; i++) {
+	TBOOLEAN criterion = FALSE;
+	if (p[i].type == UNDEFINED || p[i-1].type == UNDEFINED || p[i+1].type == UNDEFINED)
+	    continue;
+	criterion = (fpp_SG5(&p[i-2]) > 0 || fpp_SG5(&p[i+2]) > 0);
+
+	if (p[i].y >= p[i-1].y && p[i].y >= p[i+1].y
+	&&  p[i].y >= p[i-2].y && p[i].y >= p[i+2].y
+	&&  criterion)
+	{
+	    double hit_x = p[i].x;
+	    double hit_y = p[i].y;
+	    bisect_hit( plot, BISECT_MAXIMIZE, &hit_x, &hit_y, p[i-1].x, p[i+1].x );
+	    p[newcount] = p[i];	/* copy any other properties */
+	    p[newcount].x = hit_x;
+	    p[newcount].y = hit_y;
+	    if (!inrange(hit_y, y_axis->min, y_axis->max))
+		p[newcount].type = OUTRANGE;
+	    else
+		p[newcount].type = INRANGE;
+	    if (debug)
+		FPRINTF((stderr, "\tbisect max [%4g %g]\tto [%4g %4g]\n",
+			p[i].x, p[i].y, hit_x, hit_y));
+	    newcount++;
+	}
+    }
+
+    /* Move new points into proper order */
+    if (newcount > plot->p_count) {
+	plot->p_count = newcount;
+	qsort(plot->points, newcount, sizeof(struct coordinate), compare_x);
+    }
+}
+
+/* Approximate second derivative using 5-term Savitsky-Golay filter
+ *         [ +2 -1 -2 -1 +2 ] . p[i-2 : i+2]
+ * (helper function for sharpen).
+ *
+ * Normalization by 1. / delta_x**2 is not included.
+ */
+static double
+fpp_SG5( struct coordinate *p )
+{
+    double fpp;
+
+    if (p->type == UNDEFINED)
+	return 0;
+    fpp = 2.0 * (p-2)->y - (p-1)->y - 2.0 * p->y - (p+1)->y + 2.0 * (p+2)->y;
+    fpp /= 7.0;
+    
+    return fpp;
+}
