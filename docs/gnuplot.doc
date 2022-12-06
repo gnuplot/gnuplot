@@ -313,13 +313,18 @@ C
 #end
 
 3 New plot styles
-?new style
+?new styles
 #start
 #b The plot style `with surface` works in 2D polar coordinates to produce
 ## a solid-fill gridded representation of the plane, colored by a weighted
 ## contribution an arbitrary set of input points. This is analogous to
 ## the use of `dgrid3d` and style `with pm3d` to produce a 3D gridded surface.
 ## See `set polar grid` and `polar heatmap`.
+#b Plot style `with lines` now has a filter option `sharpen`.  This filter
+## detects spikes in a function plot that appear truncated in the output
+## because the peak lies between two x-coordinates at which the function has
+## been sampled.  It adds a new sample point at the location of each such peak.
+## See `filters`.
 #end
 
 3 New data formats
@@ -8100,9 +8105,10 @@ Ffigure_zerror
  Filter operations are applied immediately after reading input data, before
  applying any smoothing or style-specific processing options.
  In general the purpose of a filter is to replace the original full set of 
- input points with a selected subset of points, possibly regrouped or
- reordered.
- The filters currently supported are `bins`, `convexhull`, `mask`, and `zsort`.
+ input points with a selected subset of points, possibly modified, regrouped,
+ or reordered,
+ The filters currently supported are `bins`, `convexhull`, `mask`, `sharpen`,
+ and `zsort`.
 5 bins
 ?commands plot datafile filters bins
 ?plot datafile filters bins
@@ -8199,6 +8205,29 @@ Ffigure_convex_hull
  Once a mask has been defined, you can use it as a filter to select a
  subset of points from an image or pm3d plot.
  See `masking`.
+
+5 sharpen
+?plot filters sharpen
+?filters sharpen
+?sharpen
+
+ The `sharpen` filter applies only to function plots.  It looks for extrema in
+ the function being plotted, which may not lie exactly at any of the x values
+ sampled to generate the component line segments making up the graph.
+ The true local extrema are found by bisection and added to the set of sampled
+ points.  This reduces but does not entirely eliminate truncation of sharp
+ peaks due to coarse sampling.
+
+ Example:
+      set samples 150
+      set xrange [-8:8]
+      plot abs(sqrt(sin(x))) sharpen
+
+ Without the "sharpen" keyword, the resulting graph shows a continuous curve
+ with minima at intervals of pi that should reach zero but are artefactually
+ truncated to apparent minimal y values between 0.02 and 0.20. 
+ Adding the "sharpen" keyword produces instead a correct representation of
+ the function with periodic sharp minima that reach y=0.
 
 5 zsort
 ?commands plot datafile filters zsort
