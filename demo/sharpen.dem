@@ -1,0 +1,20 @@
+#
+# "sharpen" filter
+#
+
+set sample 300
+set yrange [-15:5]
+set xrange [-10:2]
+set grid x
+set xtics 1
+set key right center title "lgamma(x)"  samplen 0
+
+set multiplot layout 2,1 title "Effect of 'sharpen' filter"
+plot lgamma(x) title "no filters"
+plot lgamma(x) sharpen title "  sharpen"
+unset multiplot
+
+pause -1 "<cr> to continue"
+reset
+
+
