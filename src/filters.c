@@ -1076,6 +1076,11 @@ sharpen(struct curve_points *plot)
 	    p[newcount] = p[i];	/* copy any other properties */
 	    p[newcount].x = hit_x;
 	    p[newcount].y = hit_y;
+	    /* Use sharpened peak for autoscaling only if it approaches zero,
+	     * not if it's heading towards +/- Infinity!
+	     */
+	    if (fabs(hit_y) < 1.e-7 && !y_axis->log)
+		autoscale_one_point(y_axis, hit_y);
 	    if (!inrange(hit_y, y_axis->min, y_axis->max))
 		p[newcount].type = OUTRANGE;
 	    else
@@ -1104,6 +1109,8 @@ sharpen(struct curve_points *plot)
 	    p[newcount] = p[i];	/* copy any other properties */
 	    p[newcount].x = hit_x;
 	    p[newcount].y = hit_y;
+	    if (fabs(hit_y) < 1.e-7 && !y_axis->log)
+		autoscale_one_point(y_axis, hit_y);
 	    if (!inrange(hit_y, y_axis->min, y_axis->max))
 		p[newcount].type = OUTRANGE;
 	    else
