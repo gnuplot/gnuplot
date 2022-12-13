@@ -13,7 +13,7 @@
  *
  * -	f_lnGamma lnGamma
  *		log Gamma for complex argument z
- *	- 14 term Lancosz approximation
+ *	- 14 term Lanczos approximation
  *
  * -	f_Igamma Igamma Igamma_GL Igamma_negative_z Igamma_Poincare
  *		lower incomplete gamma function P(a, z)
@@ -348,7 +348,7 @@ f_lnGamma(union argument *arg)
 	return;
     }
 
-    /* The Lancosz approximation is valid on the half-plane with Real(z) > 0.
+    /* The Lanczos approximation is valid on the half-plane with Real(z) > 0.
      * To deal with z for which Real(z) < 0 we use the equivalence
      *     Gamma(1-z) = (pi*z) / ( Gamma(1+z) * sin(pi*z) )
      * to reframe the request in terms of a "reflected" z.

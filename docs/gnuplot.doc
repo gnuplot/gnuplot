@@ -316,8 +316,8 @@ C
 ?new styles
 #start
 #b The plot style `with surface` works in 2D polar coordinates to produce
-## a solid-fill gridded representation of the plane, colored by a weighted
-## contribution an arbitrary set of input points. This is analogous to
+## a solid-fill gridded representation of the plane, colored by weighted
+## contributions from an arbitrary set of input points. This is analogous to
 ## the use of `dgrid3d` and style `with pm3d` to produce a 3D gridded surface.
 ## See `set polar grid` and `polar heatmap`.
 #b Plot style `with lines` now has a filter option `sharpen`.  This filter
@@ -7165,7 +7165,7 @@ Ffigure_zerror
  can be implemented later as a plugin instead (see `plugins`).
 
  A non-trivial example of using function blocks to implement and plot
- a 15-term Lancosz approximation for the complex lngamma function is
+ a 15-term Lanczos approximation for the complex lngamma function is
  provided in the demo collection as
 ^ <a href="http://www.gnuplot.info/demo_6.0/function_block.html">
       function_block.dem
@@ -7179,7 +7179,7 @@ Ffigure_zerror
 #TeX \begin{verbatim}
 #TeX array coef[15] = [ ... ]
 #TeX 
-#TeX function $Lancosz(z) << EOD
+#TeX function $Lanczos(z) << EOD
 #TeX     local Sum = coef[1] + sum [k=2:15] coef[k] / (z + k - 1)
 #TeX     local temp = z + 671./128.
 #TeX     temp = (z + 0.5) * log(temp) - temp
@@ -7188,12 +7188,12 @@ Ffigure_zerror
 #TeX EOD
 #TeX 
 #TeX function $Reflect(z) << EOD
-#TeX     local w = $Lancosz(1.0 - z)
+#TeX     local w = $Lanczos(1.0 - z)
 #TeX     local temp = log( sin(pi * z) )
 #TeX     return log(pi) - (w + temp)
 #TeX EOD
 #TeX 
-#TeX my_lngamma(z) = (z == 0) ? NaN : (real(z) < 0.5) ? $Reflect(z) : $Lancosz(z)
+#TeX my_lngamma(z) = (z == 0) ? NaN : (real(z) < 0.5) ? $Reflect(z) : $Lanczos(z)
 #TeX \end{verbatim}
 #TeX }
 
@@ -7391,8 +7391,8 @@ Ffigure_zerror
  Local declarations may be used to prevent a global variable from being
  unintentionally overwritten by a `call` or `load` statement.  They are
  particularly useful inside a function block. The `local` command is also
- also valid inside the code block in curly brackets following an `if`,
- `else`, `do for`, or `while` statement.
+ valid inside the code block in curly brackets following an `if`, `else`,
+ `do for`, or `while` statement.
 
  Example: Suppose you want to write a script "plot_all_data.gp" containing
  commands that plot a bunch of data sets.  You want to call this convenience
