@@ -1,7 +1,7 @@
 #
 # Demonstrate use of function block definitions to
 # implement the complex lngamma(z) function using a 15 term
-# Lancosz approximation valid on the half-plane with Real(z) > 0.
+# Lanczos approximation valid on the half-plane with Real(z) > 0.
 # To deal with the other half plane we use the reflection formula
 #       Gamma(1-z) = (pi*z) / ( Gamma(1+z) * sin(pi*z) )
 #
@@ -10,7 +10,7 @@
 # z = negative integer and adjustment of the imaginary component
 # by multiples of 2pi to produce a continuous 3D surface.
 #
-# After execution of this script, $Reflect(z), $Lancosz(z), and coef remain
+# After execution of this script, $Reflect(z), $Lanczos(z), and coef remain
 # visible globally.  The coefficient array could be declared local, but then
 # the routines defined here would fail to execute outside of this script.
 # That is, "load eval_function.dem" works either way,  but a subsequent
@@ -41,12 +41,12 @@ array coef[15] = [ \
        -0.26190838401581408670e-4, 0.36899182659531622704e-5 ]
 
 function $Reflect(z) << EOD
-    local w = $Lancosz(1.0 - z)
+    local w = $Lanczos(1.0 - z)
     local temp = log( sin(pi * z) )
     return log(pi) - (w + temp)
 EOD
 
-function $Lancosz(z) << EOD
+function $Lanczos(z) << EOD
     local Sum = coef[1] + sum [k=2:15] coef[k] / (z + k - 1)
     local temp = z + 671./128.
     temp = (z + 0.5) * log(temp) - temp
@@ -54,7 +54,7 @@ function $Lancosz(z) << EOD
     return temp
 EOD
 
-my_lngamma(z) = (z == 0) ? NaN : (real(z) < 0.5) ? $Reflect(z) : $Lancosz(z)
+my_lngamma(z) = (z == 0) ? NaN : (real(z) < 0.5) ? $Reflect(z) : $Lanczos(z)
 Gamma(z) = exp( my_lngamma(z) )
 
 show var $
