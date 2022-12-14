@@ -80,7 +80,7 @@ LEGACYTERM = $(T)latex.trm $(T)emtex.trm $(T)eepic.trm $(T)tpic.trm \
 $(T)corel.trm $(T)dxy.trm $(T)excl.trm $(T)kyo.trm $(T)mif.trm \
 $(T)metafont.trm $(T)metapost.trm \
 $(T)hp2648.trm $(T)hp26.trm $(T)hp500c.trm $(T)hpljii.trm $(T)hppj.trm \
-$(T)pc.trm $(T)pdf.trm $(T)qms.trm
+$(T)pc.trm $(T)pdf.trm $(T)qms.trm $(T)vws.trm
 
 # Same thing for the subset of terminals for which we have
 # Japanese documentation
@@ -290,16 +290,15 @@ gnuplot.ps: gnuplot.dvi
 # Known limitations:
 # - The title page is not completely translated.
 # - Only the original English keywords appear in the index and hyperlinks.
-# - gnuplot-tikz-ja.help is converted to utf8 but not actually included
-#   in the resulting *.tex file because this happens too late in the
-#   build process
+# - gnuplot-tikz.help not included in the resulting *.tex file because
+#   translation and conversion to utf8 would happen too late
+#   for this build recipe.
 allterm-ja.h: $(CORETERM) $(LUA_HELP)
 	-mkdir ja
 	-mkdir ja/docs;
 	cp doc2rtf.c ja/docs
 	cp -r $(top_srcdir)/term $(TJ)
 	-( cd ja ; patch -p0 < ../term-ja.diff )
-	iconv -f EUC-JP -t UTF-8 < $(TJ)lua/gnuplot-tikz-ja.help > $(TJ)lua/gnuplot-tikz-ja.utf8
 	$(AM_V_GEN) for e in `grep -E "^[ 	]*START_HELP" $(JATERM) |\
 	     LC_ALL=C sort -f -t':' -k2` ; do \
 	  f=`echo $$e |cut -d\: -f1` ; s=`echo $$e | cut -d\: -f2` ;\

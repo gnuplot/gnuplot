@@ -1,241 +1,6 @@
-diff -ru docs/doc2rtf.c.ORG docs/doc2rtf.c
---- docs/doc2rtf.c.ORG	2017-05-19 11:36:53.427178000 +0900
-+++ docs/doc2rtf.c	2017-05-19 13:13:34.454586000 +0900
-@@ -108,7 +108,18 @@
-     fprintf(b, "{\\rtf1\\ansi ");	/* vers 1 rtf, ansi char set */
-     fprintf(b, "\\deff0");	/* default font font 0 */
-     /* font table: font 0 proportional, font 1 fixed */
-+#ifdef JAPANESE_DOC
-+    {
-+	char *msp = "\\\'82\\\'6c\\\'82\\\'72\\\'82\\\'6f";
-+	char *gothic = "\\\'83\\\'53\\\'83\\\'56\\\'83\\\'62\\\'83\\\'4e";
-+	fprintf(b, "{\\fonttbl{\\f0\\fnil\\fcharset128 %s%s;}", msp, gothic);
-+	fprintf(b, "{\\f1\\fnil\\fcharset128 %s%s;}", msp, gothic);
-+	fprintf(b, "{\\f2\\fnil\\fprq2\\fcharset128 System;}");
-+	fprintf(b, "{\\f3\\fnil\\fcharset128 %s%s;}}\n", msp, gothic);
-+    }
-+#else
-     fprintf(b, "{\\fonttbl{\\f0\\fswiss Arial;}{\\f1\\fmodern Courier New;}}\n");
-+#endif
- 
-     /* process each line of the file */
-     while (get_line(line, sizeof(line), a)) {
-@@ -117,10 +128,22 @@
- 
-     /* close final page and generate trailer */
-     fprintf(b, "}{\\plain \\page}\n");
-+#ifndef JAPANESE_DOC
-     /* fprintf(b,"}\n"); */ /* HBB: HACK ALERT: only without this, hc31 works */
-+#endif
-     list_free();
- }
- 
-+#ifdef JAPANESE_DOC
-+char filtrated_char(char *str, int nbyte)
-+{
-+    char c;
-+    c = *(str + nbyte);
-+    if (c & 0x80) return (char) 0xff;
-+    else return c;
-+}
-+#endif
-+
- void
- process_line(char *line, FILE *b)
- {
-@@ -146,7 +169,11 @@
-     i = 0;
-     j = 0;
-     while (line[i] != NUL) {
-+#ifdef JAPANESE_DOC
-+	switch (filtrated_char(line, i)) {
-+#else
- 	switch (line[i]) {
-+#endif
- 	case '\\':
- 	case '{':
- 	case '}':
-@@ -158,12 +185,20 @@
- 	case '\n':
- 	    break;
- 	case '`':		/* backquotes mean boldface or link */
-+#ifdef JAPANESE_DOC
-+	    if (filtrated_char(line, 1) == ' ') /* tabular line */
-+#else
- 	    if (line[1] == ' ')	/* tabular line */
-+#endif
- 		line2[j] = line[i];
- 	    else if ((!inref) && (!inquote)) {
- 		k = i + 1;	/* index into current string */
- 		l = 0;		/* index into topic string */
-+#ifdef JAPANESE_DOC
-+		while ((filtrated_char(line, k) != '`') && (line[k] != NUL))
-+#else
- 		while ((line[k] != '`') && (line[k] != NUL))
-+#endif
- 		    topic[l++] = line[k++];
- 		topic[l] = NUL;
- 		klist = lookup(topic);
-@@ -221,9 +256,17 @@
- 
-     i = 1;
- 
-+#ifdef JAPANESE_DOC
-+    switch (filtrated_char(line, 0)) {        /* control character */
-+#else
-     switch (line[0]) {		/* control character */
-+#endif
-     case '?':{			/* interactive help entry */
-+#ifdef JAPANESE_DOC
-+	    if ((line2[1] != NUL) && (filtrated_char(line2, 1) != ' '))
-+#else
- 	    if ((line2[1] != NUL) && (line2[1] != ' '))
-+#endif
- 		footnote('K', &(line2[1]), b);
- 	    break;
- 	}
-@@ -243,11 +286,19 @@
- 	} else if (strncmp(line2 + 1, "end", 3) == 0) {
- 	    fprintf(b, "\\par\n");
- 	    initem = FALSE;
-+#ifdef JAPANESE_DOC
-+	} else if ((line2[1] != NUL) && (filtrated_char(line2, 1) == 'b')) {
-+#else
- 	} else if ((line2[1] != NUL) && (line2[1] == 'b')) {
-+#endif
- 	    fprintf(b, "\\par\n");
- 	    fprintf(b, "\\pard \\plain \\qj \\fs20 \\f0 * ");
- 	    fprintf(b, "%s", &line2[2]);
-+#ifdef JAPANESE_DOC
-+        } else if ((line2[1] != NUL) && (filtrated_char(line2, 1) == '#'))
-+#else
-         } else if ((line2[1] != NUL) && (line2[1] == '#'))
-+#endif
- 	  fprintf(b, "%s", &line2[2]);
- 	break;
-     case '%':{			/* troff table entry */
-@@ -264,13 +315,21 @@
- 		fprintf(b, "%s", &line2[1]);
- 		break;
- 	    }
-+#ifdef JAPANESE_DOC
-+	    if ((line2[1] == NUL) || (filtrated_char(line2, 1) == '\n')) {
-+#else
- 	    if ((line2[1] == NUL) || (line2[1] == '\n')) {
-+#endif
- 		fprintf(b, "\\par\n");
- 		llpara = para;
- 		para = 0;
- 		tabl = 0;
- 	    }
-+#ifdef JAPANESE_DOC
-+	    if (filtrated_char(line2, 1) == ' ') {
-+#else
- 	    if (line2[1] == ' ') {
-+#endif
- 		if (!tabl) {
- 		    fprintf(b, "\\par\n");
- 		}
-@@ -294,7 +353,11 @@
- 	    break;
- 	}
-     default:{
-+#ifdef JAPANESE_DOC
-+	    if (isdigit((int)filtrated_char(line, 0))) { /* start of section */
-+#else
- 	    if (isdigit((int)line[0])) {	/* start of section */
-+#endif
- 		if (startpage) {	/* use new level 0 item */
- 		    refs(0, b, "\\par", NULL, "\\par{\\uldb %s}{\\v loc%d}\n");
- 		    fprintf(b, "}{\\plain \\page}\n");
-diff -ru docs/sjisenc.c.ORG docs/sjisenc.c
---- docs/sjisenc.c.ORG	2008-01-11 11:23:00.000000000 +0900
-+++ docs/sjisenc.c	2008-01-11 11:22:27.000000000 +0900
-@@ -0,0 +1,23 @@
-+/* doc2rtf ¤ÎÆüËÜ¸ìÊÑ´¹ÍÑ¥Ä¡¼¥ë
-+ * sjisenc.c
-+ * shige
-+ * 06/02 2003
-+ * Ã±¤Ë Shift_JIS ¤Î code ¤ò \'aa ¤ÎÍÍ¤Ë encode ¤¹¤ë¤À¤±
-+ */
-+#include <stdio.h>
-+#include <stdlib.h>
-+
-+int main(void)
-+{
-+    int c;
-+
-+    while((c=getchar())!=EOF && c!=0){
-+	if(c>=0x80){
-+	    printf("\\'%02x",c);
-+	    printf("\\'%02x",getchar());
-+	}
-+	else putchar(c);
-+    }
-+    if(c==0) putchar(0);
-+    return 0;
-+}
-diff -ru docs/tex2ja.awk.ORG docs/tex2ja.awk
---- docs/tex2ja.awk.ORG	2008-06-24 19:08:10.000000000 +0900
-+++ docs/tex2ja.awk	2008-06-24 19:12:09.000000000 +0900
-@@ -0,0 +1,54 @@
-+#
-+# $Id: tex2ja.awk,v 1.5 2008-06-22 20:22:11+09 shige Exp $
-+# doc2tex ¤Î½ÐÎÏ¤Î¸å½èÍý¥¹¥¯¥ê¥×¥È
-+# tex2ja.awk
-+# 06/20 2008
-+# shige@iee.niit.ac.jp
-+# 
-+# ¡Ö°Ê²¼(¤â)?»²¾È: {\bf ...¡×¤ÎÉôÊ¬¤Ë \pageref{},\index{} ¤òÆþ¤ì¤ë¡£
-+#
-+(NF>0 && !/^[\\ ]/ && /°Ê/){
-+    s=$0;
-+    while(match(s,/°Ê/)){ # ¸õÊä
-+	if(RSTART>1) printf "%s",substr(s,1,RSTART-1);
-+	s=substr(s,RSTART);
-+	while(match(s,/(¡£|\))/)==0){ # ¶çÅÀ¤«¤«¤Ã¤³¤Þ¤Ç¤Ä¤Ê¤²¤ël
-+	    getline;
-+	    if(NF==0 || /^[\\ ]/){ # ÃÊÍî¤¬½ª¤ï¤Ã¤¿
-+		print s;
-+		print $0;
-+		next;
-+	    }
-+	    s = s $0;
-+	}
-+	srest=substr(s,RSTART+RLENGTH);
-+	s=substr(s,1,RSTART+RLENGTH-1);
-+	if(s ~ /°Ê²¼(¤â)?»²¾È:/) process(s); # ¡Ö»²¾È¡×¤¬´Þ¤Þ¤ì¤ë
-+	else printf "%s",s;
-+	s=srest;
-+    }
-+    if(length(s)>0) print s; # »Ä¤ê¤ÎÉôÊ¬
-+    else print ""; # ¤³¤ì¤¬¤Ê¤¤¤È¹ÔËö¤Î²þ¹Ô¤¬¤Ê¤¯¤Ê¤ë¡£
-+    next;
-+}
-+{print}
-+
-+# ¡Ö°Ê²¼(¤â)?»²¾È: {\bf ... }¡£¡×¤Î¹Ô¤Î½èÍý´Ø¿ô 
-+function process(s0,	s,srest)
-+{
-+    s=s0;
-+    while(match(s,/{\\bf [^\}]+}/)){
-+	if(RSTART>1) printf "%s",substr(s,1,RSTART-1);
-+	srest=substr(s,RSTART+RLENGTH);
-+	s=substr(s,RSTART+5,RLENGTH-6);
-+	printf "{\\bf %s",s;
-+	gsub(/\\/,"",s);
-+	printf " (p.~\\pageref{%s})",s;
-+	if(match(s,/ [^ ]+$/)) s=substr(s,RSTART+1);
-+	gsub(/_/," ",s);
-+	printf "\\index{%s}}",s;
-+	s=srest;
-+    }
-+    printf "%s",s;
-+}
-+
 diff -ru term/ai.trm.ORG term/ai.trm
---- term/ai.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/ai.trm	2022-09-28 11:19:26.773839000 +0900
+--- term/ai.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/ai.trm	2022-12-13 17:00:39.249750000 +0900
 @@ -526,6 +526,7 @@
  
  #ifdef TERM_HELP
@@ -268,8 +33,8 @@ diff -ru term/ai.trm.ORG term/ai.trm
  END_HELP(ai)
  #endif /* TERM_HELP */
 diff -ru term/aquaterm.trm.ORG term/aquaterm.trm
---- term/aquaterm.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/aquaterm.trm	2022-09-28 11:19:26.773958000 +0900
+--- term/aquaterm.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/aquaterm.trm	2022-12-13 17:00:39.251639000 +0900
 @@ -1047,6 +1047,7 @@
  
  #ifdef TERM_HELP
@@ -320,8 +85,8 @@ diff -ru term/aquaterm.trm.ORG term/aquaterm.trm
  #endif /* TERM_HELP */
  
 diff -ru term/be.trm.ORG term/be.trm
---- term/be.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/be.trm	2022-09-28 11:19:26.774075000 +0900
+--- term/be.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/be.trm	2022-12-13 17:00:39.265941000 +0900
 @@ -387,6 +387,7 @@
  
  #ifdef TERM_HELP
@@ -633,9 +398,9 @@ diff -ru term/be.trm.ORG term/be.trm
  END_HELP(be)
  #endif /* TERM_HELP */
 diff -ru term/block.trm.ORG term/block.trm
---- term/block.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/block.trm	2022-09-28 11:19:26.774260000 +0900
-@@ -1287,6 +1287,7 @@
+--- term/block.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/block.trm	2022-12-13 17:00:39.266126000 +0900
+@@ -1370,6 +1370,7 @@
  
  #ifdef TERM_HELP
  START_HELP(block)
@@ -643,7 +408,7 @@ diff -ru term/block.trm.ORG term/block.trm
  "1 block",
  "?set terminal block",
  "?block",
-@@ -1446,5 +1446,75 @@
+@@ -1446,5 +1447,86 @@
  " screen rather than having earlier plots scroll off the top. This may be",
  " desirable in order to create an in-place animation.",
  ""
@@ -660,7 +425,8 @@ diff -ru term/block.trm.ORG term/block.trm
 +"",
 +" ½ñ¼°:",
 +"         set term block",
-+"                 {dot | half | quadrants | sextants | braille | octants}",
++"                 {dot | half | quadrants | sextants | octants | braille |",
++"                   sextpua | octpua}",
 +"                 {{no}enhanced}",
 +"                 {size <x>, <y>}",
 +#ifndef NO_DUMB_COLOR_SUPPORT
@@ -669,6 +435,7 @@ diff -ru term/block.trm.ORG term/block.trm
 +#endif
 +"                 {[no]attributes}",
 +"                 {numpoints | charpoints | gppoints}",
++"                 {[no]animate}",
 +"",
 +" `size` ¤Ï¡¢¥¿¡¼¥ß¥Ê¥ë¥µ¥¤¥º¤òÊ¸»ú¥»¥ëÃ±°Ì¤ÇÀßÄê¤·¤Þ¤¹¡£",
 +"",
@@ -676,16 +443,19 @@ diff -ru term/block.trm.ORG term/block.trm
 +" ¤ÎÀ¸À®¤ËÍÑ¤¤¤ëÊ¸»ú¥»¥Ã¥È¤ÎÁªÂò¤Ç¤¹¡£`dot` ¤ÏÃ±½ã¤Ê¥É¥Ã¥È¤ò¡¢`half` ¤ÏÈ¾",
 +" ¥Ö¥í¥Ã¥¯Ê¸»ú·²¤ò»ÈÍÑ¤·¤Þ¤¹¡£`quadrants` ¤Ï¡¢½Ä²£Î¾Êý¸þ¤Ë 2 ÇÜ¤Î²òÁüÅÙ¤ò",
 +" À¸¤à»ÍÊ¬¥Ö¥í¥Ã¥¯Ê¸»ú·²¤ò»È¤¤¤Þ¤¹¡£`sextants` ¤Ï¡¢2x3 ¤ÎÏ»Ê¬¥Ö¥í¥Ã¥¯Ê¸»ú",
-+" ·² (Block Sextant; U+1FB00-1FB3B) ¤ò»ÈÍÑ¤·¤Þ¤¹¡£`braille` ¤ÏÅÀ»úµ­¹æ¤ò",
-+" »È¤¤¡¢¤³¤ì¤Ï 2x4 ¤Îµ¿»÷²òÁüÅÙ¤òÄó¶¡¤·¤Þ¤¹¡£`octants` ¤Ï KreativeKorp",
-+"  PUA ¤Î 2x4 ¥Ö¥í¥Ã¥¯Ê¸»ú¤ò»ÈÍÑ¤·¤Þ¤¹¤¬¡¢¤³¤ì¤Î¤¦¤ÁÍ­¸ú¤Ê¤Î¤ÏÂ¿Ê¬",
-+" `FairfaxHD` ¤È `KreativeSquare` ¥Õ¥©¥ó¥È¤Î¤ß¤Ç¤¹¡£",
++" ·²¤ò»ÈÍÑ¤·¤Þ¤¹¡£`braille` ¤ÏÅÀ»úµ­¹æ¤ò»È¤¤¡¢¤³¤ì¤Ï 2x4 ¤Îµ¿»÷²òÁüÅÙ¤òÄó",
++" ¶¡¤·¤Þ¤¹¡£`octants` ¤Ï¡¢Äó°Æ¤µ¤ì¤¿ 2x4 ¥Ö¥í¥Ã¥¯Ê¸»ú¤ò»È¤¤¤Þ¤¹¡£`sectpua`",
++" ¤È `octpua` ¤Ï¡¢KreativeKorp »äÍÑÎÎ°è (PUA) Æâ¤Î 2x3, 2x4 ¥Ö¥í¥Ã¥¯Ê¸»ú",
++" ¤ò¤½¤ì¤¾¤ì»ÈÍÑ¤·¤Þ¤¹¤¬¡¢¤½¤Î¤¦¤ÁÍøÍÑ²ÄÇ½¤Ê¤Î¤ÏÂ¿Ê¬ `FairfaxHD` ¤È",
++" `KreativeSquare` ¥Õ¥©¥ó¥È¤Î¤ß¤Ç¤¹¡£",
 +"",
-+" 2x3 ¤ÎÏ»Ê¬¥Ö¥í¥Ã¥¯Ê¸»ú¤Ï¡¢Unicode 13 ¤Ë¤Î¤ß´Þ¤Þ¤ì¤Æ¤¤¤ë¤³¤È¤ËÃí°Õ¤·¤Æ¤¯",
-+" ¤À¤µ¤¤¡£¤è¤Ã¤Æ¡¢¤½¤ì¤ò¥µ¥Ý¡¼¥È¤¹¤ë¥Õ¥©¥ó¥È¤ÏÌ¤¤À¸ÂÄêÅª¤Ç¤¹¡£¤½¤ì¤ÏÅÀ»ú",
-+" µ­¹æ¤Ë¤Ä¤¤¤Æ¤âÆ±ÍÍ¤Ç¤¹¡£ÍøÍÑ²ÄÇ½¤Ê¥Õ¥©¥ó¥È¤Ë¤Ï¡¢Îã¤¨¤Ð `unscii`,",
-+" `IBM 3270`, `GNU Unifont`, `DejaVu Sans`, `FairfaxHD` ¤Ê¤É¤¬¤¢¤ê¤Þ¤¹¡£",
-+" octants ¤Î¥µ¥Ý¡¼¥È¤Ï»î¸³ÃÊ³¬¤Ç¤¹¡£",
++" 2x3 ¤ÎÏ»Ê¬¥Ö¥í¥Ã¥¯Ê¸»ú ('sextants') ¤Ï¡¢Unicode 13 ¤Ë¤Î¤ß´Þ¤Þ¤ì¤Æ¤¤¤ë¤³",
++" ¤È¤ËÃí°Õ¤·¤Æ¤¯¤À¤µ¤¤¡£¤è¤Ã¤Æ¡¢¤½¤ì¤ò¥µ¥Ý¡¼¥È¤¹¤ë¥Õ¥©¥ó¥È¤ÏÌ¤¤À¸ÂÄêÅª¤Ç",
++" ¤¹¡£¤½¤ì¤ÏÅÀ»úµ­¹æ¤Ë¤Ä¤¤¤Æ¤âÆ±ÍÍ¤Ç¤¹¡£ÍøÍÑ²ÄÇ½¤Ê¥Õ¥©¥ó¥È¤Ë¤Ï¡¢Îã¤¨¤Ð",
++" `unscii`, `IBM 3270`, `GNU Unifont`, `DejaVu Sans`, `FairfaxHD` ¤Ê¤É¤¬",
++" ¤¢¤ê¤Þ¤¹¡£2x4 ¥Ö¥í¥Ã¥¯Ê¸»ú ('octants') ¤Ï¡¢¤Þ¤À 2022 Ç¯¤Ë¾­Íè¤Î Unicode",
++" µ¬³Ê¤ËÆþ¤ë¤³¤È¤¬·è¤Þ¤Ã¤¿ÃÊ³¬¤Ë¤¹¤®¤Þ¤»¤ó¡£`FairfaxHD` ¥Õ¥©¥ó¥È¤Ë¤Ï´Þ¤Þ",
++" ¤ì¤Æ¤¤¤Þ¤¹¡£",
 +#ifndef NO_DUMB_COLOR_SUPPORT
 +"",
 +" ¥ª¥×¥·¥ç¥ó `ansi`, `ansi256`, `ansirgb` ¤Ï¡¢½ÐÎÏ¤Ë¿§¤òÉ½¼¨¤µ¤»¤ë¤¿¤á¤Î",
@@ -702,26 +472,32 @@ diff -ru term/block.trm.ORG term/block.trm
 +" ¤ëÉ¬Í×¤¬¤¢¤ê¤Þ¤¹¡£¤³¤ì¤Ï¡¢¤Ò¤È¤Ä¤ÎÊ¸»ú¥»¥ë¤Ç¡¢¤¹¤Ù¤Æ¤Î¥Ô¥¯¥»¥ë¤Î¿§¤ÎÊ¿",
 +" ¶Ñ¤ò¼è¤ë¤³¤È¤Ç½èÍý¤·¤Æ¤¤¤Þ¤¹¡£`optimize` ¤ò¤Ä¤±¤ë¤È¡¢¤³¤Î½ÐÎÏ·Á¼°¤ÏÇØ·Ê",
 +" ¿§¤ÈÁ°·Ê¿§¤ÎÎ¾Êý¤ÎÀßÄê¤Ë¤è¤Ã¤Æ¤½¤ì¤ò²þÁ±¤·¤è¤¦¤È¤·¤Þ¤¹¡£¤³¤Î¼êË¡¤Ï¡¢",
-+" `half` ¥â¡¼¥É¤Ç¤Ï´°Á´¤Ëµ¡Ç½¤·¤Þ¤¹¤¬¡¢`quadrants`, `sextants`¤Ç¤ÏÆñ¤·¤µ",
-+" ¤¬Áý¤·¤Æ¤¤¤­¤Þ¤¹¡£¤Þ¤¿¡¢`braille` ¤Ç¤Ï»ÈÍÑ¤Ç¤­¤Þ¤»¤ó¡£",
++" `half` ¥â¡¼¥É¤Ç¤Ï´°Á´¤Ëµ¡Ç½¤·¤Þ¤¹¤¬¡¢`quadrants`, `sextants`, `octants`",
++" ¤Ç¤ÏÆñ¤·¤µ¤¬Áý¤·¤Æ¤¤¤­¤Þ¤¹¡£¤Þ¤¿¡¢`braille` ¤Ç¤Ï»ÈÍÑ¤Ç¤­¤Þ¤»¤ó¡£",
 +#endif
 +"",
 +" `gppoints` ¤Ï¡¢¥°¥é¥Õ¥£¥Ã¥¯¥³¥Þ¥ó¥É¤ò»È¤Ã¤ÆÅÀµ­¹æ¤òÉÁ¤­¤Þ¤¹¡£Ã¼Ëö¤ÎÄã²ò",
-+" ÁüÅÙÀ­¤Î¤¿¤á¡¢`braille` ¥â¡¼¥É¤Ç¤Ï¤³¤ì¤ÏÂçÄñ¼ÂÍÑÅª¤Ç¤¹¡£Â¿Ê¬¥¨¥é¡¼¥Ð¡¼",
-+" ¤È¤·¤Æ¤ÏºÇ¤âÍ­ÍÑ¤Ç¤·¤ç¤¦¡£",
++" ÁüÅÙÀ­¤Î¤¿¤á¡¢`braille` ¤È `octant` ¥â¡¼¥É¤Ç¤Ï¤³¤ì¤ÏÂçÄñ¼ÂÍÑÅª¤Ç¤¹¡£Â¿",
++" Ê¬¥¨¥é¡¼¥Ð¡¼¤È¤·¤Æ¤ÏºÇ¤âÍ­ÍÑ¤Ç¤·¤ç¤¦¡£",
 +" `charpoints` ¤Ï¡¢Âå¤ï¤ê¤Ë Unicode µ­¹æÊ¸»ú¤ò»ÈÍÑ¤·¤Þ¤¹¡£¤³¤ì¤é¤â¾ï¤Ë¥°",
 +" ¥é¥Õ¥£¥Ã¥¯¤Î°ìÈÖ¾å¤ËÉÁ¤«¤ì¤ë¤³¤È¤ËÃí°Õ¤·¤Æ¤¯¤À¤µ¤¤¡£",
 +" `numpoints` ¤Ï¾åÉÕ¤­²¼ÉÕ¤­¤Î¿ô»ú¤ò»ÈÍÑ¤·¡¢¿âÄ¾Êý¸þ¤Ë 2 ÇÜ¤Î²òÁüÅÙ¤Ë¤·¤Þ",
 +" ¤¹¡£¤·¤«¤· `sextants` ¤ËÂÐ¤·¤Æ¤Ï¡¢Ê¸»ú¤ÎÏÈ¤ÎÃæ¿´°ÌÃÖ¤ÎÅÀ¤Ï¡¢ÄÌ¾ï¤Î¿ô»ú",
 +" ¤ÇÉÁ¤¯É¬Í×¤¬¤¢¤ê¤Þ¤¹¡£`charpoints` ¤« `numpoints` ¤ò»È¤Ã¤Æ¤¤¤ë¾ì¹ç¡¢¥Ó",
 +" ¥Ã¥È¥Þ¥Ã¥×¤Î²òÁüÅÙ¤Ï¤½¤ì¤Ç¤â°Û¤Ê¤ê¡¢Àþ¤Èµ­¹æ¤Ï°ìÈÌ¤ËÀµ³Î¤Ë¤ÏÂ·¤ï¤Ê¤¤¤³",
-+" ¤È¤ËÃí°Õ¤·¤Æ¤¯¤À¤µ¤¤¡£"
++" ¤È¤ËÃí°Õ¤·¤Æ¤¯¤À¤µ¤¤¡£",
++"",
++" ¥ª¥×¥·¥ç¥ó `animate` ¤Ï¡¢³ÆÉÁ²è¸å¤Ë¡¢¥«¡¼¥½¥ë°ÌÃÖ¤ò¥°¥é¥Õ¤Îº¸¾å¤Ë¥ê¥»¥Ã",
++" ¥È¤·¡¢Á°¤Î¥°¥é¥Õ¤ò¾å¤Ë¥¹¥¯¥í¡¼¥ë¤·¤Æ¾Ã¤¹Âå¤ï¤ê¤Ë¥¹¥¯¥ê¡¼¥ó¤ÎÆ±¤¸ÎÎ°è¤Ë",
++" ¼¡¤Î¥°¥é¥Õ¤ò¾å½ñ¤­¤¹¤ë¤è¤¦¤Ë¤·¤Þ¤¹¡£¤³¤ì¤Ï¡¢Æ±¤¸¾ì½ê¤Ç¤Î¥¢¥Ë¥á¡¼¥·¥ç¥ó",
++" ¤òºîÀ®¤¹¤ë¤¿¤á¤Ë¤ÏÍ­ÍÑ¤Ç¤·¤ç¤¦¡£",
++""
 +#endif /* JAPANESE_DOC */
  END_HELP(block)
  #endif
 diff -ru term/caca.trm.ORG term/caca.trm
---- term/caca.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/caca.trm	2022-09-28 11:19:26.774455000 +0900
+--- term/caca.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/caca.trm	2022-12-13 17:00:39.273008000 +0900
 @@ -1263,7 +1263,7 @@
  	if (CACA_charset == CACA_ASCII)
  		symbol = (point <= -1) ? L'.' : point % 26 + 'A';
@@ -731,27 +507,30 @@ diff -ru term/caca.trm.ORG term/caca.trm
  	caca_put_char(CACA_cv, x, CACA_ymax - y, symbol);
  
  	/* update last hypertext label */
-@@ -1700,16 +1700,16 @@
- 			default : {
- 				const wchar_t block_arrows[] = {
- 					0x2192, 0x2192, 0x2191, 0x2191, 0x2190, 0x2190, 0x2193, 0x2193
--				}; /*  L"â†’â†’â†‘â†‘â†â†â†“â†“" */
-+				}; /*  L"¢ª¢ª¢¬¢¬¢«¢«¢­¢­" */
- 				heads = block_arrows;
- 				break;
+@@ -1691,11 +1691,11 @@
+ 		const wchar_t ascii_arrows[] = L">+^+<+v+";
+ 		const wchar_t block_arrows[] = {
+ 			0x2192, 0x2192, 0x2191, 0x2191, 0x2190, 0x2190, 0x2193, 0x2193
+-		}; /*  L"â†’â†’â†‘â†‘â†â†â†“â†“" */
++		}; /*  L"¢ª¢ª¢¬¢¬¢«¢«¢­¢­" */
+ #ifndef _WIN32
+ 		const wchar_t unicode_arrows[] = {
+ 			0x2192, 0x2197, 0x2191, 0x2196, 0x2190, 0x2199, 0x2193, 0x2198
+-		}; /*  L"â†’â†—â†‘â†–â†â†™â†“â†˜" */
++		}; /*  L"¢ª[±¦¾åÌð°õ]¢¬[º¸¾åÌð°õ]¢«[º¸²¼Ìð°õ]¢­[±¦²¼Ìð°õ]" */
+ #endif
+ 		wchar_t const * heads;
+ 		int dx = ex - sx;
+@@ -1713,7 +1713,7 @@
  			}
  #ifndef _WIN32
  			case CACA_UNICODE: {
 -				/* Windows: 45Â° arrows are not available in Lucida Console nor Consolas. */
 +				/* Windows: 45¡ë arrows are not available in Lucida Console nor Consolas. */
-  				const wchar_t unicode_arrows[] = {
- 					0x2192, 0x2197, 0x2191, 0x2196, 0x2190, 0x2199, 0x2193, 0x2198
--				}; /*  L"â†’â†—â†‘â†–â†â†™â†“â†˜" */
-+				}; /*  L"¢ª[±¦¾åÌð°õ]¢¬[º¸¾åÌð°õ]¢«[º¸²¼Ìð°õ]¢­[±¦²¼Ìð°õ]" */
- 				heads = unicode_arrows; /* unicode simple arrows */
+ 				heads = unicode_arrows; /* Unicode simple arrows */
  				break;
  			}
-@@ -3255,7 +3255,7 @@
+@@ -3259,7 +3259,7 @@
  {
      static uint32_t const cp437_chars[] =
      {
@@ -760,7 +539,7 @@ diff -ru term/caca.trm.ORG term/caca.trm
          0x2500, 0x2502, 0x250c, 0x2514, 0x2510, 0x2518
      };
  
-@@ -3404,6 +3404,7 @@
+@@ -3408,6 +3408,7 @@
  
  #ifdef TERM_HELP
  START_HELP(caca)
@@ -768,7 +547,7 @@ diff -ru term/caca.trm.ORG term/caca.trm
  "1 caca",
  "?commands set terminal caca",
  "?set terminal caca",
-@@ -3515,6 +3516,125 @@
+@@ -3519,6 +3520,125 @@
  " libcaca.",
  " Closing the terminal window by clicking the \"X\" on the title line",
  " will terminate wgnuplot. Press \"q\" to close the window."
@@ -810,7 +589,7 @@ diff -ru term/caca.trm.ORG term/caca.trm
 +" ¤Æ¤¯¤À¤µ¤¤¡£¤³¤ì¤Ï¡¢¥Ç¥Õ¥©¥ë¥È¤ÎÀþ¼ï¤Î¹õ¤òÇò¤Ë¤âÊÑ¤¨¤Þ¤¹¡£",
 +"",
 +" ³ÈÄ¥Ê¸»úÎó½èÍý¤Ï¡¢¥ª¥×¥·¥ç¥ó `enhanced` ¤ò»È¤¦¤³¤È¤ÇÍ­¸ú¤Ë¤Ê¤ê¤Þ¤¹¡£°Ê",
-+" ²¼»²¾È `enhanced text`¡£",
++" ²¼»²¾È: `enhanced text`¡£",
 +"",
 +" ½ÐÎÏ¥¦¥£¥ó¥É¥¦¤Î¥¿¥¤¥È¥ë¤Ï¡¢`libcaca` ¥É¥é¥¤¥Ð¤¬¥µ¥Ý¡¼¥È¤·¤Æ¤¤¤ì¤Ð¡¢¥ª",
 +" ¥×¥·¥ç¥ó `title` ¤ÇÊÑ¹¹¤Ç¤­¤Þ¤¹¡£",
@@ -874,7 +653,7 @@ diff -ru term/caca.trm.ORG term/caca.trm
 +"",
 +" ÌÀ¤ë¤¤ÇØ·Ê¿§¤ÏÅÀÌÇ¤¹¤ë¤³¤È¤¬¤¢¤ê¤Þ¤¹¡£",
 +"",
-+" ¥Þ¥¦¥¹Áàºî¤Ç¤Ï½¤¾þ¥­¡¼¤Ï¥µ¥Ý¡¼¥È¤·¤Þ¤»¤ó¡£°Ê²¼»²¾È: `term caca`",
++" ¥Þ¥¦¥¹Áàºî¤Ç¤Ï½¤¾þ¥­¡¼¤Ï¥µ¥Ý¡¼¥È¤·¤Þ¤»¤ó¡£°Ê²¼»²¾È: `term caca`¡£",
 +"",
 +" ³ÈÄ¥Ê¸»úÎó¤Î²óÅ¾¡¢¤ª¤è¤ÓÆ©ÌÀ²½¤Ï¥µ¥Ý¡¼¥È¤·¤Æ¤¤¤Þ¤»¤ó¡£`size` ¥ª¥×¥·¥ç¥ó",
 +" ¤Ï¡¢¥ª¥ó¥¹¥¯¥ê¡¼¥ó¥Ç¥£¥¹¥×¥ì¥¤¤Ç¤Ï¹ÍÎ¸¤µ¤ì¤Þ¤»¤ó¡£",
@@ -895,8 +674,8 @@ diff -ru term/caca.trm.ORG term/caca.trm
  #endif /* TERM_HELP */
  
 diff -ru term/cairo.trm.ORG term/cairo.trm
---- term/cairo.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/cairo.trm	2022-09-28 11:19:26.774635000 +0900
+--- term/cairo.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/cairo.trm	2022-12-13 17:00:39.277850000 +0900
 @@ -1511,6 +1511,7 @@
  
  #ifdef TERM_HELP
@@ -1298,8 +1077,8 @@ diff -ru term/cairo.trm.ORG term/cairo.trm
  #endif /* TERM_HELP */
  
 diff -ru term/canvas.trm.ORG term/canvas.trm
---- term/canvas.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/canvas.trm	2022-09-28 11:19:26.774773000 +0900
+--- term/canvas.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/canvas.trm	2022-12-13 17:00:39.278426000 +0900
 @@ -1670,6 +1670,7 @@
  
  #ifdef TERM_HELP
@@ -1395,8 +1174,8 @@ diff -ru term/canvas.trm.ORG term/canvas.trm
  END_HELP(canvas)
  #endif /* TERM_HELP */
 diff -ru term/cgm.trm.ORG term/cgm.trm
---- term/cgm.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/cgm.trm	2022-09-28 11:19:26.774945000 +0900
+--- term/cgm.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/cgm.trm	2022-12-13 17:00:39.279159000 +0900
 @@ -1743,6 +1743,7 @@
  
  #ifdef TERM_HELP
@@ -1719,8 +1498,8 @@ diff -ru term/cgm.trm.ORG term/cgm.trm
  END_HELP(cgm)
  #endif /* TERM_HELP */
 diff -ru term/context.trm.ORG term/context.trm
---- term/context.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/context.trm	2022-09-28 11:19:26.775119000 +0900
+--- term/context.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/context.trm	2022-12-13 17:00:39.279874000 +0900
 @@ -1971,6 +1971,7 @@
  
  #ifdef TERM_HELP
@@ -1889,8 +1668,8 @@ diff -ru term/context.trm.ORG term/context.trm
  #endif /* TERM_HELP */
  
 diff -ru term/corel.trm.ORG term/corel.trm
---- term/corel.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/corel.trm	2022-09-28 11:19:26.775227000 +0900
+--- term/corel.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/corel.trm	2022-12-13 17:00:39.280095000 +0900
 @@ -431,6 +431,7 @@
  
  #ifdef TERM_HELP
@@ -1924,8 +1703,8 @@ diff -ru term/corel.trm.ORG term/corel.trm
  END_HELP(corel)
  #endif /* TERM_HELP */
 diff -ru term/debug.trm.ORG term/debug.trm
---- term/debug.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/debug.trm	2022-09-28 11:19:26.775298000 +0900
+--- term/debug.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/debug.trm	2022-12-13 17:00:39.280306000 +0900
 @@ -372,6 +372,7 @@
  
  #ifdef TERM_HELP
@@ -1952,9 +1731,9 @@ diff -ru term/debug.trm.ORG term/debug.trm
  END_HELP(debug)
  #endif
 diff -ru term/djsvga.trm.ORG term/djsvga.trm
---- term/djsvga.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/djsvga.trm	2022-09-28 11:19:26.775436000 +0900
-@@ -2239,6 +2239,7 @@
+--- term/djsvga.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/djsvga.trm	2022-12-13 17:00:39.280912000 +0900
+@@ -2237,6 +2237,7 @@
  
  #ifdef TERM_HELP
  START_HELP(svga)
@@ -1962,7 +1741,7 @@ diff -ru term/djsvga.trm.ORG term/djsvga.trm
  "1 svga",
  "?commands set terminal svga",
  "?set terminal svga",
-@@ -2268,5 +2269,38 @@
+@@ -2266,5 +2267,38 @@
  " parameter sets the scale factor for point symbols. You can use `fontscale`",
  " to scale the bitmap font. This might be useful if you have a hi-res display.",
  " Note that integer factors give best results."
@@ -2002,8 +1781,8 @@ diff -ru term/djsvga.trm.ORG term/djsvga.trm
  END_HELP(svga)
  #endif /* TERM_HELP */
 diff -ru term/dumb.trm.ORG term/dumb.trm
---- term/dumb.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/dumb.trm	2022-09-28 11:19:26.775543000 +0900
+--- term/dumb.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/dumb.trm	2022-12-13 17:00:39.281340000 +0900
 @@ -1206,6 +1206,7 @@
  
  #ifdef TERM_HELP
@@ -2110,8 +1889,8 @@ diff -ru term/dumb.trm.ORG term/dumb.trm
  END_HELP(dumb)
  #endif /* TERM_HELP */
 diff -ru term/dxf.trm.ORG term/dxf.trm
---- term/dxf.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/dxf.trm	2022-09-28 11:19:26.775618000 +0900
+--- term/dxf.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/dxf.trm	2022-12-13 17:00:39.281592000 +0900
 @@ -400,6 +400,7 @@
  
  #ifdef TERM_HELP
@@ -2143,8 +1922,8 @@ diff -ru term/dxf.trm.ORG term/dxf.trm
  END_HELP(dxf)
  #endif /* TERM_HELP */
 diff -ru term/dxy.trm.ORG term/dxy.trm
---- term/dxy.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/dxy.trm	2022-09-28 11:19:26.775682000 +0900
+--- term/dxy.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/dxy.trm	2022-12-13 17:00:39.281783000 +0900
 @@ -188,6 +188,7 @@
  
  #ifdef TERM_HELP
@@ -2172,8 +1951,8 @@ diff -ru term/dxy.trm.ORG term/dxy.trm
  END_HELP(dxy800a)
  #endif
 diff -ru term/eepic.trm.ORG term/eepic.trm
---- term/eepic.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/eepic.trm	2022-09-28 11:19:26.775777000 +0900
+--- term/eepic.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/eepic.trm	2022-12-13 17:00:39.282083000 +0900
 @@ -578,6 +578,7 @@
  
  #ifdef TERM_HELP
@@ -2290,8 +2069,8 @@ diff -ru term/eepic.trm.ORG term/eepic.trm
  END_HELP(eepic)
  #endif /* TERM_HELP */
 diff -ru term/emf.trm.ORG term/emf.trm
---- term/emf.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/emf.trm	2022-09-28 11:19:26.775921000 +0900
+--- term/emf.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/emf.trm	2022-12-13 17:00:39.282796000 +0900
 @@ -1981,6 +1981,7 @@
  
  #ifdef TERM_HELP
@@ -2348,8 +2127,8 @@ diff -ru term/emf.trm.ORG term/emf.trm
  END_HELP(emf)
  #endif /* TERM_HELP */
 diff -ru term/epson.trm.ORG term/epson.trm
---- term/epson.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/epson.trm	2022-09-28 11:19:26.776022000 +0900
+--- term/epson.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/epson.trm	2022-12-13 17:00:39.283199000 +0900
 @@ -1081,6 +1081,7 @@
  
  #ifdef TERM_HELP
@@ -2459,8 +2238,8 @@ diff -ru term/epson.trm.ORG term/epson.trm
  END_HELP(epson_180dpi)
  #endif /* TERM_HELP */
 diff -ru term/excl.trm.ORG term/excl.trm
---- term/excl.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/excl.trm	2022-09-28 11:19:26.776189000 +0900
+--- term/excl.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/excl.trm	2022-12-13 17:00:39.283617000 +0900
 @@ -270,6 +270,7 @@
  
  #ifdef TERM_HELP
@@ -2488,8 +2267,8 @@ diff -ru term/excl.trm.ORG term/excl.trm
  END_HELP(excl)
  #endif
 diff -ru term/fig.trm.ORG term/fig.trm
---- term/fig.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/fig.trm	2022-09-28 11:19:26.776340000 +0900
+--- term/fig.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/fig.trm	2022-12-13 17:00:39.284161000 +0900
 @@ -1314,6 +1314,7 @@
  
  #ifdef TERM_HELP
@@ -2573,8 +2352,8 @@ diff -ru term/fig.trm.ORG term/fig.trm
  #endif /* TERM_HELP */
  
 diff -ru term/gd.trm.ORG term/gd.trm
---- term/gd.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/gd.trm	2022-09-28 11:19:26.776559000 +0900
+--- term/gd.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/gd.trm	2022-12-13 17:00:39.285133000 +0900
 @@ -2511,6 +2511,7 @@
  #ifndef JPEG_HELP_ONLY
  #ifdef TERM_HELP
@@ -2955,8 +2734,8 @@ diff -ru term/gd.trm.ORG term/gd.trm
  #endif /* TERM_HELP */
  #endif /* WITH_GD_SIXEL */
 diff -ru term/ggi.trm.ORG term/ggi.trm
---- term/ggi.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/ggi.trm	2022-09-28 11:19:26.776672000 +0900
+--- term/ggi.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/ggi.trm	2022-12-13 17:00:39.285584000 +0900
 @@ -1508,6 +1508,7 @@
  
  #ifdef TERM_HELP
@@ -3009,8 +2788,8 @@ diff -ru term/ggi.trm.ORG term/ggi.trm
  END_HELP(ggi)
  #endif
 diff -ru term/gpic.trm.ORG term/gpic.trm
---- term/gpic.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/gpic.trm	2022-09-28 11:19:26.776745000 +0900
+--- term/gpic.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/gpic.trm	2022-12-13 17:00:39.285803000 +0900
 @@ -291,6 +291,7 @@
  
  #ifdef TERM_HELP
@@ -3087,8 +2866,8 @@ diff -ru term/gpic.trm.ORG term/gpic.trm
  END_HELP(gpic)
  #endif /* TERM_HELP */
 diff -ru term/grass.trm.ORG term/grass.trm
---- term/grass.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/grass.trm	2022-09-28 11:19:26.776824000 +0900
+--- term/grass.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/grass.trm	2022-12-13 17:00:39.286053000 +0900
 @@ -601,6 +601,7 @@
  
  #ifdef TERM_HELP
@@ -3118,8 +2897,8 @@ diff -ru term/grass.trm.ORG term/grass.trm
  END_HELP(grass)
  #endif
 diff -ru term/hp26.trm.ORG term/hp26.trm
---- term/hp26.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/hp26.trm	2022-09-28 11:19:26.776903000 +0900
+--- term/hp26.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/hp26.trm	2022-12-13 17:00:39.286304000 +0900
 @@ -689,6 +689,7 @@
  
  #ifdef TERM_HELP
@@ -3146,8 +2925,8 @@ diff -ru term/hp26.trm.ORG term/hp26.trm
  END_HELP(hp2623a)
  #endif
 diff -ru term/hp2648.trm.ORG term/hp2648.trm
---- term/hp2648.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/hp2648.trm	2022-09-28 11:19:26.776965000 +0900
+--- term/hp2648.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/hp2648.trm	2022-12-13 17:00:39.286500000 +0900
 @@ -185,6 +185,7 @@
  
  #ifdef TERM_HELP
@@ -3174,8 +2953,8 @@ diff -ru term/hp2648.trm.ORG term/hp2648.trm
  END_HELP(hp2648)
  #endif
 diff -ru term/hp500c.trm.ORG term/hp500c.trm
---- term/hp500c.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/hp500c.trm	2022-09-28 11:19:26.777040000 +0900
+--- term/hp500c.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/hp500c.trm	2022-12-13 17:00:39.286742000 +0900
 @@ -516,6 +516,7 @@
  
  #ifdef TERM_HELP
@@ -3212,8 +2991,8 @@ diff -ru term/hp500c.trm.ORG term/hp500c.trm
  END_HELP(hp500c)
  #endif /* TERM_HELP */
 diff -ru term/hpgeneric.h.ORG term/hpgeneric.h
---- term/hpgeneric.h	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/hpgeneric.h	2022-09-28 11:19:26.823600000 +0900
+--- term/hpgeneric.h	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/hpgeneric.h	2022-12-13 17:00:39.321134000 +0900
 @@ -4,6 +4,7 @@
   */
  #ifdef TERM_HELP
@@ -3243,8 +3022,8 @@ diff -ru term/hpgeneric.h.ORG term/hpgeneric.h
  END_HELP(hpgeneric)
  #endif
 diff -ru term/hpgl.trm.ORG term/hpgl.trm
---- term/hpgl.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/hpgl.trm	2022-09-28 11:19:26.777250000 +0900
+--- term/hpgl.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/hpgl.trm	2022-12-13 17:00:39.287711000 +0900
 @@ -3296,6 +3296,7 @@
  
  #ifdef TERM_HELP
@@ -3272,7 +3051,7 @@ diff -ru term/hpgl.trm.ORG term/hpgl.trm
 +" Hewlett Packard ¼ÒÀ½¤Î¥Ú¥ó¥×¥í¥Ã¥¿ÍÑ¤Î HPGL ½ÐÎÏ¤ò¹Ô¤Ê¤¤¤Þ¤¹¡£",
 +" HPGL ¥°¥é¥Õ¥£¥Ã¥¯¥Ç¡¼¥¿¤Ï¡¢Â¿¤¯¤Î¥½¥Õ¥È¥¦¥§¥¢¤Ç¼è¤ê¹þ¤à¤³¤È¤â¤Ç¤­¤Þ¤¹¡£",
 +" HPGL ¥³¥Þ¥ó¥É¸À¸ì¤Ï¡¢¤½¤Î¸å¤Î¥×¥ê¥ó¥¿¤Ç¤Ï¹­¤¯ PCL ¥³¥Þ¥ó¥É¸À¸ì¤ËÃÖ¤­´¹",
-+" ¤¨¤é¤ì¤Þ¤·¤¿¡£°Ê²¼»²¾È: `set term pcl5`",
++" ¤¨¤é¤ì¤Þ¤·¤¿¡£°Ê²¼»²¾È: `set term pcl5`¡£",
 +"",
 +" terminal ¥ª¥×¥·¥ç¥ó¤Ï¡¢»ÈÍÑ¤¹¤ë¥Ú¥ó¤Î¿ô¤È¡¢½ªÎ»»þ¤Ë¥×¥í¥Ã¥¿¤Ë¥Ú¡¼¥¸¤òÇÓ",
 +" ½Ð (eject) ¤µ¤»¤ë¤«¤É¤¦¤«¤òÀ©¸æ¤·¤Þ¤¹¡£¥Ç¥Õ¥©¥ë¥È¤Ç¤Ï¡¢6 ¤Ä¤Î¥Ú¥ó¤ò»È",
@@ -3380,8 +3159,8 @@ diff -ru term/hpgl.trm.ORG term/hpgl.trm
  END_HELP(pcl5)
  #endif /* TERM_HELP */
 diff -ru term/hpljii.trm.ORG term/hpljii.trm
---- term/hpljii.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/hpljii.trm	2022-09-28 11:19:26.777329000 +0900
+--- term/hpljii.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/hpljii.trm	2022-12-13 17:00:39.287960000 +0900
 @@ -388,6 +388,7 @@
  
  #ifdef TERM_HELP
@@ -3426,8 +3205,8 @@ diff -ru term/hpljii.trm.ORG term/hpljii.trm
  END_HELP(hpljii)
  #endif /* TERM_HELP */
 diff -ru term/hppj.trm.ORG term/hppj.trm
---- term/hppj.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/hppj.trm	2022-09-28 11:19:26.777404000 +0900
+--- term/hppj.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/hppj.trm	2022-12-13 17:00:39.288171000 +0900
 @@ -268,6 +268,7 @@
  
  #ifdef TERM_HELP
@@ -3460,8 +3239,8 @@ diff -ru term/hppj.trm.ORG term/hppj.trm
  END_HELP(hppj)
  #endif
 diff -ru term/imagen.trm.ORG term/imagen.trm
---- term/imagen.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/imagen.trm	2022-09-28 11:19:26.777493000 +0900
+--- term/imagen.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/imagen.trm	2022-12-13 17:00:39.288464000 +0900
 @@ -886,6 +886,7 @@
  
  #ifdef TERM_HELP
@@ -3502,8 +3281,8 @@ diff -ru term/imagen.trm.ORG term/imagen.trm
  END_HELP(imagen)
  #endif
 diff -ru term/kyo.trm.ORG term/kyo.trm
---- term/kyo.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/kyo.trm	2022-09-28 11:19:26.777560000 +0900
+--- term/kyo.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/kyo.trm	2022-12-13 17:00:39.288659000 +0900
 @@ -201,6 +201,7 @@
  
  #ifdef TERM_HELP
@@ -3538,8 +3317,8 @@ diff -ru term/kyo.trm.ORG term/kyo.trm
  END_HELP(kyo)
  #endif
 diff -ru term/latex.trm.ORG term/latex.trm
---- term/latex.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/latex.trm	2022-09-28 11:19:26.777689000 +0900
+--- term/latex.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/latex.trm	2022-12-13 17:00:39.289087000 +0900
 @@ -1164,6 +1164,7 @@
  
  #ifdef TERM_HELP
@@ -3630,8 +3409,8 @@ diff -ru term/latex.trm.ORG term/latex.trm
  END_HELP(latex)
  #endif /* TERM_TABLE */
 diff -ru term/latex_old.h.ORG term/latex_old.h
---- term/latex_old.h	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/latex_old.h	2022-09-28 11:19:26.823538000 +0900
+--- term/latex_old.h	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/latex_old.h	2022-12-13 17:00:39.320960000 +0900
 @@ -5,6 +5,7 @@
   */
  #ifdef TERM_HELP
@@ -3676,10 +3455,10 @@ diff -ru term/latex_old.h.ORG term/latex_old.h
 +" ½ÐÎÏ·Á¼°¥ª¥×¥·¥ç¥ó¤ò¸«¤ë¤Ë¤Ï¡¢`set term tikz help` ¤È¤·¤Æ¤¯¤À¤µ¤¤¡£",
 +"",
 +" (4) `pict2e` ½ÐÎÏ·Á¼° (¥Ð¡¼¥¸¥ç¥ó 5.4 ¤ÇÄÉ²Ã) ¤ÏÀÎ¤Î gnuplot ¤Î¸Å¤¤½Ð",
-+" ÎÏ·Á¼° `latex`, `emtex`, `eepic`, `tpic` ¤ËÃÖ¤­´¹¤ï¤ë¤â¤Î¤Ç¤¹¡£°Ê²¼»²",
-+" ¾È: `pict2e`¡£",
++" ÎÏ·Á¼° `latex`, `emtex`, `eepic`, `tpic` ¤ËÃÖ¤­´¹¤ï¤ë¤â¤Î¤Ç¤¹¡£°Ê²¼",
++" »²¾È: `pict2e`¡£",
 +"",
-+" (5) ¤½¤ÎÂ¾¤Ï¡¢°Ê²¼»²¾È: `context`, ¤ª¤è¤Ó¸Å¤¤½ÐÎÏ·Á¼° texdraw¡¢mp",
++" (5) ¤½¤ÎÂ¾¤Ï¡¢°Ê²¼»²¾È: `context`¡£¤ª¤è¤Ó¸Å¤¤½ÐÎÏ·Á¼° texdraw¡¢mp",
 +" (metapost)¡£",
 +"",
 +" TeX ·Ï½ÐÎÏ·Á¼°¤Ë´Ø¤¹¤ëÍ×Ìó¤¬°Ê²¼¤Ë¤¢¤ê¤Þ¤¹:",
@@ -3691,8 +3470,8 @@ diff -ru term/latex_old.h.ORG term/latex_old.h
  END_HELP(latex)
  #endif
 diff -ru term/linux-vgagl.trm.ORG term/linux-vgagl.trm
---- term/linux-vgagl.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/linux-vgagl.trm	2022-09-28 11:19:26.777750000 +0900
+--- term/linux-vgagl.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/linux-vgagl.trm	2022-12-13 17:00:39.289255000 +0900
 @@ -1,5 +1,6 @@
  #ifdef TERM_HELP
  START_HELP(linux)
@@ -3730,194 +3509,9 @@ diff -ru term/linux-vgagl.trm.ORG term/linux-vgagl.trm
 +#endif /* JAPANESE_DOC */
  END_HELP(linux)
  #endif
-diff -ru term/lua/gnuplot-tikz-ja.help.ORG term/lua/gnuplot-tikz-ja.help
---- term/lua/gnuplot-tikz-ja.help	2022-09-28.ORG 11:19:26.821103000 +0900
-+++ term/lua/gnuplot-tikz-ja.help	2022-09-28 11:19:26.797363000 +0900
-@@ -0,0 +1,181 @@
-+/* $Id: gnuplot-tikz-ja.help,v 1.4 2022-07-12 15:30:44+09 shige Exp $ */
-+#ifdef JAPANESE_DOC
-+"2 lua tikz",
-+"?set terminal lua tikz",
-+"?set term lua tikz",
-+"?term lua tikz",
-+" TikZ ¥É¥é¥¤¥Ð¤Ï¡¢ÈÆÍÑ Lua ½ÐÎÏ·Á¼°¤Î½ÐÎÏ¥â¡¼¥É¤Î°ì¤Ä¤Ç¤¹¡£",
-+"",
-+"",
-+" ½ñ¼°:",
-+"     set terminal lua tikz",
-+"",
-+"      {latex | tex | context}",
-+"      {color | monochrome}",
-+"      {nooriginreset | originreset}",
-+"      {nogparrows | gparrows}",
-+"      {nogppoints | gppoints}",
-+"      {picenvironment | nopicenvironment}",
-+"      {noclip | clip}",
-+"      {butt}",
-+"      {notightboundingbox | tightboundingbox}",
-+"      {background \"<colorpec>\"}",
-+"      {size <x>{unit},<y>{unit}}",
-+"      {scale <x>,<y>}",
-+"      {plotsize <x>{unit},<y>{unit}}",
-+"      {charsize <x>{unit},<y>{unit}}",
-+"      {font \"<fontdesc>\"}",
-+"      {{fontscale | textscale} <scale>}",
-+"      {dashlength | dl <DL>}",
-+"      {linewidth | lw <LW>}",
-+"      {nofulldoc | nostandalone | fulldoc | standalone}",
-+"      {{preamble | header} \"<preamble_string>\"}",
-+"      {tikzplot <ltn>,...}",
-+"      {notikzarrows | tikzarrows}",
-+"      {rgbimages | cmykimages}",
-+"      {noexternalimages|externalimages}",
-+"      {bitmap | nobitmap}",
-+"      {providevars <var name>,...}",
-+"      {createstyle}",
-+"      {help}",
-+"",
-+" °ú¿ô¤È¤·¤ÆÄ¹¤µ¤òÉ¬Í×¤È¤¹¤ë¥ª¥×¥·¥ç¥ó¤Ë¤Ä¤¤¤Æ¤Ï¡¢Ã±°Ì¤¬»ØÄê¤µ¤ì¤Æ¤¤¤Ê¤±",
-+" ¤ì¤Ð¤½¤Î¥Ç¥Õ¥©¥ë¥È¤Ï 'cm' ¤È¤Ê¤ê¤Þ¤¹¡£¤¹¤Ù¤Æ¤ÎÄ¹¤µ¤Ë¤Ï¡¢°Ê²¼¤ÎÃ±°Ì¤ò»È",
-+" ÍÑ¤Ç¤­¤Þ¤¹: 'cm', 'mm', 'in' ¤Þ¤¿¤Ï 'inch', 'pt', 'pc', 'bp', 'dd',",
-+" 'cc' (ÌõÃí: in ¤Ï¥¤¥ó¥Á (1in=2.54cm), pt ¤Ï¥Ý¥¤¥ó¥È (72.27pt=1in), pc",
-+" ¤Ï¥Ñ¥¤¥« (1pc=12pt), bp ¤Ï¥Ó¥Ã¥°¥Ý¥¤¥ó¥È (72bp=1in), dd ¤Ï Didot ¥Ý¥¤",
-+" ¥ó¥È (26.6dd=1cm), cc ¤Ï Cicero (1cc=12dd))¡£¿ôÃÍ¤ÈÃ±°Ì¤Î´Ö¤Ë¶õÇò¤òÆþ",
-+" ¤ì¤Æ¤Ï¤¤¤±¤Þ¤»¤ó¡£",
-+"",
-+" 'monochrome' ¤Ï¡¢Àþ¤Î¿§ÉÕ¤±¤òÌµ¸ú¤Ë¤·¡¢ÅÉ¤êÄÙ¤·¤ò³¥¿§³¬Ä´¤ËÀÚ¤êÂØ¤¨¤Þ",
-+" ¤¹¡£",
-+"",
-+" 'originreset' ¤Ï¡¢TikZ ²è¤Î¸¶ÅÀ¤ò¡¢ÉÁ²è¤Îº¸²¼³Ñ¤Ø°ÜÆ°¤·¤Þ¤¹¡£¤³¤ì¤Ï¤¤",
-+" ¤¯¤Ä¤«¤ÎÉÁ²è¤ò°ì¤Ä¤Î tikzpicture ´Ä¶­Æâ¤ËÀ°Îó¤¹¤ë¤Î¤Ë»ÈÍÑ¤Ç¤­¤Þ¤¹¡£¤³",
-+" ¤ì¤Ï¡¢multiplot¡¢pm3d ÉÁ²è¤Ç¤Ï½½Ê¬¤Ë¤Ï¥Æ¥¹¥È¤µ¤ì¤Æ¤¤¤Þ¤»¤ó¡£",
-+"",
-+" 'gparrows' ¤Ï¡¢TikZ ¤¬Äó¶¡¤¹¤ëÌð (arrow) ¤ÎÂå¤ï¤ê¤Ë¡¢gnuplot ÆâÉô¤ÎÌð",
-+" (arrow) ¤ÎÉÁ²è´Ø¿ô¤ò»ÈÍÑ¤·¤Þ¤¹¡£",
-+"",
-+" 'gppoints' ¤Ï¡¢TikZ ¤¬Äó¶¡¤¹¤ëÉÁ²èµ­¹æ¤ÎÂå¤ï¤ê¤Ë¡¢gnuplot ÆâÉô¤Îµ­¹æÉÁ",
-+" ²è´Ø¿ô¤ò»ÈÍÑ¤·¤Þ¤¹¡£",
-+"",
-+" 'nopicenvironment' ¤Ï¡¢'tikzpicture' ´Ä¶­¤ÎÀë¸À¤ò¼êÆ°¤Ç¹Ô¤¦¤è¤¦¤Ë¤¹¤ë",
-+" ¤¿¤á¤Ë¤½¤ì¤ò¾ÊÎ¬¤·¤Þ¤¹¡£¤³¤ì¤Ë¤è¤ê¡¢ÉÁ²è¤ÎÁ°¸å¤Ë¡¢¤¢¤ë PGF/TikZ ¥³¡¼¥É",
-+" ¤òÄ¾ÀÜÆþ¤ì¤ë¤³¤È¤¬¤Ç¤­¤Þ¤¹¡£",
-+"",
-+" 'clip' ¤Ï¡¢ÉÁ²è¤òÄêµÁ¤µ¤ì¤¿¥­¥ã¥ó¥Ð¥¹¥µ¥¤¥º¤Ç¥¯¥ê¥Ã¥Ô¥ó¥°¤·¤Þ¤¹¡£¥Ç¥Õ¥©",
-+" ¥ë¥È¤Ï 'noclip' ¤Ç¡¢¤³¤ì¤Ï¥­¥ã¥ó¥Ð¥¹¥µ¥¤¥º¤ò´Þ¤àºÇ¾®¤Î¶ë·Á³°ÏÈ¤Î¤ß¤òÀß",
-+" Äê¤·¤Þ¤¹¡£¥ª¥×¥·¥ç¥ó 'plotsize' ¤« 'tightboundingbox' ¤ò»ÈÍÑ¤·¤¿¾ì¹ç¤Ï",
-+" ¶ë·Á³°ÏÈ¤â¥¯¥ê¥Ã¥Ô¥ó¥°¤ÎÈ¢¤â¤¤¤º¤ì¤âÀßÄê¤·¤Þ¤»¤ó¡£",
-+"",
-+" 'butt' ¤Ï linecap (ÀþÊ¬¤ÎÃ¼) ¤ÎÂ°À­¤ò 'butt' (Àí¤é¤»¤ë) ¤Ë¤·¡¢¤½¤·¤Æ",
-+" linejoin (ÀþÊ¬¤ÎÀÜ¹çÉô) ¤ÎÂ°À­¤ò 'miter' (³ÑÄ¥¤é¤»¤ë) ¤Ë¤·¤Þ¤¹¡£¥Ç¥Õ¥©",
-+" ¥ë¥È¤Ï¤¤¤º¤ì¤â 'round' (´Ý¤¯¤¹¤ë) ¤Ç¤¹¡£", 
-+"",
-+" 'tightboundingbox' ¤òÀßÄê¤¹¤ë¤È¡¢¥ª¥×¥·¥ç¥ó 'clip' ¤ÏÌµ»ë¤µ¤ì¡¢ºÇ½ªÅª¤Ê",
-+" ¶ë·Á³°ÏÈ¤Ï tikz ¤¬·×»»¤¹¤ë¼«Á³¤Ê³°ÏÈ¤Ë¤Ê¤ê¤Þ¤¹¡£",
-+"",
-+" 'background' ¤Ï¡¢ÇØ·Ê¿§¤ò°ú¿ô <colorspec> ¤Ç»ØÄê¤·¤¿ÃÍ¤ËÀßÄê¤·¤Þ¤¹¡£",
-+" <colorspec> ¤ÏÍ­¸ú¤Ê¿§Ì¾¤«¡¢'#' ¤Î¸å¤Ë 16 ¿Ê¿ô¤òÃÖ¤¯ 3 ¥Ð¥¤¥È¤Î RGB ¥³",
-+" ¡¼¥É (Îã¤¨¤Ð '#ff0000' ¤Ï¿¿ÀÖ) ¤Î¤¤¤º¤ì¤«¤Ç¤Ê¤±¤ì¤Ð¤¤¤±¤Þ¤»¤ó¡£¾ÊÎ¬¤·¤¿",
-+" ¾ì¹ç¤ÏÇØ·Ê¤ÏÆ©ÌÀ¤Ë¤Ê¤ê¤Þ¤¹¡£",
-+"",
-+" ¥ª¥×¥·¥ç¥ó 'size' ¤Ï¡¢¥­¥ã¥ó¥Ð¥¹¥µ¥¤¥º¤Î 2 ¤Ä¤ÎÄ¹¤µ <x>, <y> ¤òÉ¬Í×¤È",
-+" ¤·¤Þ¤¹¡£¥Ç¥Õ¥©¥ë¥È¤Î¥­¥ã¥ó¥Ð¥¹¥µ¥¤¥º¤Ï 12.5cm x 8.75cm ¤Ç¤¹¡£",
-+"",
-+" ¥ª¥×¥·¥ç¥ó 'scale' ¤Ï¡¢¥ª¥×¥·¥ç¥ó 'size' ¤ÈÆ±Åù¤Îµ¡Ç½¤Ç¤¹¤¬¡¢¤³¤Î <x>,",
-+" <y> ¤ÏÄ¹¤µ¤Ç¤Ï¤Ê¤¯¡¢³ÈÂçÎ¨¤Ë¤Ê¤ê¤Þ¤¹¡£",
-+"",
-+" ¥ª¥×¥·¥ç¥ó 'plotsize' ¤Ï¡¢¥­¥ã¥ó¥Ð¥¹¥µ¥¤¥º¤ÎÂå¤ï¤ê¤ËÉÁ²èÎÎ°è¤Î¥µ¥¤¥º¤Î",
-+" ÀßÄê¤ò¹Ô¤¤¤Þ¤¹¤¬¡¢¤½¤ì¤¬ÄÌ¾ï¤Î gnuplot ¤ÎµóÆ°¤Ç¤¹¡£¤³¤Î¥ª¥×¥·¥ç¥ó¤ò»È",
-+" ÍÑ¤¹¤ë¤È¡¢¤ï¤º¤«¤ËÈóÂÐ¾Î¤Ê¹ï¤ßÉý¤òºî¤ë¤«¤â¤·¤ì¤Þ¤»¤ó¡£'originreset' ¤Î",
-+" ¤è¤¦¤Ë¡¢¤³¤Î¥ª¥×¥·¥ç¥ó¤ò multiplot ¤ä pm3d ÉÁ²è¤Ç»ÈÍÑ¤¹¤ë¤È¡¢ÉÔÅÔ¹ç¤Ê",
-+" ·ë²Ì¤ò¾·¤¯¶²¤ì¤¬¤¢¤ê¤Þ¤¹¡£¤½¤ì¤ËÂå¤ï¤ëÊýË¡¤È¤·¤Æ¡¢¤¹¤Ù¤Æ¤Î margin ¤ò 0",
-+" ¤ÈÀßÄê¤·¤¿¾å¤Ç¥ª¥×¥·¥ç¥ó 'noclip' ¤ò»ÈÍÑ¤¹¤ë¡¢¤È¤¤¤¦¼ê¤â¤¢¤ê¤Þ¤¹¡£¤³¤Î",
-+" ¾ì¹ç¤Ï¡¢ÉÁ²èÎÎ°è¤ÏÍ¿¤¨¤¿¥­¥ã¥ó¥Ð¥¹¥µ¥¤¥º¤ÎÂç¤­¤µ¤Ë¤Ê¤ê¤Þ¤¹¡£",
-+"",
-+" ¥ª¥×¥·¥ç¥ó 'charsize' ¤Ï¡¢»ÈÍÑ¤¹¤ë¥Õ¥©¥ó¥È¤Î¿åÊ¿¥µ¥¤¥º¤È¿âÄ¾¥µ¥¤¥º¤ÎÊ¿",
-+" ¶ÑÃÍ¤òÉ¬Í×¤È¤·¤Þ¤¹¡£¤¢¤Ê¤¿¤Î TeX Ê¸½ñÆâ¤Ç¤³¤ì¤ò¤É¤Î¤è¤¦¤Ë»ÈÍÑ¤¹¤ë¤«¤Ë",
-+" ¤Ä¤¤¤Æ¤Ï¡¢¥µ¥ó¥×¥ë¤È¤·¤ÆÀ¸À®¤µ¤ì¤ë¥¹¥¿¥¤¥ë¥Õ¥¡¥¤¥ë¤ò¸«¤Æ¤¯¤À¤µ¤¤¡£",
-+"",
-+" ¥ª¥×¥·¥ç¥ó 'fontscale', 'textscale' ¤Ë¤Ï¡¢½Ì¼ÜÈæ¥Ñ¥é¥á¡¼¥¿¤¬É¬Í×¤Ç¤¹¡£",
-+" ¥°¥é¥ÕÆâ¤Î¤¹¤Ù¤Æ¤ÎÊ¸»úÎó¤¬¤½¤Î½Ì¼ÜÈæ¤Ç¿­½Ì¤µ¤ì¤Þ¤¹¡£",
-+"",
-+" 'dashlength' (¤Þ¤¿¤Ï 'dl') ¤Ï¡¢Ê¬³ä¤¹¤ëÇËÀþ¤ÎÄ¹¤µ¤ò¡¢Àµ¤ÎÉâÆ°¾®¿ôÅÀÃÍ",
-+" <DL> ¤Ç¿­½Ì¤·¤Þ¤¹¡£'linewidth' (¤Þ¤¿¤Ï 'ld') ¤Ï¤¹¤Ù¤Æ¤ÎÀþÉý¤ò <LW> ¤Ç",
-+" ¿­½Ì¤·¤Þ¤¹¡£",
-+"",
-+" ¥ª¥×¥·¥ç¥ó 'tex', 'latex', 'context' ¤Ï¡¢TeX ½ÐÎÏ·Á¼°¤ÎÁªÂò¤Ç¤¹¡£¥Ç¥Õ¥©",
-+" ¥ë¥È¤Ï LaTeX ¤Ç¤¹¡£¤½¤Î¥¹¥¿¥¤¥ë¥Õ¥¡¥¤¥ë¤òÆÉ¤ß¹þ¤à¤Ë¤Ï¡¢¤¢¤Ê¤¿¤ÎÊ¸½ñ¥Õ¥¡",
-+" ¥¤¥ë¤ÎÀèÆ¬¤ËÂÐ±þ¤¹¤ë¹Ô¤òÆþ¤ì¤Æ¤¯¤À¤µ¤¤:",
-+"   \\input gnuplot-lua-tikz.tex    % (plain TeX ¤Î¾ì¹ç)",
-+"   \\usepackage{gnuplot-lua-tikz}  % (LaTeX ¤Î¾ì¹ç)",
-+"   \\usemodule[gnuplot-lua-tikz]   % (ConTeXt ¤Î¾ì¹ç)",
-+"",
-+" 'createstyle' ¤Ï¡¢¤½¤Î¥¹¥¯¥ê¥×¥È¤«¤é TeX/LaTeX/ConTeXt ¥¹¥¿¥¤¥ë¥Õ¥¡¥¤¥ë",
-+" ¤òÆ³¤­½Ð¤·¡¢¤½¤ì¤é¤òÅ¬ÀÚ¤Ê¥Õ¥¡¥¤¥ë¤Ë½ñ¤­½Ð¤·¤Þ¤¹¡£",
-+"",
-+" 'fulldoc' ¤Þ¤¿¤Ï 'standalone' ¤Ï¡¢¤½¤Î¤Þ¤Þ¥³¥ó¥Ñ¥¤¥ë¤Ç¤­¤ë¤è¤¦¤Ê´°Á´¤Ê",
-+" LaTeX Ê¸½ñ¤òÀ¸À®¤·¤Þ¤¹¡£",
-+"",
-+" 'preamble' ¤Þ¤¿¤Ï 'header' ¤Ï¡¢standalone ¥â¡¼¥É¤Î¥É¥­¥å¥á¥ó¥È¤Î¥×¥ê¥¢",
-+" ¥ó¥Ö¥ë¤ËÄÉ²Ã LaTeX ¥³¡¼¥É¤ò½ÐÎÏ¤¹¤ë¤Î¤Ë»È¤¤¤Þ¤¹¡£",
-+"",
-+" ¥ª¥×¥·¥ç¥ó 'tikzplot' ¤Ç¤Ï¡¢¥³¥Þ¥ó¥É '\\path' ¤ÎÂå¤ï¤ê¤Ë '\\path plot'",
-+" ¤ò»ÈÍÑ¤·¤Þ¤¹¡£¤½¤ì¤ËÂ³¤¯Àþ¼ï (linetype) ¤Î¿ôÃÍ¤Î¥ê¥¹¥È (<ltn>,...) ¤Ï",
-+" ¤½¤ì¤Ë±Æ¶Á¤µ¤ì¤ëÉÁ²èÀþ¤òÄêµÁ¤·¤Þ¤¹¡£¤¹¤Ù¤Æ¤ÎÀþ¼ï¤ËÂÐ¤·¡¢°ì¤Ä¤ÎÉÁ²è¥¹¥¿",
-+" ¥¤¥ë¤¬Â¸ºß¤·¤Þ¤¹¡£1 °Ê¾å¤Î¤¹¤Ù¤Æ¤ÎÀþ¼ï¤ËÂÐ¤·¤Æ¡¢¥Ç¥Õ¥©¥ë¥È¤ÎÉÁ²è¥¹¥¿¥¤",
-+" ¥ë¤Ï 'smooth' ¤Ç¤¹¡£",
-+"",
-+" tikz ½ÐÎÏ·Á¼°¤Ï¡¢¥Ç¥Õ¥©¥ë¥È¤Ç¤ÏÃ±½ã¤Ê LaTeX ¤ÎÌð (arrow) ¤òÀ¸À®¤·¤Þ¤¹",
-+" ¤¬¡¢gnuplot ¤Î 'arrowstyle' ¤ÎÀßÄê¤Ë½¾¤¦Ìð¤òÀ¸À®¤·¤¿¤±¤ì¤Ð¡¢¥ª¥×¥·¥ç¥ó",
-+" 'gparrows' ¤ò»ÈÍÑ¤·¤Æ¤¯¤À¤µ¤¤¡£¥ª¥×¥·¥ç¥ó 'tikzarrows' ¤Ï¡¢¤³¤ì¤éÎ¾¼Ô¤ò",
-+" »ÈÍÑ¤·¤Ê¤¤Âè 3 ¤Î¤â¤Î¤Ç¡¢¤½¤Î arrowstyle ¤ËÂå¤ï¤ê¡¢'angle' ¥Ñ¥é¥á¡¼¥¿¤¬",
-+" ¤¢¤é¤«¤¸¤áÄêµÁ¤µ¤ì¤Æ¤¤¤ë TikZ ¤Î 12 ¤ÎÌð¤Î¥¹¥¿¥¤¥ë¤ÎÈÖ¹æ»ØÄê¤È¤·¤Æ»ÈÍÑ",
-+" ¤µ¤ì¤Þ¤¹¡£Îã¤¨¤Ð¡¢angle '7' ¤ÎÌð¤Î¥¹¥¿¥¤¥ë¤Ï TikZ ¥¹¥¿¥¤¥ë 'gp arrow 7'",
-+" ¤Ë³ä¤êÅö¤Æ¤é¤ì¡¢Â¾¤Î arrowstyle ¤ÎÀßÄê¤Ï¤¹¤Ù¤ÆÌµ»ë¤µ¤ì¤Þ¤¹¡£",
-+"",
-+" 'cmykimages' ¤Ç¤Ï¡¢¥¤¥ó¥é¥¤¥ó²èÁü¥Ç¡¼¥¿¤ËÂÐ¤·¤Æ RGB ¥«¥é¡¼¥â¥Ç¥ë¤ÎÂå¤ï",
-+" ¤ê¤Ë CMYK ¥â¥Ç¥ë¤ò»ÈÍÑ¤·¤Þ¤¹¤¬¡¢Â¾¤Î¤¹¤Ù¤Æ¤Î¿§ (Àþ¤Î¿§¤Ê¤É) ¤Ï¡¢¤½¤ì¤é",
-+" ¤¬¡¢Îã¤¨¤Ð xcolors ¥Ñ¥Ã¥±¡¼¥¸¤Ç½èÍý¤µ¤ì¤ë¤Î¤Ç¡¢¤³¤Î¥ª¥×¥·¥ç¥ó¤Î±Æ¶Á¤ò¼õ",
-+" ¤±¤Þ¤»¤ó¡£¤³¤Î¥ª¥×¥·¥ç¥ó¤Ï¡¢²èÁü¤¬¥¤¥ó¥é¥¤¥ó²èÁü¤Ç¤Ê¤¯³°Éô¥Ç¡¼¥¿¤Ç¤¢¤ë",
-+" ¾ì¹ç¤ÏÌµ»ë¤µ¤ì¤Þ¤¹¡£",
-+"",
-+" ¥ª¥×¥·¥ç¥ó 'externalimages' ¤ò»ÈÍÑ¤¹¤ë¤È¡¢¤¹¤Ù¤Æ¤Î¥Ó¥Ã¥È¥Þ¥Ã¥×²èÁü¤ò³°",
-+" Éô¤Î PNG ²èÁü¤È¤·¤Æ½ñ¤­½Ð¤·¡¢¤½¤ì¤é¤¬Ê¸½ñ¤Î¥³¥ó¥Ñ¥¤¥ë»þ¤ËÆÉ¤ß¹þ¤Þ¤ì¤ë¤è",
-+" ¤¦¤Ë¤Ê¤ê¤Þ¤¹¡£DVI ¥Õ¥¡¥¤¥ë¡¢¤ª¤è¤Ó¤½¤Î¸å¤Î PostScript ¥Õ¥¡¥¤¥ë¤òÀ¸À®¤¹",
-+" ¤ë¤Ë¤Ï¡¢PNG ¥Õ¥¡¥¤¥ë¤ò EPS ¥Õ¥¡¥¤¥ë¤Ë¡¢ÊÌ¤ËÊÑ´¹¤¹¤ëÉ¬Í×¤¬¤¢¤ê¤Þ¤¹¡£¤³¤ì",
-+" ¤ÏÎã¤¨¤Ð ImageMagick ¤Î `convert` ¤Ç¹Ô¤¨¤Þ¤¹¡£Æ©ÌÀ²½¥Ó¥Ã¥È¥Þ¥Ã¥×²èÁü¤Ï",
-+" ¾ï¤Ë³°Éô PNG ²èÁü¤È¤·¤ÆÀ¸À®¤·¤Þ¤¹¡£",
-+"",
-+" ¥ª¥×¥·¥ç¥ó 'nobitmap' ¤Ï¡¢¥Í¥¤¥Æ¥£¥Ö¤Î PS, PDF ¥¤¥ó¥é¥¤¥ó²èÁü·Á¼°¤ÎÂå",
-+" ¤ï¤ê¤Ë¡¢²èÁü¤òÅÉ¤êÄÙ¤µ¤ì¤¿Ä¹Êý·Á¤È¤·¤Æ¥ì¥ó¥À¥ê¥ó¥°¤·¤Þ¤¹¡£¤³¤Î¥ª¥×¥·¥ç",
-+" ¥ó¤Ï¡¢²èÁü¤¬¥¤¥ó¥é¥¤¥ó²èÁü¤Ç¤Ê¤¯³°Éô¥Ç¡¼¥¿¤Ç¤¢¤ë¾ì¹ç¤ÏÌµ»ë¤µ¤ì¤Þ¤¹¡£",
-+"",
-+" ¥ª¥×¥·¥ç¥ó 'providevars' ¤Ï¡¢gnuplot ¤ÎÆâÉôÊÑ¿ô¡¢¥æ¡¼¥¶ÊÑ¿ô¤ò¡¢TeX ¥¹",
-+" ¥¯¥ê¥×¥ÈÆâ¤Ç¤â¥³¥Þ¥ó¥É '\\gpgetvar{<var name>}' ¤ò»ÈÍÑ¤¹¤ë¤³¤È¤ÇÍøÍÑ²Ä",
-+" Ç½¤Ë¤µ¤»¤Þ¤¹¡£ÍøÍÑ¤Ç¤­¤ëÊÑ¿ô¤Î°ìÍ÷¤ò¸«¤ë¤Ë¤Ï¡¢'show variables all' ¥³",
-+" ¥Þ¥ó¥É¤ò»ÈÍÑ¤·¤Æ¤¯¤À¤µ¤¤¡£",
-+"",
-+" Ê¸»úÎó <fontdesc> ¤Ë¤Ï¡¢Îã¤¨¤Ð '\\small' ¤Î¤è¤¦¤Ê TeX/LaTeX/ConTeXt ¤Ç",
-+" Í­¸ú¤Ê¥Õ¥©¥ó¥È¥³¥Þ¥ó¥É¤òÆþ¤ì¤ë¤³¤È¤â¤Ç¤­¡¢¤½¤ì¤Ï¡¢\"font=<fontdesc>\"",
-+" ¤Î·Á¼°¤Î¥Î¡¼¥É¥Ñ¥é¥á¡¼¥¿¤È¤·¤ÆÄ¾ÀÜÅÏ¤µ¤ì¤Þ¤¹¡£¤³¤ì¤Ï¡¢¤¢¤ë¥Î¡¼¥É¤Ë¥³¡¼",
-+" ¥É¤òÄÉ²Ã¤¹¤ë¤Î¤Ë¡Ö¤ï¤¶¤È´Ö°ã¤¨¤Æ¡×»È¤¨¤Þ¤¹¡£Îã¤¨¤Ð '\\small,yshift=1ex'",
-+" ¤âÍ­¸ú¤Ç¤¹¤¬¡¢',yshift=1ex' ¤âÍ­¸ú¤Ç¡¢¸å¼Ô¤Ï¸½ºß¤Î¥Õ¥©¥ó¥ÈÀßÄê¤òÊÑ¹¹¤·",
-+" ¤Þ¤»¤ó¡£¤·¤«¤·¥ê¥¹¥È¤ÎÂè 2 °ú¿ô¤ÏÎã³°¤Ç¡¢¤½¤ì¤¬ <¿ôÃÍ>{Ã±°Ì} ¤Î·Á¼°¤Î¿ô",
-+" ÃÍ¤Î¾ì¹ç¡¢¤½¤ì¤ÏÂ¾¤Î½ÐÎÏ·Á¼°Æ±ÍÍ¤Ë¥Õ¥©¥ó¥È¥µ¥¤¥º¤È²ò¼á¤·¡¢Âè 1 °ú¿ô¤ËÄÉ",
-+" ²Ã¤µ¤ì¤Æ¤·¤Þ¤¤¤Þ¤¹¡£Ã±°Ì¤ò¾ÊÎ¬¤·¤¿ÃÍ¤Ï 'pt' Ã±°Ì¤È²ò¼á¤·¤Þ¤¹¡£Îã¤¨¤Ð¡¢",
-+" '\\sffamily,12,fill=red' ¤Ï¡¢ÇØ·Ê¿§¤¬ÀÖ¤Ç 12pt ¤Î LaTeX sans serif ¥Õ¥©",
-+" ¥ó¥È¤òÀßÄê¤·¤Þ¤¹¡£",
-+" Æ±¤¸¤³¤È¤¬ ConTeXt ¤Ë¤â¸À¤¨¤Þ¤¹¡£Îã¤¨¤Ð¡¢'\\switchtobodyfont[iwona],10'",
-+" ¤Ï¥Õ¥©¥ó¥È¤ò 10pt ¥µ¥¤¥º¤Î Iwona ¤ËÊÑ¹¹¤·¤Þ¤¹¡£",
-+" Plain TeX ¥æ¡¼¥¶¤Ï¡¢¥Õ¥©¥ó¥È¥µ¥¤¥º¤ÎÊÑ¹¹¤ÏºÇ½é¤Î°ú¿ô¤ÇÌÀ¼¨Åª¤Ë¹Ô¤ï¤Ê¤±",
-+" ¤ì¤Ð¤¤¤±¤Þ¤»¤ó¡£¥Æ¥­¥¹¥È¥Ü¥Ã¥¯¥¹¤Î½Ì¼Ü¤òÀµ¤·¤¯¼èÆÀ¤¹¤ë¤è¤¦¡¢2 ¤ÄÌÜ¤âÆ±",
-+" ¤¸ÃÍ¤ËÀßÄê¤¹¤Ù¤­¤Ç¤¹¡£",
-+"",
-+" Ê¸»úÎó¤ÏÃ±°ì¡¢¤¢¤ë¤¤¤ÏÆó½Å°úÍÑÉäÆâ¤ËÆþ¤ì¤ëÉ¬Í×¤¬¤¢¤ê¤Þ¤¹¡£Æó½Å°úÍÑÉä¤Ç",
-+" ¤¯¤¯¤é¤ì¤¿Ê¸»úÎó¤Ë¤Ï¡¢²þ¹Ô¤Î '\\n' ¤Ê¤É¤ÎÆÃÊÌ¤ÊÊ¸»ú¤òÆþ¤ì¤ë¤³¤È¤¬¤Ç¤­",
-+" ¤Þ¤¹¡£",
-+""
-+#endif /* JAPANESE_DOC */
 diff -ru term/lua.trm.ORG term/lua.trm
---- term/lua.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/lua.trm	2022-09-28 11:19:26.777880000 +0900
+--- term/lua.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/lua.trm	2022-12-13 17:00:39.289712000 +0900
 @@ -1480,6 +1480,7 @@
  
  #ifdef TERM_HELP
@@ -3991,8 +3585,8 @@ diff -ru term/lua.trm.ORG term/lua.trm
  END_HELP(tikz)
  #endif /* TERM_HELP */
 diff -ru term/metafont.trm.ORG term/metafont.trm
---- term/metafont.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/metafont.trm	2022-09-28 11:19:26.777977000 +0900
+--- term/metafont.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/metafont.trm	2022-12-13 17:00:39.290024000 +0900
 @@ -538,6 +538,7 @@
  
  #ifdef TERM_HELP
@@ -4107,8 +3701,8 @@ diff -ru term/metafont.trm.ORG term/metafont.trm
  END_HELP(mf)
  #endif /* TERM_HELP */
 diff -ru term/metapost.trm.ORG term/metapost.trm
---- term/metapost.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/metapost.trm	2022-09-28 11:19:26.778115000 +0900
+--- term/metapost.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/metapost.trm	2022-12-13 17:00:39.290521000 +0900
 @@ -1054,6 +1054,7 @@
  
  #ifdef TERM_HELP
@@ -4320,8 +3914,8 @@ diff -ru term/metapost.trm.ORG term/metapost.trm
  END_HELP(mp)
  #endif				/* TERM_HELP */
 diff -ru term/mif.trm.ORG term/mif.trm
---- term/mif.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/mif.trm	2022-09-28 11:19:26.778214000 +0900
+--- term/mif.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/mif.trm	2022-12-13 17:00:39.290853000 +0900
 @@ -963,6 +963,7 @@
  
  #ifdef TERM_HELP
@@ -4372,8 +3966,8 @@ diff -ru term/mif.trm.ORG term/mif.trm
  END_HELP(mif)
  #endif /* TERM_HELP */
 diff -ru term/pbm.trm.ORG term/pbm.trm
---- term/pbm.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/pbm.trm	2022-09-28 11:19:26.778289000 +0900
+--- term/pbm.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/pbm.trm	2022-12-13 17:00:39.291088000 +0900
 @@ -534,6 +534,7 @@
  
  #ifdef TERM_HELP
@@ -4423,8 +4017,8 @@ diff -ru term/pbm.trm.ORG term/pbm.trm
  END_HELP(pbm)
  #endif /* TERM_HELP */
 diff -ru term/pc.trm.ORG term/pc.trm
---- term/pc.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/pc.trm	2022-09-28 11:19:26.778402000 +0900
+--- term/pc.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/pc.trm	2022-12-13 17:00:39.291549000 +0900
 @@ -1587,6 +1587,7 @@
  
  #ifdef TERM_HELP
@@ -4478,8 +4072,8 @@ diff -ru term/pc.trm.ORG term/pc.trm
  END_HELP(dospc)
  #endif /* TERM_HELP */
 diff -ru term/pdf.trm.ORG term/pdf.trm
---- term/pdf.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/pdf.trm	2022-09-28 11:19:26.778550000 +0900
+--- term/pdf.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/pdf.trm	2022-12-13 17:00:39.292083000 +0900
 @@ -1716,6 +1716,7 @@
  
  #ifdef TERM_HELP
@@ -4546,8 +4140,8 @@ diff -ru term/pdf.trm.ORG term/pdf.trm
  END_HELP(pdf)
  #endif
 diff -ru term/pict2e.trm.ORG term/pict2e.trm
---- term/pict2e.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/pict2e.trm	2022-09-28 11:19:26.778653000 +0900
+--- term/pict2e.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/pict2e.trm	2022-12-13 17:00:39.292491000 +0900
 @@ -1092,6 +1092,7 @@
  
  #ifdef TERM_HELP
@@ -4634,8 +4228,8 @@ diff -ru term/pict2e.trm.ORG term/pict2e.trm
  END_HELP(pict2e)
  #endif /* TERM_HELP */
 diff -ru term/pm.trm.ORG term/pm.trm
---- term/pm.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/pm.trm	2022-09-28 11:19:26.778768000 +0900
+--- term/pm.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/pm.trm	2022-12-13 17:00:39.292958000 +0900
 @@ -1579,6 +1579,7 @@
  
  #ifdef TERM_HELP
@@ -4700,8 +4294,8 @@ diff -ru term/pm.trm.ORG term/pm.trm
  END_HELP(pm)
  #endif /* TERM_HELP */
 diff -ru term/post.trm.ORG term/post.trm
---- term/post.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/post.trm	2022-09-28 11:19:26.827517000 +0900
+--- term/post.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/post.trm	2022-12-13 17:00:39.325860000 +0900
 @@ -4454,6 +4454,7 @@
   * of "text" that is necessary to avoid errors.
   */
@@ -4842,8 +4436,8 @@ diff -ru term/post.trm.ORG term/post.trm
 +" (b) '[' ¤Ç»Ï¤Þ¤ëÊ¸»úÎó¤Î¾ì¹ç¤Ï¡¢°ÌÃÖ¤Î»ØÄê¤ò¤¹¤ëÊ¸»úÎó (t,b,l,r,c ¤Î¤¦",
 +" ¤Á 2 ¤Ä¤Þ¤Ç) ¤¬Â³¤­¡¢¼¡¤Ë ']{'¡¢Ê¸»úÎóËÜÂÎ¡¢¤ÇºÇ¸å¤Ë '}' ¤È¤·¤Þ¤¹¤¬¡¢",
 +" ¤³¤ÎÊ¸»úÎó¤Ï  LaTeX ¤¬ LR-box ¤È¤·¤ÆÀ°·Á¤·¤Þ¤¹¡£\\rule{}{} ¤ò»È¤¨¤Ð¤µ",
-+" ¤é¤ËÎÉ¤¤°ÌÃÖ¹ç¤ï¤»¤¬²ÄÇ½¤Ç¤·¤ç¤¦¡£°Ê²¼¤â»²¾È: ¥É¥é¥¤¥Ð `pslatex` ¤Ë´Ø",
-+" ¤¹¤ëÀâÌÀ¡£",
++" ¤é¤ËÎÉ¤¤°ÌÃÖ¹ç¤ï¤»¤¬²ÄÇ½¤Ç¤·¤ç¤¦¡£¥É¥é¥¤¥Ð `pslatex` ¤Ë´Ø¤¹¤ëÀâÌÀ¤â»²",
++" ¾È¡£",
 +" Ê£¿ô¹Ô¤Î¸«½Ð¤·¤òºîÀ®¤¹¤ë¤Ë¤Ï \\shortstack ¤ò»ÈÍÑ¤·¤Æ¤¯¤À¤µ¤¤¡£Îã¤¨¤Ð¡¢",
 +"    set ylabel '[r]{\\shortstack{first line \\\\ second line}}'",
 +"",
@@ -5159,7 +4753,7 @@ diff -ru term/post.trm.ORG term/post.trm
 +"",
 +" PostScript ¥Õ¥¡¥¤¥ë¤ÏÊÔ½¸²ÄÇ½¤Ç¡¢°ìÅÙ `gnuplot` ¤Ç¤½¤ì¤òºî¤ì¤Ð¡¢¤½¤ì¤ò",
 +" Ë¾¤à¤è¤¦¤Ë½¤Àµ¤¹¤ë¤³¤È¤Ï¼«Í³¤Ë¹Ô¤Ê¤¨¤Þ¤¹¡£¤½¤Î¤¿¤á¤Î¥Ò¥ó¥È¤òÆÀ¤ë¤Ë¤Ï¡¢",
-+" °Ê²¼»²¾È: `editing postscript` ¤ÎÀá¡£",
++" °Ê²¼»²¾È: `editing postscript`¡£",
 +"2 PostScript ¤ÎÊÔ½¸ (editing postscript)",
 +"?commands set terminal postscript editing",
 +"?set terminal postscript editing",
@@ -5342,8 +4936,8 @@ diff -ru term/post.trm.ORG term/post.trm
  END_HELP(post)
  #endif /* TERM_HELP */
 diff -ru term/pstricks.trm.ORG term/pstricks.trm
---- term/pstricks.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/pstricks.trm	2022-09-28 11:19:26.779789000 +0900
+--- term/pstricks.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/pstricks.trm	2022-12-13 17:00:39.312108000 +0900
 @@ -1323,6 +1323,7 @@
  
  #ifdef TERM_HELP
@@ -5422,8 +5016,8 @@ diff -ru term/pstricks.trm.ORG term/pstricks.trm
  END_HELP(pstricks)
  #endif /* TERM_HELP */
 diff -ru term/qms.trm.ORG term/qms.trm
---- term/qms.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/qms.trm	2022-09-28 11:19:26.779856000 +0900
+--- term/qms.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/qms.trm	2022-12-13 17:00:39.312338000 +0900
 @@ -223,6 +223,7 @@
  
  #ifdef TERM_HELP
@@ -5450,8 +5044,8 @@ diff -ru term/qms.trm.ORG term/qms.trm
  END_HELP(qms)
  #endif
 diff -ru term/qt.trm.ORG term/qt.trm
---- term/qt.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/qt.trm	2022-09-28 11:19:26.779931000 +0900
+--- term/qt.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/qt.trm	2022-12-13 17:00:39.312585000 +0900
 @@ -76,6 +76,7 @@
  
  #ifdef TERM_HELP
@@ -5588,8 +5182,8 @@ diff -ru term/qt.trm.ORG term/qt.trm
  END_HELP(qt)
  #endif /* TERM_HELP */
 diff -ru term/regis.trm.ORG term/regis.trm
---- term/regis.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/regis.trm	2022-09-28 11:19:26.779996000 +0900
+--- term/regis.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/regis.trm	2022-12-13 17:00:39.312779000 +0900
 @@ -255,6 +255,7 @@
  
  #ifdef TERM_HELP
@@ -5621,8 +5215,8 @@ diff -ru term/regis.trm.ORG term/regis.trm
  END_HELP(regis)
  #endif
 diff -ru term/svg.trm.ORG term/svg.trm
---- term/svg.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/svg.trm	2022-09-28 11:19:26.780169000 +0900
+--- term/svg.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/svg.trm	2022-12-13 17:00:39.313499000 +0900
 @@ -2317,6 +2317,7 @@
  
  #ifdef TERM_HELP
@@ -5733,8 +5327,8 @@ diff -ru term/svg.trm.ORG term/svg.trm
  END_HELP(domterm)
  #endif /* TERM_HELP */
 diff -ru term/t410x.trm.ORG term/t410x.trm
---- term/t410x.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/t410x.trm	2022-09-28 11:19:26.780251000 +0900
+--- term/t410x.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/t410x.trm	2022-12-13 17:00:39.313719000 +0900
 @@ -312,6 +312,7 @@
  
  #ifdef TERM_HELP
@@ -5761,8 +5355,8 @@ diff -ru term/t410x.trm.ORG term/t410x.trm
  END_HELP(tek410x)
  #endif
 diff -ru term/tek.trm.ORG term/tek.trm
---- term/tek.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/tek.trm	2022-09-28 11:19:26.780357000 +0900
+--- term/tek.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/tek.trm	2022-12-13 17:00:39.314155000 +0900
 @@ -1360,6 +1360,7 @@
  
  #ifdef TERM_HELP
@@ -5863,8 +5457,8 @@ diff -ru term/tek.trm.ORG term/tek.trm
  END_HELP(tek40)
  #endif /* TERM_HELP */
 diff -ru term/texdraw.trm.ORG term/texdraw.trm
---- term/texdraw.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/texdraw.trm	2022-09-28 11:19:26.780451000 +0900
+--- term/texdraw.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/texdraw.trm	2022-12-13 17:00:39.314495000 +0900
 @@ -883,6 +883,7 @@
  
  #ifdef TERM_HELP
@@ -5933,8 +5527,8 @@ diff -ru term/texdraw.trm.ORG term/texdraw.trm
  END_HELP(texdraw)
  #endif /* TERM_HELP */
 diff -ru term/tgif.trm.ORG term/tgif.trm
---- term/tgif.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/tgif.trm	2022-09-28 11:19:26.830123000 +0900
+--- term/tgif.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/tgif.trm	2022-12-13 17:00:39.329160000 +0900
 @@ -1678,6 +1678,7 @@
  
  #ifdef TERM_HELP
@@ -6024,8 +5618,8 @@ diff -ru term/tgif.trm.ORG term/tgif.trm
  #endif
  /*{{{}}}*/
 diff -ru term/tkcanvas.trm.ORG term/tkcanvas.trm
---- term/tkcanvas.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/tkcanvas.trm	2022-09-28 11:19:26.780762000 +0900
+--- term/tkcanvas.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/tkcanvas.trm	2022-12-13 17:00:39.315698000 +0900
 @@ -2116,6 +2116,7 @@
  
  #ifdef TERM_HELP
@@ -6188,8 +5782,8 @@ diff -ru term/tkcanvas.trm.ORG term/tkcanvas.trm
  #endif
  
 diff -ru term/tpic.trm.ORG term/tpic.trm
---- term/tpic.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/tpic.trm	2022-09-28 11:19:26.780856000 +0900
+--- term/tpic.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/tpic.trm	2022-12-13 17:00:39.316027000 +0900
 @@ -926,6 +926,7 @@
  
  #ifdef TERM_HELP
@@ -6250,8 +5844,8 @@ diff -ru term/tpic.trm.ORG term/tpic.trm
  END_HELP(tpic)
  #endif /* TERM_TABLE */
 diff -ru term/webp.trm.ORG term/webp.trm
---- term/webp.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/webp.trm	2022-09-28 11:19:26.781009000 +0900
+--- term/webp.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/webp.trm	2022-12-13 17:00:39.316531000 +0900
 @@ -372,6 +372,7 @@
  
  #ifdef TERM_HELP
@@ -6314,8 +5908,8 @@ diff -ru term/webp.trm.ORG term/webp.trm
  #endif /* TERM_HELP */
  
 diff -ru term/win.trm.ORG term/win.trm
---- term/win.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/win.trm	2022-09-28 11:19:26.781140000 +0900
+--- term/win.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/win.trm	2022-12-13 17:00:39.317070000 +0900
 @@ -1190,6 +1190,7 @@
  
  #ifdef TERM_HELP
@@ -6653,8 +6247,8 @@ diff -ru term/win.trm.ORG term/win.trm
  END_HELP(windows)
  #endif /* TERM_HELP */
 diff -ru term/wxt.trm.ORG term/wxt.trm
---- term/wxt.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/wxt.trm	2022-09-28 11:19:26.781261000 +0900
+--- term/wxt.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/wxt.trm	2022-12-13 17:00:39.317404000 +0900
 @@ -499,6 +499,7 @@
  
  #ifdef TERM_HELP
@@ -6795,8 +6389,8 @@ diff -ru term/wxt.trm.ORG term/wxt.trm
  END_HELP(wxt)
  #endif /* TERM_HELP */
 diff -ru term/x11.trm.ORG term/x11.trm
---- term/x11.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/x11.trm	2022-09-28 11:19:26.781504000 +0900
+--- term/x11.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/x11.trm	2022-12-13 17:00:39.318364000 +0900
 @@ -2375,6 +2375,7 @@
  
  #ifdef TERM_HELP
@@ -7322,8 +6916,8 @@ diff -ru term/x11.trm.ORG term/x11.trm
  END_HELP(x11)
  #endif				/* TERM_HELP */
 diff -ru term/xlib.trm.ORG term/xlib.trm
---- term/xlib.trm	2022-09-27.ORG 12:19:27.000000000 +0900
-+++ term/xlib.trm	2022-09-28 11:19:26.781567000 +0900
+--- term/xlib.trm	2022-11-16.ORG 10:28:57.000000000 +0900
++++ term/xlib.trm	2022-12-13 17:00:39.318554000 +0900
 @@ -96,6 +96,7 @@
  
  #ifdef TERM_HELP
