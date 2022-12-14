@@ -3520,7 +3520,7 @@ diff -ru term/lua.trm.ORG term/lua.trm
  "1 lua",
  "?commands set terminal lua",
  "?set terminal lua",
-@@ -1506,12 +1507,45 @@
+@@ -1506,12 +1507,43 @@
  " All arguments will be provided to the selected script for further",
  " evaluation. E.g. 'set term lua tikz help' will cause the script itself",
  " to print additional help on options and choices for the script.",
@@ -3555,8 +3555,6 @@ diff -ru term/lua.trm.ORG term/lua.trm
  #ifdef HAVE_LUA
 +#ifndef JAPANESE_DOC
  #include "gnuplot-tikz.help"
-+#else
-+#include "lua/gnuplot-tikz-ja.help"
  #endif
 +#endif
  ""

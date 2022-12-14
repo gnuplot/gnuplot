@@ -502,13 +502,13 @@ C 行が長いのは、できればなんとかしたい
 ## 同じ色で境界を描きます。これは、原理的に視覚効果はありませんが、あま
 ## りよくない pdf や postscript ビューワのようなディスプレイモードで、
 ## アンチエイリアスによる副産物が導入されないようにします。
-#b `set isotoropic` は、2 次元グラフと 3 次元グラフの両方で、x, y, z 軸
+#b `set isotropic` は、2 次元グラフと 3 次元グラフの両方で、x, y, z 軸
 ## のすべてのスケールが同じになるようにスケールを合わせます。
 #b 変更: 文字の回転角が整数という制限はなくなりました。
 #b 特別な (非数値の) 線種 (linetype) `lt nodraw`, `lt black`, `lt bgnd`
 ## 以下参照: `special_linetypes`。
 #b データ駆動型の histogram グラフの色割り当て。以下参照:
-## `histgrams colors`。
+## `histograms colors`。
 #b 凡例 (key) の箱の位置は、gnuplot が他に行う仕組みによるどんな位置決
 ## めに対しても、オフセットを与えることで手動で調整できます。以下参照:
 ## `set key offset`。
@@ -656,7 +656,7 @@ C 行が長いのは、できればなんとかしたい
 ## リッピングします。これは、pm3d 曲面、そして 3 次元の boxes, polygons
 ## 等にも影響を与えます。
 #b 描画スタイル `with parallelaxes` の書式の改良。以下参照: `parallel`。
-## histgram, parallelaxis, spiderplot スタイルでは、描画要素を繰返し出
+## histogram, parallelaxis, spiderplot スタイルでは、描画要素を繰返し出
 ## 力する書式を使用できます:
 ##      `plot for [column=1:N] DATA using column`
 #b 2 次元描画での using 指定によって得られる複素数値 value は、その実数
@@ -5717,7 +5717,7 @@ Ffigure_polar_grid
 
  一つ追加のスタイルオプション `set style histogram nokeyseparators` は、
  複数のヒストグラムを含むグラフにのみ適切なものです。その場合の追加説明
- については、以下参照: `newhistgram`。
+ については、以下参照: `newhistogram`。
 
  例:
 Ffigure_histclust
@@ -11556,12 +11556,12 @@ Ffigure_missing
  ような方法でデータを前処理するべきでしょう。
 
  ネット上の以下のデモも参照
- ^ <a href="http://www.gnuplot.info/demo/dgrid3d.html">
+^ <a href="http://www.gnuplot.info/demo/dgrid3d.html">
  dgrid3d
- ^ </a>
- ^ <a href="http://www.gnuplot.info/demo/scatter.html">
+^ </a>
+^ <a href="http://www.gnuplot.info/demo/scatter.html">
  scatter
- ^ </a>
+^ </a>
 ^ <a href="http://www.gnuplot.info/demo/heatmap_points.html">
  heatmap_points
 ^ </a>
@@ -12511,7 +12511,7 @@ Ffigure_missing
  れの代わりに使えます: `set size ratio -1; set view equal xyz`。
  これは、2 次元、3 次元グラフの両方に影響します。
 
- `unset isotoropic` は、2 次元、3 次元グラフの両方でその束縛を開放しま
+ `unset isotropic` は、2 次元、3 次元グラフの両方でその束縛を開放しま
  す。これは以下の古いコマンドと同値ですが、覚えるにはこれの方が簡単でし
  ょう: `set size noratio; set view noequal_axes`。
 3 jitter
@@ -14999,7 +14999,7 @@ Ffigure_palette2
  hidden_compare.dem も参照してください。
 ^ <a href="http://www.gnuplot.info/demo/hidden_compare.html">
  (単色塗り曲面の hidden3d と pm3d の処理の比較)
- ^ </a>
+^ </a>
  例:
       set pm3d lighting primary 0.8 spec 0.4 spec2 0.4
       set pm3d spot rgb "blue"
@@ -15525,12 +15525,12 @@ Ffigure_polar_grid
  長さの比)。
 
  <r> の値を負にするとその意味は違って来ます。<r>=-1 のとき、x 軸、y 軸
- の双方の単位 (つまり 1) の目盛りの長さが同一、すなわち等長 (isotoropic)
- になるよう設定します。以下も参照: `set isotoropic`。
+ の双方の単位 (つまり 1) の目盛りの長さが同一、すなわち等長 (isotropic)
+ になるよう設定します。以下も参照: `set isotropic`。
  これは、3 次元用のコマンド `set view equal xy` の 2 次元での同等物です。
  <r>=-2 のとき、y 軸の単位目盛りの長さは x 軸の単位目盛りの長さの 2 倍
  に設定されます。<r> が負の値に関して以下同様です。以下も参照:
- `set isotoropic`。
+ `set isotropic`。
 
  `gnuplot` が指定されたアスペクト比のグラフをちゃんと書けるかは選択され
  る出力形式に依存します。グラフの領域は出力の指定された部分にちゃんと収
