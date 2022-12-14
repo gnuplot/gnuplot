@@ -444,8 +444,8 @@ clip_line(int *x1, int *y1, int *x2, int *y2)
      * when the line passes directly through at least one corner).
      */
     count = 0;
-    dx = *x2 - *x1;
-    dy = *y2 - *y1;
+    dx = (double)(*x2) - (double)(*x1);
+    dy = (double)(*y2) - (double)(*y1);
     /* Find intersections with the x parallel bbox lines: */
     if (dy != 0) {
 	x = (clip_area->ybot - *y2) * dx / dy + *x2;	/* Test for clip_area->ybot boundary. */

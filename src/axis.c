@@ -2755,7 +2755,26 @@ int
 map_y(double value)
 {
     double y = map_y_double(value);
-    if(isnan(y)) return intNaN;
+    if (isnan(y))
+	return intNaN;
+    return axis_map_toint(y);
+}
+
+/*
+ * This routine substitues for map_y() when drawing lines with
+ * option "sharpen".   It prevents extremely large values from
+ * being treated as UNDEFINED rather than OUTRANGE.
+ */
+int
+map_ysharp(double value)
+{
+    double y = map_y_double(value);
+    if (isnan(y))
+	return intNaN;
+    if (y >= (double)(INT_MAX))
+	return INT_MAX/2;
+    if (y <= (double)(-INT_MAX))
+	return -(INT_MAX/2);
 
     return axis_map_toint(y);
 }

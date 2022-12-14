@@ -506,6 +506,7 @@ void extend_autoscaled_log_axis(AXIS *primary);
 
 int map_x(double value);
 int map_y(double value);
+int map_ysharp(double value);
 
 double map_x_double(double value);
 double map_y_double(double value);
