@@ -472,13 +472,15 @@ puttex( char *str, FILE *file)
     static TBOOLEAN inquote = FALSE;
     int i;
 
-    while ((ch = *str++) != NUL) {
+    while ((ch = *str) != NUL) {
 
 	/* Japanese documentation trigger for cross-reference link */
 	if (!strncmp( str, "参照", strlen("参照") ))
 	    ja_see = TRUE;
 	if (!strncmp( str, "。", strlen("。") ))
 	    ja_see = FALSE;
+
+	str++;
 
 	switch (ch) {
 	case '#':
