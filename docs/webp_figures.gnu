@@ -13,10 +13,12 @@ do for [ang=1:360:2] {
 }
 unset output
 
-set term pngcairo size 300,300
-set output './html/figure_static_d20.png'
-replot
-unset output
+# This figure is already in the repository as a static illustration
+#
+# set term pngcairo size 300,300
+# set output './html/figure_static_d20.png'
+# replot
+# unset output
 
 reset
 
