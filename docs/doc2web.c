@@ -529,8 +529,8 @@ process_line(char *line, FILE *b, FILE *d)
 		    fclose(b);
 
                     /* open new file */
-		    strcat(newfile,path);
-		    strncat(newfile,location,PATH_MAX-strlen(newfile)-6);
+		    strncpy(newfile, path, PATH_MAX-1);
+		    strncat(newfile, location, PATH_MAX-strlen(newfile)-6);
 		    strcat(newfile,".html");
                     if (!(b = fopen(newfile, "w"))) {
                         fprintf(stderr, "doc2web: Can't open %s for writing\n",
