@@ -43,6 +43,7 @@
 #include "eval.h"
 #include "filters.h"
 #include "getcolor.h"
+#include "gplocale.h"
 #include "graph3d.h"
 #include "hidden3d.h"
 #include "interpol.h"
@@ -53,7 +54,6 @@
 #include "term_api.h"
 #include "tabulate.h"
 #include "util.h"
-#include "variable.h" /* For locale handling */
 #include "voxelgrid.h"
 
 #include "plot2d.h" /* Only for store_label() */

@@ -97,6 +97,7 @@
 #include "datablock.h"
 #include "datafile.h"
 #include "eval.h"
+#include "gplocale.h"
 #include "gp_time.h"
 #include "matrix.h"
 #include "misc.h"
@@ -105,7 +106,6 @@
 #include "scanner.h"  /* For legal_identifier() */
 #include "specfun.h"
 #include "util.h"
-#include "variable.h" /* For locale handling */
 #include <signal.h>
 
 /* Just temporary */

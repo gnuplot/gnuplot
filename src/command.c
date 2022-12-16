@@ -67,6 +67,8 @@
 #include "datafile.h"
 #include "getcolor.h"
 #include "gp_hist.h"
+#include "gplocale.h"
+#include "loadpath.h"
 #include "misc.h"
 #include "parse.h"
 #include "plot.h"
@@ -80,7 +82,6 @@
 #include "tables.h"
 #include "term_api.h"
 #include "util.h"
-#include "variable.h"
 #include "voxelgrid.h"
 #include "external.h"
 

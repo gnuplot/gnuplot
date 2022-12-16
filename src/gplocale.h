@@ -1,4 +1,4 @@
-/* GNUPLOT - variable.h */
+/* GNUPLOT - gplocale.h */
 
 /*[
  * Copyright 1999, 2004   Lars Hecking
@@ -30,10 +30,8 @@
  * to the extent permitted by applicable law.
 ]*/
 
-/* The death of global variables - part one. */
-
-#ifndef VARIABLE_H
-# define VARIABLE_H
+#ifndef GPLOCALE_H
+# define GPLOCALE_H
 
 #include "syscfg.h"
 
@@ -74,19 +72,6 @@
 #define ACTION_GET    (1<<3)
 #define ACTION_SAVE   (1<<4)
 #define ACTION_CLEAR  (1<<5)
-
-/* Loadpath related */
-
-char *loadpath_handler(int, char *);
-
-#define init_loadpath()    loadpath_handler(ACTION_INIT,NULL)
-#define set_var_loadpath(path) loadpath_handler(ACTION_SET,(path))
-#define get_loadpath()     loadpath_handler(ACTION_GET,NULL)
-#define save_loadpath()    loadpath_handler(ACTION_SAVE,NULL)
-#define clear_loadpath()   loadpath_handler(ACTION_CLEAR,NULL)
-#define dump_loadpath()    loadpath_handler(ACTION_SHOW,NULL)
-
-/* Locale related */
 
 char *locale_handler(int, char *);
 

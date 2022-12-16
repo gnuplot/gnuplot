@@ -47,8 +47,10 @@
 #include "fit.h"
 #include "gp_hist.h"
 #include "gp_time.h"
+#include "gplocale.h"
 #include "hidden3d.h"
 #include "jitter.h"
+#include "loadpath.h"
 #include "misc.h"
 #include "plot.h"
 #include "plot2d.h"
@@ -57,7 +59,6 @@
 #include "tabulate.h"
 #include "term_api.h"
 #include "util.h"
-#include "variable.h"
 #include "pm3d.h"
 #include "getcolor.h"
 #include <ctype.h>

@@ -39,7 +39,7 @@
 #include "gadgets.h"
 #include "gp_time.h"
 #include "term_api.h"
-#include "variable.h"
+#include "gplocale.h"
 
 /* HBB 20000725: gather all per-axis variables into a struct, and set
  * up a single large array of such structs. Next step might be to use

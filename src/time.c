@@ -39,10 +39,10 @@
 
 
 #include "gp_time.h"
+#include "gplocale.h"
 #include "eval.h"
 
 #include "util.h"
-#include "variable.h"
 
 const struct gen_table timelevels_tbl[] =
 {

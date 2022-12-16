@@ -1,4 +1,4 @@
-/* GNUPLOT - variable.c */
+/* GNUPLOT - gplocale.c */
 
 /*[
  * Copyright 1999, 2004   Lars Hecking
@@ -30,162 +30,13 @@
  * to the extent permitted by applicable law.
 ]*/
 
-/* The Death of Global Variables - part one. */
-
 #include <string.h>
 
-#include "variable.h"
-
-#include "alloc.h"
+#include "gplocale.h"
+#include "stdfn.h"
 #include "command.h"
-#include "plot.h"
-#include "util.h"
 #include "term_api.h"
-
-#define PATHSEP_TO_NUL(arg)			\
-do {						\
-    char *s = arg;				\
-    while ((s = strchr(s, PATHSEP)) != NULL)	\
-	*s++ = NUL;				\
-} while (0)
-
-#define PRINT_PATHLIST(start, limit)		\
-do {						\
-    char *s = start;				\
-						\
-    while (s < limit) {				\
-	fprintf(stderr, "\"%s\" ", s);		\
-	s += strlen(s) + 1;			\
-    }						\
-    fputc('\n',stderr);				\
-} while (0)
-
-/*
- * char *loadpath_handler (int, char *)
- *
- */
-char *
-loadpath_handler(int action, char *path)
-{
-    /* loadpath variable
-     * the path elements are '\0' separated (!)
-     * this way, reading out loadpath is very
-     * easy to implement */
-    static char *loadpath;
-    /* index pointer, end of loadpath,
-     * env section of loadpath, current limit, in that order */
-    static char *p, *last, *envptr, *limit;
-
-    switch (action) {
-    case ACTION_CLEAR:
-	/* Clear loadpath, fall through to init */
-	FPRINTF((stderr, "Clear loadpath\n"));
-	free(loadpath);
-	loadpath = p = last = NULL;
-	/* HBB 20000726: 'limit' has to be initialized to NULL, too! */
-	limit = NULL;
-    case ACTION_INIT:
-	/* Init loadpath from environment */
-	FPRINTF((stderr, "Init loadpath from environment\n"));
-	assert(loadpath == NULL);
-	if (!loadpath)
-	{
-	    char *envlib = getenv("GNUPLOT_LIB");
-	    if (envlib) {
-		int len = strlen(envlib);
-		loadpath = gp_strdup(envlib);
-		/* point to end of loadpath */
-		last = loadpath + len;
-		/* convert all PATHSEPs to \0 */
-		PATHSEP_TO_NUL(loadpath);
-	    }			/* else: NULL = empty */
-	}			/* else: already initialised; int_warn (?) */
-	/* point to env portion of loadpath */
-	envptr = loadpath;
-	break;
-    case ACTION_SET:
-	/* set the loadpath */
-	FPRINTF((stderr, "Set loadpath\n"));
-	if (path && *path != NUL) {
-	    /* length of env portion */
-	    size_t elen = last - envptr;
-	    size_t plen = strlen(path);
-	    if (loadpath && envptr) {
-		/* we are prepending a path name; because
-		 * realloc() preserves only the contents up
-		 * to the minimum of old and new size, we move
-		 * the part to be preserved to the beginning
-		 * of the string; use memmove() because strings
-		 * may overlap */
-		memmove(loadpath, envptr, elen + 1);
-	    }
-	    loadpath = gp_realloc(loadpath, elen + 1 + plen + 1, "expand loadpath");
-	    /* now move env part back to the end to make space for
-	     * the new path */
-	    memmove(loadpath + plen + 1, loadpath, elen + 1);
-	    strcpy(loadpath, path);
-	    /* separate new path(s) and env path(s) */
-	    loadpath[plen] = PATHSEP;
-	    /* adjust pointer to env part and last */
-	    envptr = &loadpath[plen+1];
-	    last = envptr + elen;
-	    PATHSEP_TO_NUL(loadpath);
-	}			/* else: NULL = empty */
-	break;
-    case ACTION_SHOW:
-	/* print the current, full loadpath */
-	FPRINTF((stderr, "Show loadpath\n"));
-	if (loadpath) {
-	    fputs("\tloadpath is ", stderr);
-	    PRINT_PATHLIST(loadpath, envptr);
-	    if (envptr) {
-		/* env part */
-		fputs("\tloadpath from GNUPLOT_LIB is ", stderr);
-		PRINT_PATHLIST(envptr, last);
-	    }
-	} else
-	    fputs("\tloadpath is empty\n", stderr);
-#ifdef GNUPLOT_SHARE_DIR
-	fprintf(stderr,"\tgnuplotrc is read from %s\n",GNUPLOT_SHARE_DIR);
-#endif
-	break;
-    case ACTION_SAVE:
-	/* we don't save the load path taken from the
-	 * environment, so don't go beyond envptr when
-	 * extracting the path elements
-	 */
-	limit = envptr;
-    case ACTION_GET:
-	/* subsequent calls to get_loadpath() return all
-	 * elements of the loadpath until exhausted
-	 */
-	FPRINTF((stderr, "Get loadpath\n"));
-	if (!loadpath)
-	    return NULL;
-	if (!p) {
-	    /* init section */
-	    p = loadpath;
-	    if (!limit)
-		limit = last;
-	} else {
-	    /* skip over '\0' */
-	    p += strlen(p) + 1;
-	}
-	if (p >= limit)
-	    limit = p = NULL;
-	return p;
-	break;
-    case ACTION_NULL:
-	/* just return */
-    default:
-	break;
-    }
-
-    /* should always be ignored - points to the
-     * first path in the list */
-    return loadpath;
-
-}
+#include "util.h"
 
 /* Day and month names controlled by 'set locale'.
  * These used to be defined in national.h but internationalization via locale
@@ -272,4 +123,3 @@ locale_handler(int action, char *newlocale)
 
     return time_locale;
 }
-

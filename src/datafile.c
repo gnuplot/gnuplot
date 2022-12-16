@@ -111,6 +111,7 @@
 #include "command.h"
 #include "eval.h"
 #include "gp_time.h"
+#include "gplocale.h"
 #include "graphics.h"
 #include "misc.h"
 #include "parse.h"
@@ -120,7 +121,6 @@
 #include "util.h"
 #include "breaders.h"
 #include "tabulate.h" /* For sanity check inblock != outblock */
-#include "variable.h" /* For locale handling */
 #include "voxelgrid.h"
 
 /* test to see if the end of an inline datafile is reached */

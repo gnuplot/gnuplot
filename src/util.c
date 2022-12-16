@@ -36,11 +36,11 @@
 #include "command.h"
 #include "datablock.h"
 #include "datafile.h"		/* for df_showdata and df_reset_after_error */
+#include "gplocale.h"
 #include "internal.h"		/* for eval_reset_after_error */
 #include "misc.h"
 #include "plot.h"
 #include "pm3d.h"		/* for pm3d_reset_after_error */
-#include "variable.h"		/* For locale handling */
 #include "setshow.h"		/* for conv_text() */
 #include "tabulate.h"		/* for table_mode */
 #include "voxelgrid.h"

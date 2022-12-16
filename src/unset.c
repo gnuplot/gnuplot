@@ -39,8 +39,10 @@
 #include "datafile.h"
 #include "fit.h"
 #include "gp_hist.h"
+#include "gplocale.h"
 #include "hidden3d.h"
 #include "jitter.h"
+#include "loadpath.h"
 #include "misc.h"
 #include "multiplot.h"
 #include "parse.h"
@@ -51,7 +53,6 @@
 #include "tabulate.h"
 #include "term_api.h"
 #include "util.h"
-#include "variable.h"
 #include "pm3d.h"
 #ifdef USE_MOUSE
 #include "mouse.h"

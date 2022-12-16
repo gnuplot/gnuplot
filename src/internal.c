@@ -36,11 +36,11 @@
 #include "stdfn.h"
 #include "alloc.h"
 #include "util.h"	/* for int_error() */
+#include "gplocale.h"	/* for locale handling */
 #include "gp_time.h"	/* for str(p|f)time */
 #include "command.h"	/* for do_system_func */
 #include "datablock.h"	/* for datablock_size() */
 #include "encoding.h"	/* for advance_one_utf8_char */
-#include "variable.h"	/* for locale handling */
 #include "parse.h"	/* for string_result_only */
 #include "datafile.h"	/* for evaluate_inside_using */
 

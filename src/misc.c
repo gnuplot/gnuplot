@@ -37,10 +37,10 @@
 #include "datablock.h"
 #include "encoding.h"
 #include "graphics.h"
+#include "loadpath.h"
 #include "plot.h"
 #include "tables.h"
 #include "util.h"
-#include "variable.h"
 #include "scanner.h"		/* so that scanner() can count curly braces */
 #include "setshow.h"
 #ifdef _WIN32

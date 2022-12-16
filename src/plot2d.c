@@ -42,6 +42,7 @@
 #include "eval.h"
 #include "filters.h"
 #include "fit.h"
+#include "gplocale.h"
 #include "graphics.h"
 #include "interpol.h"
 #include "misc.h"
@@ -52,7 +53,6 @@
 #include "tabulate.h"
 #include "term_api.h"
 #include "util.h"
-#include "variable.h" /* For locale handling */
 #include "watch.h"
 
 /* minimum size of points[] in curve_points */
