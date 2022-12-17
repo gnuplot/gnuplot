@@ -25,7 +25,7 @@
 #    set term DEMOTERM
 # rather than the default terminal settings
 # E.g. (for image demo)
-#    setenv DEMOTERM "png truecolor enhanced font 'arial,8' transparent size 420,320"
+#    setenv DEMOTERM "png truecolor font 'arial,8' transparent size 420,320"
 #    ./webify.pl image
 #
 # EAM Jan 2009
