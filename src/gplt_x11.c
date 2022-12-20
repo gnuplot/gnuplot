@@ -2539,7 +2539,7 @@ exec_cmd(plot_struct *plot, char *command)
 	plot->lwidth = plot->user_width;
 
 	/* Fixme: no mechanism to hold width or dashstyle for LT_BACKGROUND */
-	if (plot->lt < 0) { /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
+	if (plot->lt == -1 || plot->lt < -2) { /* LT_NODRAW, LT_UNDEFINED ... */
 	    plot->lt = LT_NODRAW;
 
 	} else {

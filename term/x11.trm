@@ -142,6 +142,9 @@ static int X11_POSITION_Y = 0;
 /* non-zero if '-display' found on command line */
 static int X11_Display = 0;
 
+/* Avoid unnecessary linetype changes */
+static int X11_linetype_last = LT_UNDEFINED;
+
 /* Fonts can have very long names */
 /* EAM FIXME - these should be dynamically allocated */
 #define X11_MAX_FONTNAME_LENGTH 255
@@ -1485,6 +1488,8 @@ X11_graphics()
     }
 #endif
 
+    X11_linetype_last = LT_UNDEFINED;
+
     /* Force default font at start of plot */
     *X11_last_font_used = '\01';
     X11_set_default_font();
@@ -1584,13 +1589,18 @@ TERM_PUBLIC void
 X11_linewidth(double lw)
 {
     PRINT1("W%d\n", (int) (lw * X11_linewidth_multiplier + 0.5));
+    X11_linetype_last = LT_UNDEFINED;	/* Force linetype to be set again, including width */
 }
 
 TERM_PUBLIC void
 X11_linetype(int lt)
 {
+    if (X11_linetype_last == lt)
+	return;
+
     PRINT1("L%d\n", lt);
     X11_INVALIDATE_CURRENT_RGB;
+    X11_linetype_last = lt;
 }
 
 TERM_PUBLIC void
@@ -1601,6 +1611,7 @@ X11_dashtype(int type, t_dashtype *custom_dash_type)
     switch (type) {
 
     case DASHTYPE_SOLID:
+	X11_linetype(LT_SOLID);
 	break;
 
     case DASHTYPE_AXIS:
