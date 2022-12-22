@@ -13365,7 +13365,7 @@ Ffigure_multiple_keys
  See for example the map_projection demo.
 
  Example:
-      `set mouse mouseformat "mouse x,y = %5.2g, %10.3f"`.
+      set mouse mouseformat "mouse x,y = %5.2g, %10.3f"
  Use `set mouse mouseformat ""` to turn this string off again.
 
  The following formats are available:
@@ -16428,14 +16428,16 @@ Ffigure_polar_grid
 ?trange
  Syntax:    set trange [tmin:tmax]
  The range of the parametric variable t is useful in three contexts.
- 1) In parametric mode `plot` commands it limits the range of sampling
-    for both generating functions.  See `set parametric`, `set samples`.
- 2) In polar mode `plot` commands it limits or defines the acceptable
-    range of the angular parameter theta during input.  Data points
-    with theta value outside this range are excluded from the plot even
-    if they would otherwise lie inside the plot boundary. See `polar`.
- 3) In `plot` or `splot` commands using 1-dimensional sampled data via
-    the pseudofile "+".  See `sampling 1D`, `special-filenames`.
+#start
+#b In parametric mode `plot` commands it limits the range of sampling
+## for both generating functions.  See `set parametric`, `set samples`.
+#b In polar mode `plot` commands it limits or defines the acceptable
+## range of the angular parameter theta during input.  Data points
+## with theta value outside this range are excluded from the plot even
+## if they would otherwise lie inside the plot boundary. See `polar`.
+#b In `plot` or `splot` commands using 1-dimensional sampled data via
+## the pseudofile "+".  See `sampling 1D`, `special-filenames`.
+#end
 3 ttics
 ?commands set ttics
 ?commands show ttics
@@ -18119,8 +18121,8 @@ Ffigure_sparsematrix
  generates binary files for the demo file `demo/binary.dem`.
 
  Usage in `plot`:
-     plot `a.dat` matrix
-     plot `a.dat` matrix using 1:3
+     plot 'a.dat' matrix
+     plot 'a.dat' matrix using 1:3
      plot 'a.gpbin' {matrix} binary using 1:3
  will plot rows of the matrix, while using 2:3 will plot matrix columns, and
  using 1:2 the point coordinates (rather useless). Applying the `every` option

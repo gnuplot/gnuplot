@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot-ja.doc,v 1.768 2022-12-12 18:12:59+09 shige Exp $
+C RCS $Id: gnuplot-ja.doc,v 1.770 2022-12-22 17:53:29+09 shige Exp $
 C corresponding original gnuplot.doc at 2022-12-12
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
@@ -502,13 +502,13 @@ C 行が長いのは、できればなんとかしたい
 ## 同じ色で境界を描きます。これは、原理的に視覚効果はありませんが、あま
 ## りよくない pdf や postscript ビューワのようなディスプレイモードで、
 ## アンチエイリアスによる副産物が導入されないようにします。
-#b `set isotropic` は、2 次元グラフと 3 次元グラフの両方で、x, y, z 軸
+#b `set isotoropic` は、2 次元グラフと 3 次元グラフの両方で、x, y, z 軸
 ## のすべてのスケールが同じになるようにスケールを合わせます。
 #b 変更: 文字の回転角が整数という制限はなくなりました。
 #b 特別な (非数値の) 線種 (linetype) `lt nodraw`, `lt black`, `lt bgnd`
 ## 以下参照: `special_linetypes`。
 #b データ駆動型の histogram グラフの色割り当て。以下参照:
-## `histograms colors`。
+## `histgrams colors`。
 #b 凡例 (key) の箱の位置は、gnuplot が他に行う仕組みによるどんな位置決
 ## めに対しても、オフセットを与えることで手動で調整できます。以下参照:
 ## `set key offset`。
@@ -656,7 +656,7 @@ C 行が長いのは、できればなんとかしたい
 ## リッピングします。これは、pm3d 曲面、そして 3 次元の boxes, polygons
 ## 等にも影響を与えます。
 #b 描画スタイル `with parallelaxes` の書式の改良。以下参照: `parallel`。
-## histogram, parallelaxis, spiderplot スタイルでは、描画要素を繰返し出
+## histgram, parallelaxis, spiderplot スタイルでは、描画要素を繰返し出
 ## 力する書式を使用できます:
 ##      `plot for [column=1:N] DATA using column`
 #b 2 次元描画での using 指定によって得られる複素数値 value は、その実数
@@ -5717,7 +5717,7 @@ Ffigure_polar_grid
 
  一つ追加のスタイルオプション `set style histogram nokeyseparators` は、
  複数のヒストグラムを含むグラフにのみ適切なものです。その場合の追加説明
- については、以下参照: `newhistogram`。
+ については、以下参照: `newhistgram`。
 
  例:
 Ffigure_histclust
@@ -11556,12 +11556,12 @@ Ffigure_missing
  ような方法でデータを前処理するべきでしょう。
 
  ネット上の以下のデモも参照
-^ <a href="http://www.gnuplot.info/demo/dgrid3d.html">
+ ^ <a href="http://www.gnuplot.info/demo/dgrid3d.html">
  dgrid3d
-^ </a>
-^ <a href="http://www.gnuplot.info/demo/scatter.html">
+ ^ </a>
+ ^ <a href="http://www.gnuplot.info/demo/scatter.html">
  scatter
-^ </a>
+ ^ </a>
 ^ <a href="http://www.gnuplot.info/demo/heatmap_points.html">
  heatmap_points
 ^ </a>
@@ -12511,7 +12511,7 @@ Ffigure_missing
  れの代わりに使えます: `set size ratio -1; set view equal xyz`。
  これは、2 次元、3 次元グラフの両方に影響します。
 
- `unset isotropic` は、2 次元、3 次元グラフの両方でその束縛を開放しま
+ `unset isotoropic` は、2 次元、3 次元グラフの両方でその束縛を開放しま
  す。これは以下の古いコマンドと同値ですが、覚えるにはこれの方が簡単でし
  ょう: `set size noratio; set view noequal_axes`。
 3 jitter
@@ -13570,7 +13570,7 @@ Ffigure_multiple_keys
  デモを参照してください。
 
  例:
-      `set mouse mouseformat "mouse x,y = %5.2g, %10.3f"`.
+      set mouse mouseformat "mouse x,y = %5.2g, %10.3f"
  この文字列をまたオフにするには、`set mouse mouseformat ""` とします。
 
  以下の書式が利用可能です:
@@ -15525,12 +15525,12 @@ Ffigure_polar_grid
  長さの比)。
 
  <r> の値を負にするとその意味は違って来ます。<r>=-1 のとき、x 軸、y 軸
- の双方の単位 (つまり 1) の目盛りの長さが同一、すなわち等長 (isotropic)
- になるよう設定します。以下も参照: `set isotropic`。
+ の双方の単位 (つまり 1) の目盛りの長さが同一、すなわち等長 (isotoropic)
+ になるよう設定します。以下も参照: `set isotoropic`。
  これは、3 次元用のコマンド `set view equal xy` の 2 次元での同等物です。
  <r>=-2 のとき、y 軸の単位目盛りの長さは x 軸の単位目盛りの長さの 2 倍
  に設定されます。<r> が負の値に関して以下同様です。以下も参照:
- `set isotropic`。
+ `set isotoropic`。
 
  `gnuplot` が指定されたアスペクト比のグラフをちゃんと書けるかは選択され
  る出力形式に依存します。グラフの領域は出力の指定された部分にちゃんと収
@@ -16673,15 +16673,15 @@ Ffigure_polar_grid
 ?trange
  書式:    set trange [tmin:tmax]
  媒介変数 t の範囲は、以下の 3 つの状況で有効です。
- 1) 媒介変数モードでは、これがコマンド `plot` の両方の生成関数の標本範
-    囲を制限します。以下参照: `set parametric`, `set samples`。
- 2) 極座標モードでは、これがコマンド `plot` の偏角変数θの入力中の許容
-    可能な範囲を制限、または定義します。この範囲外のθを持つデータ点は、
-    それが描画境界の内側に入っていたとしても、グラフからは除外されます。
-    以下参照: `polar`。
- 3) `plot` または `splot` コマンドでは、疑似ファイル "+" による 1 次元
-    データの標本化に使用します。以下参照: `sampling 1D`,
-    `special-filenames`。
+  1) 媒介変数モードでは、これがコマンド `plot` の両方の生成関数の標本範
+     囲を制限します。以下参照: `set parametric`, `set samples`。
+  2) 極座標モードでは、これがコマンド `plot` の偏角変数θの入力中の許容
+     可能な範囲を制限、または定義します。この範囲外のθを持つデータ点は、
+     それが描画境界の内側に入っていたとしても、グラフからは除外されます。
+     以下参照: `polar`。
+  3) `plot` または `splot` コマンドでは、疑似ファイル "+" による 1 次元
+      データの標本化に使用します。以下参照: `sampling 1D`,
+     `special-filenames`。
 3 ttics
 ?commands set ttics
 ?commands show ttics
@@ -18407,8 +18407,8 @@ Ffigure_sparsematrix
  します。
 
  `plot` での使用法:
-     plot `a.dat` matrix
-     plot `a.dat` matrix using 1:3
+     plot 'a.dat' matrix
+     plot 'a.dat' matrix using 1:3
      plot 'a.gpbin' {matrix} binary using 1:3
  これらは配列の行を描画し、using 2:3 とすれば配列の列を描画、using 1:2
  は、点の座標を描画します (多分無意味です)。オプション `every` を適用す
