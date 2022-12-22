@@ -2769,7 +2769,8 @@ C 4 weekdata_cdc
 ?expressions functions join
  `join(array, "sep")` concatenates the string elements of an array into a
  single string containing fields delimited by the character sequence in "sep".
- Non-string array elements generate an empty field.
+ Non-string array elements generate an empty field.  The complementary
+ operation `split` break extracts fields from a string to create an array.
  Example:
      array A = ["A", "B", , 7, "E"]
      print join(A,";")
@@ -4216,9 +4217,12 @@ Ffigure_newsyntax
  Command-line substitution can be used anywhere on the `gnuplot` command
  line except inside strings delimited by single quotes.
 
- For example, These will generate labels with the current time and userid:
+ For example, these will generate labels with the current time and userid:
        set label "generated on `date +%Y-%m-%d` by `whoami`" at 1,1
        set timestamp "generated on %Y-%m-%d by `whoami`"
+
+ This creates an array containing the names of files in the current directory:
+       FILES = split( "`ls -1`" )
 3 Substitution of string variables as macros
 ?substitution macros
 ?macros
@@ -5722,8 +5726,7 @@ Ffigure_mask
  Although it is not shown here, a single mask can include multiple polygonal
  regions.
 
- The masking commands are EXPERIMENTAL. Details may change before inclusion
- in a stable release version.
+ The masking commands are EXPERIMENTAL. Details may change in a future release.
 
 2 parallelaxes
 Ffigure_parallel
@@ -7908,8 +7911,7 @@ Ffigure_zerror
  TEXT DATA FILES:
 
  Each non-empty line in a data file describes one data point, except that
- records beginning with `#` (and also with `!` on VMS) will be treated as
- comments and ignored.
+ records beginning with `#` will be treated as comments and ignored.
 
  Depending on the plot style and options selected, from one to eight values
  are read from each line and associated with a single data point.
@@ -8178,14 +8180,14 @@ Ffigure_zerror
       plot FOO using x:y convexhull smooth path {expand <scale>}
 
 Ffigure_convex_hull
- The points in dataset FOO are replaced by a subset of the original points
- that constitute a bounding convex polygon.  The vertices of this polygon,
- the convex hull, are generated in clockwise order to form a closed curve.
- The first and last points of the generated curve are equal, making
- it suitable for plotting `with lines` or `with filledcurves`.
- The convex hull may also be useful to selectively render a region of an
- image or a pm3d surface that contains all the original data points.
- See `with mask`.
+ The points in FOO are replaced by a subset of the original points that
+ constitute the unique bounding convex polygon, the convex hull.
+ The vertices of this polygon are output in clockwise order to form a closed
+ curve.  The first and last points of the generated curve are equal, making it
+ suitable for plotting with styles `lines`, `polygons`, or `filledcurves`.
+ The convex hull may also be useful as a mask to selectively render the region
+ of an image or a pm3d surface that contains all the original data points.
+ See `masking`.
 
  If the keyword `smooth` is present, the vertices are then used as guide
  points to generate a smooth closed curve (see `smooth path`). By default
@@ -8713,8 +8715,8 @@ Ffigure_smooth_path
  The special filename `'-'` specifies that the data are inline; i.e., they
  follow the command.  Only the data follow the command; `plot` options like
  filters, titles, and line styles remain on the `plot` command line.  This is
- similar to << in unix shell script, and $DECK in VMS DCL.  The data are
- entered as though they are being read from a file, one data point per record.
+ similar to << in unix shell script.  The data are entered as though they
+ were being read from a file, one data point per record.
  The letter "e" at the start of the first column terminates data entry.
 
  `'-'` is intended for situations where it is useful to have data and commands
@@ -13062,7 +13064,7 @@ Ffigure_multiple_keys
  See for example the map_projection demo.
 
  Example:
-      `set mouse mouseformat "mouse x,y = %5.2g, %10.3f"`.
+      set mouse mouseformat "mouse x,y = %5.2g, %10.3f".
  Use `set mouse mouseformat ""` to turn this string off again.
 
  The following formats are available:
@@ -16125,14 +16127,16 @@ Ffigure_polar_grid
 ?trange
  Syntax:    set trange [tmin:tmax]
  The range of the parametric variable t is useful in three contexts.
- 1) In parametric mode `plot` commands it limits the range of sampling
-    for both generating functions.  See `set parametric`, `set samples`.
- 2) In polar mode `plot` commands it limits or defines the acceptable
-    range of the angular parameter theta during input.  Data points
-    with theta value outside this range are excluded from the plot even
-    if they would otherwise lie inside the plot boundary. See `polar`.
- 3) In `plot` or `splot` commands using 1-dimensional sampled data via
-    the pseudofile "+".  See `sampling 1D`, `special-filenames`.
+#start
+#b In parametric mode `plot` commands it limits the range of sampling
+## for both generating functions.  See `set parametric`, `set samples`.
+#b In polar mode `plot` commands it limits or defines the acceptable
+## range of the angular parameter theta during input.  Data points
+## with theta value outside this range are excluded from the plot even
+## if they would otherwise lie inside the plot boundary. See `polar`.
+#b In `plot` or `splot` commands using 1-dimensional sampled data via
+## the pseudofile "+".  See `sampling 1D`, `special-filenames`.
+#end
 3 ttics
 ?commands set ttics
 ?commands show ttics
@@ -17415,8 +17419,8 @@ Ffigure_walls
 ?commands shell
 ?shell
  The `shell` command spawns an interactive shell.  To return to `gnuplot`,
- type `logout` if using VMS, `exit` or the END-OF-FILE character if using
- Unix, or `exit` if using MS-DOS or OS/2.
+ type `exit` or the END-OF-FILE character if using Unix, or `exit` if using
+ MS-DOS or OS/2.
 
  The `shell` command ignores anything else on the gnuplot command line.
  If instead you want to pass a command string to a shell for immediate
@@ -17806,8 +17810,8 @@ Ffigure_sparsematrix
  generates binary files for the demo file `demo/binary.dem`.
 
  Usage in `plot`:
-     plot `a.dat` matrix
-     plot `a.dat` matrix using 1:3
+     plot 'a.dat' matrix
+     plot 'a.dat' matrix using 1:3
      plot 'a.gpbin' {matrix} binary using 1:3
  will plot rows of the matrix, while using 2:3 will plot matrix columns, and
  using 1:2 the point coordinates (rather useless). Applying the `every` option
