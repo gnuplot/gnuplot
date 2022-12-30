@@ -605,6 +605,10 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 		cairo_scale(panel->plot.cr,
 			1./(double)panel->plot.oversampling_scale,
 			1./(double)panel->plot.oversampling_scale);
+
+		/* FIXME: how were previous settings clobbered? */
+		gp_cairo_set_lineprops(&(panel->plot));
+
 		panel->wxt_cairo_refresh();
 
 		cairo_show_page(panel->plot.cr);
@@ -632,6 +636,10 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 		cairo_scale(panel->plot.cr,
 			1./(double)panel->plot.oversampling_scale,
 			1./(double)panel->plot.oversampling_scale);
+
+		/* FIXME: how were previous settings clobbered? */
+		gp_cairo_set_lineprops(&(panel->plot));
+
 		panel->wxt_cairo_refresh();
 
 		cairo_show_page(panel->plot.cr);

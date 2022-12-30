@@ -201,6 +201,7 @@ void gp_cairo_initialize_plot(plot_struct *plot);
 /* initialize the transformation matrix of the drawing context and other details */
 /* Depends on the setting of xscale and yscale */
 void gp_cairo_initialize_context(plot_struct *plot);
+void gp_cairo_set_lineprops(plot_struct *plot);
 
 /* functions used to process gnuplot commands */
 void gp_cairo_move(plot_struct *plot, int x, int y);
