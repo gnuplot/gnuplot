@@ -230,6 +230,11 @@ void gp_cairo_initialize_context(plot_struct *plot)
 			0.5, 0.5);
 	cairo_set_matrix(plot->cr, &matrix);
 
+	gp_cairo_set_lineprops(plot);
+}
+
+void gp_cairo_set_lineprops(plot_struct *plot)
+{
 	/* Default is square caps, mitered joins */
 	if (plot->linecap == ROUNDED) {
 	    cairo_set_line_cap  (plot->cr, CAIRO_LINE_CAP_ROUND);
@@ -243,7 +248,6 @@ void gp_cairo_initialize_context(plot_struct *plot)
 	    cairo_set_line_join (plot->cr, CAIRO_LINE_JOIN_MITER);
 	    cairo_set_miter_limit(plot->cr, 3.8);
 	}
-
 }
 
 
