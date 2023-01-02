@@ -127,9 +127,6 @@ allterm.h: $(CORETERM) $(LUA_HELP)
 	  sed -n "/^[ 	]*$$s/,/^[ 	]*END_HELP/p" $$f ; \
 	done >$@
 
-# for debugging
-alldoc: check dvi gih hlp html info ipf nroff pdf ps rnh rtf htb
-
 ### [tn]roff documentation
 troff: gnuplot.ms $(srcdir)/titlepag.ms
 	$(AM_V_GEN) tbl gnuplot.ms | eqn | $(TROFF) -ms
