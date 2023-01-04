@@ -868,6 +868,8 @@ winnow_interior_points (struct curve_points *plot)
     /* Find maximal extent on x and y, centroid */
     pp1 = pp2 = pp3 = pp4 = plot->points;
     for (p = plot->points; p < &(plot->points[plot->p_count]); p++) {
+	if (p->type == UNDEFINED)
+	    continue;
 	if (p->type == EXCLUDEDRANGE)	/* e.g. outlier or category mismatch */
 	    continue;
 	if (p->x < xmin) { xmin = p->x; pp1 = p; }
@@ -906,6 +908,8 @@ winnow_interior_points (struct curve_points *plot)
     np = 0;
     p = points;
     for  (i=0; i<plot->p_count; i++) {
+	if (points[i].type == UNDEFINED)
+	    continue;
 	if (points[i].type != EXCLUDEDRANGE)
 	    p[np++] = points[i];
     }
@@ -956,18 +960,25 @@ find_cluster_outliers( struct coordinate *points, t_cluster *cluster )
     double d2 = 0;
     int i;
     int outliers = 0;
+    int excluded = 0;
 
     for (i = 0; i < cluster->npoints; i++) {
-	xsum += points[i].x;
-	ysum += points[i].y;
+	if (points[i].type == EXCLUDEDRANGE || points[i].type == UNDEFINED) {
+	    excluded++;
+	} else {
+	    xsum += points[i].x;
+	    ysum += points[i].y;
+	}
     }
-    cluster->cx = xsum / cluster->npoints;
-    cluster->cy = ysum / cluster->npoints;
+    cluster->cx = xsum / (cluster->npoints - excluded);
+    cluster->cy = ysum / (cluster->npoints - excluded);
 
     if (cluster->threshold <= 0)
 	return 0;
 
     for (i = 0; i < cluster->npoints; i++) {
+	if (points[i].type == UNDEFINED)
+	    continue;
 	if (points[i].type == EXCLUDEDRANGE)
 	    continue;
 	d2 += (points[i].x - cluster->cx) * (points[i].x - cluster->cx)
@@ -975,6 +986,8 @@ find_cluster_outliers( struct coordinate *points, t_cluster *cluster )
     }
     cluster->rmsd = sqrt(d2 / cluster->npoints);
     for (i = 0; i < cluster->npoints; i++) {
+	if (points[i].type == UNDEFINED)
+	    continue;
 	if (points[i].type == EXCLUDEDRANGE)
 	    continue;
 	d2 = (points[i].x - cluster->cx) *(points[i].x - cluster->cx)
