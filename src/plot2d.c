@@ -636,8 +636,7 @@ get_data(struct curve_points *current_plot)
 	if (current_plot->filledcurves_options.closeto == FILLEDCURVES_CLOSED) {
 	    if (current_plot->plot_smooth == SMOOTH_CSPLINES)
 		current_plot->plot_smooth = SMOOTH_PATH;
-	    if (current_plot->plot_smooth != SMOOTH_PATH
-	    &&  current_plot->plot_smooth != SMOOTH_SMOOTH_HULL) {
+	    if (current_plot->plot_smooth != SMOOTH_PATH) {
 		current_plot->plot_smooth = SMOOTH_NONE;
 		int_warn(NO_CARET, "only 'smooth path' or 'smooth cspline' is supported for closed curves");
 	    }
@@ -1112,7 +1111,7 @@ get_data(struct curve_points *current_plot)
 		    y2 = y1;
 		else
 		    y2 = current_plot->filledcurves_options.at;
-	    } else if (current_plot->plot_smooth == SMOOTH_SMOOTH_HULL) {
+	    } else if (current_plot->plot_filter == FILTER_CONVEX_HULL) {
 		y2 = y1;
 	    } else {
 		y2 = v[2];
@@ -2500,15 +2499,20 @@ eval_plots()
 			this_plot->plot_filter = FILTER_ZSORT;
 			break;
 		    case SMOOTH_SMOOTH_HULL:
-			this_plot->plot_smooth = SMOOTH_SMOOTH_HULL;
+			/* deprecated synonym for "convexhull smooth path" */
+			this_plot->plot_smooth = SMOOTH_PATH;
 			this_plot->plot_filter = FILTER_CONVEX_HULL;
-			parse_hull_options(this_plot);
+			this_plot->plot_style = LINES;	/* can override later */
 			break;
 		    case SMOOTH_NONE:
 		    default:
 			int_error(c_token, "unrecognized 'smooth' option");
 			break;
 		    }
+
+		    /* Handles "convexhull smooth path expand <scale>" */
+		    if (this_plot->plot_smooth == SMOOTH_PATH)
+			parse_hull_options(this_plot);
 
 		    if (set_smooth)
 			duplication = TRUE;
@@ -2592,8 +2596,7 @@ eval_plots()
 		    ||  this_plot->plot_style == FILLSTEPS) {
 			/* read a possible option for 'with filledcurves' */
 			get_filledcurves_style_options(&this_plot->filledcurves_options);
-			if (this_plot->plot_filter == FILTER_CONVEX_HULL
-			||  this_plot->plot_smooth == SMOOTH_SMOOTH_HULL)
+			if (this_plot->plot_filter == FILTER_CONVEX_HULL)
 			    this_plot->filledcurves_options.closeto = FILLEDCURVES_CLOSED;
 		    }
 
@@ -3212,7 +3215,6 @@ eval_plots()
 		    cp_implode(this_plot);
 		    break;
 		case SMOOTH_ZSORT:
-		case SMOOTH_SMOOTH_HULL:
 		case SMOOTH_NONE:
 		case SMOOTH_PATH:
 		case SMOOTH_BEZIER:
@@ -3251,11 +3253,9 @@ eval_plots()
 		case SMOOTH_MONOTONE_CSPLINE:
 		    mcs_interp(this_plot);
 		    break;
-		case SMOOTH_SMOOTH_HULL:
-		    expand_hull(this_plot);
-		    gen_2d_path_splines(this_plot);
-		    break;
 		case SMOOTH_PATH:
+		    if (this_plot->plot_filter == FILTER_CONVEX_HULL)
+			expand_hull(this_plot);
 		    gen_2d_path_splines(this_plot);
 		    break;
 		case SMOOTH_NONE:
@@ -3989,10 +3989,12 @@ parse_kdensity_options(struct curve_points *this_plot)
 static void
 parse_hull_options(struct curve_points *this_plot)
 {
-    this_plot->smooth_parameter = 0;
     if (equals(c_token,"expand")) {
 	c_token++;
-	this_plot->smooth_parameter = real_expression();
+	if (this_plot->plot_filter == FILTER_CONVEX_HULL)
+	    this_plot->smooth_parameter = real_expression();
+	else
+	    int_error(c_token-2, "'smooth path expand' only available for hulls");
     }
 }
 

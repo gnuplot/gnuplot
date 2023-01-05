@@ -282,8 +282,9 @@ C
 ?new hulls
 #start
 #b A cluster of 2D points can be replaced by its bounding polygon using the
-## new filter `convexhull`.  A path-smoothed bounding curve is produced by
-## `smooth convexhull`. See `convexhull`.
+## new filter `convexhull`.  A path-smoothed bounding curve can be plotted
+## as a filled area using "convexhull smooth path with filledcurves".
+## See `convexhull`.
 #b A convex hull or other polygon can be used as a mask to display only
 ## selected portions of a pm3d surface or an image plot.
 ## See new plot style `with mask` (defines a mask) and keyword `mask`
@@ -7871,10 +7872,10 @@ Ffigure_zerror
                           {every <every list>}
                           {skip <number-of-lines>}
                           {using <using list>}
+                          {convexhull}
                           {smooth <option>}
                           {bins <options>}
                           {mask}
-                          {convexhull} 
                           {volatile} {zsort} {noautoscale}
 
  The modifiers `binary`, `index`, `every`, `skip`, `using`, `smooth`, `bins`,
@@ -8171,10 +8172,10 @@ Ffigure_zerror
 ?convexhull
 
  Convexhull is not a plot style. It can appear either alone as a filter 
- keyword or as an option of the `smooth` keyword.
+ keyword or in combination with `smooth path`.
 
       plot FOO using x:y convexhull
-      plot FOO using x:y smooth convexhull {expand <scale>}
+      plot FOO using x:y convexhull smooth path {expand <scale>}
 
 Ffigure_convex_hull
  The points in dataset FOO are replaced by a subset of the original points
@@ -8329,9 +8330,9 @@ Ffigure_convex_hull
 
  Syntax:
        smooth {unique | frequency | fnormal | cumulative | cnormal
-              | csplines | acsplines | mcsplines | path | bezier | sbezier
+              | csplines | acsplines | mcsplines  bezier | sbezier
+              | path {expand <scale>}
               | kdensity {bandwidth} {period}
-              | convexhull {expand}
               | unwrap}
 
  The `unique`, `frequency`, `fnormal`, `cumulative` and `cnormal` options
@@ -8428,11 +8429,6 @@ Ffigure_convex_hull
 ?smooth bins
  `smooth bins` is the same as `bins`.
  See `bins`.
-5 convexhull
-?data-file smooth convexhull
-?datafile smooth convexhull
-?smooth convexhull
- See `convexhull`.
 5 csplines
 ?commands plot datafile smooth csplines
 ?plot datafile smooth csplines
@@ -8487,8 +8483,8 @@ Ffigure_smooth_path
  they are presented in the input data; i.e. they are not first sorted on x.
  This generates a smooth spline through a closed curve or along a trajectory
  that contains loops. This smoothing mode is supported for both 2D and 3D
- plot commands.  As always, a separate curve is created for each set
- of points in the input file, where a blank line separates the sets.
+ plot commands.  A separate curve is created for each set of points in the
+ input file, where a blank line separates the sets.
  Plotting `smooth path with filledcurves closed` will guarantee that each set
  of points creates a closed curve.  Plotting `smooth path with lines` will
  generate a closed curve if the first and last points in the set overlap,
@@ -8496,6 +8492,13 @@ Ffigure_smooth_path
 ^ <a href="http://www.gnuplot.info/demo_6.0/smooth_path.html">
  smooth_path.dem
 ^ </a>
+
+ If the set of points being smoothed was generated using the `convexhull`
+ filter, an additional keyword `expand` is accepted together with a scale
+ factor for the expansion.  See `convexhull`.
+ Example:
+      plot DATA convexhull smooth path expand 1.1 with filledcurves, \
+           DATA with points
 5 sbezier
 ?commands plot datafile smooth sbezier
 ?plot datafile smooth sbezier

@@ -1261,7 +1261,7 @@ plot_lines(struct curve_points *plot)
 	return;
 
     /* Along-path smoothing wiped out the flags for INRANGE/OUTRANGE */
-    if (plot->plot_smooth == SMOOTH_PATH || plot->plot_smooth == SMOOTH_SMOOTH_HULL)
+    if (plot->plot_smooth == SMOOTH_PATH)
 	recheck_ranges(plot);
 
     for (i = 0; i < plot->p_count; i++) {
