@@ -162,7 +162,6 @@ fi
 AM_CONDITIONAL(HAVE_LATEX, test "$with_latex" != no)
 AC_CHECK_PROGS(DVIPS, dvips, no)
 AC_CHECK_PROGS(TROFF, troff, no)
-AC_CHECK_PROGS(LATEX2HTML, latex2html, no)
 
 AC_ARG_WITH(texdir,dnl
   [--with-texdir=DIR       where to install latex style files (default: ask kpsewhich)],

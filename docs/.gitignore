@@ -7,8 +7,6 @@ checkdoc
 doc2gih
 doc2hlp
 doc2ipf
-doc2ms
-doc2rnh
 doc2rtf
 doc2tex
 doc2web
@@ -21,8 +19,6 @@ gnuplot.html
 gnuplot.inf
 gnuplot.info
 gnuplot.ipf
-gnuplot.ms
-gnuplot.nroff
 gnuplot.out
 gnuplot.rtf
 gnuplot.tex
