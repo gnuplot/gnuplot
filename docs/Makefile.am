@@ -106,7 +106,7 @@ gnuplot.ps gnuplot.gih gnuplot.hlp gnuplot.info* gnuplot.ipf 		\
 gnuplot.rtf gnuplot.tmp VERSION gnuplot.4tc gnuplot.4ct			\
 gnuplot.idv gnuplot.xref gnuplot.lg gnuplot.pdf				\
 ja.doc gnuplot-ja.ind gnuplot-ja.ilg gnuplot-ja.aux gnuplot-ja.toc	\
-gnuplot-ja.idx gnuplot-ja.out gnuplot-ja.tex				\
+gnuplot-ja.log gnuplot-ja.idx gnuplot-ja.out gnuplot-ja.tex		\
 wxhelp_figures wxhelp/*.html wxhelp/wgnuplot.hhc wxhelp/wgnuplot.hhk	\
 wxhelp/wgnuplot.htc wxhelp/doc2html$(EXEEXT) windows/wgnuplot.htk	\
 svg_figures html/*.html html/*.svg html/*.hhc html/*.hhk                \

@@ -949,11 +949,11 @@ C  need @ in table, so end and restart the table !
       {/"Times New Roman":Bold=20 A_{/:Normal{/:Italic i}}}
 
  The phantom box is useful for a@^b_c to align superscripts and subscripts
- but does not work well for overwriting an accent on a letter.  For the latter,
- it is much better to use an encoding  (e.g. iso_8859_1 or utf8) that contains
- a large variety of letters with accents or other diacritical marks.  See
- `set encoding`. Since the box is non-spacing, it is sensible to put the shorter
- of the subscript or superscript in the box (that is, after the @).
+ but does not work well for overwriting a diacritical mark on a letter.
+ For that purpose it is much better to use an encoding (e.g. utf8) that contains
+ letters with accents or other diacritical marks.  See `set encoding`.
+ Since the box is non-spacing, it is sensible to put the shorter of the subscript
+ or superscript in the box (that is, after the @).
 
  Space equal in length to a string can be inserted using the '&' character.
  Thus
@@ -974,11 +974,8 @@ C  need @ in table, so end and restart the table !
  both strings ('~a{.5 /*.2 o}'---an 'a' with a one-fifth-size 'o' on top---and
  the space between the number and the slash is necessary), but you can't
  change it after the beginning of the string.  Neither can you use any other
- special syntax within either string.  You can, of course, use control
- characters by escaping them (see below), such as '~a{\^}'
-
- You can escape control characters using \, e.g.,  \\, \{, and so on.
- See `escape sequences` below.
+ special syntax within either string.  Control characters must be escaped,
+ e.g. '~a{.8\^}' to print â.  See `escape sequences` below.
 
  Note that strings in double-quotes are parsed differently than those enclosed
  in single-quotes.  The major difference is that backslashes may need to be
@@ -2804,11 +2801,15 @@ C 4 weekdata_cdc
  complex arguments, unless otherwise noted.  The ** operator (exponentiation)
  is supported, as in FORTRAN.
 
+ Operator precedence is the same as in Fortran and C.  As in those languages,
+ parentheses may be used to change the order of operation.  Thus -2**2 = -4,
+ but (-2)**2 = 4.
+
 4 Unary
 ?expressions operators unary
 ?operators unary
 ?unary
- The following is a list of all the unary operators and their usages:
+ The following is a list of all the unary operators:
 
 @start table - first is interactive cleartext form
      Symbol      Example    Explanation
@@ -2883,10 +2884,6 @@ C ... and restart the table:
  (*) Starred explanations indicate that the operator requires an integer
  argument.
 
- Operator precedence is the same as in Fortran and C.  As in those languages,
- parentheses may be used to change the order of operation.  Thus -2**2 = -4,
- but (-2)**2 = 4.
-
  The factorial operator returns an integer when N! is sufficiently small
  (N <= 20 for 64-bit integers). It returns a floating point approximation
  for larger values of N.
@@ -2897,7 +2894,7 @@ C ... and restart the table:
 4 Binary
 ?expressions operators binary
 ?operators binary
- The following is a list of all the binary operators and their usages:
+ The following is a list of all the binary operators:
 
 @start table - first is interactive cleartext form
      Symbol       Example      Explanation
@@ -3081,11 +3078,11 @@ C ... and restart the table:
  and undefined elsewhere:
        f(x) = 0<=x && x<1 ? sin(x) : 1<=x && x<2 ? 1/x : 1/0
        plot f(x)
- Note that `gnuplot` quietly ignores undefined values, so the final branch of
- the function (1/0) will produce no plottable points.  Note also that f(x)
- will be plotted as a continuous function across the discontinuity if a line
- style is used.  To plot it discontinuously, create separate functions for the
- two pieces.  (Parametric functions are also useful for this purpose.)
+ Note that `gnuplot` quietly ignores undefined values when plotting, so the
+ final branch of the function (1/0) will produce no plottable points.
+ Note also that f(x) will be plotted as a continuous function across the
+ discontinuity if a line style is used.  To plot it discontinuously, create
+ separate functions for the two pieces.
 
  For data in a file, plot the average of the data in columns 2 and 3 against
  the datum in column 1, but only if the datum in column 4 is non-negative:
