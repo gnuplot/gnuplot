@@ -877,8 +877,55 @@ set yrange [-30:30]
 plot for [i=0:1] 'hull.dat' index i with points ls (i+1), \
      for [i=0:1] '' index i convexhull with filledcurve ls (i+1)
 
-# Custom key placement
+#
+# concave hulls
+#
 reset
+set output out . 'figure_concave_hull_1' . ext
+unset key
+unset tics; unset border
+set offsets graph 0, 0, graph 0.1, graph 0.1
+set style fill transparent solid 0.1 border
+set style line 2 lc "forest-green" pt 7 ps 0.5
+set xrange [-30:30]
+set yrange [-30:30]
+
+set title noenhanced offset 0, -2.0
+set multiplot layout 2,2 spacing 0 margins 0, 1, 0, 0.9 \
+    title "concave hull" font ":Bold"
+
+chi_length = real("+Inf")
+set title "chi_length = +Inf  (convex hull)"
+plot 'hull.dat' index 0 with points ls 2 notitle, \
+     '' index 0 concavehull with filledcurve ls 2 \
+		title sprintf("chi_length = %.1f", GPVAL_CHI_LENGTH)
+chi_length = 25.; set title sprintf("chi_length = %.1f", chi_length)
+replot
+chi_length = 20.; set title sprintf("chi_length = %.1f", chi_length)
+replot
+chi_length = 16.; set title sprintf("chi_length = %.1f", chi_length)
+replot
+unset multiplot
+
+set output out . 'figure_concave_hull_2' . ext
+set style fill transparent solid 0.1 noborder
+set multiplot layout 2,2 spacing 0 margins 0, 1, 0, 0.9 \
+    title "concave hull smooth path expand 1.15    " font ":Bold"
+chi_length = real("+Inf")
+set title "chi_length = +Inf  (convex hull)"
+plot 'hull.dat' index 0 with points ls 2 notitle, \
+     '' index 0 concavehull smooth path expand 1.15 with filledcurve ls 2 \
+		title sprintf("chi_length = %.1f", GPVAL_CHI_LENGTH)
+chi_length = 25.; set title sprintf("chi_length = %.1f", chi_length)
+replot
+chi_length = 20.; set title sprintf("chi_length = %.1f", chi_length)
+replot
+chi_length = 16.; set title sprintf("chi_length = %.1f", chi_length)
+replot
+unset multiplot
+reset
+
+# Custom key placement
 set output out . 'figure_multiple_keys' . ext
 set xtics font ",6"  offset 0,1
 set label 1 font ",10"
