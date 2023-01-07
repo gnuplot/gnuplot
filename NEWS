@@ -1,3 +1,11 @@
+Jan 2023
+========
+End of version 5 development (no current plan to release a version 5.6).
+Freeze the current state as branch-5-5-end
+
+Development will continue in a new branch 6.1, based off 6.0 stable
+
+
 Changes not in 5.4
 ==================
 * NEW weighted and unweighted cubic spline smoothing for 3D "splot with lines"
