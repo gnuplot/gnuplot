@@ -585,7 +585,6 @@ blanks_needed(curve_points *this_plot)
 	case SMOOTH_KDENSITY:
 	    break;
 	/* These smooth styles also use the UNDEFINED point convention */
-	case SMOOTH_SMOOTH_HULL:
 	case SMOOTH_PATH:
 	    return TRUE;
 	default:

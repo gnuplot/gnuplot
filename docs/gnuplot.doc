@@ -32,6 +32,7 @@ C
 ?copyright
 ?license
      Copyright (C) 1986 - 1993, 1998, 2004, 2007  Thomas Williams, Colin Kelley
+     Copyright (C) 2004-2023  various authors
 
  Permission to use, copy, and distribute this software and its
  documentation for any purpose with or without fee is hereby granted,
@@ -65,7 +66,7 @@ C
                   Russell Lang, Dave Kotz, John Campbell.
                Gnuplot 3.0 additions:
                   Gershon Elber and many others.
-               Gnuplot 4.0 and 5.0 additions:
+               Gnuplot 4.0 and subsequent releases:
                   See list of contributors at head of this document.
 2 Introduction
 ?introduction
@@ -79,17 +80,17 @@ C
  applications like Octave. Gnuplot has been supported and under active
  development since 1986.
 
- Gnuplot supports many types of plots in either 2D and 3D. It can draw using
- lines, points, boxes, contours, vector fields, surfaces, and various
- associated text. It also supports various specialized plot types.
+ Gnuplot can generate many types of plot in 2D and 3D. It can draw using lines,
+ points, boxes, contours, vector fields, images, surfaces, and associated text.
+ It also supports specialized graphs such as heat maps, spider plots, polar
+ projection, histograms, boxplots, bee swarm plots, and nonlinear coordinates.
 
  Gnuplot supports many different types of output: interactive screen terminals
  (with mouse and hotkey input), direct output to pen plotters or modern
  printers, and output to many file formats (eps, emf, fig, jpeg, LaTeX, pdf, png,
  postscript, ...). Gnuplot is easily extensible to include new output modes.
- Recent additions include interactive terminals based on wxWidgets (usable
- on multiple platforms), and Qt.  Mouseable plots embedded in web pages
- can be generated using the svg or HTML5 canvas terminal drivers.
+ A recent example is support for webp animation.  Mouseable plots embedded in
+ web pages can be generated using the svg or HTML5 canvas terminal drivers.
 
  The command language of `gnuplot` is case sensitive, i.e. commands and
  function names written in lowercase are not the same as those written in
@@ -127,11 +128,7 @@ C
 ^ </a>
  When run from command line, gnuplot is invoked using the syntax
        gnuplot {OPTIONS} file1 file2 ...
- where file1, file2, etc. are input file as in the `load` command.
- On X11-based systems, you can use
-       gnuplot {X11OPTIONS} {OPTIONS} file1 file2 ...
- see your X11 documentation and `x11` in this document.
-
+ where file1, file2, etc. are input files as in the `load` command.
  Options interpreted by gnuplot may come anywhere on the line.  Files are
  executed in the order specified, as are commands supplied by the -e option,
  for example
@@ -140,18 +137,16 @@ C
  The special filename "-" is used to force reading from stdin.  `Gnuplot` exits
  after the last file is processed.  If no load files are named, `Gnuplot` takes
  interactive input from stdin.  See help `batch/interactive` for more details.
- The options specific to gnuplot can be listed by typing
+ See `command-line-options` for more details, or type
        gnuplot --help
- See `command-line-options` for more details.
 
  In sessions with an interactive plot window you can hit 'h' anywhere on the
  plot for help about `hotkeys` and `mousing` features.
- Section `seeking-assistance` will help you to find further information, help
- and FAQ.
-2 Seeking-assistance
+2 Seeking-assistance / Bugs
 ?help-desk
 ?faq
 ?FAQ
+?bugs
 ?seeking-assistance
  The canonical gnuplot home page can be found at
 ^ <a href="http://www.gnuplot.info">
@@ -190,23 +185,54 @@ C
  A mailing list for those interested in the development version of gnuplot is:
            gnuplot-beta@lists.sourceforge.net
 
-2 New features in this version
-?new version_5.5
+2 New features in version 6
+?new version_6
 ?new
-?development version
 ?version
- Version 5.5 is the current development version, built from a snapshot of the
- source files in the master branch of the git repository. New features
- introduced here will generally not appear in a supported release until
- version 5.6.  Details may change before that.
+ Version 6 is the latest major release in a history of gnuplot development
+ dating back to 1986.  It follows major version 5 (2015) and subsequent
+ minor version releases 5.2 (2017) and 5.4 (2020).  Development continues
+ in a separate unreleased branch in the project git repository on SourceForge.
 
- For more information about optional features built into the particular copy
- of gnuplot you are running, type `show version long`.
+ Some features described in this document are present only if chosen and
+ configured at the time gnuplot is compiled from source.  To determine what
+ configuration options were used to build the particular copy of gnuplot you
+ are running, type `show version long`.
+
+3 Function blocks and scoped variables
+?new function blocks
+ This version of gnuplot introduces a mechanism for invoking a block of
+ standard gnuplot commands as a callable function.  A function block can
+ accept from 0 to 9 parameters and returns a value.  Function blocks can be
+ used to calculate and assign a new value to a variable, to combine with other
+ functions and operators, or to perform a repetitive task preparing data.
+ There are three components to this mechanism.
+ See `local`, `scope`, `function blocks`, `return`.
+#start
+#b The `local` qualifier allows optional declaration of a variable or array
+## whose scope is limited to the duration of execution of the program unit in
+## which it is found. These units currently include execution of a
+## `load` or `call` statement, function block evaluation, and the code block
+## in curly brackets following an `if`, `else`, `do for`, or `while` statement.
+## If the name of a local variable duplicates the name of a global variable,
+## the global variable is shadowed until exit from the local scope.
+#b The `function` command declares a named function block (effectively an
+## array of strings) containing gnuplot commands.  When the function block
+## is invoked, commands are executed successively until the end of the block
+## or until a `return` command is encountered.
+#b The `return <expression>` command terminates execution of a function block.
+## The result of evaluating <expression> is returned as the value of the
+## function.  Anywhere outside a function block `return` acts like `exit`.
+#end
+
+ Please see `function_block.dem` for an example of using this mechanism
+ to define and plot a non-trivial function that is too complicated for a
+ simple one-line definition `f(x) = ...`.
 
 3 Special and complex-valued functions
 ?new math
- This version of gnuplot provides a larger set of complex-valued functions and
- updated versions of some functions that were present in earlier versions.
+ Gnuplot 6 provides an expanded set of complex-valued functions and updated
+ versions of some functions that were present in earlier versions.
 #start
 #b New: Riemann zeta function with complex domain and range.  See `zeta`.
 #b Updated lower incomplete gamma function with improved domain and precision.
@@ -266,8 +292,9 @@ C
 ?new hulls
 #start
 #b A cluster of 2D points can be replaced by its bounding polygon using the
-## new filter `convexhull`.  A path-smoothed bounding curve is produced by
-## `smooth convexhull`. See `convexhull`.
+## new filter `convexhull`.  A path-smoothed bounding curve can be plotted
+## as a filled area using "convexhull smooth path with filledcurves".
+## See `convexhull`.
 #b A convex hull or other polygon can be used as a mask to display only
 ## selected portions of a pm3d surface or an image plot.
 ## See new plot style `with mask` (defines a mask) and keyword `mask`
@@ -278,6 +305,37 @@ C
 #b cubic spline smoothing of 3D lines. See `splot smooth csplines`
 #b Smoothing options apply to plotting `with filledcurves` {above|below|between}.
 #b New keyword `period` for smoothing periodic data. See `smooth kdensity`.
+#end
+
+3 Named palettes
+?new colormaps
+#start
+#b The current palette can be saved to a named colormap for future use.
+## See `set colormap`.
+#b pm3d and image plots can specify a previously saved palette by name.
+## This permits the use of multiple palettes in a single plot command.
+## See `colorspec palette`.
+#b Named palette colormaps can be manipulated as arrays of 32-bit ARGB
+## color values. This permits addition of alpha-channel values or other
+## modifications not easily specified in a `set palette` command.
+#b There is a new predefined color scheme `set palette viridis`.
+#b Palettes read from a file or datablock (`set palette file`) may be specified
+## either using fractional color components or 24-bit packed RGB values.
+#end
+
+3 New plot styles
+?new styles
+#start
+#b The plot style `with surface` works in 2D polar coordinates to produce
+## a solid-fill gridded representation of the plane, colored by weighted
+## contributions from an arbitrary set of input points. This is analogous to
+## the use of `dgrid3d` and style `with pm3d` to produce a 3D gridded surface.
+## See `set polar grid` and `polar heatmap`.
+#b Plot style `with lines` now has a filter option `sharpen`.  This filter
+## detects spikes in a function plot that appear truncated in the output
+## because the peak lies between two x-coordinates at which the function has
+## been sampled.  It adds a new sample point at the location of each such peak.
+## See `filters`.
 #end
 
 3 New data formats
@@ -314,66 +372,20 @@ C
 #b `stats $vgrid` finds min/max/mean/stddev of voxels in grid
 #end
 
-3 Function blocks and scoped variables
-?new function blocks
- This version of gnuplot introduces a mechanism for invoking a block of
- standard gnuplot commands as a callable function.  A function block can
- accept from 0 to 9 parameters and returns a value.  Function blocks can be
- used to calculate and assign a new value to a variable, to combine with other
- functions and operators, or to perform a repetitive task preparing data.
- There are three components to this mechanism.
- See `local`, `scope`, `function blocks`, `return`.
-#start
-#b The `local` qualifier allows optional declaration of a variable or array
-## whose scope is limited to the duration of execution of the program unit in
-## which it is found. These units currently include execution of a
-## `load` or `call` statement, function block evaluation, and the code block
-## in curly brackets following an `if`, `else`, `do for`, or `while` statement.
-## If the name of a local variable duplicates the name of a global variable,
-## the global variable is shadowed until exit from the local scope.
-#b The `function` command declares a named function block (effectively an
-## array of strings) containing gnuplot commands.  When the function block
-## is invoked, commands are executely successively until the end of the block
-## or until a `return` command is encountered.
-#b The `return <expression>` command terminates execution of a function block.
-## The result of evaluating <expression> is returned as the value of the
-## function.  Anywhere outside a function block `return` acts like `exit`.
-#end
-
- Please see `function_block.dem` for an example of using this mechanism
- to define and plot a non-trivial function that is too complicated for a
- simple one-line definition `f(x) = ...`.
-
-3 Named palettes
-?new colormaps
-#start
-#b The current palette can be saved to a named colormap for future use.
-## See `set colormap`.
-#b pm3d and image plots can specify a previously saved palette by name.
-## This permits the use of multiple palettes in a single plot command.
-## See `colorspec palette`.
-#b Named palette colormaps can be manipulated as arrays of 32-bit ARGB
-## color values. This permits addition of alpha-channel values or other
-## modifications not easily specified in a `set palette` command.
-#b There is a new predefined color scheme `set palette viridis`.
-#b Palettes read from a file or datablock (`set palette file`) may be specified
-## either using fractional color components or 24-bit packed RGB values.
-#end
-
 3 Program control flow
 ?control flow
 #start
-#b Support XDG base directory for gnuplotrc configuration preferences.
-## The program reads initial commands from $HOME/.config/gnuplot/gnuplotrc
-## if this file is found. See `environment`.
+#b New syntax  `if ... else if ... else ...`
+#b XDG base directory conventions for configuration preferences are supported.
+## The program reads initial commands from $XDG_CONFIG_HOME/gnuplot/gnuplotrc.
+## Session command history is saved to $XDG_STATE_HOME/gnuplot_history.
+## If these files are not found, $HOME/.gnuplot and $HOME/.gnuplot_history
+## are used as in previous gnuplot versions.
+#b `unset warnings` suppresses output of warning messages to the console.
 #b Exception handling for the "fit" command.  Control always returns to the
 ## next line of input, even in the case of fit errors.  On return, FIT_ERROR is
 ## non-zero if an error occurred. This allows scripted recovery from a bad fit.
 ## See `fit error_recovery`.
-#b The `load` and `call` commands can input commands from a datablock as an
-## alternative to reading them from a file.
-#b New syntax  `if ... else if ... else ...`
-#b `unset warnings` suppresses output of warning messages to the console.
 #end
 
 3 New terminals and terminal options
@@ -407,9 +419,8 @@ C
 ?new week-date time
  The Covid-19 pandemic of 2020/2021 generated increased interest in plotting
  epidemiological data, which is often tabulated using a "week date" reporting
- convention.  This revealed deficiencies with gnuplot support for this
- convention, including errors in time formats %W and %U.  These have now been
- remedied and support for week-date time extended.
+ convention.  Deficiencies with gnuplot support for this convention were
+ remedied and the support for week-date time was extended.
 #start
 #b Time specifier format %W has been brought into accord with the
 ## ISO 8601 week date standard.
@@ -454,392 +465,70 @@ C
 ## See `set key offset`.
 #end
 
-3 Features introduced in version 5.4
-4 Support for 64-bit integer arithmetic
-?version_5.4
- New features in 5.4
-#start
-#b All evaluation of expressions and functions uses 64-integer arithmetic if
-## supported by the platform.
-#b Integer overflow is detected and handled according to user preference.
-## See `overflow`.
-#end
+3 Brief summary of features introduced in version 5
+?new version_5
+?version_5
 
-4 Voxel grids
- Gnuplot now supports operations based on 3D grids of voxel data.
-
+4 Features introduced in 5.4
+?new version_5 version_5.4
+?version_5 version_5.4
 #start
-#b `set vgrid $gridname size N` creates an NxNxN grid of voxels.
-#b `set vxrange [vxmin:vxmax]` together with `set vyrange` and `set vzrange`
-## define which region of space the grid occupies.  This may or may not be
-## identical to the xyz range of the plot.
-#b `voxel(x,y,z)` can be used in expressions to read or write an individual voxel.
-#b `vfill DATA_SOURCE using x:y:z:radius:(<expression>)` acts analogously to
-## a plot command except that instead of plotting it increments voxels near each
-## point in the input data.
-#b `vgfill` is a variant of `vfill` that uses grid coordinates rather than
-## user coordinates.
-#b `vclear $gridname` resets an existing voxel grid to contain all zero values.
-#b The current contents of one or more voxel grids can be referenced by
-## `splot` commands to assign colors or other properties of plot elements
-## by using the `voxel` function in using specifiers.
-## See demo `voxel.dem`.
-#b `show vgrid` reports basic statistics about all currently defined voxel grids.
-#b Voxel grids can also be plotted by name in `splot` commands with plot styles
-## `dots`, `points`, or `isosurface`.
-## See demo `vplot.dem`.
-#end
-
-4 New plot styles and style options
-#start
-#b 3D plot style `with polygons` reads polygon faces from a data file.
-## This can be used to create a surface or to construct a solid object.
-## See `with polygons`.
-#b `splot $voxelgrid with {dots|points}` marks all voxels whose value is above
-## a requested threshold level.
-#b `splot $voxelgrid with isosurface` creates a tessellated 3D surface enclosing
-## voxels above a requested threshold level. See `isosurface`.
-#b Voxel grid values can be referenced in the `using` specifiers for 3D plots.
-#b `set spiderplot` selects a new plotting mode allowing creation of spider plots
-## (also known as radar charts). These are essentially parallel axis plots where
-## the axes are arranged radially rather than vertically.
-## See `spiderplot`, `set style spiderplot`, `set paxis`.
-#b Plot style `with circles` can be used in 3D plots.
-#b Plot style `with boxes` can be used in 3D plots.
-#b 2D plot style `with arrows` is identical to `with vectors` except that each
-## arrow is specified using x:y:length:angle rather than x:y:xdelta:ydelta
-#b splot FOO with pm3d fillcolor <colorspec>
-#b pm3d surfaces can have individual fillstyle and separate top/bottom fillcolor
-#b pm3d option `noclipcb` causes quadrangles with palette color outside cbrange
-## to be skipped rather than being drawn with color clipped to cbmin or cbmax.
-#b Customized contour line types. See `set cntrparam`.
-#b The vertical lines connecting the base plane to the corners of a 3D surface
-## can be toggled on/off. See `set cornerpoles`.
-#end
-
-4 New data pre-processing filters
-#start
-#b `zsort` sorts 2D points on values in a third column. See `zsort`.
-## This is useful to bring a small number of salient points in a very large data
-## set to the front so that they are not occluded.
-#end
-
-4 New commands and command options
-#start
-#b Voxel grid commands. See `set vgrid`, `set vxrange`, `vclear`, `vfill`,
-## `vgfill`, and `voxel`.
-#b New options for showing the xy xz and yz planes in 3D plots.
-##See `set walls`, `set grid vertical`.
-#b `set table separator {tab|comma|"char"}` can be used to create csv files.
-##See `plot with table`.
-#b New options `set view projection {xy|xz|yz}` adjust view angles, axis tic
-##and label placement to generate a 2D projection of a 3D splot.
-##`set view projection xy` is equivalent to `set view map`.
-#b `set rgbmax <value>` controls interpretation of input RGB values.
-#b Array size can be implicit if an initializer is present, e.g. `Array A = [1,2,3]`.
-#b Optional radial clipping of line segments in polar mode. See `set clip`.
-#b Extra lines to customize the key can be added by substituting `keyentry` in
-## place of a filename or function in `plot` and `splot` commands.
-##This produces a line in the key without generating a corresponding plot.
-##See `keyentry`.
-#b User-specified translation of mouse coordinates (EXPERIMENTAL).
-##See map_projection demo.
-#b The `load` command can input commands from a datablock as an alternative to
-## reading them from a file.
-#b `set datafile columnheaders` causes first line of input to be read as strings
-## rather than as data values.  Equivalent to `set key autotitle columnheader`
-## except that it does not affect generation of key entries.  If this option is
-## in effect the `stats` command will generate an array of strings containing
-## the column headers found.
-#end
-
-4 New terminals and terminal options
-#start
-#b The `pcl5` terminal has been extended to support PCL5e/PCL5c printers and
-## many modern gnuplot features.
-#b The `pstricks` terminal has been extended to support many modern gnuplot
-## features including RGB colors and transparency, filled polygons, and boxes.
-#b New terminal `pict2e` to use the LaTeX2e pict2e environment.
-## It directly supersedes older terminals `latex`, `emtex`, `eepic`, and `tpic`,
-## which are no longer built by default.
-#b The `texdraw` terminal has been extended to support text at arbitrary angles,
-## variable line width, v5 dashed lines, and filled boxes and polygons. It can
-## now be used with plain TeX, too.  It still does not support color.
-#b The previously experimental Direct2D variant of the `windows` terminal
-## replaces the GDI and GDI+ variants. It now supports printing using D2D
-## and color fonts.
-#b The `dospc` and `svga` DOS terminals have been modernized and now support
-## interactive keyboard and mouse (svga only) input.
-#end
-
-4 Pixmaps as objects
-#start
-#b `set pixmap` allows import of an image in standard format (png jpeg gif) as
-## a pixmap that can be positioned anywhere in a plot or on the page.
-## Unlike plotting `with image`, pixmap objects retain their original aspect
-## ratio and size independent of axis scaling or rotation. See `pixmap`.
-#end
-
-4 Other new features
-#start
+#b Expressions and functions use 64-bit integer arithmetic. See `integer`
+#b 2D plot styles `polygons`, `spiderplot`, `arrows`
+#b 3D plot styles `boxes`, `circles`,  `polygons`, `isosurface` and
+## other representations of gridded voxel data
+#b Data preprocessing filter `zsort`
+#b Construction of customized keys using `keyentry`
+#b New LaTeX terminal pict2e supersedes older terminals `latex`, `emtex`, `eepic`,
+## and `tpic`, which are no longer built by default
+#b `set pixmap` imports a png/jpeg/gif image as a pixmap that can be scaled and
+## positioned anywhere in a plot or on the page
 #b Enhanced text mode accepts \U+xxxx (xxxx is a 4 or 5 character hexadecimal)
-##as representing a Unicode code point that is converted to the corresponding
-##UTF-8 byte sequence on output.
+## as representing a Unicode code point that is converted to the corresponding
+## UTF-8 byte sequence on output
+#b Revised syntax for `with parallelaxes` allows convenient iteration inside the
+## plot command, similar to plot styles `histogram` and `spiderplot`
 #end
 
-4 Changes
+4 Features introduced in 5.2
+?new version_5 version_5.2
+?version_5 version_5.2
 #start
-#b `pm3d filled area quadrangles` are clipped smoothly to current zrange.
-## This affects pm3d surfaces and also the faces of 3D boxes, polygons, etc.
-#b Revised syntax for plot style 'with parallelaxes'. See `parallel`.
-## The histogram, parallelaxis, and spiderplot styles now use similar syntax
-## that can iterate over plot elements:
-##     `plot for [column=1:N] DATA using column`
-#b Imaginary values returned by the using specifier of a 2D plot are treated as
-##undefined values (NaN) rather than as real(value).  This was always true for
-##function plots and 3D data plots.  E.g. the following two plots are equivalent.
-##plot [-1:1] sqrt(x); plot [-1:1] '+' using 1:(sqrt($1)
-#b The `set fontpath` command is deprecated. The search path for fonts to be
-## embedded in output from the postscript terminal has been revised.
-#end
-
-3 Features introduced in version 5.2
-4 New plot styles and style options
-#start
-#b 3D plot style `with zerrorfill`. See `zerrorfill`, `fenceplots` and
-^ <a href="http://gnuplot.info/demo_5.2/zerror.html">
-   zerror demo.
-^ </a>
-#b Beeswarm plots. See `set jitter`, `beeswarm` and
-^ <a href="http://gnuplot.info/demo_5.2/jitter.html">
-   beeswarm plot demo
-^ </a>
-#b The symbol used for individual points in a plot can be controlled by data values
-## (see `pointtype variable`)
-#end
-4 New data pre-processing filters
-#start
-#b Normalized frequency of occurrence in a data set (see `smooth fnormal`)
+#b Nonlinear coordinate systems (see `set nonlinear`)
 #b Automated binning of data (see `bins`)
-#end
-4 Polar mode improvements and extensions
-#start
-#b Polar coordinates may be used in label, arrow, and object definitions
-#b `set [m]ttics` places ticmarks and labels on the perimeter of a polar plot. See
-^ <a href="http://gnuplot.info/demo_5.2/ttics.html"> polar axis and ticlabels demo
-^ </a>
-#b `set rlabel`  places a label above the r axis
-#b Inverted `rrange` (i.e. set rrange [90:0]) allows use of celestial horizontal
-## coordinates. See
-^ <a href="http://gnuplot.info/demo_5.2/solar_path.html"> solar path demo
-^ </a>
-#b `set border polar` draws a solid line around the perimeter of a polar plot
-#b `set theta` controls the position of theta = 0 around the perimeter of a
-## polar plot and the sense (clockwise or anti-clockwise) of increasing theta
-#end
-4 Nonlinear coordinates systems
-#start
-#b Any plot axis can be assigned a pair of functions, possibly nonlinear, that
-## describe the forward and reverse mapping to a linear range (see `set nonlinear`)
-^ <a href="http://gnuplot.info/demo_5.2/nonlinear3.html">
-   Nonlinear x/y axis demo
-^ </a>
-#b The familiar command `set logscale` has been reimplemented as a special case
-## nonlinear axis where the paired functions are log(x) and exp(x).
-#end
-4 New commands and command options
-#start
-#b Inside the bracketed clause of an iteration, `continue` jumps immediately
-## to the next iteration, `break` immediately exits from the iteration
-#b `toggle {<plotno> | "plottitle" | all}"` interactively enables or disables
-## display of one element of the current plot (see `toggle`)
-#b `save fit` replaces deprecated command `update`
-#b `set table "outfile.name" append` will append subsequent tabulated plots to
-## an existing text file rather replacing its contents
-#b `set pm3d lighting` describes a lighting model with specular highlighting
-## (see `lighting`)
-#b `set minussign` tells gnuplot to use a special symbol in the current
-## encoding to replace the ascii character '-' in negative numbers
-#b `set micro` tells gnuplot to use a special symbol in the current encoding to
-## replace the ascii character 'u' for the scientific notation prefix "micro"
-## The special typographic symbols for micro and minussign are used only in axis
-## tic labels and strings explicitly created with gprintf(). The byte sequence
-## used to represent these characters depends on the current encoding.
-#end
-4 New data type "array"
-#start
-#b This gnuplot version introduces a new data type `array name[size]`.
-## An array must be declared before use. Each array element A[i] may be a string,
-## an integer, a real number, or a complex value.  A single array may contain
-## elements with different types.  The cardinality operator |A| returns the size
-## of array A. See `arrays`.
+#b 2D beeswarm plots. See `set jitter`
+#b 3D plot style `zerrorfill`
+#b 3D lighting model provides shading and specular highlighted (see `lighting`).
+#b Array data type, associated commands and operators. See `arrays`.
+#b New terminals `sizelgd`, `domterm`
+#b New format descriptors tH tM tS handle relative times (interval lengths).
+## See `time_specifiers`.
 #end
 
-4 New terminals and terminal options
+4 Features introduced in 5.0
+?new version_5 version_5.0
+?version_5 version_5.0
 #start
-#b See `sixelgd` for description of a new terminal that supports interleaving
-## plots with the command lines that generated them if gnuplot is run inside a
-## vt340-compatible terminal emulator
-#b The `domterm` terminal supports interleaving plots with the command lines
-## that generated them if gnuplot is run inside an svg-aware terminal emulator
-#b The `windows` terminal supports saving the current graph to a bitmap file
-#b The `windows` terminal graph window can be docked to the wgnuplot text window
-#b New (experimental) Direct2D/DirectWrite backend for the `windows` terminal
-#b The `wxt` terminal supports exporting to an EMF file or printer on Windows
-#b The `dumb` terminal supports ANSI colors for lines and fill area
-#b The `tkcanvas` terminal has been rewritten to support many more modern gnuplot
-## features, as well as new languages. (Since 5.0.3)
-#end
-
-4 Other new features
-#start
-#b An additional rotation angle `azimuth` affects the orientation of 3D plots.
-## This can be set from the command line (see `set view azimuth`) or by dragging
-## with the right mouse button. Hotkey `z` resets azimuth to 0.
-#b gnuplot running under Windows can interpret Unicode (BMP) input scripts by
-## converting them to the current encoding from `set encoding`, including UTF-8
-#b Textboxes can be assigned a border color and fill color (see `set style textbox`)
-#b Customized plot legends (see `plot title`, `set key`, `multiple keys`)
-#b A sampling range specifier for plotting with pseudofile '+' can include a
-## sampling interval.  For example:
-## plot sample [t=0:100:10] '+' using (t):(1):(label[t]) with labels
-#b Pseudo-file '++' generates samples on the u and v axes, rather than x and y.
-## This allows placement of multiple parametric surfaces in 3D that occupy
-## distinct regions of Cartesian space.  See `sampling.dem`.
-#b new formats descriptors tH tM tS handle relative times (interval lengths).
-##See `time_specifiers`.
-#b ^R initiates a reverse-search through the history for the built-in readline
-## which is used on Windows, too, see `command-line-editing`.
-#b Revised printing support on Windows using `set output "PRN"`,
-## see `windows printing`.
-#end
-
-3 Features introduced in version 5.0
-?Features introduced in version 5.0
-#start
-#b The dot-dash pattern of a line can now be specified independent of other
-## line properties. See `dashtype`, `set dashtype`, `set linetype`
+#b Terminal independent dash types.
 #b The default sequence of colors used for successive elements in a plot is
 ## more easily distinguished by users with color-vision defects.
-## The color sequence is under user control (see `set colorsequence`).
-## This mechanism can also be used to generate monochrome plots
-## (see `set monochrome`). In previous gnuplot versions `monochrome` could only
-## be selected when changing the current terminal via `set terminal`.
-#b New plot styles `with parallelaxes`, `with table`, and labeled contours.
-#b New data pre-processing filter for monotonic cubic splines (see `smooth mcsplines`)
-#b Text markup now supports bold and italic font settings in addition to
-## subscript, superscript, font size and other previously available properties.
-## Enhanced text mode is now enabled by default. See `enhanced text`.
-## Text elements can be enclosed in a box (see `set style textbox`).
-#b Interactive terminals support hypertext labels that only appear when the
-## mouse hovers over the label's anchor point.
-#b New coordinate system (Degrees, Minutes, Seconds). See `set xtics geographic`.
-#b The default format for axis labels is "% h" ("$%h$" for LaTeX terminals).
-## This format is like the C standard format %g except that the exponential term,
-## if present, is written using a superscript.  E.g. 1.2 x 10^5 rather than 1.2E05.
-#b Support for 32-bit Alpha channel + RGB color #AARRGGBB.  See `colorspec`.
-#b Support for HSV color space via a translation function hsv2rgb(H,S,V).
-#b Secondary axes (x2, y2) may be locked to the primary axis via a mapping
-## function.  In the simplest case this guarantees that the primary and secondary
-## axis ranges are identical.  In the general case it allows you to define a
-## non-linear axis, something that previously was possible only for log scaling.
-## See `set link`.
-#b Each function in a plot command may optionally be preceded by a sampling
-## range.  This does not affect the overall range of the plot, only the range
-## over which this function is sampled.  See `plot` and `piecewise.dem`.
-#b If the external library libcerf is available, it is used to provide complex
-## math routines cerf, cdawson, erfi, faddeeva, and the Voigt profile
-## VP(x,sigma,gamma).
-#b The `import` command attaches a user-defined function name to a function
-## provided by an external shared object (support is operating-system dependent).
-## A template header and example source and make files for creating a suitable
-## external shared object are provided in the demo collection.
-#b Previous commands in the history list of an interactive session can be
-## reexecuted by number.  For example, `history !5` will reexecute the command
-## numbered 5 in the `history` list.
-#b Bit-shift operators >> and <<.
-#b Shell invocation of gnuplot can pass parameters to a gnuplot script.
-## gnuplot -c scriptfile.gp ARG1 ARG2 ARG3 ...
+#b New plot types `with parallelaxes`, `with table`.
+#b Hypertext labels activated by a mouse-over event.
+#b Explicit sampling ranges in 2D and 3D function plots and pseudofiles
+## '+' and '++'.
+#b Plugin support through new command `import` that attaches a user-defined
+## function name to a function provided by an external shared object.
 #end
 
-2 Differences between versions 4 and 5
-?changes
-?differences
- Some changes introduced in version 5 may cause certain scripts written
- for earlier versions of gnuplot to behave differently.
+2 Differences between versions 5 and 6
 
- * Revised handling of input data containing NaN, inconsistent number of data
- columns, or other unexpected content.  See Note under `missing` for examples
- and figures.
+ Some changes introduced in version 5 could cause certain scripts written
+ for earlier versions of gnuplot to fail or to behave differently.
+ There are very few such changes in version 6.
 
- * Time coordinates are stored internally as the number of seconds relative to
- the standard unix epoch 1-Jan-1970.  Earlier versions of gnuplot used a
- different epoch internally (1-Jan-2000). This change resolves inconsistencies
- introduced whenever time in seconds was generated externally.  The epoch
- convention used by a particular gnuplot installation can be determined using
- the command `print strftime("%F",0)`.  Time is now stored to at least
- millisecond precision.
-
- * The function `timecolumn(N,"timeformat")` now has 2 parameters. Because the
- new second parameter is not associated with any particular data axis, this
- allows using the `timecolumn` function to read time data for reasons other than
- specifying the x or y coordinate. This functionality replaces the command
- sequence `set xdata time; set timefmt "timeformat"`.  It allows combining time
- data read from multiple files with different formats within a single plot.
-
- * The `reverse` keyword of the `set [axis]range` command affects only
- autoscaling. It does not invert or otherwise alter the meaning of a command
- such as `set xrange [0:1]`.  If you want to reverse the direction of the
- x axis in such a case, say instead `set xrange [1:0]`.
-
- * The `call` command is provides a set of variables ARGC, ARG0, ..., ARG9.
- ARG0 holds the name of the script file being executed.  ARG1 to ARG9 are string
- variables and thus may either be referenced directly or expanded as macros,
- e.g. @ARG1.  The contents of ARG0 ... ARG9 may alternatively be accessed as
- array elements ARGV[0] ... ARGV[ARGC].  An older gnuplot convention of
- referencing call parameters as tokens $0 ... $9 is deprecated in version 5.
-
- * The optional bandwidth for the kernel density smoothing option is taken from
- a keyword rather than a data column.  See `smooth kdensity`.
-
-2 Deprecated syntax
+3 Deprecated syntax
 ?deprecated syntax
-?backwards compatibility
-?compatibility
- Gnuplot version 4 deprecated certain syntax used in earlier versions but
- provided a configuration option that allowed backward compatibility.
- Support for the old syntax has now been removed.
-
- Deprecated in version 4 and removed in version 5:
-       set title "Old" 0,-1
-       set data linespoints
-       plot 'file' thru f(x)
-       plot 1 2 4               # horizontal line at y=1
-       update
- Current equivalent:
-       TITLE = "New"
-       set title TITLE offset char 0, char -1
-       set style data linespoints
-       plot 'file' using 1:(f(column(2)))
-       plot 1 linetype 2 pointtype 4
-       save fit "filename"
- Deprecated in version 5
-       if (defined(VARNAME)) ...
-       set style increment user
-       call 'script' 1.23 ABC
-          (in script:  print $0, "$1", "number of args = $#")
-       set fontpath
-       set clabel
-       fit control variables FIT_*
- Current equivalent:
-       if (exists("VARNAME")) ...
-       set linetype
-       call 'script' 1.23 "ABC"
-          (in script:  print ARG1, ARG2, "number of args = ", ARGC
-       set cntrlabel
-       set fit <option> <value>
-
- Deprecated in version 5.4
+ Deprecated in version 5.4, removed in 6.0
        # use of a file containing `reread` to perform iteration
        N = 0;  load "file-containing-reread";
        file content:
@@ -852,6 +541,19 @@ C
            plot func(N, x)
            pause -1
        }
+
+ Deprecated in version 5.4, removed in 6.0
+       set dgrid3d ,,foo     # no keyword to indicate meaning of foo
+ Current equivalent
+       set dgrid3d qnorm foo # (example only; qnorm is not the only option)
+
+ Deprecated in version 5.0, removed in 6.0
+       set style increment user
+ Current equivalent
+       use "set linetype" to redefine a convenient range of linetypes
+
+ Deprecated in version 5.0, removed in 6.0
+       show palette fit2rgbformulae
 
 2 Demos and Online Examples
 ?demos
@@ -870,10 +572,10 @@ C
 2 Batch/Interactive Operation
 ?batch/interactive
  `Gnuplot` may be executed in either batch or interactive modes, and the two
- may even be mixed together on many systems.
+ may even be mixed together.
 
- Any command-line arguments are assumed to be either program options
- (see command-line-options) or names of files containing `gnuplot` commands.
+ Command-line arguments are assumed to be either program options or names
+ of files containing `gnuplot` commands.
  Each file or command string will be executed in the order specified.
  The special filename "-" is indicates that commands are to be read from stdin.
  `Gnuplot` exits after the last file is processed.  If no load files and no
@@ -907,7 +609,7 @@ C
  To launch an interactive session:
        gnuplot
 
- To launch a batch session using two command files "input1" and "input2":
+ To execute two command files "input1" and "input2" in batch mode:
        gnuplot input1 input2
 
  To launch an interactive session after an initialization file "header" and
@@ -930,11 +632,6 @@ C
  titles, key, etc.  NB: For information about the HTML5 canvas terminal
  see `set term canvas`.
 
- In early versions of gnuplot, some terminal types used the values from
- `set size` to control also the size of the output canvas; others did not.
- The use of 'set size' for this purpose was deprecated in version 4.
- Almost all terminals now behave as follows:
-
  `set term <terminal_type> size <XX>, <YY>` controls the size of the output
  file, or "canvas". By default, the plot will fill this canvas.
 
@@ -953,6 +650,9 @@ C
 
  These commands produce an output file "figure.png" that is 600 pixels wide
  and 400 pixels tall. The plot will fill the lower left quarter of this canvas.
+
+ Note: In early versions of gnuplot some terminal types used `set size`
+ to control the size of the output canvas.  This was deprecated in version 4.
 
 2 Command-line-editing
 ?line-editing
@@ -1171,11 +871,15 @@ C
 ?bold
 ?italic
  Many terminal types support an enhanced text mode in which additional
- formatting information is embedded in the text string.  For example, "x^2"
+ formatting information can be embedded in the text string.  For example, "x^2"
  will write x-squared as we are used to seeing it, with a superscript 2.
  This mode is selected by default when you set the terminal, but may be
- toggled afterward using "set termoption [no]enhanced", or by marking
- individual strings as in "set label 'x_2' noenhanced".
+ toggled afterward using "set termoption [no]enhanced", or disabled for
+ individual strings as in `set label "x_2" noenhanced`.
+
+ Note:  For output to TeX-based terminals (e.g. cairolatex, pict2e, pslatex,
+ tikz) all text strings should instead use TeX/LaTeX syntax. See `latex`.
+
 
 @start table - first is interactive cleartext form
   Control      Examples        Explanation
@@ -1255,11 +959,11 @@ C  need @ in table, so end and restart the table !
       {/"Times New Roman":Bold=20 A_{/:Normal{/:Italic i}}}
 
  The phantom box is useful for a@^b_c to align superscripts and subscripts
- but does not work well for overwriting an accent on a letter.  For the latter,
- it is much better to use an encoding  (e.g. iso_8859_1 or utf8) that contains
- a large variety of letters with accents or other diacritical marks.  See
- `set encoding`. Since the box is non-spacing, it is sensible to put the shorter
- of the subscript or superscript in the box (that is, after the @).
+ but does not work well for overwriting a diacritical mark on a letter.
+ For that purpose it is much better to use an encoding (e.g. utf8) that contains
+ letters with accents or other diacritical marks.  See `set encoding`.
+ Since the box is non-spacing, it is sensible to put the shorter of the subscript
+ or superscript in the box (that is, after the @).
 
  Space equal in length to a string can be inserted using the '&' character.
  Thus
@@ -1280,11 +984,8 @@ C  need @ in table, so end and restart the table !
  both strings ('~a{.5 /*.2 o}'---an 'a' with a one-fifth-size 'o' on top---and
  the space between the number and the slash is necessary), but you can't
  change it after the beginning of the string.  Neither can you use any other
- special syntax within either string.  You can, of course, use control
- characters by escaping them (see below), such as '~a{\^}'
-
- You can escape control characters using \, e.g.,  \\, \{, and so on.
- See `escape sequences` below.
+ special syntax within either string.  Control characters must be escaped,
+ e.g. '~a{.8\^}' to print â.  See `escape sequences` below.
 
  Note that strings in double-quotes are parsed differently than those enclosed
  in single-quotes.  The major difference is that backslashes may need to be
@@ -1324,28 +1025,21 @@ C  need @ in table, so end and restart the table !
 
 2 Environment
 ?environment
- A number of shell environment variables are understood by `gnuplot`.  None of
- these are required, but may be useful.
+ A number of shell environment variables are understood by `gnuplot`.
+ None of these are required.
 
- GNUTERM, if defined, is used to set the terminal type on start-up.
- Starting with version 5.2 the entire string in GNUTERM is passed to
- "set term" so that terminal options may be included.  E.g.
-      GNUTERM="postscript eps color size 5in, 3in"
+ GNUTERM, if defined, is passed to "set term" on start-up.
  This can be overridden by a system or personal initialization file
  (see `startup`) and of course by later explicit `set term` commands.
+ Terminal options may be included.  E.g.
+      bash$ export GNUTERM="postscript eps color size 5in, 3in"
 
- GNUHELP may be defined to be the pathname of the HELP file (gnuplot.gih).
+ GNUHELP, if defined, sets the pathname of the HELP file (gnuplot.gih).
 
- On VMS, the logical name GNUPLOT$HELP should be defined as the name of the
- help library for `gnuplot`.  The `gnuplot` help can be put inside any VMS
- system help library.
-
- On Unix, HOME is used as the name of a directory to search for a .gnuplot
- file if none is found in the current directory.  Additionally gnuplot searches
- for $XDG_CONFIG_HOME/gnuplot/gnuplotrc which is loaded after .gnuplot.  On
- MS-DOS, Windows and OS/2, GNUPLOT is used.  On Windows, the NT-specific
- variable USERPROFILE is also tried. VMS, SYS$LOGIN: is used. Type `help
- startup`.
+ Initialization at start-up may search for configuration files $HOME/.gnuplot,
+ and $XDG_CONFIG_HOME/gnuplot/gnuplotrc.
+ On MS-DOS, Windows and OS/2, files in GNUPLOT or USERPROFILE are searched.
+ For more details see `startup`.
 
  On Unix, PAGER is used as an output filter for help messages.
 
@@ -1363,10 +1057,9 @@ C  need @ in table, so end and restart the table !
  of GNUPLOT_LIB are appended to the `loadpath` variable, but not saved
  with the `save` and `save set` commands.
 
- Several gnuplot terminal drivers access TrueType fonts via the gd library.
- For these drivers the font search path is controlled by the environmental
- variable GDFONTPATH.  Furthermore, a default font for these drivers may be
- set via the environmental variable GNUPLOT_DEFAULT_GDFONT.
+ Several gnuplot terminal drivers access TrueType fonts via the gd library
+ (see `fonts`). For these terminals GDFONTPATH and GNUPLOT_DEFAULT_GDFONT
+ may affect font selection.
 
  The postscript terminal uses its own font search path. It is controlled by
  the environmental variable GNUPLOT_FONTPATH.
@@ -1374,8 +1067,8 @@ C  need @ in table, so end and restart the table !
  GNUPLOT_PS_DIR is used by the postscript driver to search for external
  prologue files. Depending on the build process, gnuplot contains either a
  built-in copy of those files or a default hardcoded path. You can use this
- variable have the postscript terminal use custom prologue files rather than
- the default files. See `postscript prologue`.
+ variable to have the postscript terminal use custom prologue files rather
+ than the default prologue files. See `postscript prologue`.
 2 Expressions
 ?expressions
 ?division
@@ -1480,8 +1173,9 @@ Ffigure_E0
       1.0 -10. 1e1 3.5e-1   # floating point constants
       {1.2, -3.4}           # complex constant
       "Line 1\nLine 2"      # string constant (\n is expanded to newline)
-      '123\n456'            # string constant (\ and n are ordinary characters)
+      '123\na\456'          # string constant (\ and n are ordinary characters)
 
+#TeX \newpage
 3 Functions
 ?expressions functions
  Arguments to math functions in `gnuplot` can be integer, real, or complex
@@ -1894,7 +1588,7 @@ C ?expressions functions ceil
 %erf(x)@ ~~ @$erf ( roman real (x))$, error function of real ($x$)
  The `erf(x)` function returns the error function of the real part of its
  argument.  If the argument is a complex value, the imaginary component is
- ignored.  See `erfc`, `inverf`, and `norm`.
+ ignored.  See `cerf`, `erfc`, `inverf`, and `norm`.
 4 erfc
 ?expressions functions erfc
 ?erfc
@@ -1902,7 +1596,7 @@ C ?expressions functions ceil
 %erfc(x)@ ~~ @$erfc ( roman real (x))$, 1.0 - error function of real ($x$)
  The `erfc(x)` function returns 1.0 - the error function of the real part of
  its argument.  If the argument is a complex value, the imaginary component is
- ignored.  See `erf`, `inverf`, and `norm`.
+ ignored.  See `cerf`, `erf`, `inverf`, and `norm`.
 4 exp
 ?expressions functions exp
 ?exp
@@ -2130,10 +1824,11 @@ C 4 zeta
 %c c l .
 %Function@Arguments@Returns
 %_
+# ~ & ~ & ~ & \hspace{9cm} \\
 4 cerf
 ?expressions functions cerf
 ?cerf
-#cerf(z) & complex & \gpCX &  complex error function \\
+#cerf(z) & complex & \gpCX &  complex error function $cerf(z)={\frac{\sqrt{\pi}}{2}}{\int^{z}_{0}{e^{-t^2}dt}} $ \\
 %cerf(z)@complex@complex error function
  `cerf(z)` is the complex version of the error function erf(x)
  Requires external library libcerf.
@@ -2150,9 +1845,9 @@ C 4 zeta
 4 faddeeva
 ?expressions functions faddeeva
 ?faddeeva
-%faddeeva(z)@complex@rescaled complex error function w(z) = exp(-z^2) * erfc(-i*z)
-#faddeeva(z)&complex& \gpCX &rescaled complex error function $w(z) = e^{-z^2}~ erfc(-iz) $ \\
- The `faddeeva(z)` function returns the rescaled complex error function
+%faddeeva(z)@complex@scaled complex complementary error function w(z) = exp(-z^2) * erfc(-i*z)
+#faddeeva(z)&complex& \gpCX &scaled complex complementary error function $w(z) = e^{-z^2}~ erfc(-iz) $ \\
+ `faddeeva(z)` returns the scaled complex complementary error function
  faddeeva(z) = exp(-z^2) * erfc(-i*z)
  This corresponds to Eqs 7.1.3 and 7.1.4 of Abramowitz and Stegun.
  Requires external library libcerf.
@@ -2225,7 +1920,6 @@ C 4 FresnelS
 #\begin{tabular}{|lcl|}
 @end table
 
-#TeX \newpage
 ^<!-- INCLUDE_NEXT_TABLE -->
 @start table
 #\begin{longtable}{@{\extracolsep{\fill}}|lcl|@{}} \hline
@@ -2748,7 +2442,7 @@ C 4 weekdata_cdc
 #TeX \quad\quad ibeta$(a,b,x)=\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}\intop_{0}^{x}t^{a-1}(1-t)^{b-1}dt$
 
  If the arguments are complex, the imaginary components are ignored.
- The implementation in gnuplot 5.5 uses code from the Cephes library
+ The implementation in gnuplot uses code from the Cephes library
  [Moshier 1989, "Methods and Programs for Mathematical Functions", Prentice-Hall].
 
 4 Invibeta
@@ -3082,7 +2776,8 @@ C 4 weekdata_cdc
 ?expressions functions join
  `join(array, "sep")` concatenates the string elements of an array into a
  single string containing fields delimited by the character sequence in "sep".
- Non-string array elements generate an empty field.
+ Non-string array elements generate an empty field.  The complementary
+ operation `split` break extracts fields from a string to create an array.
  Example:
      array A = ["A", "B", , 7, "E"]
      print join(A,";")
@@ -3116,11 +2811,15 @@ C 4 weekdata_cdc
  complex arguments, unless otherwise noted.  The ** operator (exponentiation)
  is supported, as in FORTRAN.
 
+ Operator precedence is the same as in Fortran and C.  As in those languages,
+ parentheses may be used to change the order of operation.  Thus -2**2 = -4,
+ but (-2)**2 = 4.
+
 4 Unary
 ?expressions operators unary
 ?operators unary
 ?unary
- The following is a list of all the unary operators and their usages:
+ The following is a list of all the unary operators:
 
 @start table - first is interactive cleartext form
      Symbol      Example    Explanation
@@ -3195,10 +2894,6 @@ C ... and restart the table:
  (*) Starred explanations indicate that the operator requires an integer
  argument.
 
- Operator precedence is the same as in Fortran and C.  As in those languages,
- parentheses may be used to change the order of operation.  Thus -2**2 = -4,
- but (-2)**2 = 4.
-
  The factorial operator returns an integer when N! is sufficiently small
  (N <= 20 for 64-bit integers). It returns a floating point approximation
  for larger values of N.
@@ -3209,7 +2904,7 @@ C ... and restart the table:
 4 Binary
 ?expressions operators binary
 ?operators binary
- The following is a list of all the binary operators and their usages:
+ The following is a list of all the binary operators:
 
 @start table - first is interactive cleartext form
      Symbol       Example      Explanation
@@ -3393,11 +3088,11 @@ C ... and restart the table:
  and undefined elsewhere:
        f(x) = 0<=x && x<1 ? sin(x) : 1<=x && x<2 ? 1/x : 1/0
        plot f(x)
- Note that `gnuplot` quietly ignores undefined values, so the final branch of
- the function (1/0) will produce no plottable points.  Note also that f(x)
- will be plotted as a continuous function across the discontinuity if a line
- style is used.  To plot it discontinuously, create separate functions for the
- two pieces.  (Parametric functions are also useful for this purpose.)
+ Note that `gnuplot` quietly ignores undefined values when plotting, so the
+ final branch of the function (1/0) will produce no plottable points.
+ Note also that f(x) will be plotted as a continuous function across the
+ discontinuity if a line style is used.  To plot it discontinuously, create
+ separate functions for the two pieces.
 
  For data in a file, plot the average of the data in columns 2 and 3 against
  the datum in column 1, but only if the datum in column 4 is non-negative:
@@ -3480,7 +3175,7 @@ C ... and restart the table:
  where <expression> is defined in terms of <dummy1> through <dummy12>.
  This form of function definition is limited to a single line.
  More complicated multi-line functions can be defined using the function block
- mechanism (new in version 5.5). See `function blocks`.
+ mechanism (new in this version). See `function blocks`.
 
  User-defined variable syntax:
        <variable-name> = <constant-expression>
@@ -4409,7 +4104,7 @@ Ffigure_newsyntax
       func(x,y) = A + (x+y)/2.
 
  Exception 3: Variables declared with the `local` command.
- The `local` qualifier (new in version 5.5) allows optional declaration of a
+ The `local` qualifier (new in this version) allows optional declaration of a
  variable or array whose scope is limited to the execution of the code block
  in which it is found.  This includes `load` and `call` operations,
  evaluation of a function block, and the code in curly brackets that follows
@@ -4529,18 +4224,12 @@ Ffigure_newsyntax
  Command-line substitution can be used anywhere on the `gnuplot` command
  line except inside strings delimited by single quotes.
 
- Example:
-
- This will run the program `leastsq` and replace `leastsq` (including
- backquotes) on the command line with its output:
-       f(x) = `leastsq`
-
- or, in VMS
-       f(x) = `run leastsq`
-
- These will generate labels with the current time and userid:
+ For example, these will generate labels with the current time and userid:
        set label "generated on `date +%Y-%m-%d` by `whoami`" at 1,1
        set timestamp "generated on %Y-%m-%d by `whoami`"
+
+ This creates an array containing the names of files in the current directory:
+       FILES = split( "`ls -1`" )
 3 Substitution of string variables as macros
 ?substitution macros
 ?macros
@@ -4896,8 +4585,8 @@ Ffigure_watchpoints
  The 2D `arrows` style draws an arrow with specified length and orientation
  angle at each point (x,y).  Additional input columns may be used to provide
  variable (per-datapoint) color information or arrow style.
- It is identical to the 2D style `with vectors` except that each the arrow
- head is positioned using length + angle rather than delta_x + delta_y.
+ It is identical to the 2D style `with vectors` except that each arrow head
+ is positioned using length + angle rather than delta_x + delta_y.
  See `with vectors`.
 
       4 columns:  x  y  length  angle
@@ -4943,9 +4632,6 @@ Ffigure_jitter
       4 columns:  x  y  ydelta xdelta         (xdelta <= 0 means use boxwidth)
       5 columns:  x  y  ylow  yhigh  xdelta   (xdelta <= 0 means use boxwidth)
 
- DEPRECATED
-      4 columns:  x  y  ylow  yhigh          # boxwidth == -2
-
 Ffigure_boxerrorbars
  The boxwidth will come from the fourth column if the y errors are given as
  "ydelta" or from the fifth column if they are in the form of "ylow yhigh".
@@ -4958,9 +4644,11 @@ Ffigure_boxerrorbars
  The line style used for the error bar may be controlled using `set bars`.
  Otherwise the error bar will match the border of the box.
 
- DEPRECATED:  The special case `boxwidth = -2.0` is for four-column data with
- y errors in the form "ylow yhigh".  In this case the boxwidth will be
- calculated so that each box touches the adjacent boxes.
+ DEPRECATED:  Old versions of gnuplot treated `boxwidth = -2.0` as a special
+ case for four-column data with y errors in the form "ylow yhigh".
+ In this case boxwidth was adjusted to leave no gap between adjacent boxes.
+ This treatment is retained for backward-compatibility but may be removed
+ in a future version.
 
 2 boxes
 ?plotting styles boxes
@@ -5010,22 +4698,16 @@ Ffigure_boxes
        set style fill solid 1.0
        plot 'file.dat' with boxes
 
- To plot a sine and a cosine curve in pattern-filled boxes style:
+ To plot a sine and a cosine curve in pattern-filled boxes style
+ with explicit fill color:
 
        set style fill pattern
-       plot sin(x) with boxes, cos(x) with boxes
+       plot sin(x) with boxes fc 'blue', cos(x) with boxes fc 'gold'
 
  The sin plot will use pattern 0; the cos plot will use pattern 1.
  Any additional plots would cycle through the patterns supported by the
  terminal driver.
 
- To specify explicit fillstyles and fillcolors for each dataset:
-
-      plot 'file1' with boxes fs solid 0.25 fc 'cyan', \
-           'file2' with boxes fs solid 0.50 fc 'blue', \
-           'file3' with boxes fs solid 0.75 fc 'magenta', \
-           'file4' with boxes fill pattern 1, \
-           'file5' with boxes fill empty
 3 3D boxes
 ?style boxes 3D
 ?boxes 3D
@@ -5051,12 +4733,12 @@ Ffigure_boxes
  The third example command reads box width from column 4 and interprets the
  value in column 5 as an integer linetype from which the color is derived.
 
+Ffigure_3Dboxes
  By default boxes have no thickness; they consist of a single rectangle parallel
  to the xz plane at the specified y coordinate.  You can change this to a true
  box with four sides and a top by setting a non-zero extent on y.
  See `set boxdepth`.
 
-Ffigure_3Dboxes
  3D boxes are processed as pm3d quadrangles rather than as surfaces. Because of
  this the front/back order of drawing is not affected by `set hidden3d`.
  Similarly if you want each box face to have a border you must use
@@ -5126,8 +4808,8 @@ Ffigure_boxxyerror
  The `boxxyerror` plot style is only relevant to 2D data plotting.
  It is similar to the `xyerrorbars` style except that it draws rectangular areas
  rather than crosses.  It uses either 4 or 6 basic columns of input data.
- Additional input columns may be used to provide information such as
- variable line or fill color (see `rgbcolor variable`).
+ An additional (5th or 7th) input column may be used to provide variable
+ (per-datapoint) color information (see `linecolor` and `rgbcolor variable`).
 
       4 columns:  x  y  xdelta  ydelta
       6 columns:  x  y  xlow  xhigh  ylow  yhigh
@@ -5139,9 +4821,6 @@ Ffigure_boxxyerror
 
  The 6 column form of the command provides a convenient way to plot rectangles
  with arbitrary x and y bounds.
-
- An additional (5th or 7th) input column may be used to provide variable
- (per-datapoint) color information (see `linecolor` and `rgbcolor variable`).
 
  The interior of the boxes is drawn according to the current fillstyle.
  See `set style fill` and `boxes` for details.  Alternatively a new fillstyle
@@ -5199,8 +4878,9 @@ Ffigure_candlesticks
 ^ </a>
  demos.
 
- Note: To place additional symbols, such as the median value, on a
- box-and-whisker plot requires additional plot commands as in this example:
+ Note: To place additional symbols or lines on a box-and-whisker plot requires
+ additional plot components. The first example below uses a second component
+ that squashes the candlestick onto a single line placed at the median value.
 
    # Data columns:X Min 1stQuartile Median 3rdQuartile Max
    set errorbars 4.0
@@ -5234,19 +4914,23 @@ Ffigure_circles
      using x:y:radius:arc_begin:arc_end
      using x:y:radius:arc_begin:arc_end:color
 
- By default a full circle will be drawn.  It is possible to instead plot arc
- segments by specifying a start and end angle (in degrees) in columns 4 and 5.
+ By default a full circle will be drawn.
+ The result is similar to using a `points` plot with variable size points and
+ pointtype 7, except that the circles scale with the x axis range.
+ It is possible to instead plot arc segments by specifying a start and end angle
+ (in degrees) in columns 4 and 5.
 
  A per-circle color may be provided in the last column of the using specifier.
  In this case the plot command must include a corresponding variable color
  term such as `lc variable` or `fillcolor rgb variable`.
 
+ See `set style circle`, `set object circle`, and `set style fill`.
+
  For 3D plots the using specifier must contain
 
      splot DATA using x:y:z:radius:color
 
- where the variable color column is options.
- See `set style circle` and `set style fill`.
+ where the variable color column is optional.
 
  Examples:
 
@@ -5257,6 +4941,9 @@ Ffigure_circles
 
      # draws Pac-men instead of circles
      plot 'data' using 1:2:(10):(40):(320) with circles
+
+Ffigure_piechart
+=piechart
 
      # draw a pie chart with inline data
      set xrange [-15:15]
@@ -5269,9 +4956,6 @@ Ffigure_circles
      0    0    5  230   360    5
      e
 
- The result is similar to using a `points` plot with variable size points and
- pointtype 7, except that the circles will scale with the x axis range.
- See also `set object circle` and `fillstyle`.
 2 ellipses
 ?plotting styles ellipses
 ?style ellipses
@@ -5411,7 +5095,7 @@ Ffigure_yerrorfill
  (solid/transparent/pattern) or a fillcolor.  If no fillstyle (`fs`)
  is given in the plot command then the current default fill style is used.
  See `set style fill`.  If no fillcolor (`fc`) is given in the plot command,
- the usual linetype color sequence is followed.
+ the current line color is used.
 
  The {{no}border} property of the fillstyle is honored by filledcurves mode
  `closed`, the default.  It is ignored by all other filledcurves modes.
@@ -5641,8 +5325,8 @@ Ffigure_histerrorbar
        plot for [COL=2:4:2] 'file.dat' using COL:COL+1
 
  This shows how to plot the same data as a rowstacked histogram.  Just to be
- different, this example lists the separate columns explicitly rather than using
- iteration.
+ different, the plot command in this example lists the separate columns
+ individually rather than using iteration.
 
        set style histogram rowstacked
        plot 'file.dat' using 2, '' using 4:xtic(1)
@@ -6049,8 +5733,7 @@ Ffigure_mask
  Although it is not shown here, a single mask can include multiple polygonal
  regions.
 
- The masking commands are EXPERIMENTAL. Details may change before inclusion
- in a stable release version.
+ The masking commands are EXPERIMENTAL. Details may change in a future release.
 
 2 parallelaxes
 Ffigure_parallel
@@ -6245,6 +5928,11 @@ Ffigure_polygons
  generates a new polygon on the plot.
 Ffigure_spiderplot
 
+      $DATA << EOD
+               A      B      C      D      E      F
+      George  15     75     20     43     90     50
+      Harriet 40     40     40     60     30     50
+      EOD
       set spiderplot
       set style spiderplot fs transparent solid 0.2 border
       set for [p=1:5] paxis p range [0:100]
@@ -6297,6 +5985,9 @@ Ffigure_steps
  `set surface explicit` suppresses this treatment, in which case `with surface`
  and `with lines` become distinct styles that may be used in the same plot.
 
+ If you have points in 3D that are not recognized as a grid, you may be able
+ to fit a suitable grid first.  See `set dgrid3d`.
+
  In 2D polar mode plots, `with surface` is used to produce a solid fill gridded
  represention of the data. Generation of the surface is controlled using the
  command `set polar grid`.
@@ -6340,7 +6031,6 @@ Ffigure_vectors
  See also the 2D plot style `with arrows` that is identical to `with vectors`
  except that each arrow is specified using x:y:length:angle.
 
-#TeX \newpage
 2 xerrorbars
 ?plotting styles xerrorbars
 ?style xerrorbars
@@ -6697,21 +6387,20 @@ Ffigure_zerror
  `call` command.
 
  Because the parameters ARG1 ... ARG9 are stored in ordinary string variables
- they may be dereferenced by macro expansion (analogous to the older deprecated
- syntax).  However in many cases it is more natural to use them as you would any
- other variable.
+ they may be dereferenced by macro expansion.  However in many cases it is
+ more natural to use them as you would any other variable.
 
- In parallel the string parameters ARG1 ... ARG9 the passed parameters are
- stored in an array ARGV[9].  See `argv`.
+ In parallel with the string representation of parameters ARG1 ... ARG9,
+ the parameters themselves are stored in an array ARGV[9].  See `ARGV`.
 
  DEPRECATED: Versions prior to 5.0 performed macro-like substitution of the
  special tokens $0, $1, ... $9 with the literal contents of <param-1> ...
- That older mechanism is now deprecated.
+ That older mechanism is no longer supported.
 
  EXPERIMENTAL:  Function blocks (new in this version) provide a more flexible
  alternative to `call`.  See `function blocks`.
  
-3 argv[ ]
+3 ARGV[ ]
 ?argv
 ?ARGV
 ?call argv
@@ -6820,7 +6509,7 @@ Ffigure_zerror
  or in a function block.  Newline characters are not allowed within the string.
 
       evaluate "commands in a string constant"
-      evaluate <commands produced by a string-valued expression>
+      evaluate string_valued_function( ... arguments ... )
       evaluate $functionblock( ... arguments ... )
 
  This is especially useful for a repetition of similar commands.
@@ -7489,7 +7178,7 @@ Ffigure_zerror
  A non-trivial example of using function blocks to implement and plot
  a 15-term Lanczos approximation for the complex lngamma function is
  provided in the demo collection as
-^ <a href="http://www.gnuplot.info/demo_5.5/function_block.html">
+^ <a href="http://www.gnuplot.info/demo_6.0/function_block.html">
       function_block.dem
 ^ </a>
  The function block implementation is slower by a factor of roughly 25 compared
@@ -7580,8 +7269,8 @@ Ffigure_zerror
  conditional execution applies to all statements, possibly on multiple input
  lines, until a matching "}" terminates the block.  If commands may be nested.
 
- The old pre-version 5 single-line if/else syntax is still supported,
- but can not be mixed with the new block-structured syntax.  See `if-old`.
+ The old single-line if/else syntax fromm gnuplot version 4 is still supported,
+ but cannot be mixed with the new block-structured syntax.  See `if-old`.
 3 if-old
 ?if if-old
 ?if-old
@@ -7678,8 +7367,8 @@ Ffigure_zerror
  This allows a `gnuplot` command file to accept some commands from standard
  input.  Please see help for `batch/interactive` for more details.
 
- On some systems which support a popen function (Unix), the load file can be
- read from a pipe by starting the file name with a '<'.
+ On systems that support a popen function, the load file can be read from
+ a pipe by starting the file name with a '<'.
 
  Examples:
        load 'work.gnu'
@@ -7692,7 +7381,7 @@ Ffigure_zerror
 
  EXPERIMENTAL:  It is also possible to execute commands from lines of text
  stored internally. See `function blocks`. A function block may be defined
- in-line or in an external file. Once the function block has been loaded
+ in-line or in an external file. Once the function block has been defined
  the commands may be executed repeatedly using `evaluate` on the internal
  copy rather than reloading the file.
 
@@ -8193,10 +7882,10 @@ Ffigure_zerror
                           {every <every list>}
                           {skip <number-of-lines>}
                           {using <using list>}
+                          {convexhull}
                           {smooth <option>}
                           {bins <options>}
                           {mask}
-                          {convexhull} 
                           {volatile} {zsort} {noautoscale}
 
  The modifiers `binary`, `index`, `every`, `skip`, `using`, `smooth`, `bins`,
@@ -8229,8 +7918,7 @@ Ffigure_zerror
  TEXT DATA FILES:
 
  Each non-empty line in a data file describes one data point, except that
- records beginning with `#` (and also with `!` on VMS) will be treated as
- comments and ignored.
+ records beginning with `#` will be treated as comments and ignored.
 
  Depending on the plot style and options selected, from one to eight values
  are read from each line and associated with a single data point.
@@ -8427,9 +8115,10 @@ Ffigure_zerror
  Filter operations are applied immediately after reading input data, before
  applying any smoothing or style-specific processing options.
  In general the purpose of a filter is to replace the original full set of 
- input points with a selected subset of points, possibly regrouped or
- reordered.
- The filters currently supported are `bins`, `convexhull`, `mask`, and `zsort`.
+ input points with a selected subset of points, possibly modified, regrouped,
+ or reordered,
+ The filters currently supported are `bins`, `convexhull`, `mask`, `sharpen`,
+ and `zsort`.
 5 bins
 ?commands plot datafile filters bins
 ?plot datafile filters bins
@@ -8492,20 +8181,20 @@ Ffigure_zerror
 ?convexhull
 
  Convexhull is not a plot style. It can appear either alone as a filter 
- keyword or as an option of the `smooth` keyword.
+ keyword or in combination with `smooth path`.
 
       plot FOO using x:y convexhull
-      plot FOO using x:y smooth convexhull {expand <scale>}
+      plot FOO using x:y convexhull smooth path {expand <scale>}
 
 Ffigure_convex_hull
- The points in dataset FOO are replaced by a subset of the original points
- that constitute a bounding convex polygon.  The vertices of this polygon,
- the convex hull, are generated in clockwise order to form a closed curve.
- The first and last points of the generated curve are equal, making
- it suitable for plotting `with lines` or `with filledcurves`.
- The convex hull may also be useful to selectively render a region of an
- image or a pm3d surface that contains all the original data points.
- See `with mask`.
+ The points in FOO are replaced by a subset of the original points that
+ constitute the unique bounding convex polygon, the convex hull.
+ The vertices of this polygon are output in clockwise order to form a closed
+ curve.  The first and last points of the generated curve are equal, making it
+ suitable for plotting with styles `lines`, `polygons`, or `filledcurves`.
+ The convex hull may also be useful as a mask to selectively render the region
+ of an image or a pm3d surface that contains all the original data points.
+ See `masking`.
 
  If the keyword `smooth` is present, the vertices are then used as guide
  points to generate a smooth closed curve (see `smooth path`). By default
@@ -8526,6 +8215,29 @@ Ffigure_convex_hull
  Once a mask has been defined, you can use it as a filter to select a
  subset of points from an image or pm3d plot.
  See `masking`.
+
+5 sharpen
+?plot filters sharpen
+?filters sharpen
+?sharpen
+
+ The `sharpen` filter applies only to function plots.  It looks for extrema in
+ the function being plotted, which may not lie exactly at any of the x values
+ sampled to generate the component line segments making up the graph.
+ The true local extrema are found by bisection and added to the set of sampled
+ points.  This reduces but does not entirely eliminate truncation of sharp
+ peaks due to coarse sampling.
+
+ Example:
+      set samples 150
+      set xrange [-8:8]
+      plot abs(sqrt(sin(x))) sharpen
+
+ Without the "sharpen" keyword, the resulting graph shows a continuous curve
+ with minima at intervals of pi that should reach zero but are artefactually
+ truncated to apparent minimal y values between 0.02 and 0.20. 
+ Adding the "sharpen" keyword produces instead a correct representation of
+ the function with periodic sharp minima that reach y=0.
 
 5 zsort
 ?commands plot datafile filters zsort
@@ -8627,9 +8339,9 @@ Ffigure_convex_hull
 
  Syntax:
        smooth {unique | frequency | fnormal | cumulative | cnormal
-              | csplines | acsplines | mcsplines | path | bezier | sbezier
+              | csplines | acsplines | mcsplines  bezier | sbezier
+              | path {expand <scale>}
               | kdensity {bandwidth} {period}
-              | convexhull {expand}
               | unwrap}
 
  The `unique`, `frequency`, `fnormal`, `cumulative` and `cnormal` options
@@ -8726,11 +8438,6 @@ Ffigure_convex_hull
 ?smooth bins
  `smooth bins` is the same as `bins`.
  See `bins`.
-5 convexhull
-?data-file smooth convexhull
-?datafile smooth convexhull
-?smooth convexhull
- See `convexhull`.
 5 csplines
 ?commands plot datafile smooth csplines
 ?plot datafile smooth csplines
@@ -8785,15 +8492,22 @@ Ffigure_smooth_path
  they are presented in the input data; i.e. they are not first sorted on x.
  This generates a smooth spline through a closed curve or along a trajectory
  that contains loops. This smoothing mode is supported for both 2D and 3D
- plot commands.  As always, a separate curve is created for each set
- of points in the input file, where a blank line separates the sets.
+ plot commands.  A separate curve is created for each set of points in the
+ input file, where a blank line separates the sets.
  Plotting `smooth path with filledcurves closed` will guarantee that each set
  of points creates a closed curve.  Plotting `smooth path with lines` will
  generate a closed curve if the first and last points in the set overlap,
  otherwise it will create an open-ended smooth path.  See 
-^ <a href="http://www.gnuplot.info/demo_5.5/smooth_path.html">
+^ <a href="http://www.gnuplot.info/demo_6.0/smooth_path.html">
  smooth_path.dem
 ^ </a>
+
+ If the set of points being smoothed was generated using the `convexhull`
+ filter, an additional keyword `expand` is accepted together with a scale
+ factor for the expansion.  See `convexhull`.
+ Example:
+      plot DATA convexhull smooth path expand 1.1 with filledcurves, \
+           DATA with points
 5 sbezier
 ?commands plot datafile smooth sbezier
 ?plot datafile smooth sbezier
@@ -9008,8 +8722,8 @@ Ffigure_smooth_path
  The special filename `'-'` specifies that the data are inline; i.e., they
  follow the command.  Only the data follow the command; `plot` options like
  filters, titles, and line styles remain on the `plot` command line.  This is
- similar to << in unix shell script, and $DECK in VMS DCL.  The data are
- entered as though they are being read from a file, one data point per record.
+ similar to << in unix shell script.  The data are entered as though they
+ were being read from a file, one data point per record.
  The letter "e" at the start of the first column terminates data entry.
 
  `'-'` is intended for situations where it is useful to have data and commands
@@ -9918,11 +9632,11 @@ Ffigure_smooth_path
 
  This command is deprecated in favor of explicit iteration.
  See `iterate`.
- The `reread` command causes the current `gnuplot` command file, as specified
- by a `load` command, to be reset to its starting point before further commands
- are read from it.  This essentially implements an endless loop of the commands
- from the beginning of the command file to the `reread` command.
- The `reread` command has no effect when reading interactively (from stdin).
+ The `reread` command causes execution from the current `gnuplot` command file,
+ as specified by a `load` command, to immediately start again from the beginning
+ of the file.  This essentially implements an endless loop of commands from the
+ beginning of of the command file to the `reread` command.
+ `reread` has no effect when reading interactively from stdin.
 2 reset
 ?commands reset
 ?reset
@@ -9935,7 +9649,7 @@ Ffigure_smooth_path
 
  The following are _not_ affected by `reset`:
       `set term` `set output` `set loadpath` `set linetype` `set fit`
-      `set encoding` `set decimalsign` `set locale` `set psdir`
+      `set datafile` `set encoding` `set decimalsign` `set locale` `set psdir`
       `set overflow` `set multiplot`
 
  Note that `reset` does not necessarily return settings to the state they
@@ -10537,7 +10251,7 @@ Ffigure_smooth_path
  The `set boxdepth` command affects only 3D plots created by `splot with boxes`.
  It sets the extent of each box along the y axis, i.e. its thickness.
  `set boxdepth square` will try to choose a y extent that gives the appearance
- of a square crossection independent of the axis scales on x and y.
+ of a square cross section independent of the axis scales on x and y.
 3 color
 ?commands set color
 ?set color
@@ -11362,6 +11076,7 @@ Ffigure_missing
  principle to what the `smooth kdensity` option does to 1D datasets.
  See kdensity2d.dem and heatmap_points.dem for usage example.
 
+Ffigure_dgrid3d
  The `dgrid3d` option is a simple scheme which replaces scattered data
  with weighted averages on a regular grid.  More sophisticated approaches
  to this problem exist and should be used to preprocess the data outside
@@ -12240,14 +11955,6 @@ Ffigure_missing
 ^ <a href="http://www.gnuplot.info/demo/singulr.html">
  complex hidden line demo (singulr.dem).
 ^ </a>
-3 historysize
-?commands set historysize
-?set historysize
-?unset historysize
-?historysize
- (Deprecated).
- `set historysize N` is equivalent to `set history size N`.
- `unset historysize` is equivalent to `set history size -1`.
 3 history
 ?commands set history
 ?set history
@@ -12907,7 +12614,7 @@ Ffigure_multiple_keys
  text has appeared will copy the hypertext to the clipboard.
 
 ^ <br><table class="button"><tr><td>
-^     <a href="http://www.gnuplot.info/demo_svg_5.5/hypertext.html"
+^     <a href="http://www.gnuplot.info/demo_svg_6.0/hypertext.html"
 ^      class="button">
 ^ click to see hypertext demo </a>
 ^ </td></tr></table>
@@ -13327,11 +13034,10 @@ Ffigure_multiple_keys
  during execution. This option can also be toggled by hitting `6` in the
  driver's window. `verbose` is off by default.
 
- Press 'h' in the driver's window for a short summary of the mouse and key
- bindings.  This will also display user defined bindings or `hotkeys` which
- can be defined using the `bind` command, see help for `bind`.  Note, that user
- defined `hotkeys` may override the default bindings.
- See also help for `bind` and `label`.
+ Press 'h' in the driver's window for a summary of the mouse and key bindings.
+ This will also display user defined bindings or `hotkeys` defined by the
+ `bind` command. Note that user defined binding may override default bindings.
+ See also help for `bind`.
 4 doubleclick
 ?set mouse doubleclick
 ?mouse doubleclick
@@ -13385,39 +13091,36 @@ Ffigure_multiple_keys
 ?mouse wheel
 ?scrolling
 ?mousewheel
- X and Y axis scaling in both 2D and 3D graphs can be adjusted using the
- mouse wheel.  <wheel-up> scrolls up (increases both YMIN and YMAX by ten
- percent of the Y range, and increases both Y2MIN and Y2MAX likewise), and
- <wheel down> scrolls down.  <shift-wheel-up> scrolls left (decreases both
- XMIN and XMAX, and both X2MIN and X2MAX), and <shift-wheel-down> scrolls
- right.  <control-wheel-up> zooms in toward the center of the plot, and
- <control-wheel-down> zooms out.  <shift-control-wheel-up> zooms in along the
- X and X2 axes only, and <shift-control-wheel-down> zooms out along the X and
- X2 axes only.
-4 X11 mouse
-?mouse x11_mouse
-?x11_mouse
-?x11 mouse
- If multiple X11 plot windows have been opened using the `set term x11 <n>`
- terminal option, then only the current plot window supports the entire
- range of mouse commands and hotkeys.  The other windows will, however,
- continue to display mouse coordinates at the lower left.
+ The mouse wheel adjusts x and y axis ranges in both 2D and 3D plots.
+ Each adjustment increment is 10% of the current range by default.
+ This may be changed by `set mouse zoomfactor <x-multiplier>, <y-multiplier>`.
+#start
+#b <wheel-up> scrolls y and y2 axis ranges up by a fraction of the current range
+#b <wheel-down> scrolls y and y2 ranges down by a fraction of the current range
+#b <shift+wheel-up> scrolls left (decreases x and x2 ranges)
+#b <shift+wheel-down> scrolls right (increases x and x2 ranges)
+#b <control+wheel-up> zooms in around the current mouse position
+#b <control+wheel-down> zooms out around the current mouse position
+#b <shift+control+wheel-up> zooms in only along x and x2 (pinch)
+#b <shift+control+wheel-down> zooms out only along x and x2 (expand)
+#end
 4 zoom
 ?mouse zoom
 ?zoom
- Zooming is usually accomplished by holding down the left mouse button and
- dragging the mouse to delineate a zoom region.  Some platforms may require
- using a different mouse button.  The original plot can be restored by typing
- the 'u' hotkey in the plot window.  The hotkeys 'p' and 'n' step back and
- forth through a history of zoom operations.
+ Proportional zoom in/out around the current mouse position is controlled
+ by the mouse wheel (see `scrolling`).
+
+ Enlarging a selected region in a 2D plot is accomplished by holding down the
+ left mouse button and dragging the mouse to delineate a zoom region.
+ The original plot can be restored by typing the 'u' hotkey in the plot window.
+ Hotkeys 'p' and 'n' step back and forth through a history of zoom operations.
 
  The option `zoomcoordinates` determines if the coordinates of the zoom box are
  drawn at the edges while zooming. This is on by default.
 
- If the option `zoomjump` is on, the mouse pointer will be automatically
- offset a small distance after starting a zoom region with button 3. This can
- be useful to avoid a tiny (or even empty) zoom region. `zoomjump` is off by
- default.
+ If the option `zoomjump` is on, the mouse pointer will automatically offset a
+ small distance after starting a zoom region with button 3. This can be useful
+ to avoid a tiny (or even empty) zoom region. `zoomjump` is off by default.
 
 3 mttics
 ?commands set mttics
@@ -14019,18 +13722,21 @@ Ffigure_multiple_keys
 ?show output
 ?output
 ?output file
- By default, screens are displayed to the standard output. The `set output`
- command redirects the display to the specified file or device.
-
  Syntax:
        set output {"<filename>"}
+       unset output
        show output
 
- The filename must be enclosed in quotes.  If the filename is omitted, any
- output file opened by a previous invocation of `set output` will be closed
- and new output will be sent to STDOUT.  (If you give the command `set output
- "STDOUT"`, your output may be sent to a file named "STDOUT"!  ["May be", not
- "will be", because some terminals, like `x11` or `wxt`, ignore `set output`.])
+ Graphs produced by non-interactive terminals are by default sent to `stdout`.
+ The `set output` command redirects output to the specified file or device.
+ The file opened by this command remains open until a subsequent set/unset
+ output command, a change in terminal type, or exit from gnuplot.
+
+ Interactive terminals ignore `set output`.
+
+ The filename must be enclosed in quotes.  If the filename is omitted, the
+ command is equivalent to `unset output`; any output file opened by a previous
+ `set output` will be closed and new output will be sent to `stdout`.
 
  When both `set terminal` and `set output` are used together, it is safest to
  give `set terminal` first, because some terminals set a flag which is needed
@@ -14043,8 +13749,7 @@ Ffigure_multiple_keys
        set output "|lpr -Plaser filename"
        set term png; set output "|display png:-"
 
- On MSDOS machines, `set output "PRN"` will direct the output to the default
- printer.  On VMS, output can be sent directly to any spooled device.
+ On MSDOS machines, `set output "PRN"` directs output to the default printer.
 3 overflow
 ?overflow
 ?commands set overflow
@@ -14638,7 +14343,7 @@ Ffigure_palette2
                                    | depthorder {base} }
                   { flush { begin | center | end } }
                   { ftriangles | noftriangles }
-                  { clip {z} | clip1in | clip4in }
+                  { clip | clip1in | clip4in }
                   { {no}clipcb }
                   { corners2color
                     { mean|geomean|harmean|rms|median|min|max|c1|c2|c3|c4 }
@@ -15271,20 +14976,20 @@ Ffigure_polar_grid
  The <xscale> and <yscale> values are scale factors for the size of the plot,
  which includes the graph, labels, and margins.
 
- Important note:
-       In earlier versions of gnuplot, some terminal types used the values from
-       `set size` to control also the size of the output canvas; others did not.
-       Almost all terminals now follow the following convention:
+ `Historical note`: In early versions of gnuplot some terminal types used
+ `set size` to control also the size of the output canvas;
+ other terminal types did not.  Now there are two distinct properties:
+ `'set size'` and `'set term ... size'`.
 
- `set term <terminal_type> size <XX>, <YY>` controls the size of the output
- file, or `canvas`. Please see individual terminal documentation for allowed
- values of the size parameters.  By default, the plot will fill this canvas.
+ `set term <terminal_type> size <x units>, <y units>` controls the size of the
+ output file, or `canvas`. Please see individual terminal documentation for the
+ units of the size parameters.  By default, the plot will fill this canvas.
 
- `set size <XX>, <YY>` scales the plot itself relative to the size of the
- canvas.  Scale values less than 1 will cause the plot to not fill the entire
- canvas.  Scale values larger than 1 will cause only a portion of the plot to
- fit on the canvas.  Please be aware that setting scale values larger than 1
- may cause problems on some terminal types.
+ `set size <xscale>, <yscale>` scales the plot itself relative to the size of
+ the canvas.  Scale values less than 1.0 will cause the plot to not fill the
+ entire canvas.  Scale values larger than 1.0 will cause only a portion of the
+ plot to fit on the canvas.  Setting scale values larger than 1 may cause
+ problems on some terminal types.
 
  `ratio` causes `gnuplot` to try to create a graph with an aspect ratio of <r>
  (the ratio of the y-axis length to the x-axis length) within the portion of
@@ -15648,7 +15353,7 @@ Ffigure_polar_grid
 ?commands set style increment
 ?set style increment
  By default, successive plots within the same graph will use successive
- linetypes.  `set style increment userstyles` changes this to step through
+ linetypes.  `set style increment userstyles` changed this to step through
  successive user-defined line styles instead.
 
  DEPRECATED.  Instead use `set linetype` to redefine a convenient range of
@@ -16109,7 +15814,8 @@ Ffigure_polar_grid
       set termoption {no}enhanced
       set termoption font "<fontname>{,<fontsize>}"
       set termoption fontscale <scale>
-      set termoption {linewidth <lw>}{lw <lw>}
+      set termoption {linewidth <lw>}{lw <lw>} {dashlength <dl>}{dl <dl>}
+      set termoption {pointscale <scale>} {ps <scale>}
 
 3 theta
 ?commands set theta
@@ -17720,8 +17426,8 @@ Ffigure_walls
 ?commands shell
 ?shell
  The `shell` command spawns an interactive shell.  To return to `gnuplot`,
- type `logout` if using VMS, `exit` or the END-OF-FILE character if using
- Unix, or `exit` if using MS-DOS or OS/2.
+ type `exit` or the END-OF-FILE character if using Unix, or `exit` if using
+ MS-DOS or OS/2.
 
  The `shell` command ignores anything else on the gnuplot command line.
  If instead you want to pass a command string to a shell for immediate
@@ -17775,7 +17481,6 @@ Ffigure_walls
        show palette
        show palette palette {<ncolors>} {{float | int | hex}}
        show palette gradient
-       show palette fit2rgbformulae
        show palette rgbformulae
        test palette
 
@@ -17788,15 +17493,6 @@ Ffigure_walls
  `show palette gradient` displays the piecewise gradient established by a
  prior `set palette defined` command.  If the current palette is based on
  rgbformulae or a set of predefined values then this command does nothing.
-
-4 show palette fit2rgbformulae
-?commands show palette fit2rgbformulae
-?show palette fit2rgbformulae
- [deprecated] `show palette fit2rgbformulae` finds an approximation to the
- current palette in terms of the formulae coded into `set palette rgbformulae`.
- If that is indeed how the current palette was defined, the match is exact.
- Otherwise the approximation can be anything from good to horrible.
- This is probably not what you want.
 
 4 show palette palette
 ?commands show palette palette
@@ -18199,8 +17895,9 @@ Ffigure_sparsematrix
  "isolines" will connect the points in a block, and "cross-isolines"
  will connect the corresponding points in each block to generate a
  "surface".  In either case, contour and hidden3d modes may give different
- plots than if the points were in the intended format.  Scattered data can be
- converted to a {different} grid format with `set dgrid3d`.
+ plots than if the points were in the intended format.
+
+ Scattered data can be fit to a grid before plotting. See `set dgrid3d`.
 
  The contour code tests for z intensity along a line between a point on a
  y-isoline and the corresponding point in the next y-isoline.  Thus a `splot`
@@ -18742,44 +18439,4 @@ Ffigure_sparsematrix
 ^ </a>
 
 <3 -- all terminal stuff is pulled from the .trm files
-1 Bugs
-?bugs
- Please e-mail bug reports to the gnuplot-bugs mailing list or
- upload the report to the gnuplot web site on SourceForge.
- Please give complete information on the version of gnuplot you are using
- and, if possible, a test script that demonstrates the bug.
- See `seeking-assistance`.
 
-2 known limitations
- It is not possible to use inline data (e.g. plot '-' ...) inside the curly
- brackets of a `do` or `while` loop.
-
- X11 terminal: It is difficult to select UTF-8 fonts.
- Only one color palette at a time is active for any given x11 plot window.
- This means that multiplots whose constituent plots use different
- palettes will not display correctly in x11.
-
- Qt terminal: 3D rotation of polygons and surfaces can be slow;
- this is strongly affected by the Qt rendering mode (see Qt documentation).
-
- The `raise` and `lower` commands are unreliable.
-
-2 External libraries
-?bugs external_libraries
-=libgd
-=locale
-=internationalization
- External library GD (used by PNG/JPEG/GIF/sixelgd terminals, pixmap):
- Versions of libgd through 2.0.33 had various bugs in mapping the characters
- of Adobe's Symbol font.
- Dot-dash patterns are not supported for these terminals.
-
- Internationalization (locale settings):
- Gnuplot uses the C runtime library routine setlocale() to control
- locale-specific formatting of input and output number, times, and date strings.
- The locales available, and the level of support for locale features such as
- "thousands' grouping separator", depend on the internationalization support
- provided by your individual machine.
-
- External library libcerf versions 1.8 1.9 1.10 return incorrect results for
- the voigt function. Do not use.

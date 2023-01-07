@@ -1261,7 +1261,7 @@ plot_lines(struct curve_points *plot)
 	return;
 
     /* Along-path smoothing wiped out the flags for INRANGE/OUTRANGE */
-    if (plot->plot_smooth == SMOOTH_PATH || plot->plot_smooth == SMOOTH_SMOOTH_HULL)
+    if (plot->plot_smooth == SMOOTH_PATH)
 	recheck_ranges(plot);
 
     for (i = 0; i < plot->p_count; i++) {
@@ -1280,7 +1280,7 @@ plot_lines(struct curve_points *plot)
 	 */
 	if (plot->points[i].type != UNDEFINED) {
 	    x = map_x(xnow);
-	    y = map_y(ynow);
+	    y = map_ysharp(ynow);
 	    if (invalid_coordinate(x,y))
 		plot->points[i].type = UNDEFINED;
 	}
@@ -1298,7 +1298,7 @@ plot_lines(struct curve_points *plot)
 		    } else if (polar && clip_radial) {
 			draw_polar_clip_line(xprev, yprev, xnow, ynow );
 		    } else {
-			if (draw_clip_line( map_x(xprev), map_y(yprev), x, y)) {
+			if (draw_clip_line( map_x(xprev), map_ysharp(yprev), x, y)) {
 			    if (plot->watchlist)
 				watch_line(plot, xprev, yprev, zprev, xnow, ynow, znow);
 			} else {
@@ -1322,7 +1322,7 @@ plot_lines(struct curve_points *plot)
 			if (polar && clip_radial)
 			    draw_polar_clip_line(xprev, yprev, xnow, ynow );
 			else
-			    drawn = draw_clip_line( map_x(xprev), map_y(yprev), x, y);
+			    drawn = draw_clip_line( map_x(xprev), map_ysharp(yprev), x, y);
 		    }
 		} else if (prev == OUTRANGE) {
 		    /* from outrange to outrange */
@@ -1330,7 +1330,7 @@ plot_lines(struct curve_points *plot)
 			if (polar && clip_radial)
 			    draw_polar_clip_line(xprev, yprev, xnow, ynow );
 			else
-			    drawn = draw_clip_line( map_x(xprev), map_y(yprev), x, y);
+			    drawn = draw_clip_line( map_x(xprev), map_ysharp(yprev), x, y);
 		    }
 		} else {	/* prev == UNDEFINED */
 		    break;

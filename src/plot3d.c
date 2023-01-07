@@ -43,6 +43,7 @@
 #include "eval.h"
 #include "filters.h"
 #include "getcolor.h"
+#include "gplocale.h"
 #include "graph3d.h"
 #include "hidden3d.h"
 #include "interpol.h"
@@ -53,7 +54,6 @@
 #include "term_api.h"
 #include "tabulate.h"
 #include "util.h"
-#include "variable.h" /* For locale handling */
 #include "voxelgrid.h"
 
 #include "plot2d.h" /* Only for store_label() */
@@ -645,7 +645,7 @@ grid_nongrid_data(struct surface_points *this_plot)
     if (this_plot->num_iso_read == 0)
 	return;
 
-    /* Version 5.3 - allow gridding of separate color column so long as
+    /* Allow gridding of separate color column so long as
      * we don't need to generate splines for it
      */
     if (this_plot->pm3d_color_from_column && dgrid3d_mode == DGRID3D_SPLINES)
@@ -998,11 +998,9 @@ get_3ddata(struct surface_points *this_plot)
 
 	    if (j == DF_UNDEFINED || j == DF_MISSING) {
 		cp->type = UNDEFINED;
-		/* Version 5.5 - Since version 5 2D plot modes store all available
-		 * info even if one of the requested columns is missing or undefined.
-		 * Now we extend this behavior to 3D processing also.
-		 * prior to May 2020 the next line was
-		 *    goto come_here_if_undefined;
+		/* Version 5.5
+		 * Store all available info even if one of the requested columns
+		 * is missing or undefined.
 		 */
 		j = df_no_use_specs;
 	    }

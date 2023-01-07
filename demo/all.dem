@@ -189,6 +189,10 @@ print "******************** file spline.dem ********************"
 load "spline.dem"
 reset
 
+print "******************** file sharpen.dem ********************"
+load "sharpen.dem"
+reset
+
 print "******************** file binary.dem ********************"
 load "binary.dem"
 reset

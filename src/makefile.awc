@@ -4,13 +4,13 @@
 COREOBJS = alloc.$(O) amos_airy.$(O) axis.$(O) bitmap.$(O) boundary.$(O) &
 breaders.$(O) color.$(O) command.$(O) complexfun.$(O) contour.$(O) &
 datablock.$(O) datafile.$(O) dynarray.$(O) encoding.$(O) eval.$(O) &
-external.$(O) fit.$(O) gadgets.$(O) getcolor.$(O) graph3d.$(O) &
+external.$(O) fit.$(O) gadgets.$(O) getcolor.$(O) gplocale.$(O) graph3d.$(O) &
 graphics.$(O) help.$(O) hidden3d.$(O) history.$(O) internal.$(O) &
-interpol.$(O) jitter.$(O) libcerf.$(O) matrix.$(O) misc.$(O) mouse.$(O) &
+interpol.$(O) jitter.$(O) libcerf.$(O) loadpath.$(O) matrix.$(O) misc.$(O) mouse.$(O) &
 multiplot.$(O) parse.$(O) plot.$(O) plot2d.$(O) plot3d.$(O) pm3d.$(O) &
 readline.$(O) save.$(O) scanner.$(O) set.$(O) show.$(O) specfun.$(O) &
 standard.$(O) stats.$(O) stdfn.$(O) tables.$(O) tabulate.$(O) term.$(O) &
-time.$(O) unset.$(O) util.$(O) util3d.$(O) variable.$(O) voxelgrid.$(O) &
+time.$(O) unset.$(O) util.$(O) util3d.$(O) voxelgrid.$(O) &
 vplot.$(O) xdg.$(O)
 
 # List of terminal driver sources
@@ -25,6 +25,6 @@ $(T)lua.trm $(T)metafont.trm $(T)metapost.trm $(T)mif.trm $(T)pbm.trm &
 $(T)pc.trm $(T)pdf.trm $(T)pict2e.trm $(T)pm.trm $(T)post.trm &
 $(T)pslatex.trm $(T)pstricks.trm $(T)qms.trm $(T)qt.trm $(T)regis.trm &
 $(T)svg.trm $(T)t410x.trm $(T)tek.trm $(T)texdraw.trm $(T)tgif.trm &
-$(T)tkcanvas.trm $(T)tpic.trm $(T)vws.trm $(T)webp.trm $(T)win.trm &
+$(T)tkcanvas.trm $(T)tpic.trm $(T)webp.trm $(T)win.trm &
 $(T)wxt.trm $(T)x11.trm $(T)xlib.trm
 

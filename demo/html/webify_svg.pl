@@ -25,7 +25,7 @@
 #    set term DEMOTERM
 # rather than the default terminal settings
 # E.g. (for image demo)
-#    setenv DEMOTERM "png truecolor enhanced font arial 8 transparent size 420,320"
+#    setenv DEMOTERM "png truecolor font arial 8 transparent size 420,320"
 #    ./webify.pl image
 #
 # EAM Apr 2011
@@ -70,9 +70,9 @@ print STDERR $name, "\n";
 	    print GNUPLOT "set term $DEMOTERM\n";
 	} else {
 	    if ($mousing) {
-		print GNUPLOT "set term svg enhanced font 'arial,10' mouse name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
+		print GNUPLOT "set term svg font 'arial,10' mouse name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
 	    } else {
-		print GNUPLOT "set term svg enhanced font 'arial,10' name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
+		print GNUPLOT "set term svg font 'arial,10' name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
 	    }
 	}
 	print GNUPLOT "set output \"$name.$plot.svg\"\n";
@@ -129,9 +129,9 @@ print STDERR $name, "\n";
 			    print GNUPLOT "set term $DEMOTERM\n";
 			} else {
 			    if ($mousing) {
-				print GNUPLOT "set term svg enhanced font 'arial,10' mouse name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
+				print GNUPLOT "set term svg font 'arial,10' mouse name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
 			    } else {
-				print GNUPLOT "set term svg enhanced font 'arial,10' name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
+				print GNUPLOT "set term svg font 'arial,10' name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
 			    }
 			}
 			print GNUPLOT "set output \"$name.$plot.svg\"\n";
@@ -140,9 +140,9 @@ print STDERR $name, "\n";
 			    print GNUPLOT "set term $DEMOTERM\n";
 			} else {
 			    if ($mousing) {
-				print GNUPLOT "set term svg enhanced font 'arial,10' mouse name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
+				print GNUPLOT "set term svg font 'arial,10' mouse name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
 			    } else {
-				print GNUPLOT "set term svg enhanced font 'arial,10' name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
+				print GNUPLOT "set term svg font 'arial,10' name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
 			    }
 			}
 			print GNUPLOT "set output \"$name.$plot.svg\"\n";

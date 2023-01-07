@@ -1,4 +1,4 @@
-/* GNUPLOT - doc2html.c */
+/* GNUPLOT - doc2web.c */
 
 /*[
  * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
@@ -34,7 +34,7 @@
  * doc2web.c reformat gnuplot documentation into HTML for use as a 
  *		web resource.
  *
- * Derived from windows/doc2html
+ * Derived from windows/doc2html by Ethan A Merritt (2022)
  * Derived from doc2rtf and doc2html (version 3.7.3) by B. Maerkisch
  *
  * usage:  doc2web file.doc outputdirectory [-d]
@@ -58,7 +58,7 @@
 #include "version.h"
 
 static char path[PATH_MAX];
-static const char name[] = "gnuplot5";
+static const char name[] = "gnuplot6";
 static char *sectionname = "";
 static TBOOLEAN collapsing_terminal_docs = FALSE;
 static TBOOLEAN processing_title_page = FALSE;
@@ -150,7 +150,7 @@ header(FILE *a, char * title)
     fprintf(a, "<body>\n");
     fputs( 
 "<table class=\"center\" style=\"font-size:150%;\" width=\"80%\" >\n"
-"<th class=\"center\"><a href=\"gnuplot5.html\">Credits</a></td>\n"
+"<th class=\"center\"><a href=\"gnuplot6.html\">Credits</a></td>\n"
 "<th class=\"center\"><a href=\"Overview.html\">Overview</a></td>\n"
 "<th class=\"center\"><a href=\"Plotting_Styles.html\">Plotting Styles</a></td>\n"
 "<th class=\"center\"><a href=\"Commands.html\">Commands</a></td>\n"

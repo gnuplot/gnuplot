@@ -1,85 +1,91 @@
+#
+# Exercise hidden3d options.
+# Show use of keywords "nogrid" and "nohidden" to plot individual points
+# without processing them either via dgrid3d or hidden3d.
+#
+
 set view 60,75
 unset key
 set hidden3d
 
 # Raw data
 set title "The Valley of the Gnu"
-splot "gnu-valley" u 1:2:3 w linesp
+splot "gnu-valley" u 1:2:3 w lines, "" u 1:2:3 w points pt 7 lc "black"
 pause -1 "Hit return to continue"
 
 # Splines
 set title "dgrid3d splines"
 set dgrid3d splines
-splot "gnu-valley" u 1:2:3 w lines
+splot "gnu-valley" u 1:2:3 w lines, "" u 1:2:3 w points pt 7 lc "black" nogrid nohidden
 pause -1 "Hit return to continue"
 
 # Hann function
 set title "dgrid3d Hann function"
 set dgrid3d hann
-splot "gnu-valley" u 1:2:3 w lines
+splot "gnu-valley" u 1:2:3 w lines, "" u 1:2:3 w points pt 7 lc "black" nogrid nohidden
 pause -1 "Hit return to continue"
 
 # QNorm
 set title "dgrid3d 30,30 qnorm 1"
 set dgrid3d 30,30 qnorm 1
-splot "gnu-valley" u 1:2:3 w l
+splot "gnu-valley" u 1:2:3 w lines, "" u 1:2:3 w points pt 7 lc "black" nogrid nohidden
 pause -1 "Hit return to continue"
 
 set title "dgrid3d 30,30 qnorm 2"
 set dgrid3d 30,30 qnorm 2
-splot "gnu-valley" u 1:2:3 w l
+splot "gnu-valley" u 1:2:3 w lines, "" u 1:2:3 w points pt 7 lc "black" nogrid nohidden
 pause -1 "Hit return to continue"
 
 set title "dgrid3d 30,30 qnorm 3"
 set dgrid3d 30,30 qnorm 3
-splot "gnu-valley" u 1:2:3 w l
+splot "gnu-valley" u 1:2:3 w lines, "" u 1:2:3 w points pt 7 lc "black" nogrid nohidden
 pause -1 "Hit return to continue"
 
 set title "dgrid3d 30,30 qnorm 4"
 set dgrid3d 30,30 qnorm 4
-splot "gnu-valley" u 1:2:3 w l
+splot "gnu-valley" u 1:2:3 w lines, "" u 1:2:3 w points pt 7 lc "black" nogrid nohidden
 pause -1 "Hit return to continue"
 
 set title "dgrid3d 30,30 qnorm 5"
 set dgrid3d 30,30 qnorm 5
-splot "gnu-valley" u 1:2:3 w l
+splot "gnu-valley" u 1:2:3 w lines, "" u 1:2:3 w points pt 7 lc "black" nogrid nohidden
 pause -1 "Hit return to continue"
 
 
 # Gauss
 set title "dgrid3d 30,30 gauss 1"
 set dgrid3d 30,30 gauss 1
-splot "gnu-valley" u 1:2:3 w l
+splot "gnu-valley" u 1:2:3 w lines, "" u 1:2:3 w points pt 7 lc "black" nogrid nohidden
 pause -1 "Hit return to continue"
 
 set title "dgrid3d 30,30 gauss .75"
 set dgrid3d 30,30 gauss .75
-splot "gnu-valley" u 1:2:3 w l
+splot "gnu-valley" u 1:2:3 w lines, "" u 1:2:3 w points pt 7 lc "black" nogrid nohidden
 pause -1 "Hit return to continue"
 
 set title "dgrid3d 30,30 gauss .5"
 set dgrid3d 30,30 gauss .5
-splot "gnu-valley" u 1:2:3 w l
+splot "gnu-valley" u 1:2:3 w lines, "" u 1:2:3 w points pt 7 lc "black" nogrid nohidden
 pause -1 "Hit return to continue"
 
 set title "dgrid3d 30,30 gauss .35"
 set dgrid3d 30,30 gauss .35
-splot "gnu-valley" u 1:2:3 w l
+splot "gnu-valley" u 1:2:3 w lines, "" u 1:2:3 w points pt 7 lc "black" nogrid nohidden
 pause -1 "Hit return to continue"
 
 set title "dgrid3d 30,30 gauss .25"
 set dgrid3d 30,30 gauss .25
-splot "gnu-valley" u 1:2:3 w l
+splot "gnu-valley" u 1:2:3 w lines, "" u 1:2:3 w points pt 7 lc "black" nogrid nohidden
 pause -1 "Hit return to continue"
 
 set title "dgrid3d 30,30 gauss .5,.35"
 set dgrid3d 30,30 gauss 0.5,0.35
-splot "gnu-valley" u 1:2:3 w l
+splot "gnu-valley" u 1:2:3 w lines, "" u 1:2:3 w points pt 7 lc "black" nogrid nohidden
 pause -1 "Hit return to continue"
 
 set title "dgrid3d 30,30 gauss .35,.5"
 set dgrid3d 30,30 gauss 0.35,0.5
-splot "gnu-valley" u 1:2:3 w l
+splot "gnu-valley" u 1:2:3 w lines, "" u 1:2:3 w points pt 7 lc "black" nogrid nohidden
 pause -1 "Hit return to continue"
 
 reset

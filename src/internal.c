@@ -36,11 +36,11 @@
 #include "stdfn.h"
 #include "alloc.h"
 #include "util.h"	/* for int_error() */
+#include "gplocale.h"	/* for locale handling */
 #include "gp_time.h"	/* for str(p|f)time */
 #include "command.h"	/* for do_system_func */
 #include "datablock.h"	/* for datablock_size() */
 #include "encoding.h"	/* for advance_one_utf8_char */
-#include "variable.h"	/* for locale handling */
 #include "parse.h"	/* for string_result_only */
 #include "datafile.h"	/* for evaluate_inside_using */
 
@@ -1323,6 +1323,7 @@ void
 f_concatenate(union argument *arg)
 {
     struct value a, b, result;
+    char *newstring;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
@@ -1338,11 +1339,16 @@ f_concatenate(union argument *arg)
     if (a.type != STRING || b.type != STRING)
 	int_error(NO_CARET, nonstring_error);
 
-    (void) Gstring(&result, gp_stradd(a.v.string_val, b.v.string_val));
+    newstring = gp_alloc(strlen(a.v.string_val)+strlen(b.v.string_val)+1,"gp_stradd");
+    strcpy(newstring, a.v.string_val);
+    strcat(newstring, b.v.string_val);
+
+    Gstring(&result, newstring);
+    push(&result);
+
     gpfree_string(&a);
     gpfree_string(&b);
-    push(&result);
-    gpfree_string(&result); /* free string allocated within gp_stradd() */
+    gpfree_string(&result);
 }
 
 void
@@ -2014,6 +2020,7 @@ f_time(union argument *arg)
 	    push(&val); /* format string */
 	    push(Gcomplex(&val2, time_now, 0.0));
 	    f_strftime(arg);
+	    gpfree_string(&val);
 	    break;
 	default:
 	    int_error(NO_CARET,"internal error: invalid argument type");

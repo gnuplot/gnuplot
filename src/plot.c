@@ -38,12 +38,13 @@
 #include "eval.h"
 #include "fit.h"
 #include "gp_hist.h"
+#include "gplocale.h"
+#include "loadpath.h"
 #include "misc.h"
 #include "readline.h"
 #include "setshow.h"
 #include "term_api.h"
 #include "util.h"
-#include "variable.h"
 #include "version.h"
 #include "voxelgrid.h"
 #include "encoding.h"
@@ -759,6 +760,7 @@ init_session()
 	/* Reset program variables not handled by 'reset' */
 	overflow_handling = INT64_OVERFLOW_TO_FLOAT;
 	suppress_warnings = FALSE;
+	reset_datafile();
 
 	/* Reset voxel data structures if supported */
 	init_voxelsupport();

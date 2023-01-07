@@ -36,9 +36,9 @@
 #include "command.h"
 #include "datafile.h"
 #include "gadgets.h"  /* For polar and parametric flags */
+#include "gplocale.h" /* For locale handling */
 #include "matrix.h"   /* For vector allocation */
 #include "scanner.h"  /* To check for legal prefixes */
-#include "variable.h" /* For locale handling */
 #include "voxelgrid.h"
 
 #include "stats.h"

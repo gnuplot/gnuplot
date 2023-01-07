@@ -36,18 +36,15 @@
 #include "command.h"
 #include "datablock.h"
 #include "datafile.h"		/* for df_showdata and df_reset_after_error */
+#include "gplocale.h"
 #include "internal.h"		/* for eval_reset_after_error */
 #include "misc.h"
 #include "plot.h"
 #include "pm3d.h"		/* for pm3d_reset_after_error */
-#include "variable.h"		/* For locale handling */
 #include "setshow.h"		/* for conv_text() */
 #include "tabulate.h"		/* for table_mode */
 #include "voxelgrid.h"
 #include "encoding.h"
-#if defined(_MSC_VER) || defined(__WATCOMC__)
-# include <io.h>		/* for _access */
-#endif
 
 /* Exported (set-table) variables */
 
@@ -408,19 +405,6 @@ gp_strdup(const char *s)
     d = strdup(s);
 #endif
     return d;
-}
-
-/*
- * Allocate a new string and initialize it by concatenating two
- * existing strings.
- */
-char *
-gp_stradd(const char *a, const char *b)
-{
-    char *new = gp_alloc(strlen(a)+strlen(b)+1,"gp_stradd");
-    strcpy(new,a);
-    strcat(new,b);
-    return new;
 }
 
 /*{{{  mant_exp - split into mantissa and/or exponent */
@@ -1362,36 +1346,6 @@ parse_esc(char *instr)
     *t = NUL;
 }
 
-
-/* This function does nothing if dirent.h and windows.h not available. */
-TBOOLEAN
-existdir(const char *name)
-{
-#if defined(HAVE_DIRENT)
-    DIR *dp;
-    if ((dp = opendir(name)) == NULL)
-	return FALSE;
-
-    closedir(dp);
-    return TRUE;
-#else
-    int_warn(NO_CARET,
-	     "Test on directory existence not supported\n\t('%s!')",
-	     name);
-    return FALSE;
-#endif
-}
-
-
-TBOOLEAN
-existfile(const char *name)
-{
-#ifdef _MSC_VER
-    return (_access(name, 0) == 0);
-#else
-    return (access(name, F_OK) == 0);
-#endif
-}
 
 
 char *

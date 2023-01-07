@@ -90,6 +90,7 @@
  */
 
 #include "gp_types.h"
+#include "gplocale.h"
 #include "alloc.h"
 #include "axis.h"
 #include "command.h"
@@ -100,7 +101,6 @@
 #include "graph3d.h"
 #include "parse.h"
 #include "util.h"
-#include "variable.h"
 #include "voxelgrid.h"
 
 #ifdef VOXEL_GRID_SUPPORT

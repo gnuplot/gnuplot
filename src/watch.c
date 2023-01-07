@@ -142,7 +142,6 @@ struct text_label watchpoint_labelstyle;
  * Local prototypes
  */
 
-void bisect_hit(struct curve_points *plot, double *xhit, double *yhit, double xlow, double xhigh);
 static struct text_label *mouse_hit_label(struct curve_points *plot, watch_t *target, double x, double y);
 static char *apply_tic_format( struct axis *axis, double hit );
 
@@ -233,7 +232,7 @@ watch_line(struct curve_points *plot, double x1, double y1, double z1, double x2
 		hit_x = x1 + (x2 - x1) * (t->target - y1)/(y2 - y1);
 		if (plot->plot_type == FUNC && !parametric) {
 		    /* Improve x value by successive approximation */
-		    bisect_hit(plot, &hit_x, &hit_y, x1, x2);
+		    bisect_hit(plot, BISECT_MATCH, &hit_x, &hit_y, x1, x2);
 		}
 		break;
 	case FIRST_Z_AXIS:
@@ -466,11 +465,15 @@ init_watch(struct curve_points *plot)
  */
 #define PHIM1 0.618034
 void
-bisect_hit(struct curve_points *plot, double *xhit, double *yhit, double xlow, double xhigh)
+bisect_hit(struct curve_points *plot, t_bisection_target target,
+	   double *xhit, double *yhit, double xlow, double xhigh)
 {
     double x0, x1, x2, x3;
     double f1, f2;		/* f1 = f(x1),  f2 = f(x2) */
     struct value a;
+    TBOOLEAN left;
+
+    double epsilon = (target == BISECT_MATCH) ? EPS : 1.e-14;
 
     x0 = xlow;
     x3 = xhigh;
@@ -490,8 +493,16 @@ bisect_hit(struct curve_points *plot, double *xhit, double *yhit, double xlow, d
     f2 = real(&a);
 
     /* Iterate until convergence of estimated xhit */
-    while (fabs(x3-x0) > EPS * (fabs(x1) + fabs(x2))) {
-	if (fabs(f2 - *yhit) < fabs(f1 - *yhit)) {
+    while (fabs(x3-x0) > epsilon * (fabs(x1) + fabs(x2))) {
+
+	if (target == BISECT_MINIMIZE)
+	    left = (f2 < f1);
+	else if (target == BISECT_MAXIMIZE)
+	    left = (f2 > f1);
+	else /* minimize difference of f(x) from *yhit */
+	    left = (fabs(f2 - *yhit) < fabs(f1 - *yhit));
+
+	if (left) {
 	    x0 = x1;
 	    x1 = x2;
 	    x2 = PHIM1*x2 + (1.0-PHIM1)*x3;
@@ -508,10 +519,20 @@ bisect_hit(struct curve_points *plot, double *xhit, double *yhit, double xlow, d
 	    evaluate_at(plot->plot_function.at, &a);
 	    f1 = real(&a);
 	}
+
+	if ((fabs(x1) + fabs(x2)) < epsilon)
+	    break;
     }
 
     /* Update and return hit coordinates */
-    if (fabs(f2 - *yhit) < fabs(f1 - *yhit)) {
+    if (target == BISECT_MINIMIZE)
+	left = (f2 < f1);
+    else if (target == BISECT_MAXIMIZE)
+	left = (f2 > f1);
+    else /* minimize difference of f(x) from *yhit */
+	left = (fabs(f2 - *yhit) < fabs(f1 - *yhit));
+
+    if (left) {
 	*xhit = x2;
 	*yhit = f2;
     } else {

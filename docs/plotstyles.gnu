@@ -915,6 +915,55 @@ plot $CURVE smooth path with filledcurves closed title "smooth path with filledc
      $LOOP  with points pt 7 lc "steelblue" notitle
 reset
 
+# dgrid3d example
+#
+set output out.'figure_dgrid3d' . ext
+$DATA << EOD
+0 0 10
+0 1 10
+0 2 10
+1 0 10
+1 0.75 5
+1 2 10
+2 0 10
+2 1.25 1
+2 2 10
+3 0 10
+3 0.5 3
+3 1 0
+3 2 10
+EOD
+
+unset key
+set dgrid3d 30,30 splines
+set view 55, 76, 1.15, 0.9
+set xyplane 0
+
+set hidden3d 
+set title "Smooth surface fit to scattered points\nset dgrid3d 30,30 splines" 
+set title font ",14"
+splot $DATA u 1:2:3 w lines, \
+      $DATA u 1:2:3 w points pt 7 ps 0.5 lc "black" nogrid nohidden
+reset
+
+# Pie chart
+#
+set output out.'figure_piechart' . ext
+
+unset tics; unset key; unset border
+set datafile nocolumnheaders
+set xrange [-15:15]
+set style fill transparent solid 0.8 border lt -1
+plot '-' using 1:2:3:4:5:6 with circles lc variable
+0 0 5   0  30 1
+0 0 5  30  70 2
+0 0 5  70 120 3
+0 0 5 120 230 4
+0 0 5 230 360 5
+e
+
+reset
+
 # Plotting modulus and phase of complex functions
 #
 set output out.'figure_E0' . ext

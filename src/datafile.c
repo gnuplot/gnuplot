@@ -111,6 +111,7 @@
 #include "command.h"
 #include "eval.h"
 #include "gp_time.h"
+#include "gplocale.h"
 #include "graphics.h"
 #include "misc.h"
 #include "parse.h"
@@ -120,7 +121,6 @@
 #include "util.h"
 #include "breaders.h"
 #include "tabulate.h" /* For sanity check inblock != outblock */
-#include "variable.h" /* For locale handling */
 #include "voxelgrid.h"
 
 /* test to see if the end of an inline datafile is reached */
@@ -760,11 +760,6 @@ df_tokenise(char *s)
 			)
 		    )
 		) {
-
-
-		/* This was the [slow] code used through version 4.0
-		 *   count = sscanf(s, "%lf%n", &df_column[df_no_cols].datum, &used);
-		 */
 
 		/* Use strtod() because
 		 *  - it is faster than sscanf()
@@ -1806,7 +1801,6 @@ plot_option_using(int max_using)
     }
 
     /* Allow a format specifier after the enumeration of columns. */
-    /* Note: This was left out by mistake in versions 4.6.0 + 4.6.1 */
     if (!END_OF_COMMAND && isstring(c_token)) {
 	df_format = try_to_get_string();
 	if (!valid_format(df_format))
@@ -1878,8 +1872,7 @@ df_readascii(double v[], int max)
     char *s;
     int return_value = DF_GOOD;
 
-    /* Version 5.3
-     * Some plot styles (e.g. PARALLELPLOT) must guarantee that every line
+    /* Some plot styles (e.g. PARALLELPLOT) must guarantee that every line
      * of data will return some input value even if it is missing or bad.
      * This flag will force the line to return NaN rather than being skipped.
      * FIXME: it would be better to make this flag generic and set before entry.
@@ -2383,10 +2376,7 @@ df_readascii(double v[], int max)
 			&& df_column[column - 1].good == DF_GOOD) {
 			v[output] = df_column[column - 1].datum;
 
-		    /* Version 5:
-		     * Do not return immediately on DF_MISSING or DF_UNDEFINED.
-		     * THIS IS A CHANGE.
-		     */
+		    /* Do not return immediately on DF_MISSING or DF_UNDEFINED */
 		    } else if ((column <= df_no_cols)
 			     && (use_spec[output].expected_type == CT_MUST_HAVE)) {
 			/* This catches cases where the plot style cannot tolerate
@@ -2456,19 +2446,17 @@ df_readascii(double v[], int max)
 	output -= df_no_tic_specs;
 
 	/*
-	 * EAM Apr 2012 - If there is no using spec, then whatever we found on
-	 * the first line becomes the expectation for the rest of the input file.
-	 * THIS IS A CHANGE!
+	 * If there is no using spec then whatever we found on the first line
+	 * becomes the expectation for the rest of the input file.
 	 */
 	 if (df_no_use_specs == 0)
 		df_no_use_specs = output;
 
-	/* Version 5:
+	/*
 	 * If all requested values were OK, return number of columns read.
 	 * If a requested column was bad, return an error but nevertheless
 	 * return the other requested columns. The number of columns is
 	 * available to the caller in df_no_use_specs.
-	 * THIS IS A CHANGE!
 	 */
 	switch (return_value) {
 	case DF_MISSING:
@@ -2904,8 +2892,8 @@ f_valid(union argument *arg)
 /*}}} */
 
 /*{{{  void f_timecolumn() */
-/* Version 5 - replace the old and very broken timecolumn(N) with
- * a 2-parameter version that requires an explicit time format
+/*
+ * 2-parameter version that requires an explicit time format
  * timecolumn(N, "format").
  */
 void
@@ -2928,8 +2916,7 @@ f_timecolumn(union argument *arg)
 	column = (int) magnitude(pop(&a));
 	break;
     case 1:
-	/* No format parameter passed (v4-style call) */
-	/* Only needed for backward compatibility */
+	/* Only needed for backward compatibility with version 4 */
 	column = magnitude(&b);
 	b.v.string_val = gp_strdup(timefmt);
 	b.type = STRING;
@@ -5505,12 +5492,11 @@ df_readbinary(double v[], int max)
 			   && df_column[column - 1].good == DF_GOOD)
 		    v[output] = df_column[column - 1].datum;
 
-		/* EAM - Oct 2002 Distinguish between DF_MISSING
-		 * and DF_BAD.  Previous versions would never
-		 * notify caller of either case.  Now missing data
-		 * will be noted. Bad data should arguably be
-		 * noted also, but that would change existing
-		 * default behavior.  */
+		/* Distinguish between DF_MISSING and DF_BAD.
+		 * Missing data will be flagged.
+		 * Bad data should arguably be flagged also, but that would
+		 * change existing default behavior.
+		 */
 		else if ((column <= df_no_cols)
 			 && (df_column[column - 1].good == DF_MISSING))
 		    return DF_MISSING;

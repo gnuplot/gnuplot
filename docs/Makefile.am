@@ -22,39 +22,18 @@
 #   For HTML
 #	make wxhelp/wgnuplot.html (windows / wxt help system)
 #     or
-#	make webdocs (HTML for web site)
-#
-#
-#   For groff (GNU troff}
-#       make grotxt
-#       (print or view gnuplot.txt)
-#     or
-#       make grodvi
-#       (print or view gnuplot.dvi)
-#     or
-#       make grops
-#       (print or view gnuplot.ps)
-#     or
-#       make groff
-#       (all three of the above)
-#
-#   For nroff
-#     make nroff
-#     (print or view gnuplot.nroff)
-#
-#   For troff
-#     make "TROFF=itroff" troff    (use your troff here)
+#	make html (HTML for web site)
 #
 #   For GNU info (texinfo)
-#     make info
+#	make info
 #
 
 # default is what is needed for interactive gnuplot
 gih_DATA = gnuplot.gih
 gihdir = @GIHDIR@
 
-noinst_PROGRAMS = checkdoc doc2ipf doc2tex doc2gih doc2rnh doc2hlp	\
-                  doc2rtf doc2ms alldoc2gih doc2wxhtml doc2web
+noinst_PROGRAMS = checkdoc doc2ipf doc2tex doc2gih doc2hlp \
+                  doc2rtf alldoc2gih doc2wxhtml doc2web
 
 AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/term \
               -I./ja/term
@@ -101,7 +80,7 @@ $(TJ)tkcanvas.trm $(TJ)webp.trm $(TJ)win.trm $(TJ)wxt.trm $(TJ)x11.trm $(TJ)xlib
 
 # DIST_COMMON = README
 
-SOURCES = checkdoc.c doc2gih.c doc2hlp.c doc2ipf.c doc2ms.c doc2rnh.c	\
+SOURCES = checkdoc.c doc2gih.c doc2hlp.c doc2ipf.c \
 doc2rtf.c doc2tex.c windows/doc2html.c doc2web.c termdoc.c xref.c
 
 TERM_H = $(top_srcdir)/src/term.h
@@ -109,7 +88,7 @@ TERM_H = $(top_srcdir)/src/term.h
 DOCHEADERS = doc2x.h xref.h
 
 EXTRA_DIST = Makefile.in doc2texi.el figure_missing.pdf gnuplot.doc \
-titlepag.ipf titlepag.ms titlepag.tex	\
+titlepag.ipf titlepag.tex	\
 toc_entr.sty psdoc gnuplot-ja.doc README.ja	\
 term-ja.diff plotstyles.gnu gnuplot.pdf \
 windows/wgnuplot.hhk windows/wgnuplot.hhp windows/wgnuplot.stp windows/doc2html.c \
@@ -123,12 +102,11 @@ no_figures tikz_figures pdf_figures \
 wxhelp/doc2html.o
 
 CLEANFILES = allterm.h gnuplot.dvi gnuplot.tex gnuplot.idx gnuplot.ilg	\
-gnuplot.ps gnuplot.gih gnuplot.hlp gnuplot.info* gnuplot.ipf gnuplot.ms	\
-gnuplot.rnh gnuplot.rtf gnuplot.nroff gnuplot.txt gnuplot-groff.dvi	\
-gnuplot-groff.ps gnuplot.tmp VERSION gnuplot.4tc gnuplot.4ct		\
-gnuplot.idv gnuplot.xref gnuplot.lg gnuplot.pdf		 		\
+gnuplot.ps gnuplot.gih gnuplot.hlp gnuplot.info* gnuplot.ipf 		\
+gnuplot.rtf gnuplot.tmp VERSION gnuplot.4tc gnuplot.4ct			\
+gnuplot.idv gnuplot.xref gnuplot.lg gnuplot.pdf				\
 ja.doc gnuplot-ja.ind gnuplot-ja.ilg gnuplot-ja.aux gnuplot-ja.toc	\
-gnuplot-ja.idx gnuplot-ja.out gnuplot-ja.tex				\
+gnuplot-ja.log gnuplot-ja.idx gnuplot-ja.out gnuplot-ja.tex		\
 wxhelp_figures wxhelp/*.html wxhelp/wgnuplot.hhc wxhelp/wgnuplot.hhk	\
 wxhelp/wgnuplot.htc wxhelp/doc2html$(EXEEXT) windows/wgnuplot.htk	\
 svg_figures html/*.html html/*.svg html/*.hhc html/*.hhk                \
@@ -158,40 +136,6 @@ allterm.h: $(CORETERM) $(LUA_HELP)
 	  f=`echo $$e |cut -d\: -f1` ; s=`echo $$e | cut -d\: -f2` ;\
 	  sed -n "/^[ 	]*$$s/,/^[ 	]*END_HELP/p" $$f ; \
 	done >$@
-
-# for debugging
-alldoc: check dvi gih hlp html info ipf nroff pdf ps rnh rtf htb
-
-### [tn]roff documentation
-troff: gnuplot.ms $(srcdir)/titlepag.ms
-	$(AM_V_GEN) tbl gnuplot.ms | eqn | $(TROFF) -ms
-
-nroff: gnuplot.nroff
-gnuplot.nroff: gnuplot.ms $(srcdir)/titlepag.ms
-	$(AM_V_GEN) tbl $< | neqn | nroff -ms | col > $@
-
-### groff documentation
-
-groff: grotxt grodvi grops
-
-grotxt: gnuplot.txt
-gnuplot.txt: gnuplot.ms $(srcdir)/titlepag.ms
-	$(AM_V_GEN) groff -s -p -t -e -ms -Tlatin1 $< > $@
-
-grodvi: gnuplot-groff.dvi
-gnuplot-groff.dvi: gnuplot.ms $(srcdir)/titlepag.ms
-	$(AM_V_GEN) groff -s -p -t -e -ms -Tdvi $< > $@
-
-grops: gnuplot-groff.ps
-gnuplot-groff.ps: gnuplot.ms $(srcdir)/titlepag.ms
-	$(AM_V_GEN) groff -s -p -t -e -ms -Tps $< > $@ 
-
-### doc2xxx dependencies
-gnuplot.ms: doc2ms$(EXEEXT) $(srcdir)/gnuplot.doc
-	$(AM_V_GEN) ./doc2ms$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.ms "$(srcdir)/titlepag.ms"
-
-doc2ms_SOURCES = doc2ms.c termdoc.c
-doc2ms_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
 
 
 ### PDF documentation can inset figures using either tikz+wrapfig or pdf+picins
@@ -287,9 +231,9 @@ gnuplot.ps: gnuplot.dvi
 # Known limitations:
 # - The title page is not completely translated.
 # - Only the original English keywords appear in the index and hyperlinks.
-# - gnuplot-tikz-ja.help can be converted to utf8 but not actually included
-#   in the resulting *.tex file because this happens too late in the
-#   build process
+# - gnuplot-tikz.help not included in the resulting *.tex file because
+#   translation and conversion to utf8 would happen too late
+#   for this build recipe.
 allterm-ja.h: $(CORETERM) $(LUA_HELP)
 	-mkdir ja
 	-mkdir ja/docs;
@@ -434,14 +378,6 @@ gnuplot.rtf: doc2rtf$(EXEEXT) $(srcdir)/gnuplot.doc
 
 doc2rtf_SOURCES = doc2rtf.c termdoc.c xref.c
 
-# this is how to make rnh documentation (VMS help format)
-rnh: gnuplot.rnh
-
-gnuplot.rnh: doc2rnh$(EXEEXT) $(srcdir)/gnuplot.doc
-	$(AM_V_GEN) ./doc2rnh$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.rnh
-
-doc2rnh_SOURCES = doc2rnh.c termdoc.c
-
 # this is how to check the gnuplot.doc file
 check-local: checkdoc$(EXEEXT)
 	$(AM_V_at)./checkdoc$(EXEEXT) < $(srcdir)/gnuplot.doc; \
@@ -463,9 +399,5 @@ clean-local:
 	 done
 	$(AM_V_at)rm -f pdf_figures
 	$(AM_V_at)rm -rf ja
-
-# for VMS only
-install-vms: gnuplot.hlp
-	$(AM_V_at)$(INSTALL_DATA) gnuplot.hlp $(datadir)/gnuplot.hlp
 
 #the end

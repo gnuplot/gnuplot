@@ -207,7 +207,7 @@ on mouse-coordinate tracking.
 <td align=center valign=bot>
 	<h4></h4>
 	These plots were generated using
-	<pre><font size="-1">set term svg enhanced mouse size 600,400</font></pre>
+	<pre><font size="-1">set term svg mouse size 600,400</font></pre>
 </td>
 </tr>
 

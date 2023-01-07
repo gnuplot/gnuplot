@@ -15,6 +15,15 @@ typedef struct watch_t {
 
 extern TBOOLEAN watch_mouse_active;
 
+/* Prototype for bisection (used also by "sharpen" filter) */
+typedef enum t_bisection_target {
+    BISECT_MINIMIZE = -1,
+    BISECT_MATCH = 0,
+    BISECT_MAXIMIZE = 1
+} t_bisection_target;
+void bisect_hit(struct curve_points *plot, t_bisection_target target,
+		double *xhit, double *yhit, double xlow, double xhigh);
+
 #ifdef USE_WATCHPOINTS
 
 /* Prototypes of functions exported by watch.c */

@@ -86,7 +86,7 @@
 #include "driver.h"
 
 #ifdef TERM_PROTO
-#include "variable.h"	/* For loadpath_handler used in PS_dump_prologue_file */
+#include "loadpath.h"	/* For loadpath_handler used in PS_dump_prologue_file */
 #endif
 
 #ifdef TERM_REGISTER
@@ -4199,7 +4199,7 @@ PS_open_prologue_file(char *name)
 
     if (!prologue_fd) {
 	fprintf(stderr,"Can't find PostScript prologue file %s\n", name);
-	loadpath_handler(ACTION_SHOW,NULL);
+	dump_loadpath();
 	fprintf(stderr,"Please copy %s to one of the above directories\n",name);
 	fprintf(stderr,"or set the environmental variable GNUPLOT_PS_DIR\n");
 	fprintf(stderr,"or set the loadpath appropriately\n");

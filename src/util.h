@@ -90,7 +90,6 @@ char *try_to_get_string(void);
 void parse_esc(char *);
 int type_udv(int);
 
-char *gp_stradd(const char *, const char *);
 #define isstringvalue(c_token) (isstring(c_token) || type_udv(c_token)==STRING)
 
 /* HBB 20010726: IMHO this one belongs into alloc.c: */
@@ -123,9 +122,6 @@ void common_error_exit();
 #endif
 
 void squash_spaces(char *s, int remain);
-
-TBOOLEAN existdir(const char *);
-TBOOLEAN existfile(const char *);
 
 char *getusername(void);
 

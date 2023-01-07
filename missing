@@ -180,14 +180,8 @@ give_advice ()
       echo "<$gnu_software_URL/help2man/>"
     ;;
     makeinfo*)
-      echo "You should only need it if you modified a '.texi' file, or"
-      echo "any other file indirectly affecting the aspect of the manual."
       echo "You might want to install the Texinfo package:"
       echo "<$gnu_software_URL/texinfo/>"
-      echo "The spurious makeinfo call might also be the consequence of"
-      echo "using a buggy 'make' (AIX, DU, IRIX), in which case you might"
-      echo "want to install GNU make:"
-      echo "<$gnu_software_URL/make/>"
       ;;
     *)
       echo "You might have modified some files without having the proper"

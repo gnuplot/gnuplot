@@ -33,15 +33,6 @@
 /*
  * Changes:
  *
- * Feb 5, 1992  Jack Veenstra   (veenstra@cs.rochester.edu) Added support to
- * filter data values read from a file through a user-defined function before
- * plotting. The keyword "thru" was added to the "plot" command. Example
- * syntax: f(x) = x / 100 plot "test.data" thru f(x) This example divides all
- * the y values by 100 before plotting. The filter function processes the
- * data before any log-scaling occurs. This capability should be generalized
- * to filter x values as well and a similar feature should be added to the
- * "splot" command.
- *
  * 19 September 1992  Lawrence Crowl  (crowl@cs.orst.edu)
  * Added user-specified bases for log scaling.
  *
@@ -76,6 +67,8 @@
 #include "datafile.h"
 #include "getcolor.h"
 #include "gp_hist.h"
+#include "gplocale.h"
+#include "loadpath.h"
 #include "misc.h"
 #include "parse.h"
 #include "plot.h"
@@ -89,7 +82,6 @@
 #include "tables.h"
 #include "term_api.h"
 #include "util.h"
-#include "variable.h"
 #include "voxelgrid.h"
 #include "external.h"
 

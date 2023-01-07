@@ -55,6 +55,7 @@ void delete_dashtype(struct custom_dashtype_def *, struct custom_dashtype_def *)
 void reset_key(void);
 void free_marklist(struct ticmark * list);
 void reset_bars(void);
+void reset_datafile(void);
 void rrange_to_xy(void);
 void unset_monochrome(void);
 void unset_all_tics(void);
