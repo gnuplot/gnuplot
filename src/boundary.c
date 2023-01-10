@@ -1317,7 +1317,7 @@ do_key_sample(
 	    /* need_fill_border will set the border linetype, but candlesticks don't want it */
 	    if ((this_plot->plot_style == CANDLESTICKS && fs->border_color.type == TC_LT
 							&& fs->border_color.lt == LT_NODRAW)
-	    ||   style == FS_EMPTY
+	    ||   (style == FS_EMPTY && this_plot->plot_style != POLYGONS)
 	    ||   need_fill_border(fs)) {
 		newpath();
 		draw_clip_line( xl + key_sample_left,  yl - key_sample_height/4,
