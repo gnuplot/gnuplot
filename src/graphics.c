@@ -1368,7 +1368,13 @@ finish_filled_curve(
     long side = 0;
     int i;
 
-    if (points <= 0) return;
+    if (points <= 0)
+	return;
+
+    /* plot with polygons fs empty really does mean empty (no fill) */
+    if (plot->plot_style == POLYGONS && plot->fill_properties.fillstyle == FS_EMPTY)
+	return;
+
     /* add side (closing) points */
     switch (filledcurves_options->closeto) {
 	case FILLEDCURVES_CLOSED:
@@ -1503,6 +1509,7 @@ plot_filledcurves(struct curve_points *plot)
 			axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max);
 	    break;
 	default:
+	case FILLEDCURVES_CLOSED:
 	    break;
     }
 
