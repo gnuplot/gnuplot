@@ -98,13 +98,14 @@
  *	Revisit use of brush for thick lines with alpha channel
  *	+ setting alpha in the brush itself works OK up to about lw 4.
  *	  After that the repeated composition of the brush wipes out the transparency.
- *	- TODO:
- *	  The brushed line could be written to a separate layer as an opaque object,
- *	  then composited back onto the main canvas with alpha applied.
- *	  term->path(start|end) could wrap that, but as of now the core code doesn't use
- *	  start/end path for most lines.  Alternatively it might be triggered by
- *	  term->set_color with alpha channel present and last until the color is changed
- *	  again.
+ *
+ * Ethan Merritt Jan 2023:
+ *	Newer antialiasing support in gdlib makes it actually work with the native
+ *	implementation for linewidth > 1.  But it requires truecolor.
+ *	Conversely, using the brush alternative (via "rounded") has become very slow.
+ * CHANGE:
+ *	Default to "set term png butt truecolor"
+ *	gif and sixel default to "butt notruecolor"
  */
 
 #define GD_DEFINED_COLORS	96	/* Must not exceed size of pm3d_color_names_tbl[] */
@@ -209,7 +210,7 @@ static void PNG_init_brush(int);
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
-static TBOOLEAN PNG_initialized = FALSE;	/* Set when terminal first initialized */
+static const char *PNG_initialized = NULL;	/* Which terminal was previously used? */
 
 static struct {
     gdImagePtr image;
@@ -641,8 +642,8 @@ PNG_options()
     unsigned long color;
     TBOOLEAN gif_anim_option = FALSE; /* set to TRUE if an animated gif option given */
 
-    if (!PNG_initialized) {
-	PNG_initialized = TRUE;
+    if (PNG_initialized != term->name) {
+	PNG_initialized = term->name;
 	term_options[0] = '\0';
 	term->h_char = PNG_HCHAR; /* Default to medium font */
 	png_state.default_font = gdfont;
@@ -654,10 +655,13 @@ PNG_options()
 	png_state.default_ttfsize = 0;
 	png_state.fontscale = 1;
 	png_state.justify = CENTRE;
-	png_state.TrueColor = FALSE;
 	PNG_linewidth_factor = 1.0;
 	PNG_dashlength_factor = 1.0;
-	png_state.capbutt = FALSE; /* to preserve previous default behavior */
+	png_state.capbutt = TRUE; /* Change Jan 2023 */
+	if (!strcmp(term->name, "gif") || !strcmp(term->name, "sixelgd"))
+	    png_state.TrueColor = FALSE;
+	else
+	    png_state.TrueColor = TRUE;
 #ifdef _WIN32
 	/* Set the default search path for fonts to something useful. */
 	if (getenv("GDFONTPATH") == NULL) {
@@ -676,9 +680,8 @@ PNG_options()
 	}
 #endif
     } else {
-	/* FIXME EAM - these should never happen! */
 	if (!png_state.default_font) {
-	    fprintf(stderr,"gd.trm: caught initialization error\n");
+	    int_warn(NO_CARET, "gd.trm: caught initialization error");
 	    png_state.default_font = gdfont;
 	}
     }
@@ -1080,6 +1083,8 @@ PNG_options()
 	term->flags |= TERM_ALPHA_CHANNEL;
     } else if (png_state.TrueColor) {
 	strcat(term_options, "truecolor ");
+    } else {
+	strcat(term_options, "notruecolor ");
     }
     if (!(png_state.flags & PNG_USE_CROP)) {
 	strcat(term_options, "no");
@@ -1098,10 +1103,8 @@ PNG_options()
 	sprintf(term_options + strlen(term_options),
 	    "dashlength %3.1f ", PNG_dashlength_factor);
 
-    if (png_state.capbutt) {
-	sprintf(term_options + strlen(term_options),
-	    "butt ");
-    }
+    sprintf(term_options + strlen(term_options),
+	png_state.capbutt ? "butt " : "rounded ");
 
     if (png_state.animate) {
 	if (strncmp("sixel",term->name,5) == 0)
@@ -1250,26 +1253,6 @@ PNG_reset()
     }
 #endif
 }
-
-#if 0
-/* use  #if 1  that's just for debugging */
-void
-PNG_show_current_palette()
-{
-    int i;
-
-    fprintf(stderr, "*****\n SHOW THE PALETTE! total=%i\n",
-	    gdImageColorsTotal(png_state.image));
-    for (i=0; i < gdImageColorsTotal(png_state.image); i++) {
-	/* Use access macros to learn colors. */
-	fprintf(stderr, "%i\tr=%d\t g=%d\tb=%d\n",
-		i,
-		gdImageRed(png_state.image,i),
-		gdImageGreen(png_state.image,i),
-		gdImageBlue(png_state.image,i));
-    }
-}
-#endif
 
 /*
 How this works: Gray interval [0;1] will be mapped to interval
@@ -1659,23 +1642,12 @@ PNG_vector(unsigned int x, unsigned int y)
 
     /* All other (not dashed) vectors */
     } else {
-	if (png_state.linewidth == 1) {
-#if defined(gdAntiAliased)
-	    gdImageSetThickness(png_state.image,1);
+	if (png_state.capbutt) {
+	    /* Assume working antialiasing (gd version >? 2.0.12) */
+	    gdImageSetThickness(png_state.image,png_state.linewidth);
 	    gdImageSetAntiAliased(png_state.image, png_state.color);
 	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
 			x, Y(y), gdAntiAliased);
-#else
-	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
-			x, Y(y), png_state.color);
-#endif
-
-	} else if (png_state.capbutt){
-
-	    gdImageSetThickness(png_state.image,png_state.linewidth);
-	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
-			x, Y(y), png_state.color);
-
 	} else {
 	    /* EAM - Implement linewidth by using a brush */
 	    PNG_init_brush(lw);
@@ -2187,7 +2159,6 @@ ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
      * punt the string to PNG_put_text()
      */
     if (!strpbrk(str, "{}^_@&~") && !contains_unicode(str)) {
-	/* FIXME: do something to ensure default font is selected */
 	PNG_put_text(x,y,str);
 	return;
     }
@@ -2548,15 +2519,18 @@ START_HELP(png)
 " lines drawn, i.e. they are multiplied by values requested in various drawing",
 " commands.",
 "",
-" By default output png images use 256 indexed colors. The `truecolor` option",
-" instead creates TrueColor images with 24 bits of color information per pixel.",
+" By default the png terminal creates TrueColor images with 24 bits of color",
+" information per pixel. The `notruecolor` option instead uses only 8 bits,",
+" (256 indexed colors).",
 " Transparent fill styles require the `truecolor` option. See `fillstyle`.",
 " A transparent background is possible in either indexed or TrueColor images.",
+" Antialiasing also requires TrueColor.",
 "",
 " `butt` instructs the driver to use a line drawing method that does",
 " not overshoot the desired end point of a line.  This setting is only",
-" applicable for line widths greater than 1.  This setting is most useful when",
-" drawing horizontal or vertical lines.  Default is `rounded`.",
+" relevant for line widths greater than 1.  The alternative is `rounded`,",
+" which produces somewhat more uniform curved lines if antialiasing is not",
+" available (`notruecolor`) but can be much slower.",
 "",
 " The details of font selection are complicated.",
 " Two equivalent simple examples are given below:",
@@ -2571,18 +2545,14 @@ START_HELP(png)
 "",
 "2 examples",
 "?set term png examples",
-"       set terminal png medium size 640,480 background '#ffffff'",
 "",
-" Use the medium size built-in non-scaleable, non-rotatable font.",
-" Use white (24-bit RGB in hexadecimal) for the non-transparent background.",
-"",
-"       set terminal png font arial 14 size 800,600",
+"       set terminal png font \"arial,14\" size 800,600 background \"white\"",
 "",
 " Searches for a scalable font with face name 'arial' and sets the font",
 " size to 14pt.  Please see `fonts` for details of how the font search",
 " is done.",
 "",
-"       set terminal png transparent truecolor enhanced",
+"       set terminal png transparent enhanced",
 "",
 " Use 24 bits of color information per pixel, with a transparent background.",
 " Use the `enhanced text` mode to control the layout of strings to be printed.",
@@ -2700,8 +2670,7 @@ START_HELP(jpeg)
 "",
 " `butt` instructs the driver to use a line drawing method that does",
 " not overshoot the desired end point of a line.  This setting is only",
-" applicable for line widths greater than 1.  This setting is most useful when",
-" drawing horizontal or vertical lines.  Default is `rounded`.",
+" relevant for line widths greater than 1. The alternative is `rounded`.",
 "",
 " The details of font selection are complicated.",
 " Two equivalent simple examples are given below:",
@@ -2858,7 +2827,7 @@ START_HELP(gif)
 " `butt` instructs the driver to use a line drawing method that does",
 " not overshoot the desired end point of a line.  This setting is only",
 " applicable for line widths greater than 1.  This setting is most useful when",
-" drawing horizontal or vertical lines.  Default is `rounded`.",
+" drawing horizontal or vertical lines.",
 "",
 " The output plot size <x,y> is given in pixels---it defaults to 640x480.",
 " Please see additional information under `canvas` and `set size`.",
@@ -3062,8 +3031,8 @@ START_HELP(sixelgd)
 "",
 " `butt` instructs the driver to use a line drawing method that does",
 " not overshoot the desired end point of a line.  This setting is only",
-" applicable for line widths greater than 1.  This setting is most useful when",
-" drawing horizontal or vertical lines.  Default is `rounded`.",
+" relevant for line widths greater than 1.  The alternative is `rounded`,",
+" which produces somewhat more uniform curved lines but can be much slower.",
 "",
 " The details of font selection are complicated.",
 " For more information please see `fonts`.",

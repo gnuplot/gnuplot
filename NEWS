@@ -25,6 +25,7 @@ Changes not in 5.4 (will be in 6.0)
 * CHANGE criterion for fallback to default axes in 'plot with ellipse'
 * CHANGE deprecate special case of 'with boxerrorbars" flagged by boxwidth = -2
 * CHANGE wgnuplot menu files use UTF-8 encoding
+* CHANGE gdlib png terminal defaults to truecolor, antialiasing, butt linecaps
 
 Changes in 5.4
 ==============
