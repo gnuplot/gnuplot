@@ -1328,7 +1328,8 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	/* zsort filter will be applied to this data */
 	if (equals(c_token, "zsort")) {
 	    c_token++;
-	    plot->plot_filter = FILTER_ZSORT;
+	    if (plot)
+		plot->plot_filter = FILTER_ZSORT;
 	    continue;
 	}
 
