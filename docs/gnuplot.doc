@@ -13474,11 +13474,11 @@ Ffigure_multiple_keys
  subsequent plots. You may define as many objects as you like. Currently the
  supported object types are `rectangle`, `circle`, `ellipse`, and `polygon`.
  Rectangles inherit a default set of style properties (fill, color, border) from
- those set by the command `set style rectangle`, but each object can also be
- given individual style properties. Circles, ellipses, and polygons  inherit the
- fill style from `set style fill`.  Objects to be drawn in 2D plots may be
- defined in any combination of axis, graph, polar, or screen coordinates.
+ those set by the command `set style rectangle`. Every object can be given
+ individual style properties when it is defined or in a later command.
 
+ Objects to be drawn in 2D plots may be defined in any combination of
+ axis, graph, polar, or screen coordinates.
  Object specifications in 3D plots cannot use graph coordinates.
  Rectangles and ellipses in 3D plots are limited to screen coordinates.
 

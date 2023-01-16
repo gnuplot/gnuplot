@@ -49,7 +49,7 @@ array Longitude[13] = [267., 300., 328., 352., 29., 53., 90., 118., 138., 174., 
 do for [i=1:13] {
     set label i Zodiac[i] at polar Longitude[i], 1.1, 0 center font ",15"
     set obj i circle at polar Longitude[i], 1.1, 0 radius char 1.5
-    set obj i fs solid fc rgb hsv2rgb( Longitude[i]/360., 0.5, 1.0)
+    set obj i fs solid border lt -1 fc rgb hsv2rgb( Longitude[i]/360., 0.5, 1.0)
 }
 
 #

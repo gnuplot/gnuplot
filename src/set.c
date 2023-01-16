@@ -4348,6 +4348,9 @@ set_obj(int tag, int obj_type)
 	if (!got_lt) {
 	    lp_style_type lptmp = this_object->lp_properties;
 	    lp_parse(&lptmp, LP_NOFILL, FALSE);
+	    if (this_object->fillstyle.fillstyle == FS_EMPTY) {
+		this_object->fillstyle.border_color = lptmp.pm3d_color;
+	    }
 	    if (c_token != save_token) {
 		this_object->lp_properties.l_width = lptmp.l_width;
 		this_object->lp_properties.d_type = lptmp.d_type;
