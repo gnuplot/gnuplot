@@ -759,13 +759,13 @@ AC_ARG_WITH(row-help,dnl
    fi])
 
 dnl Whether we want to create the LaTeX tutorial
-TUTORIAL=notutorial
-AC_ARG_WITH(tutorial,dnl
-[  --with-tutorial         process the LaTeX tutorial when building])
-dnl only if latex/2e is found
-if test "$with_latex" != no -a "$with_tutorial" = yes ; then
-  TUTORIAL=tutorial
-fi
+dnl TUTORIAL=notutorial
+dnl AC_ARG_WITH(tutorial,dnl
+dnl [  --with-tutorial         process the LaTeX tutorial when building])
+dnl dnl only if latex/2e is found
+dnl if test "$with_latex" != no -a "$with_tutorial" = yes ; then
+dnl   TUTORIAL=tutorial
+dnl fi
 
 dnl enable multi-byte font support in x11 terminal
 AC_ARG_ENABLE(x11-mbfonts,dnl
@@ -805,11 +805,11 @@ AC_ARG_ENABLE(raise-console,dnl
 
 
 dnl
-if test ! -f src/graphics.c ; then
-  AC_MSG_RESULT([Compiling outside source directory - copying needed files])
-  mkdir tutorial >/dev/null 2>&1
-  cp ${srcdir}/tutorial/eg3.dat tutorial
-fi
+dnl if test ! -f src/graphics.c ; then
+dnl   AC_MSG_RESULT([Compiling outside source directory - copying needed files])
+dnl   mkdir tutorial >/dev/null 2>&1
+dnl   cp ${srcdir}/tutorial/eg3.dat tutorial
+dnl fi
 
 dnl  wxWidgets terminal
 
@@ -1203,7 +1203,7 @@ AC_SUBST(GIHDIR)
 AC_SUBST(TEXDIR)
 AC_SUBST(TERMLIBS)
 AC_SUBST(TERMXLIBS)
-AC_SUBST(TUTORIAL)
+dnl AC_SUBST(TUTORIAL)
 
 dnl Write Makefiles and configuration header
 AC_CONFIG_FILES([Makefile
