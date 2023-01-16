@@ -1002,12 +1002,7 @@ show_version(FILE *fp)
 		"";
 
 	    const char *nocwdrc =
-#ifdef USE_CWDRC
-		"+"
-#else
-		"-"
-#endif
-		"USE_CWDRC  ";
+		"-USE_CWDRC  ";
 
 	    const char *x11 =
 #ifdef X11

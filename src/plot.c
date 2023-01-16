@@ -770,7 +770,6 @@ init_session()
 	 */
 	reset_command();	/* FIXME: this does c_token++ */
 	load_rcfile(0);		/* System-wide gnuplotrc if configured */
-	load_rcfile(1);		/* ./.gnuplot if configured */
 
 	/* After this point we allow pipes and system commands */
 	successful_initialization = TRUE;
@@ -782,8 +781,8 @@ init_session()
 /*
  * Read commands from an initialization file.
  * where = 0: look for gnuplotrc in system shared directory
- * where = 1: look for .gnuplot in current directory
- * where = 2: look for .gnuplot in home directory
+ * where = 1: look for .gnuplot in current directory (DEPRECATED)
+ * where = 2: look for .gnuplot in user's home directory
  */
 static void
 load_rcfile(int where)
@@ -805,14 +804,6 @@ load_rcfile(int where)
 # endif
 	plotrc = fopen(rcfile, "r");
 #endif
-
-    } else if (where == 1) {
-#ifdef USE_CWDRC
-    /* Allow check for a .gnuplot init file in the current directory */
-    /* This is a security risk, as someone might leave a malicious   */
-    /* init file in a shared directory.                              */
-	plotrc = fopen(PLOTRC, "r");
-#endif /* !USE_CWDRC */
 
     } else if (where == 2 && user_homedir) {
 	/* length of homedir + directory separator + length of file name + \0 */
