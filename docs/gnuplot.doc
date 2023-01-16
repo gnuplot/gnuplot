@@ -4114,11 +4114,9 @@ Ffigure_newsyntax
  and is reported by `show loadpath`.  The program then looks in the user's HOME
  directory for a file called `.gnuplot` on Unix-like systems or `GNUPLOT.INI` on
  other systems.  (OS/2 will look for it in the directory named in
- the environment variable `GNUPLOT`; Windows will use `APPDATA`).  On Unix-like
- systems gnuplot additionally checks for the file
+ the environment variable `GNUPLOT`; Windows will use `APPDATA`).
+ On Unix-like systems gnuplot additionally checks for the file
  $XDG_CONFIG_HOME/gnuplot/gnuplotrc.
- Note: The program can be configured to look first in the current directory,
- but this is not recommended because it is bad security practice.
 2 String constants, string variables, and string functions
 ?string
 ?strings

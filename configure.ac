@@ -741,15 +741,6 @@ dnl end caca
 
 dnl Process rest of with and enable options
 
-dnl Use .gnuplot file in current directory
-AC_ARG_WITH(cwdrc,dnl
-[  --with-cwdrc            check current directory for .gnuplot file,
-                          normally disabled for security reasons],,)
-if test "$with_cwdrc" = yes; then
-     AC_DEFINE(USE_CWDRC,1,
-               [ Define if you want to read .gnuplot from current directory (SECURITY RISK!).])
-fi
-
 dnl without-extra-coordinate may leave a hole in "struct coordinate"
 AC_ARG_WITH(extra-coordinate,dnl
 [  --without-extra-coordinate    leave possible hole in struct coordinate],,)
@@ -1459,12 +1450,6 @@ if test "$enable_history_file" = yes; then
   AC_MSG_RESULT([  Command-line history file: yes])
 else
   AC_MSG_RESULT([  Command-line history file: no])
-fi
-
-if test "$with_cwdrc" = yes; then
-  AC_MSG_RESULT([  Check current directory for .gnuplot file: yes (warning: security risk)])
-else
-  AC_MSG_RESULT([  Check current directory for .gnuplot file: no (use --with-cwdrc to enable)])
 fi
 
 if test "$with_row_help" = no; then
