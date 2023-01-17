@@ -148,6 +148,15 @@ TERM_PUBLIC void ENHGD_FLUSH(void);
 TERM_PUBLIC void ENHGD_boxed_text(unsigned int, unsigned int, int);
 
 #include <gd.h>
+
+/* Compatibility hack for gd versions older than 3.1.0 */
+#ifndef gdEffectReplace
+#define gdEffectReplace 0
+#endif
+#ifndef gdEffectNormal
+#define gdEffectNormal 1
+#endif
+
 /* Include files for bitmap fonts */
 #include <gdfontt.h>
 #include <gdfonts.h>
