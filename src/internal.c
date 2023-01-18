@@ -2045,6 +2045,7 @@ sprintf_specifier(const char* format)
     const char illegal_spec[] = "hlLqjzZtCSpn*";
 
     int string_pos, real_pos, int_pos, illegal_pos;
+    int nonascii_pos;
 
     /* check if really format specifier */
     if (format[0] != '%')
@@ -2055,6 +2056,15 @@ sprintf_specifier(const char* format)
     real_pos    = strcspn(format, real_spec);
     int_pos     = strcspn(format, int_spec);
     illegal_pos = strcspn(format, illegal_spec);
+
+    /* Unfortunately snprintf can segfault on weird bytes in the format */
+    for (nonascii_pos=0; format[nonascii_pos]; nonascii_pos++) {
+	if (!isascii(format[nonascii_pos]))
+	    break;
+    }
+    if ( nonascii_pos < int_pos && nonascii_pos < real_pos
+	 && nonascii_pos < string_pos )
+	return INVALID_NAME;
 
     if ( illegal_pos < int_pos && illegal_pos < real_pos
 	 && illegal_pos < string_pos )
