@@ -312,7 +312,7 @@ make_bins(struct curve_points *plot, int nbins,
      * new z = number of points in the bin
      */
     plot->p_count = nbins;
-    plot->points = gp_realloc( plot->points, nbins * sizeof(struct coordinate), "curve_points");
+    cp_extend(plot, nbins);
     for (i=0; i<nbins; i++) {
 	double bincent = bottom + (0.5 + (double)i) * binwidth;
 	double ybin = bin[i];
@@ -779,9 +779,8 @@ convex_hull(struct curve_points *plot)
     if (np < 3)
 	return;
     if (np == 3) {
-	points = gp_realloc( points, 4*sizeof(struct coordinate), "HULL" );
-	points[3] = points[0];
-	plot->points = points;
+	cp_extend(plot, 4);
+	plot->points[3] = plot->points[0];
 	plot->p_count = 4;
 	return;
     }
@@ -841,10 +840,11 @@ convex_hull(struct curve_points *plot)
     points = gp_alloc( np * sizeof(struct coordinate), "Hull" );
     for (i=0; i<np; i++)
 	points[i] = *(stack[i]);
-    free(plot->points);
+    cp_extend(plot, 0);
     free(stack);
     plot->points = points;
     plot->p_count = np;
+    plot->p_max = np;
 }
 #undef CROSS
 
