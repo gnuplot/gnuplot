@@ -164,7 +164,6 @@ cp_extend(struct curve_points *cp, int num)
 				/* true end in case two slots are used at once	*/
 				/* (e.g. redundant final point of closed curve)	*/
     } else {
-	/* FIXME: Does this ever happen?  Should it call cp_free() instead? */
 	free(cp->points);
 	cp->points = NULL;
 	cp->p_max = 0;
@@ -4250,10 +4249,12 @@ grid_polar_data(struct curve_points *this_plot)
     /* Create the new grid structure and fill in grid point values
      * derived from the original data point values.
      */
+    this_plot->points = NULL;
+    cp_extend(this_plot, 0);
     this_plot->p_count = polar_grid.theta_segments * polar_grid.r_segments;
-    this_plot->points = gp_alloc( sizeof(coordinate) * this_plot->p_count, "polar grid");
-    point = this_plot->points;
+    cp_extend(this_plot, this_plot->p_count);
 
+    point = this_plot->points;
     for (i = 0, r = rmin; i < polar_grid.r_segments; i++, r += dr) {
 	for (j = 0, t = tmin; j < polar_grid.theta_segments; j++, t+=dt, point++) {
 	    opoint = old_points;
