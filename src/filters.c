@@ -1285,6 +1285,13 @@ delaunay_triangulation( struct curve_points *plot )
     /* Clear out any previous work */
     reset_hulls();
 
+    /* Pull color out of the varcolor array and copy it into point.CRD_COLOR
+     * so that it isn't lost during sort.
+     */
+    if (plot->varcolor)
+	for (i = 0; i < plot->p_count; i++)
+	    plot->points[i].CRD_COLOR = plot->varcolor[i];
+
     /* Sort the points on x.
      * This allows us to reduce the time required from O(N^2) to
      * approximately O(NlogN).
@@ -1762,6 +1769,7 @@ save_delaunay_triangles( struct curve_points *plot )
 {
     struct coordinate *point = plot->points;
     struct coordinate *newpoints = NULL;
+    double *newcolor = NULL;
     triangle *t;
     int outp;
 
@@ -1781,9 +1789,17 @@ save_delaunay_triangles( struct curve_points *plot )
 	newpoints[outp++] = blank_data_line;
     }
 
+    /* Make a new separate list of colors */
+    if (plot->varcolor) {
+	newcolor = gp_alloc( 5 * outp * sizeof(double), "delaunay colors" );
+	for (int i = 0; i < outp; i++)
+	    newcolor[i] = newpoints[i].CRD_COLOR;
+    }
+
     /* Replace original point list with the new one */
     cp_extend(plot, 0);
     plot->points = newpoints;
+    plot->varcolor = newcolor;
     plot->p_count = outp;
     plot->p_max = outp;
 }
