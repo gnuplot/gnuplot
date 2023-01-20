@@ -5853,6 +5853,7 @@ Ffigure_points
  specifier and the keywords `lc variable` (value is interpreted as a linetype)
  or `lc rgb variable` (value is interpreted as a 24-bit RGB color).
  Only the color value from the first vertex of the polygon is used.
+ The border line type, if any, is taken from the fill style.
 
  3D plots:
 

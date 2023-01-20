@@ -1271,8 +1271,13 @@ plot_lines(struct curve_points *plot)
 
 	(void)zprev; /* prevents unused variable warning #ifndef USE_WATCHPOINTS */
 
-	/* rgb variable  -  color read from data column */
-	check_for_variable_color(plot, &plot->varcolor[i]);
+	/* rgb variable or palette z  -  color is read from data column
+	 * Exception:
+	 *	If we are retracing the border of a filled curve or polygon
+	 *	the color has already been set to the border color.
+	 */
+	if (plot->plot_style != FILLEDCURVES && plot->plot_style != POLYGONS)
+	    check_for_variable_color(plot, &plot->varcolor[i]);
 
 	/* Only map and plot the point if it is well-behaved (not UNDEFINED).
 	 * Note that map_x or map_y can hit NaN during eval_link_function(),
