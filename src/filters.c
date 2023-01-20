@@ -575,8 +575,9 @@ gen_2d_path_splines( struct curve_points *plot )
     int curves = num_curves(plot);
 
     /* Allocate space to hold the interpolated points */
-    splined_points = gp_alloc( (samples_1 * curves) * sizeof(struct coordinate), NULL );
-    memset( splined_points, 0, (samples_1 * curves) * sizeof(struct coordinate));
+    splined_points = gp_alloc( (plot->p_count + samples_1 * curves) * sizeof(struct coordinate), NULL );
+    memset( splined_points, 0, (plot->p_count + samples_1 * curves) * sizeof(struct coordinate));
+
 
     first_point = 0;
     for (ic = 0; ic < curves; ic++) {
