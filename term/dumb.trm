@@ -327,7 +327,7 @@ DUMB_options()
 static TBOOLEAN
 is_wide_char(unsigned char *charpixel)
 {
-    // see also mbwidth() in readline.c
+    /* see also mbwidth() in readline.c */
     if (encoding == S_ENC_UTF8)
 	return (*charpixel >= 0xe3);
     else
@@ -344,12 +344,12 @@ dumb_set_pixel(int x, int y, int v)
     &&  (unsigned int) y <= dumb_ymax) {
 	charpixel = (unsigned char *)(&DUMB_PIXEL(x, y));
 	if (*charpixel == NUL && (x > 0)) {
-	    // Also clear the wide character to the left
+	    /* Also clear the wide character to the left */
 	    unsigned char * c = (unsigned char *) &(DUMB_PIXEL((x - 1), y));
 	    DUMB_PIXEL((x - 1), y) = 0;
 	    *c = ' ';
 	} else if (is_wide_char(charpixel) && ((x + 1) <= dumb_xmax)) {
-	    // This is a wide character, clear the cell to the right.
+	    /* This is a wide character, clear the cell to the right. */
 	    char * c = (char *) &(DUMB_PIXEL((x + 1), y));
 	    DUMB_PIXEL((x + 1), y) = 0;
 	    *c = ' ';
@@ -451,14 +451,14 @@ static unsigned
 to_ansi256(rgb255_color *c)
 {
     if ((c->r - 8) / 10 == (c->b - 8) / 10 && (c->r - 8) / 10 == (c->g - 8) / 10) {
-	// gray scale
-	if (c->g < 8) // black
+	/* gray scale */
+	if (c->g < 8) /* black */
 	    return 16;
-	if (c->g >= 238) // white
+	if (c->g >= 238) /* white */
 	    return 231;
-	return (c->g - 8) / 10 + 232;  // like XTerm, Mintty
+	return (c->g - 8) / 10 + 232;  /* like XTerm, Mintty */
     } else {
-	// 6x6x6 color cube
+	/* 6x6x6 color cube */
 #define RMAPCUBE6(n) ((n >= 55) ? ((n) - 35) / 40 : 0)
 	return (((unsigned) RMAPCUBE6(c->r) * 36) +
 	        ((unsigned) RMAPCUBE6(c->g) *  6) +
@@ -816,7 +816,7 @@ DUMB_put_text(unsigned int x, unsigned int y, const char *str)
 	if (dumb_text_attributes)
 	    dumb_attributes[dumb_xmax * y + x] = dumb_attr;
 	if (is_wide_char((unsigned char *)(&DUMB_PIXEL(x, y))) && (x + 1) < dumb_xmax) {
-	    DUMB_PIXEL(x + 1, y) = 0;  // mark as occupied
+	    DUMB_PIXEL(x + 1, y) = 0;  /* mark as occupied */
 	    x++;
 	}
     }
@@ -926,7 +926,7 @@ ENHdumb_OPEN(
 	/* widthflag FALSE means do not update text position after printing */
 	    ENHdumb_widthflag = widthflag;
 	/* Many drivers will need to do something about font selection here */
-	    DUMB_set_font(fontname);  // we ignore the font size
+	    DUMB_set_font(fontname);  /* we ignore the font size */
     }
 }
 
@@ -1028,14 +1028,14 @@ ENHdumb_put_text(unsigned int x, unsigned int y, const char *str)
 TERM_PUBLIC int
 DUMB_set_font(const char *s)
 {
-    // reset current attributes
+    /* reset current attributes */
     if (dumb_text_attributes)
 	memset(&dumb_attr, 0, sizeof(text_attr));
 
     if (s == NULL || *s == NUL || !dumb_text_attributes)
 	return TRUE;
 
-    // test for attributes
+    /* test for attributes */
     if ((strstr(s, ":Bold") != NULL))
 	dumb_attr.bold = 1;
     if ((strstr(s, ":Italic") != NULL))

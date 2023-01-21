@@ -510,9 +510,9 @@ static void SIXEL_setfont(void);
 /* This is the _maximum_ number of allowed palette entries. */
 #define SIXEL_NCOL 256
 
-static int SIXEL_mode = 1;  // mono=0, color=1
-static int SIXEL_font = 1;  // small=1,medium=2,large=3
-static int SIXEL_ncol = 16; // actual number of colors to be used
+static int SIXEL_mode = 1;  /* mono=0, color=1 */
+static int SIXEL_font = 1;  /* small=1,medium=2,large=3 */
+static int SIXEL_ncol = 16; /* actual number of colors to be used */
 static int SIXEL_lt;
 static int SIXEL_fp, SIXEL_np;
 
@@ -618,7 +618,7 @@ SIXEL_options()
 	    break;
 	case SIXEL_COLOR:
 	    SIXEL_mode = 1;
-	    // We do not change number of colors here.
+	    /* We do not change number of colors here. */
 	    term->flags &= ~TERM_MONOCHROME;
 	    c_token++;
 	    break;
@@ -725,7 +725,7 @@ SIXEL_text()
 
     map = gp_alloc(6 * b_xsize * sizeof(unsigned), "sixeltek");
     for (j = b_ysize - 6; j >= 0; j -= 6) {
-	// get pixel values only once
+	/* get pixel values only once */
 	for (i = 0; i < b_xsize; i++)
 	    for (l = 0; l < 6; l++)
 		map[i * 6 + l] = b_getpixel(i, j + l);
@@ -759,7 +759,7 @@ SIXEL_text()
 		    } else {
 			for (l = 1; l <= n; l++)
 			    fputc(pc, gpoutfile);
-			    no += n;
+			no += n;
 		    }
 		    if (i == b_xsize-1 && c != pc) {
 			fputc(c, gpoutfile);
@@ -887,7 +887,6 @@ SIXEL_make_palette(t_sm_palette *palette)
 	if (SIXEL_fp > 0) {
 	    for (i = SIXEL_fp; i < SIXEL_ncol; i++)
 		SIXEL_palette[i].state = SIXEL_COL_UNDEFINED;
-	    // return SIXEL_np;
 	}
 
 	SIXEL_np = SIXEL_ncol;

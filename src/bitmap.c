@@ -1029,7 +1029,7 @@ b_wline(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)
 	    }
 	    for (i = 1; i <= wh; i++) {
 		x = xplot - wh2;
-		// for (x = (int) xplot - (int) wh2; dx <= ((int) xplot - (int) wh2 + wh); x++)
+		/* for (x = (int) xplot - (int) wh2; dx <= ((int) xplot - (int) wh2 + wh); x++) */
 		   b_setpixel(x, yplot - wh2 + i, b_value);
 	    }
 	}
@@ -1044,7 +1044,7 @@ b_wline(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)
 	    }
 	    for (i = 1; i <= wh; i++) {
 		x = xplot - wh2;
-		// for (x = (int) xplot - (int) wh2; dx <= ((int) xplot - (int) wh2 + wh); x++)
+		/* for (x = (int) xplot - (int) wh2; dx <= ((int) xplot - (int) wh2 + wh); x++) */
 		   b_setpixel(x, yplot - wh2 + i, b_value);
 	    }
 	}
@@ -1256,7 +1256,7 @@ b_boxfill(
     switch (style & 0xf) {
     case FS_TRANSPARENT_SOLID:
 	transparent = TRUE;
-	// fall-through
+	/* fall-through */
     case FS_SOLID:
 	/* use halftone fill pattern according to filldensity */
 	/* filldensity is from 0..100 percent */
@@ -1270,7 +1270,7 @@ b_boxfill(
 	break;
     case FS_TRANSPARENT_PATTERN:
 	transparent = TRUE;
-	// fall-through
+	/* fall-through */
     case FS_PATTERN:
 	/* use fill pattern according to fillpattern */
 	idx = (style >> 4);  /* fillpattern is enumerated */
@@ -1323,7 +1323,7 @@ b_filled_polygon(int points, gpiPoint *corners)
     switch (style & 0xf) {
     case FS_TRANSPARENT_SOLID:
 	transparent = TRUE;
-	// fall-through
+	/* fall-through */
     case FS_SOLID:
 	/* use halftone fill pattern according to filldensity */
 	/* filldensity is from 0..100 percent */
@@ -1335,7 +1335,7 @@ b_filled_polygon(int points, gpiPoint *corners)
 	break;
     case FS_TRANSPARENT_PATTERN:
 	transparent = TRUE;
-	// fall-through
+	/* fall-through */
     case FS_PATTERN:
 	/* use fill pattern according to fillpattern */
 	idx = GPMAX((style >> 4), 0);  /* fillpattern is enumerated */
