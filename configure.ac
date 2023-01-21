@@ -114,7 +114,7 @@ if test "${with_libcerf}" = yes ; then
 fi
 
 AC_ARG_WITH(amos,dnl
-[  --with-amos[=DIR]           location of libamos or libopenspecfun (complex functions)],,
+[  --with-amos[=DIR]         location of libamos or libopenspecfun (complex functions)],,
   with_amos=yes)
 
 if test -d "$with_amos"; then
@@ -1025,7 +1025,7 @@ fi
 
 dnl Enable polar mode gridded surface plots
 AC_ARG_ENABLE(polar-grid,dnl
-[  --enable-polar-grid   include support for gridded polar surface plots],
+[  --enable-polar-grid     include support for gridded polar surface plots],
   [if test "$enableval" != no; then
     AC_DEFINE(USE_POLAR_GRID,1,
                [ Define to support polar gridded surface plots])
@@ -1240,25 +1240,26 @@ AC_MSG_RESULT([gnuplot will be compiled with the following terminals:])
 AC_MSG_RESULT([])
 
 AC_MSG_RESULT([  Standalone terminals: yes (included by default)])
-AC_MSG_RESULT([    canvas, cgm, context, dumb, dxf, emf, epslatex,])
-AC_MSG_RESULT([    fig, hpgl, pcl5, postscript,])
-AC_MSG_RESULT([    pict2e, pslatex, pstex, pstricks, svg, texdraw, tkcanvas])
+AC_MSG_RESULT([    canvas cgm context dumb dxf emf epslatex])
+AC_MSG_RESULT([    fig hpgl pcl5 postscript])
+AC_MSG_RESULT([    pict2e pslatex pstex pstricks svg texdraw tkcanvas])
 AC_MSG_RESULT([])
 
 if test "$with_bitmap_terminals" = yes; then
-  AC_MSG_RESULT([  dot-matrix terminals: yes ( --without-bitmap-terminals to disable)])
+  AC_MSG_RESULT([  Dot-matrix terminals: yes ( --without-bitmap-terminals to disable)])
 else
-  AC_MSG_RESULT([  dot-matrix terminals: no (use --with-bitmap-terminals to enable)])
+  AC_MSG_RESULT([  Dot-matrix terminals: no (use --with-bitmap-terminals to enable)])
+  AC_MSG_RESULT([  These would include, if enabled])
 fi
-AC_MSG_RESULT([    printers: epson, nec, okidata, tandy, seiko dpu414 ])
-AC_MSG_RESULT([              hp500c, hpdj, hpljii, hppj, starc])
+AC_MSG_RESULT([    printers: epson nec okidata tandy seiko dpu414 ])
+AC_MSG_RESULT([              hp500c hpdj hpljii hppj starc])
 AC_MSG_RESULT([    other:    block pbm ])
 AC_MSG_RESULT([])
 
 if test "$with_tektronix" = no; then
-  AC_MSG_RESULT([  tektronix terminal emulators: no ( --with-tektronix to enable)])
+  AC_MSG_RESULT([  Tektronix terminal emulators: no ( --with-tektronix to enable)])
 else
-  AC_MSG_RESULT([  tektronix terminal emulators: yes ( --without-tektronix to disable)])
+  AC_MSG_RESULT([  Tektronix terminal emulators: yes ( --without-tektronix to disable)])
 fi
 AC_MSG_RESULT([    tek410x tek40 vttek xterm kc_tek40 km_tek40 selanar bitgraph])
 AC_MSG_RESULT([    sixeltek (not needed for sixel graphics output to vt100-series emulators)])
@@ -1336,90 +1337,78 @@ dnl These are the most common interactive terminal options
 AC_MSG_RESULT([])
 if test "$no_x" != yes; then
   if test "$enable_x11_mbfonts" = yes; then
-    AC_MSG_RESULT([  x11 (X Window System) : yes  (multi-byte fonts OK)])
+    AC_MSG_RESULT([  x11 (X Window System): yes  (multi-byte fonts OK)])
   else
-    AC_MSG_RESULT([  x11 (X Window System) : yes  (multi-byte fonts not supported)])
+    AC_MSG_RESULT([  x11 (X Window System): yes  (multi-byte fonts not supported)])
   fi
 
   if test "$enable_x11_external" = yes; then
-    AC_MSG_RESULT([    (enable plotting to windows opened by external apps) ])
+    AC_MSG_RESULT([                               (enable plotting to windows opened by external apps) ])
   else
-    AC_MSG_RESULT([    (disable plotting to windows opened by external apps) ])
+    AC_MSG_RESULT([                               (disable plotting to windows opened by external apps) ])
   fi
 
   if test "$with_x_dcop" = yes; then
     AC_MSG_RESULT([    (gnuplot_x11 can use KDE3/DCOP to raise konsole) ])
   fi
 else
-  AC_MSG_RESULT([  x11 (X Window System) : no (requires X libraries)])
+  AC_MSG_RESULT([  x11 (X Window System) :   no (requires X libraries)])
 fi
 
 if test "$ac_cv_lib_gd_gdImageJpeg" = yes && 
    test "$ac_cv_lib_gd_gdImagePng" = yes && 
    test "$ac_cv_lib_gd_gdImageGif" = yes; then
     if test "$ac_cv_lib_gd_gdImageGifAnimBegin" = yes; then
-      AC_MSG_RESULT([  libgd-based png, jpeg, gif, and sixel terminals: yes (with animated gif)])
+      AC_MSG_RESULT([  libgd-based png jpeg gif sixel: yes (with animated gif)])
     else
-      AC_MSG_RESULT([  libgd-based png, jpeg, gif, and sixel terminals: yes (no animated gif)])
+      AC_MSG_RESULT([  libgd-based png jpeg gif sixel: yes (no animated gif)])
     fi
 else
-    AC_MSG_RESULT([  libgd-based png, jpeg, gif, and sixel terminals: no (requires libgd,  see config.log) ])
+    AC_MSG_RESULT([  libgd-based png jpeg gif sixel: no (requires libgd,  see config.log) ])
 fi
 
 if test "$with_cairo" = yes; then
-  AC_MSG_RESULT([  cairo-based pdf and png terminals: yes ])
+  AC_MSG_RESULT([  cairo-based pdf png  : yes ])
 else
   AC_MSG_RESULT([  cairo-based terminals: no (requires cairo>=1.2, pango>=1.22, glib>=2.28)])
 fi
 
 if test "$with_webp" = yes; then
-  AC_MSG_RESULT([  webp terminal: yes ])
+  AC_MSG_RESULT([  webp                 : yes ])
 else
-  AC_MSG_RESULT([  webp terminal: no (requires cairo, pango, libwebp, libwebpmux)])
+  AC_MSG_RESULT([  webp                 : no (requires cairo, pango, libwebp, libwebpmux)])
 fi
 
 if test "$with_lua" = yes; then
-  AC_MSG_RESULT([  lua/TikZ terminal: yes ])
+  AC_MSG_RESULT([  lua/TikZ             : yes ])
 else
-  AC_MSG_RESULT([  lua/TikZ terminal: no ])
+  AC_MSG_RESULT([  lua/TikZ             : no ])
 fi
 
 if test "$enable_wxwidgets_ok" = yes; then
   if test "$with_wx_multithreaded" = yes; then
-    AC_MSG_RESULT([  wxt terminal: yes (multithreaded)])
+    AC_MSG_RESULT([  wxt                  : yes (multithreaded)])
   else
-    AC_MSG_RESULT([  wxt terminal: yes ])
+    AC_MSG_RESULT([  wxt                  : yes ])
   fi
 else
-  AC_MSG_RESULT([  wxt terminal: no (requires C++, wxWidgets>2.6, cairo>0.9, pango>1.22)])
+  AC_MSG_RESULT([  wxt                  : no (requires C++, wxWidgets>2.6, cairo>0.9, pango>1.22)])
 fi
 
 if test "$enable_qt_ok" = yes; then
   if test "$QTVER" = 4; then
-      AC_MSG_RESULT([  Qt terminal: yes (qt4)])
+      AC_MSG_RESULT([  Qt                   : yes (qt4)])
   fi
   if test "$QTVER" = 5; then
-      AC_MSG_RESULT([  Qt terminal: yes (qt5)])
+      AC_MSG_RESULT([  Qt                   : yes (qt5)])
   fi
 else
-  AC_MSG_RESULT([  Qt terminal: no (use --with-qt or --with-qt=qt4 to enable])
+  AC_MSG_RESULT([  Qt                   : no (use --with-qt or --with-qt=qt4 to enable])
 fi
 
 AC_MSG_RESULT([])
 AC_MSG_RESULT([gnuplot will be compiled with the following configurable features:])
 AC_MSG_RESULT([])
-
-if test "$enable_mouse" = yes; then
-  AC_MSG_RESULT([  Mouse support in interactive terminals: yes])
-else
-  AC_MSG_RESULT([  Mouse support in interactive terminals: no])
-fi
-
-if test "$enable_raise_console" = yes; then
-  AC_MSG_RESULT([  Typing <space> in plot window raises console: yes])
-else
-  AC_MSG_RESULT([  Typing <space> in plot window raises console: no])
-fi
 
 if test "$with_readline" = no; then
   AC_MSG_RESULT([  No readline support (use --with-readline=gnu or --with-readline=builtin)])
@@ -1447,15 +1436,27 @@ fi
 fi
 
 if test "$enable_history_file" = yes; then
-  AC_MSG_RESULT([  Command-line history file: yes])
+  AC_MSG_RESULT([  Command-line history file:                       yes])
 else
-  AC_MSG_RESULT([  Command-line history file: no])
+  AC_MSG_RESULT([  Command-line history file:                       no])
 fi
 
 if test "$with_row_help" = no; then
-  AC_MSG_RESULT([  Sort help/subtopic tables by column: yes])
+  AC_MSG_RESULT([  Sort help tables by column rather than row:      yes])
 else
-  AC_MSG_RESULT([  Sort help/subtopic tables by column: no (use --without-row-help to enable)])
+  AC_MSG_RESULT([  Sort help tables by column rather than row:      no])
+fi
+
+if test "$enable_mouse" = yes; then
+  AC_MSG_RESULT([  Mouse support in interactive terminals:          yes])
+else
+  AC_MSG_RESULT([  Mouse support in interactive terminals:          no])
+fi
+
+if test "$enable_raise_console" = yes; then
+  AC_MSG_RESULT([  Typing <space> in plot window raises console:    yes])
+else
+  AC_MSG_RESULT([  Typing <space> in plot window raises console:    no])
 fi
 
 if test "$have_libcerf" = yes; then
@@ -1465,20 +1466,20 @@ else
 fi
 
 if test "$have_amoslibrary" = yes; then
-  AC_MSG_RESULT([  Airy and Bessel functions from libopenspecfun or libamos: yes])
+  AC_MSG_RESULT([  Complex Airy and Bessel functions:               yes])
 else
-  AC_MSG_RESULT([  Library containing Amos routines for complex functions not found])
+  AC_MSG_RESULT([  Complex Airy and Bessel functions:               no (requires libopenspec or libamos])
 fi
 if test "$have_cexint" = yes; then
-  AC_MSG_RESULT([  Complex exponential integral cexint from libamos: yes])
+  AC_MSG_RESULT([  Complex exponential integral cexint (libamos):   yes])
 else
-  AC_MSG_RESULT([  Complex exponential integral cexint from libamos: no])
+  AC_MSG_RESULT([  Complex exponential integral cexint (libamos):   no])
 fi
 
 if test "$have_external_functions" = yes; then
-  AC_MSG_RESULT([  plugin support for loading external functions: yes ])
+  AC_MSG_RESULT([  plugin support for loading external functions:   yes ])
 else
-  AC_MSG_RESULT([  plugin support for loading external functions: no ])
+  AC_MSG_RESULT([  plugin support for loading external functions:   no ])
 fi
 
 dnl if test "$enable_backwards_compatibility" = yes; then
@@ -1488,27 +1489,27 @@ dnl   AC_MSG_RESULT([  Allow deprecated syntax: no (use --enable-backwards-compa
 dnl fi
 
 if test "$enable_stats" != no; then
-  AC_MSG_RESULT([  Statistical summary of data ("stats" command): yes])
+  AC_MSG_RESULT([  Statistical summary of data ("stats" command):   yes])
 else
-  AC_MSG_RESULT([  Statistical summary of data ("stats" command): no (--enable-stats to enable)])
+  AC_MSG_RESULT([  Statistical summary of data ("stats" command):   no (--enable-stats to enable)])
 fi
 
 if test "$enable_watchpoints" != no; then
-  AC_MSG_RESULT([  Support watchpoints during 2D plotting:        yes])
+  AC_MSG_RESULT([  Support watchpoints during 2D plotting:          yes])
 else
-  AC_MSG_RESULT([  Support watchpoints during 2D plotting:        no (--enable-watchpoints to enable)])
+  AC_MSG_RESULT([  Support watchpoints during 2D plotting:          no (--enable-watchpoints to enable)])
 fi
 
 if test "$enable_polar_grid" != no; then
-  AC_MSG_RESULT([  Support for polar gridded surfaces:            yes])
+  AC_MSG_RESULT([  Support for polar gridded surfaces:              yes])
 else
-  AC_MSG_RESULT([  Support for polar gridded surfaces:            no (--enable-polar-grid to enable)])
+  AC_MSG_RESULT([  Support for polar gridded surfaces:              no (--enable-polar-grid to enable)])
 fi
 
 if test "$enable_function_blocks" = yes; then
-  AC_MSG_RESULT([  Support function blocks:                       yes])
+  AC_MSG_RESULT([  Support function blocks:                         yes])
 else
-  AC_MSG_RESULT([  Support function blocks:                       no (--enable-function-blocks to enable)])
+  AC_MSG_RESULT([  Support function blocks:                         no (--enable-function-blocks to enable)])
 fi
 
 
