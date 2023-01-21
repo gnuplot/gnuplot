@@ -902,7 +902,7 @@ X11_waitforinput(int options)
     return getc(stdin);
 #else
 
-    // normal path
+    /* normal path */
     fd_set fds;
     static struct gp_event_t ge;
     static int l = 0;
@@ -915,16 +915,18 @@ X11_waitforinput(int options)
 
     if (ipc_back_fd < 0) {
         if (paused_for_mouse) {
-            // We're waiting for a command from the back-channel IPC, but this pipe
-            // doesn't exist, so we'll never get the command we're waiting for. Give
-            // up.
+            /* We're waiting for a command from the back-channel IPC, but this pipe
+             * doesn't exist, so we'll never get the command we're waiting for.
+             * Give up.
+	     */
             paused_for_mouse = 0;
             int_error(NO_CARET,"Mousing not active");
         }
 
         if (options & TERM_WAIT_FOR_FONTPROPS) {
-            // Similar. No back-channel, so we'll never get the "done" event.
-            // Here I just silently return
+            /* Similar. No back-channel, so we'll never get the "done" event.
+             * Here I just silently return.
+	     */
             return 0;
         }
         return getc(stdin);
@@ -935,11 +937,12 @@ X11_waitforinput(int options)
      *       as on some systems /dev/null is not selectable.
      * TODO: should we close the ipc_back_fd in this case ? */
 
-    // While we have ipc_back_fd data to process, process it. If not, read the
-    // stdin data
+    /* While we have ipc_back_fd data to process, process it.
+     * If not, read the stdin data.
+     */
     do {
         int ierr;
-        struct timeval *timeout = NULL; // wait forever by default
+        struct timeval *timeout = NULL; /* wait forever by default */
         FD_ZERO(&fds);
         FD_SET(ipc_back_fd, &fds);
 
@@ -962,21 +965,21 @@ X11_waitforinput(int options)
         }
 
         if (!FD_ISSET(ipc_back_fd, &fds)) {
-            // no ipc_back_fd data available. I can move on
+            /* no ipc_back_fd data available. I can move on */
             if (options & TERM_ONLY_CHECK_MOUSING)
                 return 0;
             if (blocking_loop_reading_ipc_back_fd)
-                // This shouldn't happen. In this case we should be waiting
-                // for ipc_back_fd data forever, so select() should never
-                // return with no data. In any case, I ask for more data if
-                // there isn't any
+                /* This shouldn't happen. In this case we should be waiting
+                 * for ipc_back_fd data forever, so select() should never
+                 * return with no data. In any case, I ask for more data if
+                 * there isn't any.
+		 */
                 continue;
 
             break;
         }
 
-        // got some ipc_back_fd data. Process all of it before moving on to
-        // stdin
+        /* got some ipc_back_fd data. Process all of it before moving on to stdin */
         have_any_ipc_back_fd_data = true;
 
         n = read(ipc_back_fd, (void *) (l + (char *) &ge), sizeof(ge) - l);

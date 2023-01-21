@@ -77,7 +77,7 @@ extern smg$create_key_table();
 # include <windows.h>
 # include "win/winmain.h"
 # include "win/wcommon.h"
-# include <io.h>           // for isatty
+# include <io.h>           /* for isatty */
 #endif /* _WIN32 */
 
 /* GNU readline
