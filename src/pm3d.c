@@ -100,10 +100,7 @@ static TBOOLEAN reserve_quadrangles(int needed, int chunk);
 static gpdPoint *get_polygon(int size);
 static void free_polygonlist(void);
 
-#define PM3D_INTERSECTING_SURFACES
-#ifdef PM3D_INTERSECTING_SURFACES
 static void split_intersecting_surface_tiles(void);
-#endif
 
 /*
  * Utility routines.
@@ -380,9 +377,7 @@ void pm3d_depth_queue_flush(void)
     if (pm3d.direction != PM3D_DEPTH && !track_pm3d_quadrangles)
 	return;
 
-#ifdef PM3D_INTERSECTING_SURFACES
     split_intersecting_surface_tiles();
-#endif
 
     term->layer(TERM_LAYER_BEGIN_PM3D_FLUSH);
 
@@ -1877,7 +1872,6 @@ pm3d_reset_after_error()
     free_polygonlist();
 }
 
-#ifdef PM3D_INTERSECTING_SURFACES
 /*
  * Ethan Merritt Sep 2021
  * When two pm3d surfaces intersect, the intersection line is jagged because
@@ -2112,4 +2106,3 @@ split_intersecting_surface_tiles()
     }
 
 }
-#endif /* PM3D_INTERSECTING_SURFACES */
