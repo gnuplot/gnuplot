@@ -2111,8 +2111,13 @@ eval_plots()
 	    define();
 	    if (equals(c_token,","))
 		c_token++;
-	    was_definition = TRUE;
-	    continue;
+	    if (equals(c_token,"for"))
+		/* fall through to iteration check at the end of the loop */
+		c_token--;
+	    else {
+		was_definition = TRUE;
+		continue;
+	    }
 
 	} else {
 	    int specs = 0;
@@ -3089,7 +3094,7 @@ eval_plots()
 		this_plot->sample_var2->udv_value = original_value_sample_var2;
 	    }
 
-	} /* !is_defn */
+	} /* !is_definition */
 
 	if (in_parametric) {
 	    if (equals(c_token, ",")) {
@@ -3217,8 +3222,13 @@ eval_plots()
 		define();
 		if (equals(c_token, ","))
 		    c_token++;
-		was_definition = TRUE;
-		continue;
+		if (equals(c_token,"for"))
+		    /* fall through to iteration check at the end of the loop */
+		    c_token--;
+		else {
+		    was_definition = TRUE;
+		    continue;
+		}
 
 	    } else {
 		struct at_type *at_ptr;
