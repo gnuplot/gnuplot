@@ -1654,8 +1654,13 @@ eval_3dplots()
 	    define();
 	    if (equals(c_token, ","))
 		c_token++;
-	    was_definition = TRUE;
-	    continue;
+	    if (equals(c_token,"for")) {
+		/* fall through to iteration check at the end of the loop */
+		c_token--;
+	    } else {
+		was_definition = TRUE;
+		continue;
+	    }
 
 	} else {
 	    int specs = -1;
@@ -2606,8 +2611,13 @@ eval_3dplots()
 		define();
 		if (equals(c_token,","))
 		    c_token++;
-		was_definition = TRUE;
-		continue;
+		if (equals(c_token,"for")) {
+		    /* fall through to iteration check at the end of the loop */
+		    c_token--;
+		} else {
+		    was_definition = TRUE;
+		    continue;
+		}
 
 	    } else {
 		struct at_type *at_ptr;
