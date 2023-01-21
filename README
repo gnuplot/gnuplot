@@ -69,9 +69,8 @@ page, also at SourceForge:
 
 	http://sourceforge.net/projects/gnuplot/
 
- Note that since gnuplot has nothing to do with the GNU project, please
-don't ask them for help or information about gnuplot; also, please
-don't ask us about GNU stuff.
+ There are separate tracking systems for Feature Requests and proposed
+patches that implement new features, also hosted at SourceForge.
 
  All bug reports should include the version of gnuplot you are using,
 the operating system and version you are running it on, and the output
@@ -79,13 +78,6 @@ device (gnuplot's "terminal") that you are plotting to.  It helps a lot
 to provide a simple script, possibly with data, that reproducibly 
 demonstrates the problem you are reporting.
  
-Usenet
-======
-
- Additional help can be obtained from the USENET newsgroup
-
-        comp.graphics.apps.gnuplot
-
 Mailing Lists
 =============
 
@@ -95,38 +87,10 @@ the web interface at
 	
 	http://sourceforge.net/mail/?group_id=2055
 
- The main lists you may be interested in are "gnuplot-info" and 
-"gnuplot-bugs".  "gnuplot-info" is for general discussion and
-questions about how to use the program.  But as noted above,
-using the Usenet newsgroup for this kind of communication is 
-almost certainly better both for you and for us.
-
- "gnuplot-bugs" is NOT an appropriate place to ask questions on how to
-solve a gnuplot problem or even to report a bug that you haven't
-investigated personally.  It is far more likely you'll get the help
-you need for this kind of problem from comp.graphics.apps.gnuplot
-or the gnuplot-info mailing list.
-
- Using "gnuplot-bugs" is also slightly disfavoured, because it makes it
-hard for us to keep track what bugs are currently under investigation,
-and hard for you to check if maybe the bug you've found has already
-been reported by somebody else before.  We would thus like to ask to
-you please use the "Bug Tracker" system that is part of gnuplot's
-development web site at SourceForge.net instead of this mailing list.
-
- If you found a fix already, pleast post it in "diff -c" or "diff -u"
-format done against the most current official version of gnuplot or
-a snapshot of the current development source.  Major modifications should
-include documentation and, if new features were added, a demo file.
-Finally, it is much easier to integrate smaller stepwise modifications
-rather than one gigantic diff file which represents months of changes.  
-
- There are separate tracking systems for Feature Requests and proposed
-patches that implement new features, also hosted at SourceForge.  
-
- Discussions about plans for new features or other significant changes
-should be announced and discussed on the developers' mailing list,
-gnuplot-beta, which is also hosted by SourceForge.net.
+ The lists you may be interested in are "gnuplot-info" and "gnuplot-beta".
+"gnuplot-info" is for general discussion and questions about how to use
+the program.  "gnuplot-beta" is for discussion about possible new features,
+plans for future work, release schedules, or other development issues.
 
 ----
 
