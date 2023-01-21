@@ -117,12 +117,10 @@ can be controlled in different ways:
    make X11_DRIVER_DIR='/gnuplot/lib/4.0'
    gnuplot_x11 will be installed as /gnuplot/lib/4.0/gnuplot_x11
 
-If you don't install the program at the place chosen by ./configure,
+   If you don't install the program at the place chosen by ./configure,
 e.g. by overriding the "prefix" at "make install" time, files written
-by the `save' command cannot be used as scripts on Un*x platforms, so
-this should be avoided.  There is no way to specify the location of
-the executables during runtime. Other platforms are not affected by
-this.
+by the `save' command cannot be used as self-executing scripts on Un*x
+platforms (but they still work as input scripts to gnuplot).
 
    The gnuplot demo files are not installed by default, mainly because
 there is no universally agreed place where such files should go.
@@ -150,36 +148,29 @@ to change.  A complete list of options is available through
 
 $ ./configure --help
 
-   Some options relevant to gnuplot are listed below:
-
-  --prefix=PREFIX         Install architecture-independent files in PREFIX
-                          [/usr/local]
-  --exec-prefix=EPREFIX	  Install architecture-specific file in EPREFIX
-			  [PREFIX]
-  --bindir=DIR            user executables in DIR [EPREFIX/bin]
-			  The gnuplot binary is installed this directory
-  --libexecdir=DIR        program executables in DIR [EPREFIX/libexec]
-			  gnuplot_x11 goes into $libexecdir/gnuplot/<version>.
-  --datadir=DIR           Read-only architecture-independent data in DIR
-                          [PREFIX/share]. The gnuplot help file is installed
-                          in this directory.
-  --libdir=DIR            object code libraries in DIR [EPREFIX/lib]
-  --includedir=DIR        C header files in DIR [PREFIX/include]
-  --mandir=DIR            Man documentation in DIR [PREFIX/man]
+   Many of the available options are generic to programs built with the
+   autotools/autoconf build system.
+   Some options specifically relevant to gnuplot are listed below:
 
   --disable-history-file  do not use history file
-  --disable-mouse         disable mouse for interactive terminals
-  --disable-x11-mbfonts   disable multi-byte font support for x11
-  --disable-x11-external  disable drawing to windows belonging to external apps
-  --disable-raise-console spacebar in plot window does not raise console
-  --disable-wxwidgets     wxWidgets terminal (default enabled)
-  --enable-backwards-compatibility       enable deprecated syntax
+  --without-latex         do not install latex support files
+  --with-textdir=DIR      where to install latex support files
+  --without-tektronix     do not include tektronix terminal emulators
 
-  --with-bitmap-terminals enable support for HP deskjet era dot matrix printers
-			  and *.pbm files
   --with-readline={gnu|bsd|builtin}
 			  Override the automatic choice of terminal input modes.
 			  See below for more detail.
+
+  Source files for many older terminal types, legacy output modes, and
+hardware or platform-specific devices are included in the distribution.
+These can be included in the gnuplot executable by selecting a corresponding
+configure option.  For example to build in support for physical terminals or
+terminal emulators that accept Tektronix graphics protocols (1970s-1980s),
+and also build in support for a large set of 1990s era dot matrix printers
+(HP deskjet, epson, tandy, etc):
+
+  ./configure --with-tektronix --with-bitmap-terminals
+
 
 Options marked with (*) are enabled by default, ie. these features or
 packages are used if configure detects them even if the corresponding
@@ -232,12 +223,17 @@ Readline issues:
 
 wxt terminal:
 
+  This interactive terminal is in principle cross-platform and you needn't
+  do anything special.  However if you discover that practice diverges from
+  principle, the notes below that were collected from problems encountered
+  in the past might help.
+
   Cairo & pango need to be installed first on Mac, 
   I recommend using MacPorts building universal (i386 libraries):
   sudo port install cairo +no_x11 +quartz +universal
   sudo port install pango +no_x11 +quartz +universal
 
-  Next gnuplot may be compiled with shipped with Mac OS X 10.6 SL wxWidgets using:
+  Next gnuplot may be compiled with Mac OS X 10.6 SL wxWidgets using:
   ./configure CPPFLAGS='-arch i386' LDFLAGS='-arch i386'
 
   NOTE: 10.6 SL by default generates x86_64 code, but wxWidgets stable is using
@@ -251,47 +247,6 @@ wxt terminal:
   Note that some people have reported runtime problems with wxgtk 3.0.
   If you have the option of linking to libraries for wxgtk 2.8 instead,
   this may be preferable.  The -lX11 flag is not need in this case.
-
-VMS
----
-
-   John Hasstedt <John.Hasstedt@sunysb.edu> has written configure.vms,
-a command file that creates the necessary make and option files to build
-gnuplot.  See the file for instructions on using it.  If you have problems
-with it, the old build files are still included; instructions for using
-them follow.
-
-   On VMS, you can use MMS, MMK, or another make utility, or you can
-use BUILDVMS.COM.  The supplied files work with Alpha/VMS V6.2 and
-DECC V5.7; you may get warnings or more serious errors depending on
-the versions of the C compiler, the C run-time libraries, and VMS on
-your system.
-
-  To compile using MMK:
-     MMK/DESCRIPTION=MAKEFILE.VMS
-  To compile using MMS on VAX:
-     MMS/DESCRIPTION=MAKEFILE.VMS
-  To compile using MMS on Alpha:
-     MMS/DESCRIPTION=MAKEFILE.VMS/MACRO=__ALPHA__=1
-
-  Alternatively, you can use MAKE_VMS.COM.  This command file will run
-MMK or MMS to build gnuplot.  If you don't have either one installed, it
-will use the command file.  The first parameter on the command line is
-the compiler you want to use (default DECC).
-
-  It may sometimes be useful to add  `/IGNORE=WARNING' to the `MMS' call.
-
-  To compile using GNUC or VAXC:
-     add /MACRO=GNUC or /MACRO=VAXC to the above command
-  To compile with another make utility:
-     check the documentation of your utility to specify the description
-     file and any necessary macros (__ALPHA__, GNUC, or VAXC)
-  Or if you don't have a suitable make:
-     @BUILDVMS
-  To tell gnuplot where to find the help library:
-     $ define gnuplot$help disk:[directory]gnuplot.hlb
-  Alternatively, put the help in the main system help library.
-
 
 MS-Windows
 ----------
@@ -420,8 +375,8 @@ Platform compiler problems
 This section addresses trouble shooting and testing issues. Userland questions
 are answered in the FAQ.
 
-Platform and compiler notes
----------------------------
+Platform and compiler notes (probably long out of date)
+-------------------------------------------------------
 
    Generally, if you think that configure has made a mistake in detecting
 platform features, you should consider that a bug either in GNU autoconf
@@ -539,16 +494,6 @@ The CGI drivers need the CGIPATH environment variable to set the path
 to the CGI agents, and the CGIDISP and/or CGIPRNT environment variables
 to the CGI agents, and the CGIDISP and/or CGIPRNT environment variables
 to set the output devices.
-
-If creating dynamically linked executables, it may be necessary to add
-flags to the LIBS variable in Makefile to make sure gnuplot finds all
-required libraries at runtime.  Systems like SunOS and Solaris use -R
-to specify the runtime library search path, whereas OSF/Dec Unix, Irix
-and Linux use -rpath. If this is not possible, the LD_LIBRARY_PATH
-environment variable should be set.  Generally it's recommended to
-install shared libraries only in places that are already searched by
-the linker without such options.  LD_LIBRARY_PATH is the second-best
-choice.
 
 
 How to test gnuplot
