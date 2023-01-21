@@ -126,12 +126,14 @@ cp_alloc(int num)
     struct lp_style_type default_lp_properties = DEFAULT_LP_STYLE_TYPE;
 
     cp = (struct curve_points *) gp_alloc(sizeof(struct curve_points), "curve");
-    memset(cp,0,sizeof(struct curve_points));
+    memset(cp, 0, sizeof(struct curve_points));
 
     cp->p_max = (num >= 0 ? num : 0);
-    if (num > 0)
+    if (num > 0) {
 	cp->points = (struct coordinate *)
 	    gp_alloc(num * sizeof(struct coordinate), "curve points");
+	memset(cp->points, 0, num * sizeof(struct coordinate)); 
+    }
 
     /* Initialize various fields */
     cp->lp_properties = default_lp_properties;
