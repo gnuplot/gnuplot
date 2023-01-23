@@ -252,7 +252,7 @@ MS-Windows
 ----------
 
 We provide binary packages with an installer or as "portable" versions packed
-in zip / 7z format on SourceForge.
+in 7z format on SourceForge.
 
 We currently support and test building with the following compilers and
 Makefiles:
@@ -270,7 +270,7 @@ Some of the Makefiles include an "install" target (e.g. config/mingw/Makefile).
 
 In order to build the help file you require the "Microsoft HTML Help 1.4
 SDK", which is freely downloadable here:
-http://go.microsoft.com/fwlink/?LinkId=154968
+https://www.helpandmanual.com/downloads_mscomp.html
 
 
 MSDOS
