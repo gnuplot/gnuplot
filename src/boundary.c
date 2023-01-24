@@ -1014,10 +1014,10 @@ do_key_layout(legend_key *key)
 	(void) estimate_strlen(key->title.text, &est_height);
 	key_title_height = est_height * t->v_char;
 	key_title_ypos = (key_title_height/2);
-	if (key->title.font)
-	    t->set_font("");
 	/* FIXME: empirical tweak. I don't know why this is needed */
 	key_title_ypos -= (est_lines-1) * t->v_char/2;
+	if (key->title.font)
+	    t->set_font((key->font) ? key->font : "");
     }
 
     if (key->reverse) {
