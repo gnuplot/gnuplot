@@ -72,6 +72,7 @@ static int key_title_extra;	/* allow room for subscript/superscript */
 static int key_title_width;
 static int key_width;
 static int key_height;
+static int key_font_hchar;
 
 /* is contouring wanted ? */
 t_contour_placement draw_contour = CONTOUR_NONE;
@@ -334,13 +335,22 @@ boundary3d(struct surface_points *plots, int count)
 	key_entry_height = t->v_char * key->vert_factor;
     }
 
+    /* string lengths for internal key layout (other than the title)
+     * use the key font.  Save it for later use.
+     */
+    if (key->font)
+	t->set_font(key->font);
+    key_font_hchar = t->h_char;
+    if (key->font)
+	t->set_font("");
+
     /* Approximate width of titles is used to determine number of rows, cols
      * The actual widths will be recalculated later
      */
     max_ptitl_len = find_maxl_keys3d(plots, count, &ptitl_cnt);
     key_title_width = label_width(key->title.text, &i) * t->h_char;
     ktitle_lines = i;
-    key_col_wth = (max_ptitl_len + 4) * t->h_char + key_sample_width;
+    key_col_wth = (max_ptitl_len + 4) * key_font_hchar + key_sample_width;
 
     if (lmargin.scalex == screen)
 	plot_bounds.xleft = lmargin.x * (double)t->xmax + 0.5;
@@ -377,7 +387,7 @@ boundary3d(struct surface_points *plots, int count)
 	    if (ptitl_cnt > 0) {
 		/* calculate max no cols, limited by label-length */
 		key_cols = (plot_bounds.xright - plot_bounds.xleft)
-			 / ((max_ptitl_len + 4) * t->h_char + key_sample_width);
+			 / ((max_ptitl_len + 4) * key_font_hchar + key_sample_width);
 		if (key_cols == 0)
 		    key_cols = 1;
 		key_rows = ((ptitl_cnt - 1)/ key_cols) + 1;
@@ -4218,17 +4228,17 @@ do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
     if (key->reverse) {
 	key_sample_left = -key_sample_width;
 	key_sample_right = 0;
-	key_text_left = t->h_char;
-	key_text_right = t->h_char * (max_ptitl_len + 1);
-	key_size_right = t->h_char * (max_ptitl_len + 2 + key->width_fix);
-	key_size_left = t->h_char + key_sample_width;
+	key_text_left = key_font_hchar;
+	key_text_right = key_font_hchar * (max_ptitl_len + 1);
+	key_size_right = key_font_hchar * (max_ptitl_len + 2 + key->width_fix);
+	key_size_left = key_font_hchar + key_sample_width;
     } else {
 	key_sample_left = 0;
 	key_sample_right = key_sample_width;
-	key_text_left = -(t->h_char * (max_ptitl_len + 1));
-	key_text_right = -(t->h_char);
-	key_size_left = t->h_char * (max_ptitl_len + 2 + key->width_fix);
-	key_size_right = t->h_char + key_sample_width;
+	key_text_left = -(key_font_hchar * (max_ptitl_len + 1));
+	key_text_right = -(key_font_hchar);
+	key_size_left = key_font_hchar * (max_ptitl_len + 2 + key->width_fix);
+	key_size_right = key_font_hchar + key_sample_width;
     }
     key_point_offset = (key_sample_left + key_sample_right) / 2;
 
