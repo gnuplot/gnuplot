@@ -4600,6 +4600,20 @@ Ffigure_watchpoints
  so that the visual length is independent of the orientation angle.
 
  `angle` is always specified in degrees.
+3 arrowstyle variable
+?arrowstyle variable
+?variable arrowstyle
+ For plot styles `with arrows` and `with vectors`, you can provide an extra
+ column of input data that provides an integer arrow style corresponding to
+ style previously defined using `set style arrow`.
+
+ Example:
+      set style arrow 1 head nofilled linecolor "blue" linewidth 0.5
+      set style arrow 2 head filled linecolor "red" linewidth 1.0
+      # column 5 is expected to contain either 1 or 2,
+      # determining which of the two previous defined styles to use
+      plot DATA using 1:2:3:4:5 with arrows arrowstyle variable
+
 2 Bee swarm plots
 ?beeswarm
 ?bee swarm
