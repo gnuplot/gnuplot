@@ -3282,7 +3282,7 @@ C ... and restart the table:
 ?arrays slice
 ?slice
 =split
- Starting with gnuplot version 5.5, an array can be passed to a function or
+ Starting with gnuplot version 6, an array can be passed to a function or
  returned by a function.  For example a simple dot-product function acting on
  two equal-sized numerical arrays could be defined:
 
@@ -3538,7 +3538,7 @@ Ffigure_newsyntax
  guaranteed to be consistent across different terminal types although most
  used the color sequence red/green/blue/magenta/cyan/yellow.  You can select
  this old behaviour via the command `set colorsequence classic`, but by default
- gnuplot version 5 uses a terminal-independent sequence of 8 colors.
+ gnuplot now uses a terminal-independent sequence of 8 colors.
 
  You can further customize the sequence of linetype properties interactively or
  in an initialization file.  See `set linetype`.  Several sample initialization
@@ -3573,8 +3573,8 @@ Ffigure_newsyntax
  See also `set monochrome`.
 
  Linetypes also have an associated dot-dash pattern although not all terminal
- types are capable of using it. Gnuplot version 5 allows you to specify the
- dot-dash pattern independent of the line color. See `dashtype`.
+ types are capable of using it.  You can specify the dot-dash pattern
+ independent of the line color. See `dashtype`.
 
 3 colorspec
 ?colorspec
@@ -3731,10 +3731,10 @@ Ffigure_newsyntax
 3 dashtype
 ?dashtype
 =dashtype
- In gnuplot version 5 the dash pattern (`dashtype`) is a separate property
- associated with each line, analogous to `linecolor` or `linewidth`.  It is not
- necessary to place the current terminal in a special mode just to draw dashed
- lines.  I.e. the command `set term <termname> {solid|dashed}` is now ignored.
+ The dash pattern (`dashtype`) is a separate property associated with each line,
+ analogous to `linecolor` or `linewidth`.  It is not necessary to place the
+ current terminal in a special mode just to draw dashed lines.
+ I.e. the command `set term <termname> {solid|dashed}` is now ignored.
  If backwards compatibility with old scripts written for version 4 is required,
  the following lines can be used instead:
 
@@ -4072,7 +4072,7 @@ Ffigure_newsyntax
 
  The demo/plugin directory also contains source for a plugin that implements
  Q(a,x). As noted above, this plugin allows earlier versions of gnuplot to
- provide the same function `uigamma` as the current development version.
+ provide the same function `uigamma` as version 6.
       import Q(a,x) from "uigamma_plugin"
       uigamma(a,x) = ((x<1 || x<a) ? 1.0-igamma(a,x) : Q(a,x))
 
@@ -4106,7 +4106,7 @@ Ffigure_newsyntax
       func(x,y) = A + (x+y)/2.
 
  Exception 3: Variables declared with the `local` command.
- The `local` qualifier (new in this version) allows optional declaration of a
+ The `local` qualifier (new in version 6) allows optional declaration of a
  variable or array whose scope is limited to the execution of the code block
  in which it is found.  This includes `load` and `call` operations,
  evaluation of a function block, and the code in curly brackets that follows
@@ -4219,7 +4219,7 @@ Ffigure_newsyntax
  is returned in variables GPVAL_SYSTEM_ERRNO and GPVAL_SYSTEM_ERRMSG.
 
  Note: Internal carriage-return ('\r') and newline ('\n') characters are not
- stripped from the substituted string.  This is a change from version 5.2.
+ stripped from the substituted string.
 
  Command-line substitution can be used anywhere on the `gnuplot` command
  line except inside strings delimited by single quotes.
@@ -5886,7 +5886,7 @@ Ffigure_points
  The fill style and color may be specified in the splot command, otherwise the
  global fillstyle from `set style fill` is used.  Due to limitations in the
  pm3d code, a single border line style from `set pm3d border` is applied to all
- polygons.  This restriction may be removed in a later gnuplot version.
+ 3D polygons.  This restriction may be removed in a later gnuplot version.
 
  Each polygon may be assigned a separate RGB color by providing a fourth using
  specifier and the keywords `lc variable` (value is interpreted as a linetype)
@@ -7011,7 +7011,7 @@ Ffigure_zerror
 3 error recovery
 ?commands fit error_recovery
 ?fit error_recovery
- Starting with gnuplot version 5.5, the `fit` command always returns to the
+ Starting with gnuplot version 6, the `fit` command always returns to the
  next command input line regardless of the success or failure of fitting.
  This allows scripted recovery from fit errors.  The variable FIT_ERROR is
  set to 0 on success, non-zero on error.
@@ -8922,8 +8922,7 @@ Ffigure_smooth_path
  should be specified as column three.
 
  It should be noted that (a) `plot 'file'`, (b) `plot 'file' using 1:2`, and
- (c) `plot 'file' using ($1):($2)` can be subtly different.  The exact
- behaviour has changed in version 5.  See `missing`.
+ (c) `plot 'file' using ($1):($2)` can be subtly different.  See `missing`.
 
  It is often possible to plot a file with lots of lines of garbage at
  the top simply by specifying
@@ -13372,14 +13371,14 @@ Ffigure_multiple_keys
  Syntax:
       set mxtics time <N> {seconds|minutes|hours|days|weeks|months|years}
 
- This is a new command option introduced in gnuplot version 5.5.
+ This is a new command option introduced in gnuplot version 6.
  It places minor tic marks exactly at some integral number of time units
  rather than at some fraction of the major tic interval.
 
  The new default is that minor tics are not generated if the major tics are
  in time mode (`set xdata time` or `set xtics time`).
 
- `set mxtics` or `set mxtics <freq>` can restore the pre-version 5.5 behavior
+ `set mxtics` or `set mxtics <freq>` can restore the pre-version 6 behavior
  but this was always problematic.  For example, automatic subdivision of a
  72-year span placed major tics at 12-year intervals and minor tics at
  5-year intervals.
@@ -16494,7 +16493,7 @@ Ffigure_walls
  The same syntax applies to `ydata`, `zdata`, `x2data`, `y2data` and `cbdata`.
 
  The `time` option signals that data represents a time/date in seconds.
- The current version of gnuplot stores time to millisecond precision.
+ Gnuplot version 6 stores time to millisecond precision.
 
  `set xdata` (with no `time` keyword) restores data interpretation to normal.
 4 time
@@ -16675,7 +16674,7 @@ Ffigure_walls
  The `reverse` option reverses the direction of an autoscaled axis. For example,
  if the data values range from 10 to 100, it will autoscale to the equivalent of
  set xrange [100:10].  The `reverse` flag has no effect if the axis is not
- autoscaled. NB: This is a change introduced in version 4.7.
+ autoscaled.
 
  Autoscaling:  If <min> (the same applies for correspondingly to <max>) is
  an asterisk "*" autoscaling is turned on.  The range in which autoscaling
