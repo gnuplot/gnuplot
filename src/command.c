@@ -850,6 +850,7 @@ lower_command(void)
  * Arrays are declared using the syntax
  *    array A[size] { = [ element, element, ... ] }
  *    array A = [ .., .. ]
+ *    array A = <expression>     (only valid if <expression> returns an array)
  * where size is an integer and space is reserved for elements A[1] through A[size]
  * The size itself is stored in A[0].v.int_val.A
  * The list of initial values is optional.
@@ -889,7 +890,20 @@ array_command()
 		break;
 	}
 	nsize = est_size;
+    } else if (equals(c_token, "=")) {
+	/* array A = <expression> */
+	struct value a;
+	int save_token = ++c_token;
+	const_express(&a);
+	if (a.type != ARRAY) {
+	    free_value(&a);
+	    int_error(save_token, "not an array expression");
+	}
+	make_array_permanent(&a);
+	array->udv_value = a;
+	return;
     }
+
     if (nsize > 0)
 	init_array(array, nsize);
     else

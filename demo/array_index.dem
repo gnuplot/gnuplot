@@ -5,6 +5,7 @@
 # It returns the index of that entry.
 
 array A = [1, 2, 3.0, 4.0, "five", "six", 7*I, {8,8}, NaN]
+array B = A[2:4]
 
 do for [ i = 1:|A| ] {
     x = A[i]
@@ -15,6 +16,7 @@ do for [ i = 1:|A| ] {
 	print "no member of A matches ", x
     }
 }
+print "array B = ", B
 
 # Use of index to establish key/value pairs
 print "\nKey/value pairs\n"
