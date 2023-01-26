@@ -3233,8 +3233,9 @@ C ... and restart the table:
  Arrays are implemented as indexed lists of user variables.  The elements in an
  array are not limited to a single type of variable.  Arrays must be created
  explicitly before being referenced. The size of an array cannot be changed
- after creation.  All elements are initially undefined.  In most places an array
- element can be used instead of a named user variable.
+ after creation.  Array elements are initially undefined unless they are
+ provided in the array declaragion.
+ In most places an array element can be used instead of a named user variable.
 
  The cardinality (number of elements) of array A is given by the expression |A|.
 
@@ -3246,6 +3247,7 @@ C ... and restart the table:
       A[4] = "four"
       A[6] = A[2]**3
       array B[6] = [ 1, 2.0, A[3], "four", , B[2]**3 ]
+      array C = split("A B C D E F")
 
       do for [i=1:6] { print A[i], B[i] }
           1 1
@@ -3256,8 +3258,8 @@ C ... and restart the table:
           8.0 8.0
 
  Note: Arrays and variables share the same namespace.  For example, assignment
- of a string variable named FOO will destroy any previously created array with
- name FOO.
+ of a string to a variable named FOO will destroy any previously created array
+ with name FOO.
 
  The name of an array can be used in a `plot`, `splot`, `fit`, or `stats`
  command.  This is equivalent to providing a file in which column 1 holds the
