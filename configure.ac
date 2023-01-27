@@ -557,10 +557,16 @@ dnl check presence of gd library
 dnl we don't check for libfreetype and libjpeg locations - if gd requires
 dnl them, the gdlib-config script or the gdlibc.pc contains all the required information
 AC_ARG_WITH(gd,dnl
-[  --with-gd[=DIR]           location of gd library (png jpeg gif terminals)],,
+[  --with-gd[=DIR]           (DIR is location of include/gd.h and lib/libgd.so)],,
   with_gd=yes)
 
-if test "$with_gd" != no; then
+if test -d "$with_gd"; then
+  libgd_LDFLAGS=-L$with_gd/lib
+  libgd_CFLAGS=-I$with_gd/include
+  libgd_LIBS=-lgd
+  AC_MSG_WARN(([Looking for $with_gd/include/gd.h and $with_gd/lib/libgd.so]))
+
+elif test "$with_gd" != no; then
   PKG_CHECK_MODULES_NOFAIL(libgd, [gdlib])
   AC_PATH_PROG([GDLIB_CONFIG], [gdlib-config])
 
@@ -573,14 +579,10 @@ if test "$with_gd" != no; then
     libgd_CFLAGS=`$GDLIB_CONFIG --cflags`
     libgd_LDFLAGS=`$GDLIB_CONFIG --ldflags`
     libgd_LIBS=`$GDLIB_CONFIG --libs`
-  elif test -d "$with_gd"; then
-    # pkg-config did NOT succeed, we do NOT have gdlib-config but user
-    # specified --with-gd=
-    libgd_CFLAGS="-I$with_gd/include"
-    libgd_LDFLAGS="-L$with_gd/lib"
-    libgd_LIBS="-ljpeg -lpng -lfreetype -lz"
   fi
+fi
 
+if test "$with_gd" != no; then
   # Verify that libgd works, but backup the previous compilation variables to
   # be able to revert in the case that libgd is not functional
   _cppflags="$CPPFLAGS"
