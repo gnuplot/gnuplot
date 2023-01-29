@@ -2520,6 +2520,17 @@ eval_plots()
 		    if (this_plot->plot_smooth == SMOOTH_PATH)
 			parse_hull_options(this_plot);
 
+		    /* Sanity check - very few smooth options work with polar coords */
+		    if (polar) {
+			switch(this_plot->plot_smooth) {
+			default:
+			    int_error(c_token, "this smooth option not possible with polar coordinates");
+			case SMOOTH_NONE:
+			case SMOOTH_PATH:
+			    break;
+			}
+		    }
+
 		    if (set_smooth)
 			duplication = TRUE;
 		    else
