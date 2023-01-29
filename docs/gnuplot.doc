@@ -7900,8 +7900,8 @@ Ffigure_zerror
 ## reread later and therefore it should be retained internally for re-use.
 #end
 
- `splot` has a similar syntax but does not support `bins` and smoothing
- support is limited to `smooth csplines` and `smooth acsplines`.
+ `splot` has a similar syntax but does not support `bins` and supports only a
+ few `smooth` options.
 
  The `noautoscale` keyword means that the points making up this plot will be
  ignored when automatically determining axis range limits.
@@ -8359,7 +8359,8 @@ Ffigure_convex_hull
  If too few points are available to apply the requested smoothing operation
  an error message is produced.
 
- The `smooth` options have no effect on function plots.
+ The `smooth` options have no effect on function plots. Only `smooth path`
+ is possible in polar coordinate mode.
 
  Smoothing in 3D plots (splot) is currently limited to generating a natural
  cubic spline to pass through a set of 3D points.  In the general case
