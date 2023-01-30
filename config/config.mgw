@@ -10,9 +10,6 @@
 /* Define to allow use of certain deprecated syntax. */
 /* #undef BACKWARDS_COMPATIBLE */
 
-/* Define if you want online help and subtopic tables sorted by column. */
-/* #undef COLUMN_HELP */
-
 /* Provide contact info for gnuplot development */
 /* #undef DEVELOPMENT_VERSION */
 /* Don't change it here -- this define is set in config/mingw/Makefile. */

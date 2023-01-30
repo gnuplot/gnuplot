@@ -48,6 +48,7 @@
 #include "gp_hist.h"
 #include "gp_time.h"
 #include "gplocale.h"
+#include "help.h"
 #include "hidden3d.h"
 #include "jitter.h"
 #include "loadpath.h"
@@ -90,6 +91,7 @@ static void set_dummy(void);
 static void set_encoding(void);
 static void set_fit(void);
 static void set_grid(void);
+static void set_help(void);
 static void set_hidden3d(void);
 static void set_history(void);
 static void set_pixmap(void);
@@ -298,6 +300,9 @@ set_command()
 	    break;
 	case S_GRID:
 	    set_grid();
+	    break;
+	case S_HELP:
+	    set_help();
 	    break;
 	case S_HIDDEN3D:
 	    set_hidden3d();
@@ -2046,6 +2051,22 @@ set_grid()
     }
 }
 
+
+/* process 'set help {rows|columns}' */
+static void
+set_help()
+{
+#ifndef NO_GIH
+    c_token++;
+    if (almost_equals(c_token,"col$umns"))
+	help_sort_by_rows = FALSE;
+    else if (almost_equals(c_token,"row$s"))
+	help_sort_by_rows = TRUE;
+    else
+	int_error(c_token, "unrecognized option");
+    c_token++;
+#endif
+}    
 
 /* process 'set hidden3d' command */
 static void

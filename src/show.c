@@ -47,6 +47,7 @@
 #include "fit.h"
 #include "gp_time.h"
 #include "graphics.h"
+#include "help.h"
 #include "hidden3d.h"
 #include "jitter.h"
 #include "misc.h"
@@ -101,6 +102,7 @@ static void show_style_rectangle(void);
 static void show_style_circle(void);
 static void show_style_ellipse(void);
 static void show_grid(void);
+static void show_help(void);
 static void show_raxis(void);
 static void show_paxis(void);
 static void show_zeroaxis(AXIS_INDEX);
@@ -261,6 +263,9 @@ show_command()
 	break;
     case S_GRID:
 	show_grid();
+	break;
+    case S_HELP:
+	show_help();
 	break;
     case S_RAXIS:
 	show_raxis();
@@ -1749,6 +1754,16 @@ show_grid()
 	fprintf(stderr, "\tGrid shown in spiderplots\n");
 
     fprintf(stderr, "\tGrid drawn at %s\n", (grid_layer==-1) ? "default layer" : ((grid_layer==0) ? "back" : "front"));
+}
+
+/* process 'show help' command */
+static void
+show_help()
+{
+#ifndef NO_GIH
+    fprintf(stderr,"\thelp subtopics are sorted by %s\n",
+	help_sort_by_rows ? "row" : "column");
+#endif
 }
 
 static void

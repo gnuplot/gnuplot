@@ -741,15 +741,6 @@ if test "$with_extra_coordinate" != no; then
                [ Define to make use of otherwise empty space in struct coordinate ])
 fi
 
-dnl Sort help/subtopic tables by row or column
-AC_ARG_WITH(row-help,dnl
-[  --with-row-help         format help and subtopic tables by row (default)
-  --without-row-help      format help and subtopic tables by column],
-  [if test "$with_row_help" = no; then
-     AC_DEFINE(COLUMN_HELP,1,
-               [ Define if you want online help and subtopic tables sorted by column. ])
-   fi])
-
 dnl Whether we want to create the LaTeX tutorial
 dnl TUTORIAL=notutorial
 dnl AC_ARG_WITH(tutorial,dnl
@@ -1431,12 +1422,6 @@ if test "$enable_history_file" = yes; then
   AC_MSG_RESULT([  Command-line history file:                       yes])
 else
   AC_MSG_RESULT([  Command-line history file:                       no])
-fi
-
-if test "$with_row_help" = no; then
-  AC_MSG_RESULT([  Sort help tables by column rather than row:      yes])
-else
-  AC_MSG_RESULT([  Sort help tables by column rather than row:      no])
 fi
 
 if test "$enable_mouse" = yes; then

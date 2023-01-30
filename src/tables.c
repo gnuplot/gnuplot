@@ -205,6 +205,7 @@ const struct gen_table set_tbl[] =
     { "fu$nction", S_FUNCTIONS },
     { "fu$nctions", S_FUNCTIONS },
     { "g$rid", S_GRID },
+    { "help", S_HELP },
     { "hid$den3d", S_HIDDEN3D },
     { "historysize", S_HISTORYSIZE },	/* Deprecated */
     { "his$tory", S_HISTORY },

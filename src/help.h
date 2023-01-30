@@ -41,6 +41,9 @@
 #define	H_NOTFOUND	1	/* didn't find the keyword */
 #define	H_ERROR		(-1)	/* didn't find the help file */
 
+/* User control of help layout */
+extern TBOOLEAN help_sort_by_rows;
+
 /* Prototypes from file "help.c" */
 
 int  help(char *keyword, char *path, TBOOLEAN *subtopics);
