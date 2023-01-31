@@ -482,10 +482,7 @@ process_line(char *line, FILE *b, FILE *d)
 		tabl = FALSE;
 
                 /* output unique ID */
-                if (startpage) {
-                    strcpy(location, sectionname);
-                } else
-                    sprintf(location, "loc%d", line_count);
+		sprintf(location, "loc%d", line_count);
 
 		/* add list of subtopics */
 		if (!collapsing_terminal_docs && !processing_title_page) {
@@ -538,7 +535,21 @@ process_line(char *line, FILE *b, FILE *d)
                         exit(EXIT_FAILURE);
                     }
 		    if (startpage) {
-			// fprintf(stderr,"Opening %s for output\n",newfile);
+			/* Make a symlink with a known name */
+			char knownfile[PATH_MAX] = "";
+			char locfile[16];
+			strcpy(locfile, location);
+			strcat(locfile, ".html");
+			strncpy(knownfile, path, PATH_MAX-1);
+			strncat(knownfile, sectionname, PATH_MAX-strlen(knownfile)-6);
+			strcat(knownfile,".html");
+			if (symlink(locfile, knownfile)) {
+			    perror("doc2web: Can't create symlink ");
+			    exit(EXIT_FAILURE);
+			}
+			fprintf(stderr,"Creating symlink %s for %s\n", knownfile, newfile);
+
+			/* Start the new file */
 			header(b, sectionname);
 #ifdef CREATE_INDEX
 			sidebar(b, 1);
