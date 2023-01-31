@@ -953,17 +953,20 @@ do_plot(struct curve_points *plots, int pcount)
 		||  this_plot->filledcurves_options.closeto == FILLEDCURVES_ABOVE
 		||  this_plot->filledcurves_options.closeto == FILLEDCURVES_BELOW) {
 		    plot_betweencurves(this_plot);
-		} else if (!this_plot->plot_smooth &&
+
+		} else if (!this_plot->plot_smooth && !parametric &&
 		   (this_plot->filledcurves_options.closeto == FILLEDCURVES_ATY1
 		||  this_plot->filledcurves_options.closeto == FILLEDCURVES_ATY2
 		||  this_plot->filledcurves_options.closeto == FILLEDCURVES_ATR)) {
-		    /* Smoothing may have trashed the original contents	*/
-		    /* of the 2nd y data column, so piggybacking on the	*/
-		    /* code for FILLEDCURVES_BETWEEN will not work.	*/
-		    /* FIXME: Maybe piggybacking is always a bad idea?		*/
-		    /* IIRC the original rationale was to get better clipping	*/
-		    /* but the general polygon clipping code should now work.	*/
+		    /* Smoothing may have trashed the original contents of the
+		     * 2nd y data column, and parametric code never loaded it at all.
+		     * Either way piggybacking on FILLEDCURVES_BETWEEN will not work.
+		     * FIXME: Maybe piggybacking is always a bad idea?
+		     * IIRC the original rationale was to get better clipping
+		     * but the general polygon clipping code should now work.
+		     */
 		    plot_betweencurves(this_plot);
+
 		} else {
 		    plot_filledcurves(this_plot);
 		}
