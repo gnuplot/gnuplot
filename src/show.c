@@ -1760,8 +1760,10 @@ show_grid()
 static void
 show_help()
 {
+#ifndef NO_GIH
     fprintf(stderr,"\thelp subtopics are sorted by %s\n",
 	help_sort_by_rows ? "row" : "column");
+#endif
 }
 
 static void

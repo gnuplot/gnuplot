@@ -2056,6 +2056,7 @@ set_grid()
 static void
 set_help()
 {
+#ifndef NO_GIH
     c_token++;
     if (almost_equals(c_token,"col$umns"))
 	help_sort_by_rows = FALSE;
@@ -2064,6 +2065,7 @@ set_help()
     else
 	int_error(c_token, "unrecognized option");
     c_token++;
+#endif
 }    
 
 /* process 'set hidden3d' command */
