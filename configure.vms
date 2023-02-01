@@ -330,7 +330,6 @@ $ HAVE_LIBPNG = 0
 $ CGI = 0
 $ NOCWDRC = 0
 $ THIN_PLATE_SPLINES_GRID = 0
-$ COLUMN_HELP = 0
 $ ! USE_MOUSE = 0   ! USE_MOUSE is defined above
 $ MAX_PARALLEL_AXES = 7
 $ !
