@@ -651,13 +651,9 @@ grid_nongrid_data(struct surface_points *this_plot)
     if (this_plot->pm3d_color_from_column && dgrid3d_mode == DGRID3D_SPLINES)
 	int_error(NO_CARET, "Spline gridding of a separate color column is not implemented");
 
-    /* Compute XY bounding box on the original data. */
-    /* FIXME HBB 20010424: Does this make any sense? Shouldn't we just
-     * use whatever the x and y ranges have been found to be, and
-     * that's that? The largest difference this is going to make is if
-     * we plot a datafile that doesn't span the whole x/y range
-     * used. Do we want a dgrid3d over the actual data rectangle, or
-     * over the xrange/yrange area? */
+    /* Compute XY bounding box on the original data.
+     * Otherwise the grid would change as you zoom.
+     */
     xmin = xmax = old_iso_crvs->points[0].x;
     ymin = ymax = old_iso_crvs->points[0].y;
     for (icrv = old_iso_crvs; icrv != NULL; icrv = icrv->next) {

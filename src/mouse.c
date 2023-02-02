@@ -2540,8 +2540,9 @@ do_event(struct gp_event_t *ge)
 	break;
     case GE_fontprops:
 #ifdef X11
-	/* EAM FIXME:  Despite the name, only X11 uses this to pass font info.	*/
-	/* Everyone else passes just the plot height and width.			*/
+	/* Despite the name, only X11 uses this to pass font info.
+	 * Everyone else passes just the plot height and width.
+	 */
 	if (!strcmp(term->name,"x11")) {
 	    /* These are declared in ../term/x11.trm */
 	    extern int          X11_hchar_saved, X11_vchar_saved;

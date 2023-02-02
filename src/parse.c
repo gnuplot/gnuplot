@@ -333,7 +333,7 @@ create_call_column_at(char *string)
 
     at->a_count = 2;
     at->actions[0].index = PUSHC;
-    at->actions[0].arg.j_arg = 3;	/* FIXME - magic number! */
+    at->actions[0].arg.j_arg = 0;
     at->actions[0].arg.v_arg.type = STRING;
     at->actions[0].arg.v_arg.v.string_val = string;
     at->actions[1].index = COLUMN;
@@ -351,7 +351,7 @@ create_call_columnhead()
 
     at->a_count = 2;
     at->actions[0].index = PUSHC;
-    at->actions[0].arg.j_arg = 3;	/* FIXME - magic number! */
+    at->actions[0].arg.j_arg = 0;
     at->actions[0].arg.v_arg.type = INTGR;
     at->actions[0].arg.v_arg.v.int_val = -1;
     at->actions[1].index = COLUMNHEAD;

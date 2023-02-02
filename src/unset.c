@@ -258,7 +258,7 @@ unset_command()
 	unset_hidden3d();
 	break;
     case S_HISTORY:
-	break; /* FIXME: reset to default values? */
+	break;
     case S_HISTORYSIZE:	/* Deprecated */
 	unset_historysize();
 	break;
@@ -1047,13 +1047,8 @@ unset_fit()
 static void
 unset_grid()
 {
-    /* FIXME HBB 20000506: there is no command to explicitly reset the
-     * linetypes for major and minor gridlines. This function should
-     * do that, maybe... */
-    AXIS_INDEX i = 0;
-
     /* grid_selection = GRID_OFF; */
-    for (; i < NUMBER_OF_MAIN_VISIBLE_AXES; i++) {
+    for (AXIS_INDEX i = 0; i < NUMBER_OF_MAIN_VISIBLE_AXES; i++) {
 	axis_array[i].gridmajor = FALSE;
 	axis_array[i].gridminor = FALSE;
     }
@@ -1845,7 +1840,6 @@ unset_terminal()
 
     term_reset();
 
-    /* FIXME: change is correct but reported result is truncated */
     if (original_terminal && original_terminal->udv_value.type != NOTDEFINED) {
 	char *termname = gp_strdup(original_terminal->udv_value.v.string_val);
 	if (strchr(termname, ' '))

@@ -782,12 +782,14 @@ apply_pm3dcolor(struct t_colorspec *tc)
 	return;
     }
     if (tc->type == TC_RGB) {
-	/* FIXME: several plausible ways for monochrome terminals to handle color request
+	/* There are several plausible ways monochrome terminals might handle color request
 	 * (1) Allow all color requests despite the label "monochrome"
 	 * (2) Choose any color you want so long as it is black
 	 * (3) Convert colors to gray scale (NTSC?)
+	 *
+	 * We go for a modified (1):
+	 * Monochrome terminals are still allowed to display rgb variable colors.
 	 */
-	/* Monochrome terminals are still allowed to display rgb variable colors */
 	if (monochrome_terminal && tc->value >= 0)
 	    t->set_color(&black);
 	else

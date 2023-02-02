@@ -325,7 +325,7 @@ real(struct value *val)
 	return ((double) val->v.int_val);
     case CMPLX:
 	return (val->v.cmplx_val.real);
-    case STRING:    /* FIXME is this ever used? */
+    case STRING:
 	return (atof(val->v.string_val));
     case NOTDEFINED:
 	return not_a_number();

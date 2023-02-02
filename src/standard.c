@@ -1422,10 +1422,9 @@ ri1(double x)
 }
 
 
-/* FIXME HBB 20010726: should bessel functions really call int_error,
- * right in the middle of evaluating some mathematical expression?
- * Couldn't they just flag 'undefined', or ignore the real part of the
- * complex number? */
+/* Warn if the user passes an argument with non-zero imaginary component */
+static const char *bessel_error
+    = "For complex Bessel functions use BesselI, BesselJ, BesselY, BesselK";
 
 void
 f_besi0(union argument *arg)
@@ -1435,7 +1434,7 @@ f_besi0(union argument *arg)
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     if (fabs(imag(&a)) > zero)
-	int_error(NO_CARET, "can only do bessel functions of reals");
+	int_error(NO_CARET, bessel_error);
     push(Gcomplex(&a, ri0(real(&a)), 0.0));
 }
 
@@ -1447,7 +1446,7 @@ f_besi1(union argument *arg)
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     if (fabs(imag(&a)) > zero)
-	int_error(NO_CARET, "can only do bessel functions of reals");
+	int_error(NO_CARET, bessel_error);
     push(Gcomplex(&a, ri1(real(&a)), 0.0));
 }
 
@@ -1459,7 +1458,7 @@ f_besj0(union argument *arg)
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     if (fabs(imag(&a)) > zero)
-	int_error(NO_CARET, "can only do bessel functions of reals");
+	int_error(NO_CARET, bessel_error);
     push(Gcomplex(&a, rj0(real(&a)), 0.0));
 }
 
@@ -1472,7 +1471,7 @@ f_besj1(union argument *arg)
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     if (fabs(imag(&a)) > zero)
-	int_error(NO_CARET, "can only do bessel functions of reals");
+	int_error(NO_CARET, bessel_error);
     push(Gcomplex(&a, rj1(real(&a)), 0.0));
 }
 
@@ -1485,7 +1484,7 @@ f_besy0(union argument *arg)
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     if (fabs(imag(&a)) > zero)
-	int_error(NO_CARET, "can only do bessel functions of reals");
+	int_error(NO_CARET, bessel_error);
     if (real(&a) > 0.0)
 	push(Gcomplex(&a, ry0(real(&a)), 0.0));
     else {
@@ -1503,7 +1502,7 @@ f_besy1(union argument *arg)
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     if (fabs(imag(&a)) > zero)
-	int_error(NO_CARET, "can only do bessel functions of reals");
+	int_error(NO_CARET, bessel_error);
     if (real(&a) > 0.0)
 	push(Gcomplex(&a, ry1(real(&a)), 0.0));
     else {
@@ -1522,7 +1521,7 @@ f_besjn(union argument *arg)
     if ((n.type != INTGR) || (fabs(imag(&a)) > zero)) {
 	push(Gcomplex(&a, 0.0, 0.0));
 	undefined = TRUE;
-	int_error(NO_CARET, "improper argument to besjn(int,real)");
+	int_error(NO_CARET, bessel_error);
     } else {
 	push(Gcomplex(&a, jn(n.v.int_val, real(&a)), 0.0));
     }
@@ -1538,7 +1537,7 @@ f_besyn(union argument *arg)
     if ((n.type != INTGR) || (fabs(imag(&a)) > zero)) {
 	push(Gcomplex(&a, 0.0, 0.0));
 	undefined = TRUE;
-	int_error(NO_CARET, "improper argument to besyn(int,real)");
+	int_error(NO_CARET, bessel_error);
     } else {
 	push(Gcomplex(&a, yn(n.v.int_val, real(&a)), 0.0));
     }

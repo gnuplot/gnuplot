@@ -70,7 +70,6 @@ typedef enum en_edge_position {
 } t_edge_position;
 
 
-/* FIXME HBB 2000052: yet another local copy of 'epsilon'. Why? */
 #define EPSILON  1e-5		/* Used to decide if two float are equal. */
 
 #ifndef TRUE

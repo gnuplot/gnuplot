@@ -1001,7 +1001,7 @@ statsrequest(void)
 		}
 	    } /* if (need to extend storage space) */
 
-	    /* FIXME: ascii "matrix" input from df_readline via df_readbinary does not
+	    /* ascii "matrix" input from df_readline via df_readbinary does not
 	     * flag NaN values so we must check each returned value here
 	     */
 	    if (df_matrix && (i == 2) && isnan(v[1]))

@@ -1183,7 +1183,7 @@ pm3d_add_polygon(struct surface_points *plot, gpdPoint corners[], int vertices)
     quadrangle *q;
 
     if (!plot || (plot->plot_style == ISOSURFACE))
-	/* FIXME: I have no idea how to estimate the number of facets for an isosurface */
+	/* I have no idea how to estimate the number of facets for an isosurface */
 	reserve_quadrangles(100, 1000);
     else
 	reserve_quadrangles(plot->iso_crvs->p_count, 0);

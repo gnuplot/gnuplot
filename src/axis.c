@@ -609,7 +609,6 @@ copy_or_invent_formatstring(struct axis *this_axis)
 	    double axmax = this_axis->max;
 	    int precision = ceil(-log10(GPMIN(fabs(axmax-axmin),fabs(axmin))));
 	    /* FIXME: Does horrible things for large value of precision */
-	    /* FIXME: Didn't I have a better patch for this? */
 	    if ((axmin*axmax > 0) && 4 < precision && precision < 10)
 		sprintf(tempfmt, "%%.%df", precision);
 	}
@@ -746,7 +745,7 @@ make_tics(struct axis *this_axis, int guide)
     if (xr >= VERYLARGE) {
 	int_warn(NO_CARET, "%s axis range undefined or overflow, resetting to [0:0]",
 	    axis_name(this_axis->index));
-	/* FIXME: this used to be int_error but there were false positives
+	/* This used to be int_error but there were false positives
 	 * (bad range on unused axis).  However letting +/-VERYLARGE through
 	 * can overrun data structures for time conversions. min = max avoids this.
 	 */
@@ -882,9 +881,6 @@ round_outward(
 
     if (this_axis->tictype == DT_TIMEDATE) {
 	double ontime = time_tic_just(this_axis->timelevel, result);
-
-	/* FIXME: how certain is it that we don't want to *always*
-	 * return 'ontime'? */
 	if ((upwards && (ontime > result))
 	||  (!upwards && (ontime < result)))
 	    return ontime;
@@ -1059,7 +1055,7 @@ gen_tics(struct axis *this, tic_callback callback)
 		/* string constant that contains no format keys */
 		ticlabel = mark->label;
 	    } else if (this->index >= PARALLEL_AXES) {
-		/* FIXME: needed because axis->ticfmt is not maintained for parallel axes */
+		/* Needed because axis->ticfmt is not maintained for parallel axes */
 		gprintf(label, sizeof(label),
 			mark->label ? mark->label : this->formatstring,
 			log10_base, mark->position);
@@ -1229,7 +1225,6 @@ gen_tics(struct axis *this, tic_callback callback)
 		    miniend = step;
  		}
 	    } else if (nonlinear(this) && this->ticdef.logscaling) {
-		/* FIXME: Not sure this works for all values of step */
 		ministart = ministep = step / (this->base - 1);
 		miniend = step;
 	    } else if (this->tictype == DT_TIMEDATE) {
