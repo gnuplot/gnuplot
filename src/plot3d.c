@@ -1468,9 +1468,6 @@ get_3ddata(struct surface_points *this_plot)
 	this_iso->next = new_icrvs;
     }
 
-    /* Deferred evaluation of plot title now that we know column headers */
-    reevaluate_plot_title( (struct curve_points *)this_plot );
-
     return retval;
 }
 
@@ -2434,6 +2431,9 @@ eval_3dplots()
 		int_error(NO_CARET, "unexpected plot_type %d at plot3d:%d\n",
 			this_plot->plot_type, __LINE__);
 	    }
+
+	    /* Deferred evaluation of plot title now that we know column headers */
+	    reevaluate_plot_title( (struct curve_points *)this_plot );
 
 	    if (this_plot->plot_style == IMAGE
 	    ||  this_plot->plot_style == RGBIMAGE
