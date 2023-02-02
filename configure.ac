@@ -568,18 +568,8 @@ if test -d "$with_gd"; then
 
 elif test "$with_gd" != no; then
   PKG_CHECK_MODULES_NOFAIL(libgd, [gdlib])
-  AC_PATH_PROG([GDLIB_CONFIG], [gdlib-config])
-
   # If pkg-config did return libgd configuration then
   # libgd_{CFLAGS,LDFLAGS,LIBS} is set
-  # If gdlib-config executable is found then GDLIB_CONFIG is set
-  if test $pkg_failed = no && test -n "$GDLIB_CONFIG"; then
-    # If pkg-config did succeed and we have gdlib-config then the later takes
-    # priority
-    libgd_CFLAGS=`$GDLIB_CONFIG --cflags`
-    libgd_LDFLAGS=`$GDLIB_CONFIG --ldflags`
-    libgd_LIBS=`$GDLIB_CONFIG --libs`
-  fi
 fi
 
 if test "$with_gd" != no; then
