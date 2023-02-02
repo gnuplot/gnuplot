@@ -2356,9 +2356,9 @@ enhanced_recursion(
 		    break;
 		}
 
-	    /*     FIXME: non-utf8 environments not yet supported.
-	     *     Note that some terminals may have an alternative way to handle unicode
-	     *     escape sequences that is not dependent on encoding.
+	    /*     Non-utf8 environments not supported here.
+	     *     Note that some terminals have an alternative way to handle unicode
+	     *     escape sequences that is not dependent on gnuplot's encoding.
 	     *     E.g. svg and html output could convert to xml sequences &#xhhhh;
 	     *     For these cases we must retain the leading backslash so that the
 	     *     unicode escape sequence can be recognized by the terminal driver.

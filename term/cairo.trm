@@ -1157,7 +1157,7 @@ void cairotrm_put_text(unsigned int x, unsigned int y, const char * string)
 		/* else carry on and process the rest of the string */
 	}
 
-	/* EAM FIXME: I still don't understand why this is needed */
+	/* I still don't understand why this is needed */
 	gp_cairo_clear_bold_font(&plot);
 
 	/* finish */
@@ -1368,7 +1368,6 @@ void cairotrm_image(unsigned int M, unsigned int N, coordval * image, gpiPoint *
 	image. */
 
 	/* we will draw an image, scale and resize it */
-	/* FIXME add palette support ??? */
 
 	unsigned int *image255 = gp_cairo_helper_coordval_to_chars(image, M, N, color_mode);
 	gp_cairo_draw_image(&plot, image255,

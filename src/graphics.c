@@ -688,7 +688,7 @@ do_plot(struct curve_points *plots, int pcount)
     term_start_plot();
 
     /* Figure out if we need a colorbox for this plot */
-    set_plot_with_palette(0, MODE_PLOT); /* EAM FIXME - 1st parameter is a dummy */
+    set_plot_with_palette(0, MODE_PLOT);
 
     /* Compute boundary plot_bounds.{xleft|xright|ytop|ybot}.
      * Also calculate tics, since xtics depend on plot_bounds.xleft

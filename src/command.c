@@ -469,7 +469,6 @@ do_line()
 	if (lf_head && lf_head->depth > 0) {
 	    /* This catches the case that we are inside a "load foo" operation
 	     * and therefore requesting interactive input is not an option.
-	     * FIXME: or is it?
 	     */
 	    int_error(NO_CARET, "Syntax error: missing block terminator }");
 	}
@@ -1638,7 +1637,7 @@ link_command()
 	    return;
 	else
 	    secondary_axis->linked_to_primary = NULL;
-	/* FIXME: could return here except for the need to free link_udf->at */
+	/* can't return yet because we need to free link_udf->at */
 	linked = FALSE;
     } else {
 	linked = TRUE;
@@ -1921,9 +1920,6 @@ pause_command()
 	sleep_time = -1;
 	c_token++;
 
-/*	EAM FIXME - This is not the correct test; what we really want */
-/*	to know is whether or not the terminal supports mouse feedback */
-/*	if (term_initialised) { */
 	if (mouse_setting.on && term) {
 	    struct udvt_entry *current;
 	    int end_condition = 0;

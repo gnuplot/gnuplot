@@ -127,7 +127,7 @@ Givens(
 {
     int i, j, k;
     double w, gamma, sigma, rho, temp;
-    double epsilon = DBL_EPSILON;	/* FIXME (?) */
+    double epsilon = DBL_EPSILON;
 
 /*
  * First, construct QR decomposition of C, by 'rotating away'

@@ -627,7 +627,6 @@ show_command()
     case S_VARIABLES:
 	show_variables();
 	break;
-/* FIXME: get rid of S_*DTICS, S_*MTICS cases */
     case S_XTICS:
     case S_XDTICS:
     case S_XMTICS:

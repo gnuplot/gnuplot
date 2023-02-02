@@ -661,9 +661,6 @@ loadpath_fopen(const char *filename, const char *mode)
 
     /* The global copy of fullname is only for the benefit of post.trm's
      * automatic fontfile conversion via a constructed shell command.
-     * FIXME: There was a Feature Request to export the directory path
-     * in which a loaded file was found to a user-visible variable for the
-     * lifetime of that load.  This is close but without the lifetime.
      */
     free(loadpath_fontname);
     loadpath_fontname = NULL;
@@ -997,15 +994,15 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
     }
 
     while (!END_OF_COMMAND) {
+	TBOOLEAN lt_really_means_lc = FALSE;
 
-	/* This special case is to flag an attempt to "set object N lt <lt>",
-	 * which would otherwise be accepted but ignored, leading to confusion
-	 * FIXME:  Couldn't this be handled at a higher level?
+	/* This special case is to catch an attempt to "set object N lt <lt>",
+	 * which would otherwise be accepted but ignored, leading to confusion.
 	 */
 	if ((destination_class == LP_NOFILL)
 	&&  (equals(c_token,"lt") || almost_equals(c_token,"linet$ype"))) {
-	    int_error(c_token, "object linecolor must be set using fillstyle border");
-	}
+	    lt_really_means_lc = TRUE;
+	} else
 
 	if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt")) {
 	    if (set_lt++)
@@ -1068,6 +1065,7 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 
 	if (equals(c_token,"lc") || almost_equals(c_token,"linec$olor")
 	||  equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")
+	|| lt_really_means_lc
 	   ) {
 	    if (set_pal++)
 		break;

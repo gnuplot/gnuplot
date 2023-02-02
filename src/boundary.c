@@ -234,7 +234,7 @@ boundary(struct curve_points *plots, int count)
 
     /* Polar (theta) tic labels need space at top and bottom of plot */
     if (THETA_AXIS.ticmode) {
-	/* FIXME:  Really 5% of polar grid radius, but we don't know that yet */
+	/* Really wants to be 5% of polar grid radius, but we don't know that yet */
 	ttic_textheight = 2. * t->v_char;
     }
 
@@ -940,12 +940,6 @@ do_key_bounds(legend_key *key)
     } else {
 	int x, y;
 
-	/* FIXME!!!
-	 * pm 22.1.2002: if key->user_pos.scalex or scaley == first_axes or second_axes,
-	 * then the graph scaling is not yet known and the box is positioned incorrectly;
-	 * you must do "replot" to avoid the wrong plot ... bad luck if output does not
-	 * go to screen
-	 */
 	map_position(&key->user_pos, &x, &y, "key");
 
 	/* Here top, bottom, left, right refer to the alignment with respect to point. */

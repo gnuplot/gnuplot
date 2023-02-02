@@ -1222,7 +1222,7 @@ get_data(struct curve_points *current_plot)
 	    coordval orientation = (j >= 5) ? v[4] : 0.0;
 	    coordval flag = (major_axis <= 0 || minor_axis <= 0) ?  DEFAULT_RADIUS : 0;
 
-	    if (j == 2)	/* FIXME: why not also for j == 3 or 4? */
+	    if ((j == 2) || (j == 3) || (j == 4))
 		orientation = default_ellipse.o.ellipse.orientation;
 
 	    store2d_point(current_plot, i++, x, y,
@@ -1802,7 +1802,7 @@ histogram_range_fiddling(struct curve_points *plot)
 			axis_array[FIRST_X_AXIS].min = xlow;
 		}
 		if (axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_MAX) {
-		    /* FIXME - why did we increment p_count on UNDEFINED points? */
+		    /* Why did we increment p_count on UNDEFINED points? */
 		    while (plot->p_count > 0
 			&& plot->points[plot->p_count-1].type == UNDEFINED) {
 			plot->p_count--;
@@ -3212,7 +3212,6 @@ eval_plots()
 		    boxplot_range_fiddling(this_plot);
 		if (this_plot->plot_style == IMPULSES)
 		    impulse_range_fiddling(this_plot);
-		/* FIXME: not sure this is necessary.  Only for x2 or y2 axes? */
 		if (polar)
 		    polar_range_fiddling(&axis_array[this_plot->x_axis], &axis_array[this_plot->y_axis]);
 

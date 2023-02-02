@@ -52,7 +52,7 @@
 #endif
 
 /*
- * FIXME: Any platforms that still want support for matherr should
+ * Any platforms that still want support for matherr should
  * add appropriate definitions here.  Everyone else can now ignore it.
  *
  * Use of matherr is out of date on linux, since the matherr
@@ -961,7 +961,7 @@ f_mult(union argument *arg)
     case INTGR:
 	switch (b.type) {
 	case INTGR:
-	    /* FIXME: The test for overflow is complicated because (double)
+	    /* The test for overflow is complicated because (double)
 	     * does not have enough precision to simply compare against
 	     * 64-bit INTGR_MAX.
 	     */
