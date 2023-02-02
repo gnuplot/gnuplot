@@ -3015,7 +3015,7 @@ eval_plots()
 
 	    /* We can skip a lot of stuff if this is not a real plot */
 	    if (this_plot->plot_type == KEYENTRY)
-		goto SKIPPED_EMPTY_FILE;
+		goto NOTHING_HERE_BUT_PLOT_TITLE;
 
 	    /* Initialize the label list in case the BOXPLOT style needs it to store factors */
 	    if (this_plot->plot_style == BOXPLOT) {
@@ -3295,12 +3295,14 @@ eval_plots()
 		    process_image(this_plot, IMG_UPDATE_AXES);
 		}
 
-		/* Feb 2022: Deferred evaluation of plot title
-		 * now that we know column headers (loaded in get_data)
-		 * and potentially stats from filters, smoothing and image processing.
-		 */
-		reevaluate_plot_title(this_plot);
-	    }
+	    }	/* plot_type == DATA */
+
+	    /* Deferred evaluation of plot title
+	     * now that we know column headers (loaded in get_data)
+	     * and potentially stats from filters, smoothing and image processing.
+	     */
+	    NOTHING_HERE_BUT_PLOT_TITLE:
+	    reevaluate_plot_title(this_plot);
 
 	    SKIPPED_EMPTY_FILE:
 	    /* Note position in command line for second pass */
@@ -4064,8 +4066,6 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
 	} else if (equals(c_token,"at")) {
 	    *set_title = FALSE;
 	} else {
-	    int save_token = c_token;
-
 	    /* If the command is "plot ... notitle <optional title text>" */
 	    /* we can throw the result away now that we have stepped over it  */
 	    if (this_plot->title_is_suppressed) {
@@ -4087,24 +4087,6 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
 	    } else { 
 		free_at(df_plot_title_at);
 		df_plot_title_at = perm_at();
-
-		/* We can evaluate the title for a function plot immediately */
-		/* FIXME: or this code could go into eval_plots() so that    */
-		/*        function and data plots are treated the same way.  */
-		if (this_plot->plot_type == FUNC || this_plot->plot_type == FUNC3D
-		||  this_plot->plot_type == VOXELDATA
-		||  this_plot->plot_type == KEYENTRY) {
-		    struct value a;
-		    evaluate_at(df_plot_title_at, &a);
-		    if (a.type == STRING) {
-			free(this_plot->title);
-			this_plot->title = a.v.string_val;
-		    } else {
-			int_warn(save_token, "expecting string for title");
-		    }
-		    free_at(df_plot_title_at);
-		    df_plot_title_at = NULL;
-		}
 	    }
 	}
 	if (equals(c_token,"at")) {
@@ -4183,6 +4165,8 @@ reevaluate_plot_title(struct curve_points *this_plot)
 		free_at(df_plot_title_at);
 		df_plot_title_at = NULL;
 	    }
+	} else {
+	    int_warn(NO_CARET, "plot title must be a string");
 	}
     }
 
