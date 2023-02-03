@@ -213,16 +213,19 @@ invalidate_palette()
    Set the colour on the terminal
    Each terminal takes care of remembering the current colour,
    so there is not much to do here.
-   FIXME: NaN could alternatively map to LT_NODRAW or TC_RGB full transparency
  */
 void
 set_color(double gray)
 {
     t_colorspec color;
-    color.value = gray;
-    color.lt = LT_BACKGROUND;
-    color.type = (isnan(gray)) ? TC_LT : TC_FRAC;
-    term->set_color(&color);
+
+    if (isnan(gray)) {
+	term->linetype(LT_NODRAW);
+    } else {
+	color.type = TC_FRAC;
+	color.value = gray;
+	term->set_color(&color);
+    }
 }
 
 void
