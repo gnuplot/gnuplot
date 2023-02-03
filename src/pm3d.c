@@ -500,8 +500,9 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     if (this_plot->lp_properties.colormap)
 	private_colormap = this_plot->lp_properties.colormap;
 
-    /* Apply and save the user-requested line properties */
-    term_apply_lp_properties(&this_plot->lp_properties);
+    /* Feb 2023:  not necessary and may be counter-productive
+	term_apply_lp_properties(&this_plot->lp_properties);
+     */
 
     if (at_which_z != PM3D_AT_BASE && at_which_z != PM3D_AT_TOP && at_which_z != PM3D_AT_SURFACE)
 	return;
