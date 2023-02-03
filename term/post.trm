@@ -547,6 +547,7 @@ PS_escape_string(char *origstr, char *escapelist)
 static int PS_pen_x, PS_pen_y;
 static int PS_taken;
 static int PS_linetype_last;
+static int PS_dashtype_current;
 static double PS_linewidth_last;
 static double PS_linewidth_current;
 static TBOOLEAN PS_relative_ok;
@@ -2064,6 +2065,7 @@ PS_dashtype(int type, t_dashtype *custom_dash_type)
 		    PS_linetype(type);
 		break;
     }
+    PS_dashtype_current = type;
 }
 
 TERM_PUBLIC void
@@ -2183,7 +2185,10 @@ PS_vector(unsigned int x, unsigned int y)
     if (!PS_relative_ok)
 	PS_move(PS_pen_x, PS_pen_y);
 
-    if (strlen(rel) < strlen(abso)) {
+    if (PS_dashtype_current == DASHTYPE_NODRAW) {
+	PS_move(x,y);
+	ps_path_count = 1;
+    } else if (strlen(rel) < strlen(abso)) {
 	fputs(rel, gppsfile);
 	PS_taken++;		/* only used for debug info */
 	ps_path_count += 1;
