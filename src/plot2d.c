@@ -2459,12 +2459,15 @@ eval_plots()
 		    continue;
 		}
 
-		/* "convexhull" is unsmoothed; "smooth convexhull is smoothed */
 		if (equals(c_token, "convexhull")) {
 		    this_plot->plot_filter = FILTER_CONVEX_HULL;
 		    c_token++;
 		    continue;
 		}
+
+		/* this catches "expand <value>", which is only relevant to hulls */
+		if (this_plot->plot_filter == FILTER_CONVEX_HULL)
+		    parse_hull_options(this_plot);
 
 		/* deal with smooth */
 		if (almost_equals(c_token, "s$mooth")) {
@@ -2515,10 +2518,6 @@ eval_plots()
 			int_error(c_token, "unrecognized 'smooth' option");
 			break;
 		    }
-
-		    /* Handles "convexhull smooth path expand <scale>" */
-		    if (this_plot->plot_smooth == SMOOTH_PATH)
-			parse_hull_options(this_plot);
 
 		    /* Sanity check - very few smooth options work with polar coords */
 		    if (polar) {
@@ -3186,6 +3185,8 @@ eval_plots()
 		}
 		if (this_plot->plot_filter == FILTER_CONVEX_HULL) {
 		    convex_hull(this_plot);
+		    if (this_plot->smooth_parameter != 0)
+			expand_hull(this_plot);
 		}
 		if (this_plot->plot_filter == FILTER_ZSORT) {
 		    zsort_points(this_plot);
@@ -3277,8 +3278,6 @@ eval_plots()
 		    mcs_interp(this_plot);
 		    break;
 		case SMOOTH_PATH:
-		    if (this_plot->plot_filter == FILTER_CONVEX_HULL)
-			expand_hull(this_plot);
 		    gen_2d_path_splines(this_plot);
 		    break;
 		case SMOOTH_NONE:
@@ -4021,8 +4020,6 @@ parse_hull_options(struct curve_points *this_plot)
 	c_token++;
 	if (this_plot->plot_filter == FILTER_CONVEX_HULL)
 	    this_plot->smooth_parameter = real_expression();
-	else
-	    int_error(c_token-2, "'smooth path expand' only available for hulls");
     }
 }
 

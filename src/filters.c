@@ -919,29 +919,35 @@ winnow_interior_points (struct curve_points *plot)
 }
 
 /*
+ * EXPERIMENTAL
+ *
  * expand_hull() "inflates" a smooth convex hull by pushing each
  * perimeter point further away from the centroid of the bounded points.
- * FIXME: The expansion value is currently interpreted as a scale
- *        factor; i.e. 1.0 is no expansion.  It might be better to
- *	  instead accept a fixed value in user coordinates.
+ * This is not a great way to do it, since it expands anisotropically.
+ * Also it would not work for concave hulls.
+ * Consider this a place-holder for implementation of a better algorithm.
+ * FIXME: Since this is no longer attached to a "smooth" option 
+ * plot->smooth_parameter is probably not the best place to pass a value.
  */
 void
 expand_hull(struct curve_points *plot)
 {
-    struct coordinate *points = plot->points;
+    struct coordinate *p = plot->points;
     double xcent = plot->filledcurves_options.at;
     double ycent = plot->filledcurves_options.aty;
-    double scale = plot->smooth_parameter;
+    double extra = plot->smooth_parameter;
+    double scale;
     int i;
 
-    if (scale <=0 || scale == 1.0)
+    if (extra <= 0)
 	return;
 
     for (i=0; i<plot->p_count; i++) {
-	points[i].x = xcent + scale * (points[i].x - xcent);
-	points[i].y = ycent + scale * (points[i].y - ycent);
+	scale = sqrt((p[i].x - xcent) * (p[i].x - xcent) + (p[i].y - ycent) * (p[i].y - ycent));
+	scale = (scale + extra) / scale;
+	p[i].x = xcent + scale * (p[i].x - xcent);
+	p[i].y = ycent + scale * (p[i].y - ycent);
     }
-
 }
 
 /*

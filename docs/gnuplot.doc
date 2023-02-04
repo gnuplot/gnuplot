@@ -4454,7 +4454,7 @@ Ffigure_newsyntax
 ?watch
  Support for watchpoints is present only if your copy of gnuplot was built
  with configuration option --enable-watchpoints. This feature is EXPERIMENTAL
- [details may change before it appears in a release version].
+ [details may change in a subsequent release version].
 
  Syntax:
        plot FOO watch {x|y|z|F(x,y)} = <value>
@@ -8172,10 +8172,11 @@ Ffigure_zerror
 ?convexhull
 
  Convexhull is not a plot style. It can appear either alone as a filter 
- keyword or in combination with `smooth path`.
+ keyword or in combination with `smooth path` and/or `expand <increment>`.
 
       plot FOO using x:y convexhull
-      plot FOO using x:y convexhull smooth path {expand <scale>}
+      plot FOO using x:y convexhull smooth path
+      plot FOO using x:y convexhull expand 2.0 smooth path
 
 Ffigure_convex_hull
  The points in FOO are replaced by a subset of the original points that
@@ -8189,9 +8190,12 @@ Ffigure_convex_hull
 
  If the keyword `smooth` is present, the vertices are then used as guide
  points to generate a smooth closed curve (see `smooth path`). By default
- this smoothed curve runs through the bounding points.  The optional scale
- factor shifts the guide points away from the centroid so that for scale
- values greater than 1.0 all data points lie within the smoothed curve.
+ this smoothed curve runs through the bounding points.
+
+ EXPERIMENTAL: The optional `expand` keyword and increment shift the
+ guide points away from the centroid by <increment> so that the bounding
+ polygon or smoothed curve is outside all data points.
+ This algorithm is will be replaced in a later gnuplot version.
 
 5 mask
 ?commands plot datafile filters mask
@@ -8331,7 +8335,7 @@ Ffigure_convex_hull
  Syntax:
        smooth {unique | frequency | fnormal | cumulative | cnormal
               | csplines | acsplines | mcsplines  bezier | sbezier
-              | path {expand <scale>}
+              | path
               | kdensity {bandwidth} {period}
               | unwrap}
 
@@ -8493,13 +8497,6 @@ Ffigure_smooth_path
 ^ <a href="http://www.gnuplot.info/demo_6.0/smooth_path.html">
  smooth_path.dem
 ^ </a>
-
- If the set of points being smoothed was generated using the `convexhull`
- filter, an additional keyword `expand` is accepted together with a scale
- factor for the expansion.  See `convexhull`.
- Example:
-      plot DATA convexhull smooth path expand 1.1 with filledcurves, \
-           DATA with points
 5 sbezier
 ?commands plot datafile smooth sbezier
 ?plot datafile smooth sbezier
