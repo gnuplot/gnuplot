@@ -4464,7 +4464,7 @@ Ffigure_newsyntax
 ?watch
  Support for watchpoints is present only if your copy of gnuplot was built
  with configuration option --enable-watchpoints. This feature is EXPERIMENTAL
- [details may change before it appears in a release version].
+ [details may change in a subsequent release version].
 
  Syntax:
        plot FOO watch {x|y|z|F(x,y)} = <value>
@@ -8213,9 +8213,12 @@ Ffigure_convex_hull
 
  If the keyword `smooth` is present, the vertices are then used as guide
  points to generate a smooth closed curve (see `smooth path`). By default
- this smoothed curve runs through the bounding points.  The optional scale
- factor shifts the guide points away from the centroid so that for scale
- values greater than 1.0 all data points lie within the smoothed curve.
+ this smoothed curve runs through the bounding points.
+
+ EXPERIMENTAL: The optional `expand` keyword and scale factor shift the
+ guide points away from the centroid so that for scale values greater than
+ 1.0 the smoothed curve is outside all data points. This procedure is not
+ very satisfactory and will be replaced in a later gnuplot version.
 
 5 mask
 ?commands plot datafile filters mask

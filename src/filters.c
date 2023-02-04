@@ -920,11 +920,16 @@ winnow_interior_points (struct curve_points *plot)
 }
 
 /*
+ * EXPERIMENTAL
+ *
  * expand_hull() "inflates" a smooth convex hull by pushing each
  * perimeter point further away from the centroid of the bounded points.
  * FIXME: The expansion value is currently interpreted as a scale
  *        factor; i.e. 1.0 is no expansion.  It might be better to
  *	  instead accept a fixed value in user coordinates.
+ * FIXME: A common term for this operation is "polygon offsetting".
+ *	  There are several approaches to the problem, probably all
+ *	  better than the one implemented here.
  */
 void
 expand_hull(struct curve_points *plot)
@@ -942,7 +947,6 @@ expand_hull(struct curve_points *plot)
 	points[i].x = xcent + scale * (points[i].x - xcent);
 	points[i].y = ycent + scale * (points[i].y - ycent);
     }
-
 }
 
 /*
