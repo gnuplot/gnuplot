@@ -2942,6 +2942,12 @@ eval_plots()
 				    "This plot style is not available in polar mode");
 	    }
 
+	    /* Rule out incompatible filter options */
+	    if (this_plot->plot_filter != FILTER_NONE) {
+		if (this_plot->plot_style == LABELPOINTS)
+		    int_error(NO_CARET, "label plots cannot use data filters");
+	    }
+
 	    /* If we got this far without initializing the fill style, do it now */
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_FILL) {
 		if (!set_fillstyle) {
