@@ -28,6 +28,7 @@ set xtics auto
 set yrange [*:*]
 set title "Distribution of energy usage of the continents, grouped by type of energy source\n"
 set ylabel "Billion Tons of Oil Equivalent"
+set datafile columnheaders
 
 plot 'energy_circles.dat' using (1):($8/1.e6):(0):4
 
