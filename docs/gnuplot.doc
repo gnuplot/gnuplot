@@ -4,7 +4,7 @@ C
 ?gnuplot
 ^<h2 align="center"> An Interactive Plotting Program </h2>
 ^<p align="center">  Thomas Williams & Colin Kelley</p>
-^<p align="center">  Version 5 organized by Ethan A Merritt and others</p>
+^<p align="center">  Version 6 organized by Ethan A Merritt</p>
 ^<p align="center">Major contributors (alphabetic order):<br>
 ^<br>
 ^  Hans-Bernhard Broeker, John Campbell,<br>
@@ -20,7 +20,7 @@ C
 ^  James R. Van Zandt, Alex Woo, Johannes Zellner<br>
 ^</p>
 ^<p align="center">  Copyright (C) 1986 - 1993, 1998 - 2004   Thomas Williams, Colin Kelley<br>
-^     Copyright (C) 2004 - 2022 various authors</p>
+^     Copyright (C) 2004 - 2023 various authors</p>
 ^<p align="center">   Mailing list for comments: <tt>gnuplot-info@lists.sourceforge.net</tt><br>
 ^   Gnuplot <a href="http://gnuplot.info"> home page </a><br>
 ^      Issue trackers: &nbsp;
