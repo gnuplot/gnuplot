@@ -2526,7 +2526,6 @@ eval_plots()
 		}
 #endif
 
-		/* DEBUG available for hulls only */
 		if (this_plot->plot_filter == FILTER_CONVEX_HULL
 		||  this_plot->plot_filter == FILTER_CONCAVE_HULL)
 		    parse_hull_options(this_plot);

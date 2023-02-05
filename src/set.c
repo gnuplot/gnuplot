@@ -693,7 +693,6 @@ set_command()
 	    break;
 	default:
 #ifdef WITH_CHI_SHAPES
-	    /* DEBUG undocumented "set chi_shape fraction <value>" */
 	    if (almost_equals(c_token,"chi$_shape")
 	    &&  equals(++c_token,"fraction")) {
 		extern double chi_shape_default_length;

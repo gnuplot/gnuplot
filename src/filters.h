@@ -11,13 +11,17 @@
 
 /* If gnuplot ever gets a subsystem to do clustering, this would belong there.
  * As of now, however, the only clustering operations are outlier detection
- * and finding a convex hull, for which the code is in filters.c.
+ * and finding a convex or concave hull, for which the code is in filters.c.
  */
 typedef struct cluster {
     int npoints;
+    double xmin;
+    double xmax;
+    double ymin;
+    double ymax;
     double cx;		/* x coordinate of center-of-mass */
     double cy;		/* y coordinate of center-of-mass */
-    double rmsd;	/* root mean square distance from center of mass */
+    int pin;		/* index of point with minimum x */
 } t_cluster;
 
 /* Exported functions */
