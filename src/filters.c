@@ -71,18 +71,19 @@
  */
 
 static int do_curve_cleanup(struct coordinate *point, int npoints);
-static void winnow_interior_points (struct curve_points *plot);
+static void winnow_interior_points (struct curve_points *plot, t_cluster *cluster);
 static double fpp_SG5(struct coordinate *p);
-static void cluster_find_center(struct coordinate *points, t_cluster *cluster);
-static int cluster_find_cm_outliers (struct coordinate *points, t_cluster *cluster);
+static void cluster_stats(struct coordinate *points, t_cluster *cluster);
 
 /* Variables related to clustering
  * These really belong somewhere else, but the only routines so
  * far that use cluster properties are the hull routines,
  * so keep them together for now.
  *	cluster_outlier_threshold sets criterion for finding outliers
+ *	    not currently settable
  *	chi_shape_default_length sets the default choice of chi_length to
- *		chi_shape_default_length * max(edgelengths)
+ *			chi_shape_default_length * max(edgelengths)
+ *	    currently controlled by "set chi_shape fraction <value>"
  */
 double cluster_outlier_threshold = 0.0;
 double chi_shape_default_length = 0.6;
@@ -760,17 +761,13 @@ do_curve_cleanup( struct coordinate *point, int npoints )
 /*
  * convex_hull() replaces the original set of points with a subset that
  * delimits the convex hull of the original points.
+ * The hull is found using Graham's algorithm
+ *    RL Graham (1972), Information Processing Letters 1: 132–133.
  * winnow_interior_points() is a helper routine that can greatly reduce
  * processing time for large data sets but is otherwise not necessary.
- * expand_hull() pushes the hull points away from the centroid for the
- *	purpose of drawing a smooth bounding curve.
+ * expand_hull() pushes the hull segments away from the interior to
+ * produce a bounding curve exterior to all points.
  * - Ethan A Merritt 2021
- *
- * cluster_find_cm_outliers() calculates the centroid of plot->points.
- *	If cluster_outlier_threshold > 0 it calculates the rmsd distance
- *	of all points to the centroid so that outliers can be flagged
- *	EXCLUDEDRANGE.
- * - Ethan A Merritt 2022
  */
 #define CROSS(p1,p2,p3) \
   ( ((p2)->x - (p1)->x) * ((p3)->y - (p2)->y) \
@@ -785,6 +782,10 @@ convex_hull(struct curve_points *plot)
     int np = plot->p_count;
     int ntop;
 
+    /* cluster is used to hold x/y ranges and centroid */
+    t_cluster cluster;
+    cluster.npoints = plot->p_count;
+
     /* Special cases */
     if (np < 3)
 	return;
@@ -795,25 +796,13 @@ convex_hull(struct curve_points *plot)
 	return;
     }
 
-    /* Find centroid (used by "smooth path expand").
-     * Flag and remove outliers.
-     */
-    if (TRUE) {
-	t_cluster cluster;
-	int outliers = 0;
-	cluster.npoints = plot->p_count;
-	do {
-	    cluster_find_center(plot->points, &cluster);
-	    outliers = cluster_find_cm_outliers(plot->points, &cluster);
-	    plot->filledcurves_options.at = cluster.cx;
-	    plot->filledcurves_options.aty = cluster.cy;
-	} while (outliers > 0);
-    }
+    /* Find x and y limits of points in the cluster.  */
+    cluster_stats(plot->points, &cluster);
 
     /* This is not strictly necessary, but greatly reduces the number
      * of points to be sorted and tested for the hull boundary.
      */
-    winnow_interior_points(plot);
+    winnow_interior_points(plot, &cluster);
 
     /* Sort the remaining points (probably only need to sort on x?) */
     qsort(plot->points, plot->p_count,
@@ -852,7 +841,6 @@ convex_hull(struct curve_points *plot)
     plot->p_count = np;
     plot->p_max = np;
 }
-#undef CROSS
 
 /*
  * winnow_interior_points() is an optional helper routine for convex_hull.
@@ -860,28 +848,22 @@ convex_hull(struct curve_points *plot)
  * points in a quadrilateral bounded by the four points with max/min x/y.
  */
 static void
-winnow_interior_points (struct curve_points *plot)
+winnow_interior_points (struct curve_points *plot, t_cluster *cluster)
 {
 #define TOLERANCE -1.e-10
 
     struct coordinate *p, *pp1, *pp2, *pp3, *pp4;
-    double xmin = VERYLARGE, xmax = -VERYLARGE;
-    double ymin = VERYLARGE, ymax = -VERYLARGE;
     struct coordinate *points = plot->points;
     double area;
     int i, np;
 
-    /* Find maximal extent on x and y, centroid */
+    /* Find points defining maximal extent on x and y */
     pp1 = pp2 = pp3 = pp4 = plot->points;
     for (p = plot->points; p < &(plot->points[plot->p_count]); p++) {
-	if (p->type == UNDEFINED)
-	    continue;
-	if (p->type == EXCLUDEDRANGE)	/* e.g. outlier or category mismatch */
-	    continue;
-	if (p->x < xmin) { xmin = p->x; pp1 = p; }
-	if (p->x > xmax) { xmax = p->x; pp3 = p; }
-	if (p->y < ymin) { ymin = p->y; pp4 = p; }
-	if (p->y > ymax) { ymax = p->y; pp2 = p; }
+	if (p->x == cluster->xmin) pp1 = p;
+	if (p->x == cluster->xmax) pp2 = p;
+	if (p->y == cluster->ymin) pp3 = p;
+	if (p->y == cluster->ymax) pp4 = p;
     }
 
     /* Ignore any points that lie inside the clockwise triangle bounded by pp1 pp2 pp3 */
@@ -925,102 +907,130 @@ winnow_interior_points (struct curve_points *plot)
 }
 
 /*
- * EXPERIMENTAL
- *
- * expand_hull() "inflates" a smooth convex hull by pushing each
- * perimeter point further away from the centroid of the bounded points.
- * This is not a great way to do it, since it expands anisotropically.
- * Also it would not work for concave hulls.
- * Consider this a place-holder for implementation of a better algorithm.
- * FIXME: Since this is no longer attached to a "smooth" option 
- * plot->smooth_parameter is probably not the best place to pass a value.
+ * expand_hull() "inflates" a convex or concave hull by displacing
+ * each edge away from the interior along its normal vector
+ * by requested distance d.
  */
 void
 expand_hull(struct curve_points *plot)
 {
-    struct coordinate *p = plot->points;
-    double xcent = plot->filledcurves_options.at;
-    double ycent = plot->filledcurves_options.aty;
-    double extra = plot->smooth_parameter;
-    double scale;
-    int i;
+    struct coordinate *newpoints = NULL;
+    struct coordinate *points = plot->points;
+    double scale = plot->smooth_parameter;
+    double d = fabs(scale);
+    int N = plot->p_count;
 
-    if (extra <= 0)
-	return;
+    struct coordinate *v1, *v2, *v3;
+    t_cluster cluster;
+    double winding;	/* +1 for clockwise -1 for anticlockwise */
+    int ni;
 
-    for (i=0; i<plot->p_count; i++) {
-	scale = sqrt((p[i].x - xcent) * (p[i].x - xcent) + (p[i].y - ycent) * (p[i].y - ycent));
-	scale = (scale + extra) / scale;
-	p[i].x = xcent + scale * (p[i].x - xcent);
-	p[i].y = ycent + scale * (p[i].y - ycent);
+    /* Determine whether the hull points are ordered clockwise or
+     * anticlockwise.  This allows easy determination of the interior
+     * side of each edge and the concave/convex status of each vertex.
+     */
+    cluster.npoints = N;
+    cluster_stats(points, &cluster);
+    v1 = &points[ (cluster.pin == 0) ? N-2 : cluster.pin-1 ];
+    v2 = &points[cluster.pin];
+    v3 = &points[cluster.pin + 1];
+
+    if (CROSS(v2,v1,v3) > 0)
+	winding = 1.0;
+    else
+	winding = -1.0;
+
+    /* Each edge of the hull is displaced outward by a constant amount d.
+     * At each convex vertex this replaces the original point with two
+     * points that are the vertices of a beveled join.
+     * At each concave vertex this displaces the original point toward
+     * the mouth of the concavity.
+     */
+    newpoints = gp_alloc(2*N * sizeof(struct coordinate), "expand hull");
+    ni = 0;
+    for (int i = 0; i < N; i++) {
+	double m1, m2, d2norm;
+	double dx1, dy1, dx2, dy2;
+
+	v1 = &points[ (i == 0) ? N-2 : i-1 ];
+	v2 = &points[i];
+	v3 = &points[ (i == N-1) ? 1 : i+1 ];
+
+	m1 = (v2->y - v1->y) / (v2->x - v1->x);	/* slope of v1v2 */
+	d2norm = d*d / (1/(m1*m1) + 1);
+	dx1 = copysign( sqrt(d2norm), -winding * (v2->y - v1->y) );
+	dy1 = copysign( sqrt(d*d - d2norm), winding * (v2->x - v1->x) );
+	m2 = (v3->y - v2->y) / (v3->x - v2->x);	/* slope of v2v3 */
+	d2norm = d*d / (1/(m2*m2) + 1);
+	dx2 = copysign( sqrt(d2norm), -winding * (v3->y - v2->y) );
+	dy2 = copysign( sqrt(d*d - d2norm), winding * (v3->x - v2->x) );
+
+	/* convex vertex */
+	if (winding * CROSS(v1,v2,v3) < 0) {
+	    newpoints[ni] = points[i];
+	    newpoints[ni].x = v2->x + dx1;
+	    newpoints[ni].y = v2->y + dy1;
+	    ni++;
+	    newpoints[ni] = points[i];
+	    newpoints[ni].x = v2->x + dx2;
+	    newpoints[ni].y = v2->y + dy2;
+	    ni++;
+
+	/* concave vertex (over-emphasizes steep holes) */
+	} else {
+	    double dnorm = d / sqrt((dx1+dx2)*(dx1+dx2) + (dy1+dy2)*(dy1+dy2));
+	    newpoints[ni] = points[i];
+	    newpoints[ni].x = v2->x + dnorm * (dx1 + dx2);
+	    newpoints[ni].y = v2->y + dnorm * (dy1 + dy2);
+	    ni++;
+	}
     }
+
+    /* Replace original point list with the new one */
+    cp_extend(plot, 0);
+    plot->points = newpoints;
+    plot->p_count = ni;
+    plot->p_max = 2*N;
 }
 
 /*
- * Find center of mass of plot->points.
+ * Find min, max, center of mass points in cluster held in plot->points.
  * All points not marked EXCLUDEDRANGE are assumed to be in a single cluster.
  */
 static void
-cluster_find_center( struct coordinate *points, t_cluster *cluster )
+cluster_stats( struct coordinate *points, t_cluster *cluster )
 {
     double xsum = 0;
     double ysum = 0;
     int excluded = 0;
 
+    cluster->xmin = cluster->ymin = VERYLARGE;
+    cluster->xmax = cluster->ymax = -VERYLARGE;
+    cluster->pin = -1;
+
     for (int i = 0; i < cluster->npoints; i++) {
 	if (points[i].type == EXCLUDEDRANGE || points[i].type == UNDEFINED) {
 	    excluded++;
-	} else {
-	    xsum += points[i].x;
-	    ysum += points[i].y;
+	    continue;
 	}
+	xsum += points[i].x;
+	ysum += points[i].y;
+	if ((cluster->xmin == points[i].x)
+	&&  (points[i].y > points[cluster->pin].y))
+	    cluster->pin = i;
+	if (cluster->xmin > points[i].x) {
+	    cluster->xmin = points[i].x;
+	    cluster->pin = i;
+	    }
+	if (cluster->ymin > points[i].y)
+	    cluster->ymin = points[i].y;
+	if (cluster->xmax < points[i].x)
+	    cluster->xmax = points[i].x;
+	if (cluster->ymax < points[i].y)
+	    cluster->ymax = points[i].y;
     }
     cluster->cx = xsum / (cluster->npoints - excluded);
     cluster->cy = ysum / (cluster->npoints - excluded);
-}
-
-/*
- * Find outliers in a cluster based on distance from center of mass.
- * All points not marked EXCLUDEDRANGE are assumed to be in a single cluster.
- * If a threshold has been set for cluster cm outlier detection, then flag
- * any points whose distance from the center of mass is greater than
- * threshold * cluster.rmsd.
- * Return the number of outliers found.
- */
-static int
-cluster_find_cm_outliers( struct coordinate *points, t_cluster *cluster )
-{
-    double d2 = 0.0;
-    int outliers = 0;
-
-    if (cluster_outlier_threshold <= 0)
-	return 0;
-
-    for (int i = 0; i < cluster->npoints; i++) {
-	if (points[i].type == UNDEFINED)
-	    continue;
-	if (points[i].type == EXCLUDEDRANGE)
-	    continue;
-	d2 += (points[i].x - cluster->cx) * (points[i].x - cluster->cx)
-	    + (points[i].y - cluster->cy) * (points[i].y - cluster->cy);
-    }
-    cluster->rmsd = sqrt(d2 / cluster->npoints);
-    for (int i = 0; i < cluster->npoints; i++) {
-	if (points[i].type == UNDEFINED)
-	    continue;
-	if (points[i].type == EXCLUDEDRANGE)
-	    continue;
-	d2 = (points[i].x - cluster->cx) *(points[i].x - cluster->cx)
-	   + (points[i].y - cluster->cy) *(points[i].y - cluster->cy);
-	if (sqrt(d2) > cluster->rmsd * cluster_outlier_threshold) {
-	    points[i].type = EXCLUDEDRANGE;
-	    outliers++;
-	}
-    }
-
-    FPRINTF((stderr, "cluster_find_cm_outliers:\n\trmsd = %g   outliers: %d\n",
-	    cluster->rmsd, outliers));
-    return outliers;
 }
 
 /*
@@ -1122,7 +1132,7 @@ sharpen(struct curve_points *plot)
 	    newcount++;
 	}
     }
-    
+
     /* Equivalent search for maxima */
     for (int i = 4; i < plot->p_count-4; i++) {
 	TBOOLEAN criterion = FALSE;
@@ -1175,7 +1185,7 @@ fpp_SG5( struct coordinate *p )
 	return 0;
     fpp = 2.0 * (p-2)->y - (p-1)->y - 2.0 * p->y - (p+1)->y + 2.0 * (p+2)->y;
     fpp /= 7.0;
-    
+
     return fpp;
 }
 
@@ -1247,7 +1257,7 @@ static int n_bounding_edges = 0;
 static int max_bounding_edges = 0;
 
 /*
- * Free local storage
+ * Free local storage (called also from global reset command)
  */
 void
 reset_hulls()
@@ -1266,8 +1276,8 @@ reset_hulls()
  * The points are taken from the current plot structure.
  * This is a filter operation; i.e. it is called from a gnuplot "plot"
  * command after reading in data but before smoothing or plot generation.
- * The resulting list of triangles is stored in good_triangles.
- * The edges making up the convex hull are stored in bounding_edges.
+ * The resulting triangles are stored in a list with head good_triangles.
+ * The edges making up the convex hull are stored in array bounding_edges[].
  * All points that lie on the hull are flagged by setting
  *     point->extra = HULL_POINT
  */
@@ -1704,7 +1714,7 @@ concave_hull( struct curve_points *plot )
     struct coordinate *newpoints;
     double chi_length = 0.0;
 
-    /* Apply χ-shapes */
+    /* Construct χ-shape */
     udv = get_udv_by_name("chi_length");
     if (udv && udv->udv_value.type == CMPLX)
 	chi_length = real(&(udv->udv_value));
@@ -1718,19 +1728,8 @@ concave_hull( struct curve_points *plot )
 	chi_length *= chi_shape_default_length;
     }
 
-
     chi_reduction( plot, chi_length );
     fill_gpval_float("GPVAL_CHI_LENGTH", chi_length);
-
-    /* Find centroid (used by "smooth path expand") */
-    /* FIXME: When that expansion method goes away, so can this */
-    if (TRUE) {
-	t_cluster cluster;
-	cluster.npoints = plot->p_count;
-	cluster_find_center(plot->points, &cluster);
-	plot->filledcurves_options.at = cluster.cx;
-	plot->filledcurves_options.aty = cluster.cy;
-    }
 
     /* Replace original points with perimeter points as a closed curve.
      * This wipes out bounding_edges as it goes.
