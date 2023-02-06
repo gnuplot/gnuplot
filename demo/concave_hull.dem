@@ -2,7 +2,7 @@
 # Debugging / test code for Delaunay triangulation, χ-shapes,
 # and generation of concave hulls.
 #
-if (!exists("N")) N = 17
+if (!exists("N")) { N = 17 }
 
 set sample N*10
 
@@ -30,11 +30,12 @@ plot $DATA using 1:2 convexhull with lines lw 2 lt 4 title "convex", \
 
 pause -1 "<cr> to continue"
 
-set style fill transparent solid 0.25 border
+set style fill transparent solid 0.25 noborder
 
-plot $DATA using 1:2 concavehull smooth path with filledcurve fc "dark-green" lw 2 title "smooth concave", \
-     $DATA using 1:2 convexhull with lines lw 1 lt 4 title "convex", \
+plot $DATA using 1:2 concavehull expand .05 smooth path with filledcurve fc "dark-green" \
+           title "expand .05 smooth concave", \
      $DATA using 1:2 concavehull with lines lc "blue" title "concave", \
+     $DATA using 1:2 convexhull with lines lw 1 lt 4 title "convex", \
      $DATA using 1:2 with points pt 7 ps 0.5 lc "black" notitle, \
      keyentry title sprintf("chi_length = %.2f",GPVAL_CHI_LENGTH) noenhanced
 
@@ -46,6 +47,7 @@ pause -1 "<cr> to continue"
 # This will fail if the debugging code is not present or not enabled.
 #
 if (N < 50) {
+    set style fill transparent solid 0.25 border
     plot $DATA using 1:2 delaunay with polygons fs empty lw 0.5 title "Delaunay triangulation", \
         $DATA using 1:2 concavehull with filledcurve fc "dark-green" lw 2 title "concavehull", \
 	$DATA using 1:2 with points pt 7 ps 0.5 lc "black" notitle, \

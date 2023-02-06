@@ -8316,10 +8316,11 @@ Ffigure_zerror
 ?convexhull
 
  Convexhull is not a plot style. It can appear either alone as a filter 
- keyword or in combination with `smooth path`.
+ keyword or in combination with `smooth path` and/or `expand <increment>`.
 
       plot FOO using x:y convexhull
-      plot FOO using x:y convexhull smooth path {expand <scale>}
+      plot FOO using x:y convexhull smooth path
+      plot FOO using x:y convexhull expand <increment> {smooth path}
 
 Ffigure_convex_hull
  The points in FOO are replaced by a subset of the original points that
@@ -8335,10 +8336,11 @@ Ffigure_convex_hull
  points to generate a smooth closed curve (see `smooth path`). By default
  this smoothed curve runs through the bounding points.
 
- EXPERIMENTAL: The optional `expand` keyword and scale factor shift the
- guide points away from the centroid so that for scale values greater than
- 1.0 the smoothed curve is outside all data points. This procedure is not
- very satisfactory and will be replaced in a later gnuplot version.
+ EXPERIMENTAL: The optional `expand` keyword and increment shift the
+ edge segments of the hull away from the interior by an incremental distance.
+ The displaced segments are then connected using miter joins; this means
+ that each vertex of the original hull is replaced by two vertices, since
+ there is now a gap between the to adjoining edges.
 
 5 concavehull
 ?commands plot datafile filters concavehull
@@ -8350,6 +8352,8 @@ Ffigure_convex_hull
 ?concavehull
 
  EXPERIMENTAL (implementation details may change in a future release).
+ Present only if your copy of gnuplot was configured --enable-chi-shapes.
+
  Concavehull is not a plot style. It is a filter that finds a bounding
  polygon, a "hull",  of the input data points and replaces the original points
  with an ordered subset of points that lie along the perimeter of this polygon.
@@ -8379,9 +8383,17 @@ Ffigure_concave_hull_2
  been set by the user, gnuplot will choose one automatically but there is
  no guarantee that this value is suitable for your data.  For the data used
  in the figures shown here gnuplot would choose chi_length=22.6 by default,
- which is 60% of the length of the longest edge in the convex hull.
+ which is 0.6 of the length of the longest edge in the convex hull.
+ You can change the fraction of the longest edge used as a default with the
+ command `set chi_shape fraction <value>`
+
  The value of `chi_length` used in the current plot, whether provided by the
  user or chosen by the program, is saved to variable GPVAL_CHI_LENGTH.
+
+ The optional `expand` keyword and increment shift each edge segment of the
+ hull away from the interior by a fixed distance.  This creates a new set of
+ points describing a closed curve that lies outside all of the original points.
+ It can be combined with `smooth path`.
 
 5 mask
 ?commands plot datafile filters mask
@@ -8521,7 +8533,7 @@ Ffigure_concave_hull_2
  Syntax:
        smooth {unique | frequency | fnormal | cumulative | cnormal
               | csplines | acsplines | mcsplines  bezier | sbezier
-              | path {expand <scale>}
+              | path
               | kdensity {bandwidth} {period}
               | unwrap}
 
@@ -8683,13 +8695,6 @@ Ffigure_smooth_path
 ^ <a href="http://www.gnuplot.info/demo_6.0/smooth_path.html">
  smooth_path.dem
 ^ </a>
-
- If the set of points being smoothed was generated using the `convexhull`
- filter, an additional keyword `expand` is accepted together with a scale
- factor for the expansion.  See `convexhull`.
- Example:
-      plot DATA convexhull smooth path expand 1.1 with filledcurves, \
-           DATA with points
 5 sbezier
 ?commands plot datafile smooth sbezier
 ?plot datafile smooth sbezier
@@ -10439,6 +10444,16 @@ Ffigure_smooth_path
  It sets the extent of each box along the y axis, i.e. its thickness.
  `set boxdepth square` will try to choose a y extent that gives the appearance
  of a square cross section independent of the axis scales on x and y.
+3 chi_shapes
+?command set chi_shapes
+?set chi_shapes
+?chi_shapes
+      set chi_shapes fraction <value>
+ The concave hull filter creates χ-shapes defined by a characteristic length
+ chi_length.  If no chi_length variable has been set, it chooses a value equal
+ to some fraction of the longest edge in the bounding polygon (default 0.6).
+ Choosing a value of 1.0 will reduce the resulting hull to the convex hull.
+ Smaller values will produce increasingly concave hulls. See `concavehull`.
 3 color
 ?commands set color
 ?set color
