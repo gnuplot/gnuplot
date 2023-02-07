@@ -12,7 +12,11 @@ Changes in 5.4.6
 * FIX    x11: bad interactions of lt nodraw, bgnd and dash pattern     Bug #2572
 * FIX    wxt: export-to-file widget should preserve line properties
 * FIX	 svg: set initial default fill to "none"
+* FIX    png: back-compatibility with very old versions of gdlib       Bug #2579
 * FIX    variable pointtype, pointsize in plot style yerrorlines
+* FIX	 border color for polygons with variable fillcolor
+* FIX	 definition followed by iteration in a plot command            Bug #2580
+* FIX	 parametric plot with filledcurves y1=<limit>                  Bug #1797
 
 Changes in 5.4.5
 ================

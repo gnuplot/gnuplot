@@ -1,11 +1,8 @@
-		Gnuplot Version 5.4.5 Release Notes
+		Gnuplot Version 5.4.6 Release Notes
 		===================================
 
-The 5.4.5 patchlevel release contains bug fixes for a serious regression
-in 5.4.4 and for a long-standing problem with the Windows qt terminal.
-
-It also adds two new features back-ported from the development version,
-"set key offset" and data-driven histogram coloring.
+The 5.4.6 patchlevel release contains various terminal-specific bug fixes.
+It also adds two new features back-ported from the development version.
 
 Gnuplot development is tracked in a git repository on SourceForge.
 You can generate a complete history of changes using "git log"
@@ -13,7 +10,27 @@ after downloading:
 
 	git clone -b branch-5-4-stable git://git.code.sf.net/p/gnuplot/gnuplot-main
 
-Release Notes date:  28-Sep-2022
+Release Notes date:  31-Jan-2023
+
+Changes in 5.4.6
+================
+* NEW    set key {columns <exact no of columns>}
+         set key {keywidth <exact width>}
+* NEW    XDG support
+	   startup file:      $XDG_CONFIG_HOME/gnuplot/gnuplotrc
+	   history file:      $XDG_STATE_HOME/gnuplot_history
+	   wxt configuration: $XDG_CONFIG_HOME/gnuplot/gnuplot-wxt.conf
+* CHANGE remove "alldoc" build target
+* CHANGE plot with polygons fillstyle empty really does mean empty
+* FIX    windows: various problems mixing piped input and stdin        Bug #2491
+* FIX    x11: bad interactions of lt nodraw, bgnd and dash pattern     Bug #2572
+* FIX    wxt: export-to-file widget should preserve line properties
+* FIX	 svg: set initial default fill to "none"
+* FIX	 png: back-compatibility with very old versions of gdlib       Bug #2579
+* FIX    variable pointtype, pointsize in plot style yerrorlines
+* FIX	 border color for polygons with variable fillcolor
+* FIX	 definition followed by iteration in a plot command            Bug #2580
+* FIX	 parametric plot with filledcurves y1=<limit>                  Bug #1797
 
 Changes in 5.4.5
 ================
@@ -295,7 +312,7 @@ Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-5.4.4 ; ./configure ; make
+      cd gnuplot-5.4.6 ; ./configure ; make
 test it:
       make check
 install it:
