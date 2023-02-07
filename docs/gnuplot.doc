@@ -13769,9 +13769,8 @@ Ffigure_multiple_keys
 ?unset style arrow
 ?show style arrow
 ?arrowstyle
- Each terminal has a default set of arrow and point types, which can be seen
- by using the command `test`.  `set style arrow` defines a set of arrow types
- and widths and point types and sizes so that you can refer to them later by
+ You can use `set style arrow` to define a set of arrow types.  Each type has
+ its own width, point type, color, etc so that you can refer to them later by
  an index instead of repeating all the information at each invocation.
 
  Syntax:
