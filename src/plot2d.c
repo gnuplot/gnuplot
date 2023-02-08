@@ -1006,7 +1006,11 @@ get_data(struct curve_points *current_plot)
 		ylow = v[1] - v[2];
 		yhigh = v[1] + v[2];
 	    }
-	    store2d_point(current_plot, i++, v[0], v[1],
+	    if (polar) /* Polar mode bars need both xlow/high and ylow/high */
+		store2d_point(current_plot, i++, v[0], v[1],
+					v[0], v[0], ylow, yhigh, -1.0);
+	    else
+		store2d_point(current_plot, i++, v[0], v[1],
 					var_ps, var_pt, ylow, yhigh, -1.0);
 	    break;
 	}
@@ -1478,8 +1482,8 @@ store2d_point(
 	break;
     case YERRORBARS:		/* auto-scale ylow yhigh */
     case YERRORLINES:		/* auto-scale ylow yhigh */
-	cp->CRD_PTSIZE = xlow;
-	cp->CRD_PTTYPE = xhigh;
+	cp->xlow = xlow;	/* really theta if polar; CRD_PTSIZE otherwise */
+	cp->xhigh = xhigh;	/* really theta if polar; CRD_PTTYPE otherwise */
 	STORE_AND_UPDATE_RANGE(cp->ylow, ylow, dummy_type, current_plot->y_axis,
 				current_plot->noautoscale, cp->ylow = -VERYLARGE);
 	STORE_AND_UPDATE_RANGE(cp->yhigh, yhigh, dummy_type, current_plot->y_axis,
