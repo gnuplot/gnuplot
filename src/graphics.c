@@ -2417,8 +2417,8 @@ plot_points(struct curve_points *plot)
 
 		/* Feb 2016: variable point type */
 		if ((plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS
-		     || plot->plot_style == YERRORLINES
-		     || plot->plot_style == YERRORBARS)
+		     || (!polar && (plot->plot_style == YERRORLINES))
+		     || (!polar && (plot->plot_style == YERRORBARS)))
 		&&  (plot->lp_properties.p_type == PT_VARIABLE)
 		&&  !(isnan(plot->points[i].CRD_PTTYPE))) {
 		    pointtype = plot->points[i].CRD_PTTYPE - 1;
@@ -2443,8 +2443,8 @@ plot_points(struct curve_points *plot)
 
 		if ((plot->lp_properties.p_size == PTSZ_VARIABLE)
 		&&  (plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS
-		     || plot->plot_style == YERRORLINES
-		     || plot->plot_style == YERRORBARS))
+		     || (plot->plot_style == YERRORLINES && !polar)
+		     || (plot->plot_style == YERRORBARS && !polar)))
 		    (*t->pointsize)(pointsize * plot->points[i].CRD_PTSIZE);
 
 		/* rgb variable  -  color read from data column */
