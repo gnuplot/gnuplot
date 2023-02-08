@@ -1,12 +1,12 @@
-<html><head><title>Demos for gnuplot version 5.5</title>
+<html><head><title>Demos for gnuplot version 6.1</title>
 
 <link text="text/css" href="gnuplot_demo.css" rel="stylesheet"></head><body>
 
 
-<h2 align=center>Demos for gnuplot version 5.5 (pngcairo terminal)<br>
+<h2 align=center>Demos for gnuplot version 6.1 (pngcairo terminal)<br>
     See also the demo output for the
-    <a href="../demo_svg_5.5/">SVG</a> and
-    <a href="../demo_canvas_5.5/">canvas</a> terminals.
+    <a href="../demo_svg_6.1/">SVG</a> and
+    <a href="../demo_canvas_6.1/">canvas</a> terminals.
 </h2>
 
 <table border="0" width="100%">
@@ -84,7 +84,6 @@
     <li><a href="pm3d.html">pm3d coloring</a></li>
     <li><a href="hidden2.html">pm3d hidden surfaces</a></li>
     <li><a href="pm3d_clip.html">pm3d clipping</a></li>
-    <li><a href="world2.html">3D mapping</a></li>
     <li><a href="projection.html">2D projection of 3D surface</a></li>
     <li><a href="zerror.html">shaded error region</a></li>
     <li><a href="azimuth.html">azimuth</a></li>
@@ -125,7 +124,7 @@
     <li><a href="polar_quadrants.html">polar quadrants</a></li>
     <li><a href="world.html">cylindrical/spherical</a></li>
     <li><a href="timedat.html">time/date coords</a></li>
-    <li><a href="sampling.html">coord sampling ranges</a></li>
+    <li><a href="sampling.html">coordinate sampling ranges</a></li>
     </ul>
 
     <h4>Binary and Image data </h4>
@@ -270,7 +269,7 @@
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated October 2022</i>
+    <i>This page generated February 2023</i>
     </td>
 
     <td>
@@ -278,9 +277,9 @@
     <li><a href="http://sourceforge.net/projects/gnuplot/">
 	Gnuplot development pages on SourceForge</a></li>
     <li>On-line PDF documentation in
-	<a href="http://gnuplot.sourceforge.net/docs_5.5/gnuplot.pdf">English</a>
+	<a href="http://gnuplot.sourceforge.net/docs_6.1/gnuplot.pdf">English</a>
 	and
-	<a href="http://gnuplot.sourceforge.net/docs_5.5/gnuplot-ja.pdf">Japanese</a>
+	<a href="http://gnuplot.sourceforge.net/docs_6.1/gnuplot-ja.pdf">Japanese</a>
     </li>
     </ul>
     </td>

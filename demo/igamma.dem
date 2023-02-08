@@ -1,10 +1,10 @@
 #
-# Show limitation in old (prior to version 5.5) igamma domain and convergence
+# Show limitation in old (prior to version 6) igamma domain and convergence
 #
 save_encoding = GPVAL_ENCODING
 set encoding utf8
 
-set title "igamma domain and convergence improved in version 5.5"
+set title "igamma domain and convergence improved in version 6"
 
 set label 1 at graph 0.1, 0.8
 set label 1 "igamma(a,z) = {Γ^{-1}(a) {/*2 ∫@_{/*0.5 0}^{/*.5 z}} {/:Italic t^{a-1}e^{-t}dt}"
@@ -26,7 +26,7 @@ reset
 #
 # Previous igamma algorithm fails to converge for large a
 #
-set title "igamma domain and convergence improved in version 5.5"
+set title "igamma domain and convergence improved in version 6"
 set border -1 front linewidth 1.000
 set view 46, 16, 1, 1
 set samples 201, 201

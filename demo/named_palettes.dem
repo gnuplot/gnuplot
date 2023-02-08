@@ -49,7 +49,7 @@ pause -1 "<cr> to continue"
 # Method 2 (new in development version)
 #	"set pm3d interpolate" works now
 #	"set pm3d lighting" also works
-set title "Version 5.5 offers a new keyword to access this palette"
+set title "Version 6 offers a new keyword to access this palette"
 
 set palette defined (0 "dark-blue", 1 "white")
 set colormap new bluemap

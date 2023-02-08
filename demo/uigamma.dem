@@ -33,7 +33,7 @@ reset
 #                  Q(a,x) as uigamma
 #
 unset key
-set title offset 0, -7
+set title offset 0, -7.5
 set pointsize 0.5
 set grid x
 
@@ -41,7 +41,7 @@ set multiplot layout 2,1 upwards margins 0.25, 0.95, 0.1, 0.95 spacing 0, screen
 set xrange [83. : 89.]
 set yrange [1. - 2.e-15 : 1.0]
 set format y "%.16f"
-set title "Lower incomplete gamma function:     igamma(23, x)"
+set title "Lower incomplete gamma function:     igamma(23, x)\n(low precision in this range)"
 plot igamma(23., x) with points notitle
 
 set format y " %h"
