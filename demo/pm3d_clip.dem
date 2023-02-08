@@ -20,13 +20,13 @@ set ztics 5
 
 f(x,y) = x**2 + y**2 * (1 - x)**3
 
-set multiplot layout 1,2 title "new pm3d default is smooth clipping against zrange"
+set multiplot layout 1,2 title "Gnuplot 6 pm3d default is smooth clipping against zrange"
 set title "set pm3d clip4in (old default)"
 set pm3d clip4in
 
 splot f(x,y) with pm3d fc "cyan"
 
-set title "set pm3d clip (new default)"
+set title "set pm3d clip (Gnuplot 6)"
 set pm3d clip
 
 replot
