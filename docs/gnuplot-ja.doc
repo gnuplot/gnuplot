@@ -1,5 +1,4 @@
-C RCS $Id: gp540-j.doc,v 1.10 2022-09-26 18:39:10+09 shige Exp $
-C corresponding original gnuplot.doc for 5.4.5 (2022-09)
+C corresponding original gnuplot.doc for 5.4.6 (2023-02)
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -293,8 +292,8 @@ C 行が長いのは、できればなんとかしたい
 #b `splot $voxelgrid with {dots|points}` は、指定した閾値レベルより上の
 ## 値のすべてのボクセルに印をつけます。
 #b `splot $voxelgrid with isosurface` は、指定した閾値レベルより上の値
-## のすべてのボクセルを包むモザイク型の 3 次元曲面を生成します。以下参
-## 照: `isosurface`。
+## のすべてのボクセルを包むモザイク型の 3 次元曲面を生成します。以下
+## 参照: `isosurface`。
 #b ボクセル格子値は、3 次元描画時に `using` 指定で参照できます。
 #b `set spiderplot` は、クモの巣グラフ (レーダーチャートとも) を生成す
 ## る新しい描画モードを選択します。これは本質的には、軸を縦に並べる代わ
@@ -343,7 +342,7 @@ C 行が長いのは、できればなんとかしたい
 ## 字列として読ませます。これは、凡例行の生成には影響を与えないことを除
 ## けば `set key autotitle columnheader` と同等です。このオプションの有
 ## 効時には、コマンド `stats` は先頭行の文字列の配列を生成します。
-#b 多様な textbox style を定義できます。以下参照: `set style textbox`
+#b 多様な textbox style を定義できます。以下参照: `set style textbox`。
 #end
 
 4 新しい出力形式や出力形式オプション
@@ -419,15 +418,16 @@ C 行が長いのは、できればなんとかしたい
 ##         通し番号) を返します。よって MxN 行列の A[i,j] 要素に対して、
 ##         column(0) / M は行番号 i になり
 ##         column(0) % M は列番号 j になります。
-#b (5.4.5) 凡例 (key) の箱の位置は、gnuplot が他に行う仕組みによるどん
-##         な位置決めに対しても、オフセットを与えることで手動で調整でき
-##         ます。
 #b (5.4.5) "plot with histograms" の構成要素の箱は、種類/色の情報を示す
 ##         別の列の値によって色付けすることができます。以下参照:
 ##         `lc variable`。
 #b (5.4.5) 文字列から整数への変換機構が、0 につながる数字を 8 進数を意
 ##         味すると誤って解釈するというバージョン 5.4.4 の仕組みを後退
 ##         させることで修正
+#b (5.4.5) 凡例 (key) の箱の位置は、gnuplot が他に行う仕組みによるどん
+##         な位置決めに対しても、オフセットを与えることで手動で調整でき
+##         ます。
+#b (5.4.6) 凡例の列数、幅を正確に決める `set key` の新しいオプション。
 #end
 
 4 変更点 (Changes)
@@ -439,7 +439,7 @@ C 行が長いのは、できればなんとかしたい
 #b `set pm3d border retrace` は、隣接する pm3d 四辺形同士を同じ色境界で
 ## 塗ることで、内在するアンチエイリアスの副産物を解消します。
 #b 描画スタイル `with parallelaxes` の書式の改良。以下参照: `parallel`。
-## histgram, parallelaxis, spiderplot スタイルでは、描画要素を繰返し出
+## histogram, parallelaxis, spiderplot スタイルでは、描画要素を繰返し出
 ## 力する書式を使用できます:
 ##      `plot for [column=1:N] DATA using column`
 #b `set trange` が疑似ファイル '+' が生成する標本点に影響するように。
@@ -458,11 +458,11 @@ C 行が長いのは、できればなんとかしたい
 4 新しい描画スタイルやスタイルオプション
 #start
 #b 3 次元描画スタイル `with zerrorfill`。以下参照: `zerrorfill`,
-## `fenceplots`,
+## `fenceplots`。および
 ^ <a href="http://gnuplot.info/demo_5.4/zerror.html">
    zerror デモ。
 ^ </a>
-#b ビースウォームグラフ。以下参照: `set jitter`, `beeswarm`,
+#b ビースウォームグラフ。以下参照: `set jitter`, `beeswarm`。および
 ^ <a href="http://gnuplot.info/demo_5.4/jitter.html">
    ビースウォームグラフデモ。
 ^ </a>
@@ -478,13 +478,14 @@ C 行が長いのは、できればなんとかしたい
 #start
 #b ラベル、矢 (arrow)、オブジェクトの定義に極座標が使えます。
 #b `set [m]ttics` は極座標モードでの外周方位軸のラベルと刻みを配置しま
-## す。以下参照:
+## す。参考:
 ^ <a href="http://gnuplot.info/demo_5.4/ttics.html">
    極座標軸と刻みラベルデモ
 ^ </a>
 #b `set rlabel` は動径軸 (r 軸) の上にラベルを配置します。
 #b 逆向きの `rrange` (例: set rrange [90:0]) で天球地平座標 (celestial
-## horizontal coordinates) が使えるようになります。以下参照:
+## horizontal coordinates) が使えるようになります。参考:
+## い:
 ^ <a href="http://gnuplot.info/demo_5.4/solar_path.html">
    天体軌道デモ
 ^ </a>
@@ -1218,10 +1219,11 @@ C  need @ in table, so end and restart the table !
  ラリに入れることができます。
 
  Unix においては、カレントディレクトリに .gnuplot というファイルがない
- 場合には、HOME に定義されたディレクトリを探します。MS-DOS, Windows,
- OS/2 では GNUPLOT がその役割に使われます。Windows では、NT 専用の変数
- USERPROFILE も参照されます。VMS では SYS$LOGIN です。`help startup`
- と打ってみてください。
+ 場合には、HOME に定義されたディレクトリを探します。追加で、gnuplot は
+ $XDG_CONFIG_HOME/gnuplot/gnuplotrc もチェックし、それは .gnuplot の後
+ に読み込みます。MS-DOS, Windows, OS/2 では GNUPLOT がその役割に使われ
+ ます。Windows では、NT 専用の変数 USERPROFILE も参照されます。VMS では
+ SYS$LOGIN です。`help startup` と打ってみてください。
 
  Unix においては、PAGER がヘルプメッセージの出力用のフィルタとして使わ
  れます。
@@ -1822,8 +1824,8 @@ C マーカを doc2html へのこのシグナルとして使用します。
 ?rand
 #rand(x) & 整数 & 開区間 (0:1) 内の疑似乱数生成器 \\
 %rand(x)@整数@開区間 (0:1) 内の疑似乱数生成器
- 関数 `rand(x)` は、開区間 (0:1) 内の疑似乱数を返します。詳しくは以下参
- 照: `random`。
+ 関数 `rand(x)` は、開区間 (0:1) 内の疑似乱数を返します。詳しくは以下
+ 参照: `random`。
 4 real
 ?expressions functions real
 ?real
@@ -3529,13 +3531,16 @@ Ffigure_newsyntax
 ?start-up
 ?initialization
 ?.gnuplot
+?gnuplotrc
  起動時に、gnuplot はまずシステム用の初期設定ファイル `gnuplotrc` を探
  します。そのファイルの置き場所は gnuplot のインストール時に決定され、
  `show loadpath` で知ることができます。次にユーザのホームディレクトリ内
  に個人用の設定ファイルを探します。そのファイルは Unix 系のシステムでは
  `.gnuplot` であり、その他の処理系では `GNUPLOT.INI` となっています。
  (OS/2 では、環境変数 `GNUPLOT` に設定されている名前のディレクトリ内に
- それを探します; Windows では、`APPDATA` を使用します)。
+ それを探します; Windows では、`APPDATA` を使用します)。Unix 系のシステ
+ ムでは、追加で gnuplot は $XDG_CONFIG_HOME/gnuplot/gnuplotrc もチェッ
+ クします。
  注意: インストール時に `gnuplot` が最初にカレントディレクトリを探すよ
  うに設定できますが、セキュリティ上危険なのでそれは推奨しません。
 2 文字列定数、文字列変数、文字列関数 (Strings)
@@ -4561,7 +4566,7 @@ Ffigure_histeps
 
  一つ追加のスタイルオプション `set style histogram nokeyseparators` は、
  複数のヒストグラムを含むグラフにのみ適切なものです。その場合の追加説明
- については、以下参照: `newhistgram`。
+ については、以下参照: `newhistogram`。
 
  例:
 Ffigure_histclust
@@ -5006,13 +5011,26 @@ Ffigure_points
       plot DATA using x:y:pointsize:pointtype:color \
            with points lc variable pt variable ps variable
 
- 注意: 「ユーザ定義変数」の方の variable に関する情報については、以下参
- 照: `variables`。
+ 注意: 「ユーザ定義変数」の方の variable に関する情報については、以下
+ 参照: `variables`。
 2 polygons
 ?plotting styles polygons
 ?style polygons
 ?with polygons
 ?polygons
+ 2 次元グラフ:
+
+      plot DATA {using 1:2} with polygons
+
+ `plot with polygons` は、現在は `plot with filledcurves closed` として
+ 処理されます。各多角形には、3 列目の値を与え、キーワード `lc variable`
+ を指定する (その値を linetype と解釈) か、`lc rgb variable` を指定する
+ (その値を 24 ビット RGB 色と解釈) ことで、個別の色を割り当てることがで
+ きます。多角形の最初の頂点の色の値のみが使用されます。境界の線種は、も
+ しあれば塗り潰しスタイル (fill style) から取ります。
+
+ 3 次元グラフ:
+
       splot DATA {using x:y:z} with polygons
             {fillstyle <fillstyle spec>}
             {fillcolor <colorspec>}
@@ -5022,13 +5040,9 @@ Ffigure_points
  なければいけません。
  個々の多角形を定義する頂点は、入力ファイルの連続する行から読み込みます。
  空行は多角形同士を分離します。
-
- 塗り潰しスタイルと色は、splot コマンド上で指定できますが、そうでなけれ
- ば大域的な塗り潰しスタイルの `set style fill` の設定を使用します。pm3d
- ルーチンの制限のため、`set pm3d border` による一つの境界線スタイルが、
- すべての多角形に適用されますが、この制限は将来の版の gnuplot では取り
- 除かれるでしょう。
-
+ pm3d ルーチンの制限のため、`set pm3d border` による一つの境界線スタイ
+ ルが、すべての 3 次元多角形に適用されますが、この制限は将来の版の
+ gnuplot では取り除かれるでしょう。
  面には、pm3d のソート順と光源モデルを適用しますので、常に、
  `set pm3d depthsort` を使う方がいいかもしれせん。
 
@@ -5175,7 +5189,8 @@ Ffigure_xerrorbars
       3 列:  x  y  xdelta
       4 列:  x  y  xlow  xhigh
 
- 入力列を追加 (4,5 列目) すると、variable color として使われます。
+ 入力列を追加 (4,5 列目) するとそれらを variable color として使います。
+ このスタイルでは、variable point 属性は使えません。
 
 2 xyerrorbars
 ?plotting styles xyerrorbars
@@ -5202,8 +5217,8 @@ Ffigure_xyerrorbars
 
        plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorbars
 
- 入力列を追加 (5,7 列目) すると、それらは各データ点毎の variable color
- 情報として使われます。
+ 入力列を追加 (5,7 列目) するとそれらを variable color として使います。
+ このスタイルでは、variable point 属性は使えません。
 
 #TeX \newpage
 2 yerrorbars
@@ -5250,7 +5265,8 @@ Ffigure_xerrorlines
       3 列:  x  y  xdelta
       4 列:  x  y  xlow  xhigh
 
- 入力列を追加 (4,5 列目) すると、variable color として使われます。
+ 入力列を追加 (4,5 列目) するとそれらを variable color として使います。
+ このスタイルでは、variable point 属性は使えません。
 
 2 xyerrorlines
 ?plotting styles xyerrorlines
@@ -5276,8 +5292,8 @@ Ffigure_xyerrorlines
 
        plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorlines
 
- 入力列を追加 (5,7 列目) すると、それらは各データ点毎の variable color
- 情報として使われます。
+ 入力列を追加 (5,7 列目) するとそれらを variable color として使います。
+ このスタイルでは、variable point 属性は使えません。
 
 2 yerrorlines
 ?plotting styles yerrorlines
@@ -5298,8 +5314,8 @@ Ffigure_yerrorlines
       3 列:  x  y  ydelta
       4 列:  x  y  ylow  yhigh
 
- 入力列を追加 (4,5 列目) すると、それらは点の variable color 情報として
- 使われます。
+ 入力列を追加すると、それらは可変 (variable) pointsize, 可変 pointtype,
+ 可変色 (variable color) の情報として使われます。
 
  以下も参照。
 ^ <a href="http://www.gnuplot.info/demo/mgr.html">
@@ -6098,12 +6114,12 @@ Ffigure_zerror
  バージョン 5 では非推奨。
  以下のユーザ変数は、fit の挙動に影響を与えるために使われます。
 
-     FIT_LIMIT - `set fit limit <epsilon>` を使用のこと
-     FIT_MAXITER - `set fit maxiter <number_of_cycles>` を使用のこと
-     FIT_START_LAMBDA - `set fit start-lambda <value>` を使用のこと
-     FIT_LAMBDA_FACTOR - `set fit lambda-factor <value>` を使用のこと
-     FIT_SKIP - datafile の `every` 指定を使用のこと
-     FIT_INDEX - 以下参照: `fit multi-branch`
+     FIT_LIMIT - `set fit limit <epsilon>` を使用のこと。
+     FIT_MAXITER - `set fit maxiter <number_of_cycles>` を使用のこと。
+     FIT_START_LAMBDA - `set fit start-lambda <value>` を使用のこと。
+     FIT_LAMBDA_FACTOR - `set fit lambda-factor <value>` を使用のこと。
+     FIT_SKIP - datafile の `every` 指定を使用のこと。
+     FIT_INDEX - 以下参照: `fit multi-branch`。
 
 4 環境変数 (control environment)
 ?commands fit control environment
@@ -6515,8 +6531,8 @@ Ffigure_zerror
  (parametric) では 2 つの関数から)、または一つのデータファイルから読み
  込まれるもの、または事前に定義された名前付きデータブロックから読み込ま
  れるもの、のいずれかです。コンマで区切ることで、複数のデータファイル、
- データブロック、関数などを 1 つの plot コマンドで描画できます。以下参
- 照: `data`, `inline data`, `functions`。
+ データブロック、関数などを 1 つの plot コマンドで描画できます。以下
+ 参照: `data`, `inline data`, `functions`。
 
  関数、変数の定義の描画要素は、画像出力を生成しません。下の 3 つ目の例
  を参照してください。
@@ -6953,8 +6969,8 @@ Ffigure_zerror
  ドの `noextend` オプションを使うことができます。これは、次の目盛りの刻
  みを入れるような軸の範囲の拡張機能を無効にします。
 
- ラベルの座標と文字列もデータファイルから読み込むことができます (以下参
- 照: `labels`)。
+ ラベルの座標と文字列もデータファイルから読み込むことができます (以下
+ 参照: `labels`)。
 4 bins
 ?commands plot datafile bins
 ?plot datafile bins
@@ -7084,7 +7100,7 @@ Ffigure_zerror
        every ::5::15    # それぞれのブロックでポイント 5 から 15 までを
                         # 選びます
 
- 参照:
+ 参考:
 ^ <a href="http://www.gnuplot.info/demo/simple.html">
  単純な plot デモ (simple.dem)
 ^ </a>
@@ -7200,7 +7216,7 @@ Ffigure_zerror
  に注意してください。問題を避けるために、例えば '== Popolation ==' や
  '[Population]' などの命名法を選択すると便利でしょう。
 
-^ <p>以下の Web ページも参照:
+^ <p>以下の Web ページも参考:
 ^ <a href="http://www.gnuplot.info/demo/multimsh.html">
 ^ index を使った splot のデモ
 ^ </a></p>
@@ -8349,8 +8365,8 @@ Ffigure_zerror
  のスタイルは、さらに塗り潰し属性も持っています。以下参照: `fillstyle`。
  さらにサブスタイルを持つスタイルもあります。個々のスタイルの詳細につい
  ては、以下参照: `plotting styles`。
- スタイル `table` は、グラフの代わりに表形式の出力を生成します。以下参
- 照: `set table`。
+ スタイル `table` は、グラフの代わりに表形式の出力を生成します。以下
+ 参照: `set table`。
 
  デフォルトのスタイルは、`set style function` と `set style data` で選
  択できます。
@@ -8604,17 +8620,17 @@ Ffigure_zerror
       `set overflow` `set multiplot`
 
  `reset` は、必ずしもプログラム立ち上がった初期状態には戻さないことに注
- 意してください。それは、初期設定ファイル gnuplotrc や $HOME/.gnuplot
- 内のコマンドでデフォルトの値を変更した場合は、それもリセットされてしま
- うからです。しかし `reset session` とすれば、それらのコマンドも再実行
- します。
+ 意してください。それは、初期設定ファイル gnuplotrc や $HOME/.gnuplot、
+ $XDG_CONFIG_HOME/gnuplot/gnuplotrc 内のコマンドでデフォルトの値を変更
+ した場合は、それもリセットされてしまうからです。しかし `reset session`
+ とすれば、それらのコマンドも再実行します。
 
 ?reset session
 =session
  `reset session` は、ユーザ定義変数、ユーザ定義関数すべてを削除し、デフ
  ォルトの設定を復帰し、システム全体の初期設定ファイル gnuplotrc と個人
- 用の初期設ファイル $HOME/.gnuplot を再実行します。以下参照:
- `initialization`。
+ 用の初期設ファイル $HOME/.gnuplot、$XDG_CONFIG_HOME/gnuplot/gnuplotrc
+ を再実行します。以下参照: `initialization`。
 
 ?reset errors
 =error state
@@ -8663,8 +8679,8 @@ Ffigure_zerror
  save の出力をパイプ経由で他の外部プログラムに渡すことができます。その
  場合、ファイル名としてコマンド名の先頭に '|' をつけたものを使います。
  これは、`gnuplot` とパイプを通して通信するプログラムに、`gnuplot` の内
- 部設定に関する首尾一貫したインターフェースを提供します。詳細は、以下参
- 照: `batch/interactive`。
+ 部設定に関する首尾一貫したインターフェースを提供します。詳細は、以下
+ 参照: `batch/interactive`。
 
  例:
        save 'work.gnu'
@@ -8859,7 +8875,7 @@ Ffigure_zerror
        unset autoscale {<axis>}
        show autoscale
 
- ここで、<axs> (軸) は `x`, `y`, `z`, `cb`, `x2`, `y2`, `xy`, 
+ ここで、<axis> (軸) は `x`, `y`, `z`, `cb`, `x2`, `y2`, `xy`,
  `paxis <p>` のいずれかです。軸名の後ろに `min` または `max` を追加する
  と、それは `gnuplot` にその軸の最小値、または最大値のみを自動縮尺させ
  ることになります。
@@ -9866,9 +9882,12 @@ Ffigure_missing
 ?dgrid3d
 ?nodgrid3d
 =kdensity
- コマンド `set dgrid3d` は、非格子状データから格子状データへの写像機能を
- 有効にし、そのためのパラメータを設定します。格子状データの構造について
- の詳細は、以下参照: `splot grid_data`。
+?nogrid
+ コマンド `set dgrid3d` は、非格子状データから格子状データへの写像機能
+ を有効にし、そのためのパラメータを設定します。格子状データの構造につい
+ ての詳細は、以下参照: `splot grid_data`。この処理は、3 次元曲面への当
+ てはめで利用できること以外に、2 次元温度分布図を生成するのにも使えます。
+ その場合、各点の 'z' の値は局所的な重み付けに寄与します。
 
  書式:
        set dgrid3d {<rows>} {,{<cols>}}
@@ -9879,15 +9898,19 @@ Ffigure_missing
        unset dgrid3d
        show dgrid3d
 
- デフォルトでは `dgrid3d` は無効になっています。有効になると、ファイル
- から読み込まれる 3 次元のデータは「散在した」データ (非格子状データ)
- であると見なされます。格子は、グラフと等高線の描画のために、散在したデ
- ータを囲む矩形から得られる寸法と、row_size/col_size で指定される数の行
- と列を持つように生成されます。格子は x 方向 (行) と y 方向 (列) に等間
- 隔です。z の値は散在するデータの z の値の重み付きの平均、またはスプラ
- イン補間として計算されます。言い変えれば、規則的な間隔の格子が生成され、
- 全ての格子点で元のデータの滑かな近似値が評価されます。元のデータの代わ
- りにこの近似値が描画されます。
+ デフォルトでは `dgrid3d` は無効になっています。有効な場合は、ファイル
+ から読み込まれる 3 次元のデータ点は、格子曲面に当てはめるのに使用する
+ 「散在した」データ (非格子状データ) であると見なされます。格子の寸法は、
+ `set dgrid3d` 文で与えるパラメータ row_size/col_size の行数、列数で再
+ 分割する散在データを囲む矩形 (bounding box) から求めます。格子は x 方
+ 向 (行) と y 方向 (列) に等間隔です。z の値は散在するデータの z の値の
+ 重み付きの平均、またはスプライン補間として計算します。言い変えれば、規
+ 則的な間隔の格子を生成し、全ての格子点で元データの滑かな近似値を評価し
+ ます。そして元データの代わりにこの曲面を描画します。
+
+ dgrid3d モードが有効な間は、これを使用せずに格子曲面を生成する個々の点
+ や線分を描きたい場合は、対応する splot コマンドにキーワード `nogrid`
+ を追加する必要があります。
 
  デフォルトの列の数は行の数に等しく、そのデフォルトの値は 10 です。
 
@@ -10734,7 +10757,6 @@ Ffigure_missing
 ?unset grid
 ?show grid
 ?grid
-?nogrid
  コマンド `set grid` は格子線を描きます。
 
  書式:
@@ -10922,6 +10944,11 @@ Ffigure_missing
  書式:
     set history {size <N>} {quiet|numbers} {full|trim} {default}
 
+ 最近の gnuplot コマンド履歴を、デフォルトでは $HOME/.gnuplot_history
+ に保存します。このファイルが見つからず、かつ XDG デスクトップサポート
+ が有効な場合、gnuplot は代わりに $XDG_STATE_HOME/gnuplot_history を使
+ 用します。
+
  gnuplot の終了時にヒストリファイルに保存する行数を、history size の値
  に制限します。`set history size -1` とすると、ヒストリファイルに書き出
  す行数の制限がなくなります。
@@ -11042,55 +11069,44 @@ Ffigure_missing
  項目については、対応する plot コマンドでキーワード `notitle` を使用す
  ることで無効にできます。凡例のタイトル文字列は、オプション
  `set key autotitle` や、個々の `plot` や `splot` コマンド上の `title`
- キーワードで制御できます。詳細は以下参照: `plot title`。
+ キーワードで制御できます。
 
- 書式:
+ 凡例の配置に影響するオプションの書式については以下参照:
+ `key placement`。
+#TeX \\
+ 凡例の内容に影響するオプションの書式については以下参照:`key layout`。
+
+ 書式 (大域的オプション):
        set key {on|off} {default}
-             {{inside | outside | fixed}
-               | {lmargin | rmargin | tmargin | bmargin}
-               | {at <position>}}
-             {left | right | center} {top | bottom | center}
-             {vertical | horizontal} {Left | Right}
-             {{no}enhanced}
-             {{no}opaque {fc <colorspec>}}
-             {{no}reverse} {{no}invert}
-             {samplen <sample_length>} {spacing <line_spacing>}
-             {width <width_increment>} {height <height_increment>}
+             {font "<face>,<size>"} {{no}enhanced}
+             {{no}title "<text>" {<font or other text options>}}
              {{no}autotitle {columnheader}}
-             {title {"<text>"} {{no}enhanced} {center | left | right}}
-             {font "<face>,<size>"} {textcolor <colorspec>}
-             {{no}box {linestyle <style> | linetype <type> | linewidth <width>}}
-             {maxcols {<max no. of columns> | auto}}
-             {maxrows {<max no. of rows> | auto}}
-             {offset <dx>, <dy>}
+             {{no}box {<line properties>}} {{no}opaque {fc <colorspec>}}
+             {width <width_increment>} {height <height_increment>}
        unset key
-       show key
 
- 凡例 (key) は各要素を `vertical` (縦) か `horizontal` (横) の指定に従
- って重ねます。`vertical` の場合、凡例は可能ならば 2,3 個の縦の列を使い
- ます。すなわち、垂直方向の場所がある間は各要素を 1 つの列に並べますが、
- その次は新しい列に並べ始めます。垂直方向の行数は、`maxrows` を使って制
- 限できます。`horizontal` の場合は、凡例は横の行数をなるべく少なくしよ
- うとします。水平方向の列数は `maxcols` で制限できます。
+ デフォルトでは、凡例はグラフ領域の内側の右上の角に置きます。
+ 追加の `font` 指定は、凡例のすべての要素に対するデフォルトになります。
+ 凡例の頂上に、凡例の横幅全体に渡る、凡例全体用のオプションのタイトルを
+ 与えるこもできます。このタイトルには、個々の描画タイトルのフォント、色、
+ 位置合わせ、拡張文字列処理とは別のものを使うことができます。
 
- デフォルトでは、凡例はグラフ領域の内側の右上の角に置かれます。キーワー
- ド `left`, `right`, `top`, `bottom`, `center`, `inside`, `outside`,
- `lmargin`, `rmargin`, `tmargin`, `bmargin` (, `above`, `over`, `below`,
- `under`) は、グラフ領域の他の場所への自動的な配置のために使用します。
- 凡例の描画をどこに置くかをより詳しく指示するための `at <position>` も
- あります。この場合、キーワード `left`, `right`, `top`, `bottom`,
- `center` が同様の基準点合わせの設定の目的で使われます。
- より詳しくは、以下参照: `key placement`。
+ 凡例内には、plot コマンドの各要素に対して、そのタイトル文字列と、その
+ グラフの描画スタイルを示す線分か記号か形が 1 行で表現されます。タイト
+ ル文字列は、自動的に生成しますが、plot コマンド中に `title "text"` を
+ 入れることで明示的に与えることもできます。plot コマンドでキーワード
+ `notitle` を使うとそのグラフの凡例行を生成しませんが、タイトルだけを消
+ したい場合は plot コマンドで `title ""` としてください。
 
- グラフのタイトルの行揃えは `Left`, `Right` (デフォルト) で指示します。
- ラベル文字列と曲線のサンプルは左右入れ替えることができます (`reverse`)
- し、 全体を枠で囲むこともできます (`box {...}`)。その枠の線は、線種
- (`linetype`), 線幅 (`linewidth`)、あるいは定義済のラインスタイル
- (`linestyle`) を指定することもできます。
+ 等高線描画では、凡例内に対応する行を追加します (以下参照: `cntrlabel`)。
+ ファイル名や関数名の代わりにキーワード `keyentry` を与えたダミーの plot
+ コマンドを使うことで、凡例内に余分に行を追加することができます。以下
+ 参照: `keyentry`。
 
- 凡例の文字列は、デフォルトで拡張文字列モード (`enhanced`) に設定されて
- いますが、これはオプション `{no}enhanced` で変更でき、キーのタイトルだ
- けや、個々のグラフ毎に変更することも可能です。
+ 凡例の回りに枠を、ユーザ指定線属性で描くこともできます (`box {...}`)。
+ `height` と `width` の増分は、文字幅単位で指定し、それはその分だけ凡例
+ の箱のサイズを大きくしたり小さくしたりします。これは、主に凡例のエント
+ リを囲む境界を大きくするのに有用です。
 
  デフォルトでは、凡例は一つのグラフと同時に作られます。すなわち、凡例の
  記号とタイトルは、それに対応するグラフと同時に描かれます。それは、新し
@@ -11100,38 +11116,16 @@ Ffigure_missing
  の記号とタイトルを書きます。
  `set key noopaque` でデフォルトに復帰できます。
 
- デフォルトでは、最初の描画のラベルが凡例の一番上に現われ、それに続くラ
- ベルがその下に並んで行きます。オプション `invert` は、最初のラベルを凡
- 例の一番下に置き、それに続くラベルをその上に並べて行きます。このオプシ
- ョンは、凡例のラベルの縦の並びの順番を、積み上げ形式のヒストグラム
- (`histograms`) の箱の順番に合わせるときに便利でしょう。
+ 凡例の文字列は、デフォルトでは拡張文字列モード (`enhanced`) を使用しま
+ す。これはオプション `noenhanced` で変更でき、凡例全体、あるいは凡例タ
+ イトルのみ、あるいはグラフタイトル毎に変更することも可能です。
 
- <height_increment> は、凡例の箱の高さに加えたり減らしたりする高さ (何
- 文字分か) を表す数値です。これは主に、凡例の回りに箱を描く場合で、凡例
- の並びの回りの境界線をより大きくしたい場合のものです。
-
- 全体に渡るタイトルを凡例の上につけることもできます (`title "<text>"`)。
- 単一引用符 (') と二重引用符 (") の違いについては、以下も参照: `syntax`。
- タイトルの行揃えはデフォルトでは中央合わせで、それはキーワード `right`
- や `left` で変更することもできます。
-
- `set key` のデフォルトは、`on`,  `right`, `top`, `vertical`, `Right`,
- `noreverse`, `noinvert`, `samplen 4`, `spacing 1`, `notitle`, `nobox`
- です。凡例の枠の線種はデフォルトではグラフ描画の外枠と同じものが使われ
- ます。`set key default` とするとデフォルトの設定に戻ります。
-
- 凡例内には、各グラフに対して、その描画スタイルを示す線分か記号か形、お
- よびそのタイトルが 1 行で表現されます。plot コマンドでキーワード
- `notitle` を使うと、凡例行の生成を抑制します。等高線描画では、各等高線
- に対応した行が凡例内に追加されます (以下参照: `cntrlabel`)。ファイル名
- や関数名の代わりにキーワード `keyentry` を与えたダミーの plot コマンド
- を使うことで、凡例内に追加の行を入れることができます。以下参照:
- `keyentry`。
-
- TeX, LaTeX 系の出力形式や、整形情報が文字列に埋め込まれる出力形式を使
- う場合は、`gnuplot` は凡例の位置決めのための文字列の幅を評価することし
- かできません。よって凡例を左に置く場合は、`set key left Left reverse`
- という組合せを使うのがいいでしょう。
+ `set key default` は、以下のデフォルトの key の設定を復帰します。
+      set key notitle
+      set key nobox noopaque
+      set key fixed right top vertical Right noreverse enhanced autotitle
+      set key noinvert samplen 4 spacing 1 width 0 height 0
+      set key maxcolumns 0 maxrows 0
 
 4 3 次元グラフの凡例 (3D key)
 ?set key 3D
@@ -11141,13 +11135,12 @@ Ffigure_missing
 ?set key fixed
 ?key fixed
  3 次元グラフ (`splot`) の凡例の配置は、デフォルトでは `fixed` オプショ
- ンを使用します。注意: これは、gnuplot 5.0 以前とは異なる挙動です。
- `fixed` による配置は、`inside` による配置に似ていますが、重要な違いが
- 一つあります。3 次元グラフの視点が回転したりスケールすると、それに伴な
- って描画の境界も変化します。凡例の配置が `inside` の場合は、視点が変更
- するときにこれらの境界が移動するため、凡例も移動します。`fixed` の場合
- は、視角やスケールの変更を無視して凡例を配置するので、グラフが回転して
- も、凡例の位置はキャンバスの一つの場所に固定されたままになります。
+ ンを使用します。これは、`inside` による配置に似ていますが、重要な違い
+ が一つあります。3 次元グラフの視点が回転したりスケールすると、それに伴
+ なって描画の境界も変化します。凡例の配置が `inside` の場合は、視点が変
+ 更するときにこれらの境界が移動するため、凡例も移動します。`fixed` の場
+ 合は、視角やスケールの変更を無視して凡例を配置するので、グラフが回転し
+ ても、凡例の位置はキャンバスの一つの場所に固定されたままになります。
 
  なお、2 次元グラフでは、`fixed` オプションは完全に `inside` と同じです。
 
@@ -11160,24 +11153,20 @@ Ffigure_missing
  以下はデフォルトの位置に凡例を表示します:
        set key default
 
- 以下は凡例を表示しなくします:
-       unset key
+ 以下は、凡例をスクリーン座標での指定位置 (右上) に配置します。
+       set key at screen 0.85, 0.85
 
- 以下はデフォルトの (第一の) 座標系での (2,3.5,2) の位置に凡例を表示
- します:
-       set key at 2,3.5,2
+ 以下は、凡例をグラフより下 (奥) に置き、垂直方向の幅を最小化します。
+       set key below horizontal
 
- 以下は凡例をグラフの下に表示します:
-       set key below
+ 以下は、凡例をグラフ領域の左下隅に置き、文字列は左揃えとし、上に凡例の
+ タイトルを与え、回りを太い境界線の枠で囲みます。
+       set key left bottom Left title 'Legend' box lw 3
 
- 以下は凡例を左下角に表示し、テキストは左に行揃えで、タイトルをつけ、
- 線種 3 の外枠を書きます:
-       set key left bottom Left title 'Legend' box 3
-
-Ffigure_keyentry
 4 凡例行の追加 (extra key entries)
 ?key entries
 ?keyentry
+Ffigure_keyentry
  通常、各グラフに対して凡例内に 1 行のエントリが自動生成されます。凡例
  内に見た目をより細かく制御したい場合は、コマンド `plot`, `splot` にキ
  ーワード `keyentry` をつけることで、余分に凡例行を追加できます。plot
@@ -11186,6 +11175,7 @@ Ffigure_keyentry
  に指定します。通常のタイトルフォント、文字色、`at` 座標、拡張文字列処
  理に対するオプションは、すべて適用します。
  例:
+      set key outside right center title "Outcomes"
       plot $HEATMAP matrix with image notitle, \
            keyentry with boxes fc palette cb 0 title "no effect", \
            keyentry with boxes fc palette cb 1 title "threshold", \
@@ -11223,23 +11213,87 @@ Ffigure_keyentry
  また、いずれの場合でも、plot コマンドに明示的な `title` や `notitle`
  キーワードを指定すれば、それは `set key autotitle` による設定より優先
  されます。
+4 凡例のレイアウト (key layout)
+?set key layout
+?key layout
+ 凡例のレイアウト用オプション:
+      set key {vertical | horizontal}
+             {maxcols {<max no. of columns> | auto}}
+             {maxrows {<max no. of rows> | auto}}
+             {columns <exact no. of columns>}
+             {keywidth [screen|graph] <fraction>}
+             {Left | Right}
+             {{no}reverse} {{no}invert}
+             {samplen <sample_length>} {spacing <line_spacing>}
+             {width <width_increment>} {height <height_increment>}
+             {title {"<text>"} {{no}enhanced} {center | left | right}}
+             {font "<face>,<size>"} {textcolor <colorspec>}
+
+ 凡例の要素を自動的に行、または列に並べるやり方は、上のキーワードの影響
+ を受けます。デフォルトは、`vertical` で、これは可能な限り列数を少なく
+ しようとします。各要素は、垂直方向に余裕があるうちは縦に揃えて並べます
+ が、足りなくなれば新しい列に並べます。垂直方向の幅は、'maxrows' で上限
+ を設定できます。
+ `horizontal` の場合は、可能な限り行数を少なくしようとし、水平方向の幅
+ は、'maxcols' で上限を設定できます。
+
+ 自動で選択される行数、列数には満足できないかもしれません。その場合、
+ `set key columns <N>` で列数を明確に指定できます。この場合、サンプル幅
+ (`samplen`) と全体の凡例幅 (`keywidth`) も調整する必要があるかもしれま
+ せん。
+
+ デフォルトでは、最初の描画のラベルが凡例の一番上に現われ、それに続くラ
+ ベルがその下に並んで行きます。オプション `invert` は、最初のラベルを凡
+ 例の一番下に置き、それに続くラベルをその上に並べて行きます。このオプシ
+ ョンは、凡例のラベルの縦の並びの順番を、積み上げ形式のヒストグラム
+ (`histograms`) の箱の順番に合わせるときに便利でしょう。
+
+ `set key title "text"` は、凡例の上に、全体に渡るタイトルを置きます。
+ そのタイトルのフォント、文字列の行揃え、およびその他の文字属性は、この
+ コマンドの `"text"` の直後に必要なキーワードを置くことで指定できます。
+ 他の場所で指定したフォントや文字列の属性は、凡例内のすべての文字列に適
+ 用します
+
+ デフォルトのレイアウトは、スタイルサンプル (色、線、点、形状等) を凡例
+ の各行の左に置き、タイトル文字列を右に置きます。このサンプルと文字列の
+ 位置は、`reverse` キーワードで逆転できます。凡例内のグラフタイトルの行
+ 揃えは、`Left`、`Right` (デフォルト) で指示します。スタイルサンプルの
+ 水平方向の幅は、ほぼ文字幅単位の数値で設定できます (`samplen`)。
+
+  TeX, LaTeX 系の出力形式や、整形情報が文字列に埋め込まれる出力形式を使
+ う場合は、`gnuplot` は必要な幅の見積りがうまくはできませんので、自動的
+ な凡例のレイアウトは、見すぼらしいものになり得ます。凡例を左に置く場合
+ は、`set key left Left reverse` という組合せがいいかもしれませんし、適
+ 切な列数や全体の凡例幅を強制的に設定するといいかもしれません。
+
 4 凡例の配置 (key placement)
 ?commands set key placement
 ?set key placement
 ?key placement
+ 凡例の配置用オプション:
+       set key {inside | outside | fixed}
+               {lmargin | rmargin | tmargin | bmargin}
+               {at <position>}}
+               {left | right | center} {top | bottom | center}
+               {offset <dx>,<dy>}
+
  この節では、自動的に生成される通常の凡例の配置の説明をします。二次的な
  凡例の構成や、他の場所への描画タイトルの配置については、以下参照:
  `multiple keys`。
 
+#TeX \begin{minipage}{0.5\textwidth}
  配置の仕組みを理解ための最も重要な概念は、グラフ領域、すなわち内か外か
  ということと、グラフ領域の境界との間の余白 (margin) を考えることです。
  グラフ領域に沿って、キーワード `left/center/right` (l/c/r) と
  `top/center/bottom` (t/c/b) は、凡例 (key) をその領域の内側のどこに置
  くかを制御します。
-
  モード `inside` では、凡例はキーワード `left` (l), `right` (r), `top`
  (t), `bottom` (b), `center` (c) によって以下の図のように描画領域の境界
  に向かって出力されます:
+
+#TeX \end{minipage}
+#TeX \hspace{0.15\textwidth}
+#TeX \begin{minipage}{0.35\textwidth}
 
       t/l   t/c   t/r
 
@@ -11247,6 +11301,7 @@ Ffigure_keyentry
 
       b/l   b/c   b/r
 
+#TeX \end{minipage}
 
  モード `outside` でも上と同様に自動的に配置されますが、グラフ領域の境
  界に対して、というよりもむしろ見た目に対して、というべきでしょう。すな
@@ -11260,10 +11315,18 @@ Ffigure_keyentry
  境界が、`horizontal` の場合は上または下の境界が、それぞれ内側に適切に
  移動します。
 
+#TeX \begin{minipage}{0.5\textwidth}
  余白 (margin) の書き方は、重ね上げの方向にかかわない自動的な配置を可能
  にしています。`lmargin` (lm), `rmargin` (rm), `tmargin` (tm),
  `bmargin` (bm) のうちの一つを、矛盾しない 1 方向のキーワードと組み合わ
- せて使用した場合、以下の図に示した場所に凡例が配置されます:
+ せて使用した場合、凡例の位置は、以下の図に示すようにページの外側に沿っ
+ て配置されます。
+ キーワード `above` と `over` は `tmargin` と同じ意味で、キーワード
+ `below` と `under` は `bmargin` と同じ意味です。
+
+#TeX \end{minipage}
+#TeX \hspace{0.1\textwidth}
+#TeX \begin{minipage}{0.4\textwidth}
 
            l/tm  c/tm  r/tm
 
@@ -11276,14 +11339,13 @@ Ffigure_keyentry
            l/bm  c/bm  r/bm
 
 
- キーワード `above` と `over` は `tmargin` と同じ意味です。以前のバージ
- ョンとの互換性のために、`above` と `over` は l/c/r や重ね上げ方向のキ
- ーワードなしで使用すると、`center` で `horizontal` を使います。キーワ
- ード `below` と `under` は `bmargin` と同じ意味です。互換性のために、
- `below` と `under` は l/c/r や重ね上げ方向のキーワードなしで使用すると
- `center` で `horizontal` を使います。さらに、`outside` も互換性のため
- に t/b/c や重ね上げ方向のキーワードがなければ、`top`, `right`,
- `vertical` (つまり上の t/rm と同じ) を使用します。
+#TeX \end{minipage}
+
+ 以前のバージョンとの互換性のために、`above`, `over`, `below`, `under`
+ に l/c/r や重ね上げ方向のキーワードがないと、`center` と `horizontal`
+ を使用します。キーワード `outside` に t/b/c や重ね上げ方向のキーワード
+ がないと、`top`, `right`, `vertical` (つまり上の t/rm と同じ) を使用し
+ ます。
 
  凡例の位置 (<position>) は、以前のバージョンと同様単に x,y,z を指定し
  てもいいですが、その最初のサンプル行の座標の座表系を選択するための 5
@@ -11314,10 +11376,9 @@ Ffigure_keyentry
  のある時期の gnuplot のデフォルトの挙動でした。
 
  グラフ曲線のサンプルの線分の長さは `samplen` で指定できます。その長さ
- は目盛りの長さと、<sample_length>*(文字幅) の和として計算されます。
- `sapmlen` は、グラフ上の点のサンプルの位置にも (もしサンプル線分自身が
- 書かれなくても) 影響を与えています。それは、点の記号はサンプル線分の中
- 央に書かれるためです。
+ は、目盛りの長さと <sample_length>*(文字幅) の和として計算します。
+ 点の記号は、サンプル線分の中央に書かれるため、これは凡例内の点のサンプ
+ ル位置にも (線分は描かなくても) 影響を与えます。
 
  凡例のベースライン間隔は、現在のフォントサイズに対する「1 行空き」
  (single space) になっています。これは `set key spacing <line-spacing>`
@@ -11337,7 +11398,6 @@ Ffigure_multiple_keys
  る代わりに、表題や凡例を手動で配置することができます。これにより、例え
  ば多重描画モード (multiplot) での各グラフ要素に対する表題を 1 箇所に集
  約して作ることができるようになります。
- 以下はその一例:
         set multiplot layout 3,2 columnsfirst
         set style data boxes
         plot $D using 0:6  lt 1 title at 0.75, 0.20
@@ -11445,8 +11505,8 @@ Ffigure_multiple_keys
  ます。詳細は、以下参照: `coordinates`。
 
  もし一つ (あるいはそれ以上の) 軸が時間軸である場合、座標は `timefmt`
- の書式にしたがって引用符で囲まれた文字列で与える必要があります。以下参
- 照: `set xdata`, `set timefmt`。
+ の書式にしたがって引用符で囲まれた文字列で与える必要があります。以下
+ 参照: `set xdata`, `set timefmt`。
 
  `set label` に関して有効なオプションは、描画スタイル `labels` でも有効
  です。以下参照: `labels`。この場合、`textcolor`, `rotate`, `pointsize`
@@ -12867,8 +12927,8 @@ Ffigure_multiple_keys
  きる割り当て関数の一覧は `show palette rgbformulae` で見ることができま
  す。デフォルトは `7,5,15` で、他の例としては `3,11,6`, `21,23,3`,
  `3,23,21` などがあります。`3,-11,-6` のような負の値は、逆のカラーを意
- 味します (すなわち、1-gray をその関数に代入します)。
-C 下記の以下参照: オプション `positive`, `negative`)。
+ 味します (すなわち、1-gray をその関数に代入します。下記の以下参照:
+ `positive`, `negative`)。
 
  RGB の色空間では、いくつかの良い割り当て公式があります:
     7,5,15   ... 伝統的 pm3d (黒-青-赤-黄)
@@ -13334,8 +13394,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  色の範囲 [0:1] を与える `zrange` または `cbrange` の範囲
  [min_color_z,max_color_z] への対応により、灰色/カラーの値が得られます。
  この値は、直接灰色の色地図用の灰色の値として使うことができます。正規化
- された灰色の値をカラーに対応させることもできます。完全な説明は、以下参
- 照: `set palette`。
+ された灰色の値をカラーに対応させることもできます。完全な説明は、以下
+ 参照: `set palette`。
 
  2. 2 つか 4 つのデータ列からなるデータの splot: 灰色/カラーの値は、z
  の値の代わりに最後の列の座標を使って得られますので、色と z 座標が独立
@@ -13902,8 +13962,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?unset style
  デフォルトの描画スタイルは、`set style data` と `set style function`
  で設定できます。関数やデータのデフォルトの描画スタイルを個々に変更す
- る方法については、以下参照: `plot with`。スタイルの一覧全体は、以下参
- 照: `plotting styles`, `plot with`。
+ る方法については、以下参照: `plot with`。スタイルの一覧全体は、以下
+ 参照: `plotting styles`, `plot with`。
 
  書式:
        set style function <style>
@@ -13932,10 +13992,10 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?unset style arrow
 ?show style arrow
 ?arrowstyle
- 各出力形式は矢や点の形のデフォルトの集合を持っていて、それはコマンド
- `test` で参照できます。`set style arrow` は矢の形、幅、点の形、サイズ
- を定義し、それらを後で使うときにいちいち同じ情報を繰り返して指定しなく
- てもインデックスで参照できるようにします。
+ 矢の形の集合を定義するには、`set style arrow` を使用できます。それぞれ
+ の形は、それ自身の幅、点の型、色などを持っていて、そのためそれらを後で
+ 使うときにいちいち同じ情報を繰り返して指定しなくても、それをインデック
+ スで参照できます。
 
  書式:
        set style arrow <index> default
@@ -14198,6 +14258,9 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  書式:
        set style function <plotting-style>
        show style function
+4 ヒストグラムスタイル指定 (set style histogram)
+?commands set style histogram
+ 以下参照: `histograms`。
 4 set style increment
 ?commands set style increment
 ?commands show style increment
@@ -14229,7 +14292,6 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  れます。ユーザ定義ラインスタイルが見つからない場合は、代わりにそれに対
  応するデフォルトの線種が利用されます。例えば、上の例では、f3(x) はデフ
  ォルトの線種 3 で描画されます。
-
 4 線スタイル指定 (set style line)
 ?commands set style line
 ?commands unset style line
@@ -14536,10 +14598,10 @@ C 下記の以下参照: オプション `positive`, `negative`)。
       X Y {Z} <flag>
  の値の複数列からなる表形式のテキスト出力を行ないます。フラグ文字 <frag>
  は、その点が有効な範囲内にある場合は "i"、範囲外の場合は "o"、未定義値
- (undefined) の場合は "u" です。データの書式は、軸の刻みの書式 (以下参
- 照: `set format`) によって決まり、列は一つの空白で区切られます。これは、
- 等高線を生成し、それを再利用のために保存したいときに便利です。この方法
- は、補間されたデータを保存するのにも使うことができます (以下参照:
+ (undefined) の場合は "u" です。データの書式は、軸の刻みの書式 (以下
+ 参照: `set format`) によって決まり、列は一つの空白で区切られます。これ
+ は、等高線を生成し、それを再利用のために保存したいときに便利です。この
+ 方法は、補間されたデータを保存するのにも使うことができます (以下参照:
  `set samples`, `set dgrid3d`)。
 
  書式:
@@ -15196,12 +15258,12 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?commands set vyrange
 ?set vyrange
 ?vyrange
- 以下参照: `set vxrange`
+ 以下参照: `set vxrange`。
 3 vzrange
 ?commands set vzrange
 ?set vzrange
 ?vzrange
- 以下参照: `set vxrange`
+ 以下参照: `set vxrange`。
 3 walls
 ?commands set walls
 ?commands show walls
@@ -15459,7 +15521,7 @@ Ffigure_walls
  `x2mtics`, `ymtics`, `y2mtics`, `zmtics`, `cbmtics` にも同じ書式が適用
  されます。
 
- 以下も参照: コマンド `set format`。
+ 以下も参照: `set format`。
 3 軸範囲指定 (xrange)
 ?commands set xrange
 ?commands show xrange
@@ -15481,8 +15543,8 @@ Ffigure_walls
  ここで <min> と <max> は定数、数式、または '*' で、'*' は自動縮尺機能
  を意味します。日時データの場合、範囲は `set timefmt` の書式に従った文
  字列を引用符で囲む必要があります。<min> や <max> を省略した場合は、現
- 在の値を変更しません。自動縮尺機能に関する詳細は下に述べます。以下も参
- 照: `noextend`。
+ 在の値を変更しません。自動縮尺機能に関する詳細は下に述べます。以下も
+ 参照: `noextend`。
 
  `yrange`, `zrange`, `x2range`, `y2range`, `cbrange`, `rrange`, `trange`,
  `urange`, `vrange` は同じ書式を使用します。
@@ -15754,9 +15816,9 @@ Ffigure_walls
 
  見出しは引用符で囲んだ文字列か、または文字列値の数式です。それには、
  "%3f clients" のようにその位置を数字に変換する書式文字列を入れても構い
- ませんし、空文字列 "" でも構いません。より詳しい情報については、以下参
- 照: `set format`。もし、文字列を指定しなければ、デフォルトの数字の見出
- しを使用します。
+ ませんし、空文字列 "" でも構いません。より詳しい情報については、以下
+ 参照: `set format`。もし、文字列を指定しなければ、デフォルトの数字の見
+ 出しを使用します。
 
  明示的な形式では 3 つ目のパラメータとしてレベルを指定できます。デフォ
  ルトのレベルは 0 で、これは大目盛りを意味し、レベル 1 の場合は小目盛り
@@ -16036,16 +16098,16 @@ C 度の記号は set encoding locale で出るようになると。
 ?show ymtics
 ?ymtics
 ?noymtics
- コマンド `set ymtics` は、y 軸の目盛りを月に変更します。詳細は、以下参
- 照: `set xmtics`。
+ コマンド `set ymtics` は、y 軸の目盛りを月に変更します。詳細は、以下
+ 参照: `set xmtics`。
 3 yrange
 ?commands set yrange
 ?commands show yrange
 ?set yrange
 ?show yrange
 ?yrange
- コマンド `set yrange` は、y 方向の垂直範囲を設定します。詳細は、以下参
- 照: `set xrange`。
+ コマンド `set yrange` は、y 方向の垂直範囲を設定します。詳細は、以下
+ 参照: `set xrange`。
 3 ytics
 ?commands set ytics
 ?commands unset ytics
@@ -16192,8 +16254,8 @@ C 度の記号は set encoding locale で出るようになると。
 ?show zmtics
 ?zmtics
 ?nozmtics
- コマンド `set zmtics` は z 軸の目盛りを月に変更します。詳細は、以下参
- 照: `set xmtics`。
+ コマンド `set zmtics` は z 軸の目盛りを月に変更します。詳細は、以下
+ 参照: `set xmtics`。
 3 zrange
 ?commands set zrange
 ?commands show zrange
@@ -16201,8 +16263,8 @@ C 度の記号は set encoding locale で出るようになると。
 ?show zrange
 ?zrange
  コマンド `set zrange` は z 軸方向に表示される範囲を設定します。このコ
- マンドは `splot` にのみ有効で、`plot` では無視されます。詳細は、以下参
- 照: `set xrange`。
+ マンドは `splot` にのみ有効で、`plot` では無視されます。詳細は、以下
+ 参照: `set xrange`。
 3 ztics
 ?commands set ztics
 ?commands unset ztics
