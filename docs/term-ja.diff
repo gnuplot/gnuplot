@@ -3410,8 +3410,8 @@ diff -ru term/lua.trm.ORG term/lua.trm
  #ifdef HAVE_LUA
 +#ifndef JAPANESE_DOC
  #include "gnuplot-tikz.help"
-+#else
-+#include "lua/gnuplot-tikz-ja.help"
++
++
  #endif
 +#endif
  ""
