@@ -20,3 +20,5 @@ plot 'histerror.dat' using 2:3 fs solid 0.5 lw 2 ti 'A', \
 set datafile nocolumnhead
 pause -1 "<cr> to continue"
 
+unset datafile
+reset

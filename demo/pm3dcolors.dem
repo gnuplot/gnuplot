@@ -211,5 +211,6 @@ set title "set palette model RGB functions\n4*x*(1-theta(x-0.25)), 0.5*theta(x-0
 splot f(x)
 pause -1 "Hit return to continue"
 
+unset datafile
 reset
 

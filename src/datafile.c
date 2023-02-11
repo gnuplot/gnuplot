@@ -1142,6 +1142,9 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	parse_1st_row_as_headers = TRUE;
     else
 	parse_1st_row_as_headers = FALSE;
+    /* Pseudofiles '+' and '++' can never have column headers */
+    if (df_pseudodata > 0)
+	parse_1st_row_as_headers = FALSE;
 
     if (!cmd_filename)
 	int_error(c_token, "missing filename");
