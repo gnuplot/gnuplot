@@ -12,7 +12,7 @@ set xrange [1:100]
 set key opaque box
 set style data line
 
-if (ARGC < 1) ARG1 = 0
+if (ARGC < 1) { ARG1 = 0 }
 
 set trange [20:50]
 

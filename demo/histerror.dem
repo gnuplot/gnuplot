@@ -17,5 +17,6 @@ set datafile columnhead separator tab
 plot 'histerror.dat' using 2:3 fs solid 0.5 lw 2 ti 'A', \
      '' using 4:5:xticlabel(1) fs solid 0.0 lw 2 ti 'B'
 
+set datafile nocolumnhead
 pause -1 "<cr> to continue"
 
