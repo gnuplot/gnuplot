@@ -61,6 +61,7 @@ plot keyentry with yerrorbars pt 6 ps 0.4 title "min/avg/max temp", \
 
 pause -1 '<cr> to continue'
 
+unset datafile
 reset
 
 
