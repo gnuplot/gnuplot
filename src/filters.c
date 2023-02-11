@@ -1313,15 +1313,15 @@ delaunay_triangulation( struct curve_points *plot )
     /* Construct a triangle "sufficiently big" to enclose the set of points.
      * That means each bounding vertex must be far enough away from the data
      * points that a circumcircle does not catch extra data points.
+     * It turns out this is easier to guarantee if we start with two triangles.
      */
     {
-#       define BIG 8
 	double xmin = VERYLARGE, xmax = -VERYLARGE;
 	double ymin = VERYLARGE, ymax = -VERYLARGE;
-	double xdelta, ydelta;
+	double xdelta, ydelta, gap;
 
-	/* Allocate 3 additional points for the triangle */
-	cp_extend(plot, N+3);
+	/* Allocate 4 additional points for the two triangles */
+	cp_extend(plot, N+4);
 	points = plot->points;
 
 	for (p = points; p < &points[N]; p++) {
@@ -1333,17 +1333,22 @@ delaunay_triangulation( struct curve_points *plot )
 	    if (p->y > ymax) ymax = p->y;
 	}
 	xdelta = xmax - xmin;
-	points[N].x = xmin - 2*BIG * xdelta;
-	points[N+1].x = xmax + 2*BIG * xdelta;
-	points[N+2].x = (xmax+xmin)/2.;
 	ydelta = ymax - ymin;
-	points[N].y = ymin - BIG * ydelta;
-	points[N+1].y = ymin - BIG * ydelta;
-	points[N+2].y = ymax + BIG * ydelta;
+	/* Is 100 "sufficiently big"??? */
+	gap = 100. * GPMAX(xdelta,ydelta);
+
+	points[N].x   = xmin - gap;
+	points[N+1].x = xmax + gap;
+	points[N+2].x = xmin - gap;
+	points[N+3].x = xmax + gap;
+	points[N].y   = ymin - gap;
+	points[N+1].y = ymin - gap;
+	points[N+2].y = ymax + gap;
+	points[N+3].y = ymax + gap;
 	t = insert_new_triangle( points, N, N+1, N+2 );
 	find_circumcircle(points, t);
-
-#	undef BIG
+	t = insert_new_triangle( points, N+1, N+2, N+3 );
+	find_circumcircle(points, t);
     }
 
     /* Add points one by one */
