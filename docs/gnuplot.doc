@@ -7236,7 +7236,12 @@ Ffigure_zerror
  Nevertheless it is still fast enough for 3D interactive rotation.
 #TeX The function definitions used in that demo are show below.
 #TeX \newline
-#TeX {\small
+#TeX \begin{center}
+#TeX \begin{minipage}{5in}
+#TeX {
+#TeX \hrule
+#TeX ~\newline
+#TeX \small
 #TeX \begin{verbatim}
 #TeX array coef[15] = [ ... ]
 #TeX 
@@ -7256,7 +7261,10 @@ Ffigure_zerror
 #TeX 
 #TeX my_lngamma(z) = (z == 0) ? NaN : (real(z) < 0.5) ? $Reflect(z) : $Lanczos(z)
 #TeX \end{verbatim}
+#TeX \hrule
 #TeX }
+#TeX \end{minipage}
+#TeX \end{center}
 
  Use of function blocks is EXPERIMENTAL.
  Details may change before inclusion in a release version.
