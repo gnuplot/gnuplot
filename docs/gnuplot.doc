@@ -6579,7 +6579,9 @@ Ffigure_zerror
  dependent variable, and any number of parameters can be fitted.
  Optionally, error estimates can be input for weighting the data points.
 
- The basic use of `fit` is best explained by a simple example:
+ The basic use of `fit` is best explained by a simple example where a set of
+ measured x and y values read from a file are used to be modeled by a
+ function y = f(x).
 
        f(x) = a + b*x + c*x**2
        fit f(x) 'measured.dat' using 1:2 via a,b,c
@@ -6781,9 +6783,9 @@ Ffigure_zerror
  squared differences or 'residuals' (SSR) between the input data points and
  the function values, evaluated at the same places.  This quantity is often
  called 'chisquare' (i.e., the Greek letter chi, to the power of 2).  The
- algorithm attempts to minimize SSR, or more precisely, WSSR, as the residuals
- are 'weighted' by the input data errors (or 1.0) before being squared;
- see `fit error_estimates` for details.
+ algorithm attempts to minimize SSR, or more precisely the weighted sum of
+ squared residuals (WSSR), for which the residuals are weighted by the input
+ data errors before being squared; see `fit error_estimates` for details.
 
  That's why it is called 'least-squares fitting'.  Let's look at an example
  to see what is meant by 'non-linear', but first we had better go over some
@@ -6797,10 +6799,10 @@ Ffigure_zerror
  second {and higher} derivatives of the fitting function with respect to
  the parameters are zero for a linear least-squares problem).
 
- For linear least-squares (LLS), the user-defined function will be a sum of
- simple functions, not involving any parameters, each multiplied by one
- parameter.  NLLS handles more complicated functions in which parameters can
- be used in a large number of ways.  An example that illustrates the
+ For linear least-squares the user-defined function will be a sum of simple
+ functions, not involving any parameters, each multiplied by one parameter.
+ Nonlinear least-squares handles more complicated functions in which parameters
+ can be used in a large number of ways.  An example that illustrates the
  difference between linear and nonlinear least-squares is the Fourier series.
  One member may be written as
       z=a*sin(c*x) + b*cos(c*x).
@@ -6809,8 +6811,8 @@ Ffigure_zerror
  c is an unknown parameter, the problem is nonlinear.
 
  In the linear case, parameter values can be determined by comparatively
- simple linear algebra, in one direct step.  However LLS is a special case
- which is also solved along with more general NLLS problems by the iterative
+ simple linear algebra, in one direct step.  However the linear special case
+ is also solved along with more general nonlinear problems by the iterative
  procedure that `gnuplot` uses.  `fit` attempts to find the minimum by doing
  a search.  Each step (iteration) calculates WSSR with a new set of parameter
  values.  The Marquardt-Levenberg algorithm selects the parameter values for
@@ -6858,7 +6860,7 @@ Ffigure_zerror
 4 statistical overview
 ?commands fit error statistical_overview
 ?statistical_overview
- The theory of non-linear least-squares (NLLS) is generally described in terms
+ The theory of non-linear least-squares is generally described in terms
  of a normal distribution of errors, that is, the input data is assumed to be
  a sample from a population having a given mean and a Gaussian (normal)
  distribution about the mean with a given standard deviation.  For a sample of
@@ -6907,9 +6909,9 @@ Ffigure_zerror
  in the same way as the standard errors (standard deviation of each parameter)
  of a linear least-squares problem, even though the statistical conditions for
  designating the quantity calculated to be a standard deviation are not
- generally valid for the NLLS problem.  The asymptotic standard errors are
- generally over-optimistic and should not be used for determining confidence
- levels, but are useful for qualitative purposes.
+ generally valid for a nonlinear least-squares problem.  The asymptotic
+ standard errors are generally over-optimistic and should not be used for
+ determining confidence levels, but are useful for qualitative purposes.
 
  The final solution also produces a correlation matrix indicating correlation of
  parameters in the region of the solution; The main diagonal elements,
@@ -6982,11 +6984,11 @@ Ffigure_zerror
  of parameter uncertainties or evaluate the significance of the correlation
  matrix.
 
- Note that `fit`, in common with most NLLS implementations, minimizes the
- weighted sum of squared distances (y-f(x))**2.  It does not provide any means
- to account for "errors" in the values of x, only in y.  Also, any "outliers"
- (data points outside the normal distribution of the model) will have an
- exaggerated effect on the solution.
+ Note that `fit`, in common with most nonlinear least-squares implementations,
+ minimizes the weighted sum of squared distances (y-f(x))**2.  It does not
+ provide any means to account for "errors" in the values of x, only in y.
+ Also, any "outliers" (data points outside the normal distribution of the model)
+ will have an exaggerated effect on the solution.
 3 control
 ?commands fit control
 ?fit control
@@ -7014,13 +7016,15 @@ Ffigure_zerror
  Starting with gnuplot version 6, the `fit` command always returns to the
  next command input line regardless of the success or failure of fitting.
  This allows scripted recovery from fit errors.  The variable FIT_ERROR is
- set to 0 on success, non-zero on error.
- Example:
+ set to 0 on success, non-zero on error.  This example plots however many
+ of five data sets can be successfully fit.  Failure for data set 2 would
+ not prevent fitting data sets 3 through 5.
 
       do for [i=1:5] {
           DATA = sprintf("Data_%05d.dat", i)
           fit f(x) DATA via a,b,c
           if (FIT_ERROR || !FIT_CONVERGED) {
+              print "Fit failed for ", DATA
               continue
           }
           set output sprintf("dataset_%05.png", i)
@@ -7083,6 +7087,37 @@ Ffigure_zerror
  criterion, or a physical sense, with a solution more consistent with the
  model.)  Depending on the problem, it may be desirable to `fit` with various
  sets of starting values, covering a reasonable range for each parameter.
+3 time data
+?commands fit time_data
+?fit time_data
+ In fitting time data it is important to remember that gnuplot represents
+ time as seconds since 1 January 1970.  For example if you wanted to fit a
+ quadratic model for the time dependence of something measured over the course
+ of one day in 2023, you might expect that it could be done using
+      T(x) = a + b*x + c*x*x
+      set xdata time
+      fit T(x) 'hits.dat' using 1:3 via a,b,c
+
+ This will probably fail, because internally the x values corresponding to
+ that one day will have a range something like [1.67746e+09 : 1.67754e+09].
+ The fractional change in x across the measured data will be only about
+ 1.e-05 and to guarantee convergence you would probably need many
+ decimal places of accuracy in the initial parameter estimates.
+
+ One solution is to recast the problem as change in time since the start
+ of measurement.
+      set xdata time       # data format "27-02-2023 12:00:00 measurement"
+      timefmt  = "%d-%m-%Y %H:%M:%S"
+      set timefmt timefmt
+      t0 = strptime( timefmt, "27-02-2023 00:00:00" )
+      fit T(x) 'temperature.dat' using ($1-t0):3 via a,b,c
+
+ This shifts the range of the data to [0 : 86400], which is more tractable.
+ Another possibility in this case is to ignore the date in column 1 and use
+ relative time formats (tH/tM/tS) applied to column 2.
+      set timefmt "%tH:%tM:%tS"
+      fit T(x) 'temperature.dat' using 2:3 via a,b,c
+ 
 3 tips
 ?commands fit tips
 ?fit tips
@@ -16084,7 +16119,7 @@ Ffigure_polar_grid
  If the %p format returns "am" or "AM", hour 12 will be interpreted as hour 0.
  If the %p format returns "pm" or "PM", hours < 12 will be increased by 12.
 
- See also `set xdata` and `time/date` for more information.
+ See also `set xdata` `time/date` and `time_specifiers` for more information.
 
  Example:
        set timefmt "%d/%m/%Y\t%H:%M"
