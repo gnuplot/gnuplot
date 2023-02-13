@@ -120,7 +120,9 @@
 #include <wx/printdlg.h>
 
 extern "C" {
+#if (wxMAJOR_VERSION >= 3)
 #include "xdg.h"
+#endif
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
