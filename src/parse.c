@@ -1731,8 +1731,9 @@ forever_iteration(t_iterator *iter)
 {
     if (!iter)
 	return FALSE;
-    else
-	return (iter->iteration_end == INT_MAX);
+    if (iter->iteration_end == INT_MAX)
+	return TRUE;
+    return forever_iteration(iter->next);
 }
 
 /* The column() function requires special handling because
