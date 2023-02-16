@@ -2156,6 +2156,7 @@ eval_plots()
      * the xrange is defined.
      */
     plot_iterator = check_for_iteration();
+    warn_if_too_many_unbounded_iterations(plot_iterator);
     while (TRUE) {
 
 	/* Forgive trailing comma on a multi-element plot command */
@@ -3162,7 +3163,9 @@ eval_plots()
 
 		/* actually get the data now */
 		if (get_data(this_plot) == 0) {
-		    if (!forever_iteration(plot_iterator))
+		    if (forever_iteration(plot_iterator))
+			flag_iteration_nodata(plot_iterator);
+		    else
 			int_warn(NO_CARET,"Skipping data file with no valid points");
 		    this_plot->plot_type = NODATA;
 		    goto SKIPPED_EMPTY_FILE;
@@ -3177,6 +3180,7 @@ eval_plots()
 			    ninrange++;
 		    if (ninrange == 0) {
 			this_plot->plot_type = NODATA;
+			flag_iteration_nodata(plot_iterator);
 			goto SKIPPED_EMPTY_FILE;
 		    }
 		}
@@ -3338,8 +3342,20 @@ eval_plots()
 	    this_plot->plot_type = NODATA;
 	if (forever_iteration(plot_iterator) && !this_plot)
 	    int_error(NO_CARET,"unbounded iteration in something other than a data plot");
-	else if (forever_iteration(plot_iterator) && (this_plot->plot_type == NODATA)) {
-	    FPRINTF((stderr,"Ending * iteration at %d\n",plot_iterator->iteration));
+
+	/* This handles the case a nested unbounded iteration.
+	 * If the top level iteration is bounded, next_iteration will advance it.
+	 * If the top level iteration is unbounded, next_iteration will warn and return FALSE.
+	 */
+	if (plot_iterator && (forever_iteration(plot_iterator->next) < 0)
+	&&  (this_plot->plot_type == NODATA)) {
+	    if (next_iteration(plot_iterator)) {
+		c_token = start_token;
+		continue;
+	    }
+	}
+
+	if (forever_iteration(plot_iterator) && (this_plot->plot_type == NODATA)) {
 	    /* Clearing the plot title ensures that it will not appear in the key */
 	    free (this_plot->title);
 	    this_plot->title = NULL;
@@ -3354,6 +3370,7 @@ eval_plots()
 	if (equals(c_token, ",")) {
 	    c_token++;
 	    plot_iterator = check_for_iteration();
+	    warn_if_too_many_unbounded_iterations(plot_iterator);
 	} else
 	    break;
     }
