@@ -75,6 +75,7 @@ static int check_or_add_boxplot_factor(struct curve_points *plot, char* string, 
 static void add_tics_boxplot_factors(struct curve_points *plot);
 static void parse_kdensity_options(struct curve_points *this_plot);
 static void parse_hull_options(struct curve_points *this_plot);
+static int evaluate_iteration(struct curve_points *this_plot);
 
 #ifdef USE_POLAR_GRID
     static void grid_polar_data(struct curve_points *this_plot);
@@ -3099,7 +3100,7 @@ eval_plots()
 	    /* We can now do some checks that we deferred earlier */
 
 	    if (this_plot->plot_type == DATA) {
-		if (specs < 0) {
+		if (specs == DF_EOF) {
 		    /* Error check to handle missing or unreadable file */
 		    ++line_num;
 		    this_plot->plot_type = NODATA;
@@ -3164,9 +3165,10 @@ eval_plots()
 
 		/* actually get the data now */
 		if (get_data(this_plot) == 0) {
-		    if (forever_iteration(plot_iterator))
+		    if (forever_iteration(plot_iterator)) {
 			flag_iteration_nodata(plot_iterator);
-		    else
+			line_num--;
+		    } else
 			int_warn(NO_CARET,"Skipping data file with no valid points");
 		    this_plot->plot_type = NODATA;
 		    goto SKIPPED_EMPTY_FILE;
@@ -3182,6 +3184,7 @@ eval_plots()
 		    if (ninrange == 0) {
 			this_plot->plot_type = NODATA;
 			flag_iteration_nodata(plot_iterator);
+			line_num--;
 			goto SKIPPED_EMPTY_FILE;
 		    }
 		}
@@ -3338,31 +3341,10 @@ eval_plots()
 		break;
 	}
 
-	/* Iterate-over-plot mechanism */
-	if (empty_iteration(plot_iterator) && this_plot)
-	    this_plot->plot_type = NODATA;
-	if (forever_iteration(plot_iterator) && !this_plot)
-	    int_error(NO_CARET,"unbounded iteration in something other than a data plot");
-
-	/* This handles the case a nested unbounded iteration.
-	 * If the top level iteration is bounded, next_iteration will advance it.
-	 * If the top level iteration is unbounded, next_iteration will warn and return FALSE.
+	/* If we are in the middle of an iterated plot clause
+	 * go back and run it again.
 	 */
-	if (plot_iterator && (forever_iteration(plot_iterator->next) < 0)
-	&&  (this_plot->plot_type == NODATA)) {
-	    if (next_iteration(plot_iterator)) {
-		c_token = start_token;
-		continue;
-	    }
-	}
-
-	if (forever_iteration(plot_iterator) && (this_plot->plot_type == NODATA)) {
-	    /* Clearing the plot title ensures that it will not appear in the key */
-	    free (this_plot->title);
-	    this_plot->title = NULL;
-	} else if (forever_iteration(plot_iterator) && (this_plot->plot_type != DATA)) {
-	    int_error(NO_CARET,"unbounded iteration in something other than a data plot");
-	} else if (next_iteration(plot_iterator)) {
+	if (evaluate_iteration(this_plot)) {
 	    c_token = start_token;
 	    continue;
 	}
@@ -4008,6 +3990,54 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
     *last_pointer = free_list;
 }
 
+/*
+ * Track the progress of iteration inside a plot command.
+ * This became complicated enough to split out into a
+ * separate routine for readability.
+ * In the future a non-zero return value may carry more information.
+ *
+ * Return:
+ *	0 = no more in this iteration
+ *	    continue to the next plot clause
+ *  non-0 = iteration counters have been incremented
+ *	    loop back up to the next iteration
+ */
+static int
+evaluate_iteration( struct curve_points *this_plot )
+{
+    /* Iterate-over-plot mechanism */
+    if (empty_iteration(plot_iterator) && this_plot)
+	this_plot->plot_type = NODATA;
+    if (forever_iteration(plot_iterator) && !this_plot)
+	int_error(NO_CARET,
+		"unbounded iteration in something other than a data plot");
+
+    /* This handles the case a nested unbounded iteration.
+     * If the top level iteration is bounded, next_iteration will advance it.
+     * If the top level iteration is unbounded, next_iteration will warn and
+     * return FALSE.
+     */
+    if (plot_iterator && (forever_iteration(plot_iterator->next) < 0)
+    &&  (this_plot->plot_type == NODATA)) {
+	if (next_iteration(plot_iterator))
+	    return 1;
+    }
+
+    if (forever_iteration(plot_iterator)
+    &&  (this_plot->plot_type == NODATA)) {
+	/* Clearing the plot title ensures that it will not appear in the key */
+	free (this_plot->title);
+	this_plot->title = NULL;
+    } else if (forever_iteration(plot_iterator) && this_plot->plot_type != DATA) {
+	int_error(NO_CARET,
+		"unbounded iteration in something other than a data plot");
+    } else if (next_iteration(plot_iterator)) {
+	return 1;
+    }
+
+    /* This is the 'normal' return - no continuing iteration to handle */
+    return 0;
+}
 
 /*
  * handle optional keywords for
