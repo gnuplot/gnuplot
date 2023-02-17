@@ -1629,6 +1629,7 @@ eval_3dplots()
      * after the x/yrange is defined.
      */
     plot_iterator = check_for_iteration();
+    warn_if_too_many_unbounded_iterations(plot_iterator);
     last_iteration_in_first_pass = INT_MAX;
 
     while (TRUE) {
@@ -2340,6 +2341,7 @@ eval_3dplots()
 			count_3dpoints(this_plot, &ntotal, &ninrange, &nundefined);
 			if (ninrange == 0) {
 			    this_plot->plot_type = NODATA;
+			    flag_iteration_nodata(plot_iterator);
 			    goto SKIPPED_EMPTY_FILE;
 			}
 		    }
@@ -2464,7 +2466,6 @@ eval_3dplots()
 		last_iteration_in_first_pass = plot_iterator->iteration_current;
 
 	    /* restore original value of sample variables */
-	    /* FIXME: somehow this_plot has changed since we saved sample_var! */
 	    if (name_str && this_plot->sample_var) {
 		this_plot->sample_var->udv_value = original_value_u;
 		this_plot->sample_var2->udv_value = original_value_v;
@@ -2480,10 +2481,21 @@ eval_3dplots()
 		break;
 	}
 
-	/* Iterate-over-plot mechanisms */
+	/* Iterate-over-plot mechanisms
+	 * First handle the special case of a nested unbounded iteration
+	 *    splot for [i=a:b] for [j=c:*] ...
+	 * where eof_during_iteration means the inner loop finished but the
+	 * outer loop continues.
+	 * Then handle the usual cases where eof_during_iterantion means we're done.
+	 */
+	if (plot_iterator && eof_during_iteration
+	&&  (forever_iteration(plot_iterator->next) < 0)) {
+	    if (next_iteration(plot_iterator)) {
+		c_token = start_token;
+		continue;
+	    }
+	}
 	if (eof_during_iteration) {
-	    FPRINTF((stderr, "eof during iteration current %d\n", plot_iterator->iteration_current));
-	    FPRINTF((stderr, "    last_iteration_in_first_pass %d\n", last_iteration_in_first_pass));
 	    eof_during_iteration = FALSE;
 	} else if (next_iteration(plot_iterator)) {
 	    c_token = start_token;
@@ -2494,13 +2506,13 @@ eval_3dplots()
 	if (equals(c_token, ",")) {
 	    c_token++;
 	    plot_iterator = check_for_iteration();
-	    if (forever_iteration(plot_iterator))
-		if (last_iteration_in_first_pass != INT_MAX)
-		    int_warn(NO_CARET, "splot does not support multiple unbounded iterations");
+	    warn_if_too_many_unbounded_iterations(plot_iterator);
+	    if (forever_iteration(plot_iterator)
+	    &&  last_iteration_in_first_pass != INT_MAX)
+		int_warn(NO_CARET, "splot does not support multiple unbounded iterations");
 	} else
 	    break;
-
-    }				/* while(TRUE), ie first pass */
+    }			/* end of first pass, while (TRUE) */
 
 
     if (parametric && crnt_param != 0)
