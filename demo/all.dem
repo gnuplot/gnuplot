@@ -303,6 +303,7 @@ reset
 
 print "********************** file heatmaps *********************"
 load "heatmaps.dem"
+load "heatmap_4D.dem"
 load "heatmap_points.dem"
 reset
 
