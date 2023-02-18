@@ -33,10 +33,6 @@ on mouse-coordinate tracking.
     <li><a href="fillbetween.html">fill&nbsp;between&nbsp;curves</a></li>
     <li><a href="candlesticks.html">candlesticks</a></li>
     <li><a href="errorbars.html">error bars</a></li>
-    <li><a href="histograms.html">histograms</a> (<a href="histograms2.html">more</a>)
-	(<a href="histogram_colors.html">even more</a>)</li>
-    <li><a href="histerror.html">histogram + errorbars</a></li>
-    <li><a href="boxclusters.html">bar graphs</a>
     <li><a href="steps.html">step functions</a></li>
     <li><a href="multiaxis.html">multiple axis scales</a></li>
     <li><a href="using.html">mixing styles</a></li>
@@ -76,10 +72,19 @@ on mouse-coordinate tracking.
     <h4>Colors</h4>
     <ul>
     <li><a href="varcolor.html">data-dependent coloring</a></li>
-    <li><a href="rgb_variable.html">RGB and HSV coloring</a></li>
+    <li><a href="rgb_variable.html">RGB coloring</a></li>
     <li><a href="rgba_lines.html">RGB + Alpha</a></li>
     <li><a href="pm3dcolors.html">pm3d colors</a></li>
     <li><a href="named_palettes.html">named palettes</a></li>
+    </ul>
+
+    <h4>Line and Fill Styles</h4>
+    <ul>
+    <li><a href="lines_arrows.html">line and arrow styles</a></li>
+    <li><a href="fillstyle.html">fill styles</a></li>
+    <li><a href="dashtypes.html">dashed lines</a></li>
+    <li><a href="transparent.html">transparency</a></li>
+    <li><a href="transparent_solids.html">transparent solids</a></li>
     </ul>
 
 </td>
@@ -145,6 +150,23 @@ on mouse-coordinate tracking.
 </td>
 
 <td rowspan=2>
+    <h4>Heat Maps</h4>
+    <ul>
+    <li><a href="heatmaps.html">Derived from a regular grid</a></li>
+    <li><a href="heatmap_points.html">Derived from scattered points</a></li>
+    <li><a href="heatmap_4D.html">4D data (3D surface + value)</a></li>
+    <li><a href="polargrid.html">Polar coordinate maps</a></li>
+    </ul>
+
+    <h4>Histograms</h4>
+    <ul>
+    <li><a href="histograms.html">clustering options</a></li>
+    <li><a href="histogram_colors.html">user-assigned colors</a></li>
+    <li><a href="histerror.html">histogram + errorbars</a></li>
+    <li><a href="boxclusters.html">make-your-own with boxes</a>
+    <li><a href="bins.html">automatic binning</a></li>
+    </ul>
+
     <h4>Sample Applications</h4>
     <ul>
     <li><a href="controls.html">control models</a></li>
@@ -153,15 +175,12 @@ on mouse-coordinate tracking.
     <li><a href="iterate.html">iteration</a></li>
     <li><a href="scatter.html">non-gridded data</a></li>
     <li><a href="running_avg.html">running averages</a></li>
-    <li><a href="bins.html">automatic binning</a></li>
     <li><a href="smooth.html">binning/histograms</a></li>
     <li><a href="array.html">arrays</a></li>
     <li><a href="fenceplot.html">fence plots</a></li>
     <li><a href="gantt.html">Gantt chart</a></li>
     <li><a href="columnhead.html">points labeled by origin</a></li>
     <li><a href="label_stacked_histograms.html">label stacked histogram</a></li>
-    <li><a href="heatmaps.html">2D and 3D heat maps</a></li>
-    <li><a href="heatmap_points.html">heat maps from scattered points</a></li>
     <li><a href="solar_path.html">solar path diagram</a></li>
     <li><a href="map_projection.html">map projections</a></li>
     <li><a href="violinplot.html">violin plot</a></li>
@@ -190,15 +209,6 @@ on mouse-coordinate tracking.
     <li><a href="rectangle.html">rectangles</a></li>
     <li><a href="custom_key.html">customized key</a></li>
     <li><a href="keyentry.html">extra key entries</a></li>
-    </ul>
-
-    <h4>Styles</h4>
-    <ul>
-    <li><a href="lines_arrows.html">line and arrow styles</a></li>
-    <li><a href="fillstyle.html">fill styles</a></li>
-    <li><a href="dashtypes.html">dashed lines</a></li>
-    <li><a href="transparent.html">transparency</a></li>
-    <li><a href="transparent_solids.html">transparent solids</a></li>
     </ul>
 
 </td>
@@ -243,8 +253,11 @@ on mouse-coordinate tracking.
     <ul>
     <li><a href="http://sourceforge.net/projects/gnuplot/">
 	Gnuplot development pages on SourceForge</a></li>
-    <li>On-line documentation in
-	<a href="http://gnuplot.sourceforge.net/docs_6.1/gnuplot.pdf">PDF</a></li>
+    <li>On-line PDF documentation in
+	<a href="http://gnuplot.sourceforge.net/docs_6.1/gnuplot.pdf">English</a>
+	and
+	<a href="http://gnuplot.sourceforge.net/docs_6.1/gnuplot-ja.pdf">Japanese</a>
+	</li>
     </ul>
     </td>
     

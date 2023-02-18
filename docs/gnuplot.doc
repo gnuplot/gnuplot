@@ -5201,7 +5201,7 @@ Ffigure_histeps
  Several of gnuplot's plot styles can be used to create heat maps. The choice
  of which style to use is dictated by the type of data.
 
-Ffigure_sparsematrix
+Ffigure_heatmap
  Pixel-based heat maps all have the property that each pixel in the map
  corresponds exactly to one original data value.
  The pixel-based image styles require a regular rectangular grid of data values;

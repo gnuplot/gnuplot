@@ -29,7 +29,7 @@ set xtics 10
 set ytics 10
 set xrange noextend
 set yrange noextend
-set border 10
+set border 31
 
 set label 1 "Heat map of point density " font ":Bold"
 set label 2 "set dgrid 15,15 gauss  kdensity 3, 3"
