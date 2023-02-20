@@ -101,6 +101,7 @@ typedef struct iterator {
 	int iteration_increment;
 	int iteration_current;		/* start + increment * iteration */
 	int iteration;			/* runs from 0 to (end-start)/increment */
+	TBOOLEAN iteration_NODATA;	/* set when an unbounded iteration dead-ends */
 	struct at_type *start_at;	/* expression that evaluates to iteration_start */
 	struct at_type *end_at;		/* expression that evaluates to iteration_end */
 } t_iterator;
@@ -112,7 +113,10 @@ extern t_iterator * set_iterator;	/* Used by set/unset commands */
 t_iterator * check_for_iteration(void);
 TBOOLEAN next_iteration (t_iterator *);
 TBOOLEAN empty_iteration (t_iterator *);
-TBOOLEAN forever_iteration (t_iterator *);
+int forever_iteration (t_iterator *);
+void flag_iteration_nodata(t_iterator *iter);
+void warn_if_too_many_unbounded_iterations(t_iterator *iter);
+
 t_iterator * cleanup_iteration(t_iterator *);
 
 void parse_link_via(struct udft_entry *);

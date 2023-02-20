@@ -1397,6 +1397,7 @@ check_for_iteration()
 	this_iter->iteration_increment = iteration_increment;
 	this_iter->iteration_current = iteration_current;
 	this_iter->iteration = iteration;
+	this_iter->iteration_NODATA = FALSE;
 	this_iter->start_at = iteration_start_at;
 	this_iter->end_at = iteration_end_at;
 	this_iter->next = NULL;
@@ -1468,6 +1469,7 @@ reset_iteration(t_iterator *iter)
     reevaluate_iteration_limits(iter);
     iter->iteration = -1;
     iter->iteration_current = iter->iteration_start;
+    iter->iteration_NODATA = FALSE;
     if (iter->iteration_string) {
 	gpfree_string(&(iter->iteration_udv->udv_value));
 	Gstring(&(iter->iteration_udv->udv_value), 
@@ -1481,6 +1483,33 @@ reset_iteration(t_iterator *iter)
 }
 
 /*
+ * Called to terminate an iteration of the form [i=n:*] when
+ * the resulting plot is determined to contain no valid data (NODATA).
+ */
+void
+flag_iteration_nodata(t_iterator *iter)
+{
+    if (!iter)
+	return;
+    if (iter->iteration_end == INT_MAX)
+	iter->iteration_NODATA = TRUE;
+    flag_iteration_nodata(iter->next);
+}
+
+void
+warn_if_too_many_unbounded_iterations(t_iterator *iter)
+{
+    int nfound = 0;
+    while (iter) {
+	if (iter->iteration_end == INT_MAX)
+	    nfound++;
+	iter = iter->next;
+    }
+    if (nfound > 1)
+	int_warn(NO_CARET, "multiple nested iterations of the form [start:*]");
+}
+
+/*
  * Increment the iteration position recursively.
  * returns TRUE if the iteration is still in range
  * returns FALSE if the incement put it past the end limit
@@ -1491,6 +1520,19 @@ next_iteration(t_iterator *iter)
     /* Once it goes out of range it will stay that way until reset */
     if (!iter || no_iteration(iter))
 	return FALSE;
+
+    /* This is a top-level unbounded iteration [n:*] for which a
+     * lower-level (nested) iteration yielded no data. Stop here.
+     */
+    if (forever_iteration(iter->next) < 0 && iter->iteration_NODATA) {
+	FPRINTF((stderr,"multiple nested unbounded iterations"));
+	return FALSE;
+    }
+
+    /* This is a nested unbounded iteration [n:*] that yielded no data */
+    if (forever_iteration(iter->next) < 0 && iter->next->iteration_NODATA)
+	FPRINTF((stderr, "\t skip terminated NODATA iteration\n"));
+    else
 
     /* Give sub-iterations a chance to advance */
     if (next_iteration(iter->next)) {
@@ -1584,13 +1626,21 @@ cleanup_iteration(t_iterator *iter)
     return NULL;
 }
 
-TBOOLEAN
+/*
+ * returns  0 if well-bounded [i=a:b]
+ * returns  1 if unbounded    [i=a:*]
+ * returns -1 if unbounded and we already hit a stop condition (NODATA)
+ */
+int
 forever_iteration(t_iterator *iter)
 {
     if (!iter)
-	return FALSE;
-    else
-	return (iter->iteration_end == INT_MAX);
+	return 0;
+    if (iter->iteration_end == INT_MAX && iter->iteration_NODATA)
+	return -1;
+    if (iter->iteration_end == INT_MAX)
+	return 1;
+    return forever_iteration(iter->next);
 }
 
 /* The column() function requires special handling because

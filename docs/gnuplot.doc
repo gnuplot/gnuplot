@@ -8079,9 +8079,15 @@ Ffigure_zerror
  matching a template.
 
  Examples:
-       plot for [i=2:*] 'datafile' using 1:i with histogram
+       plot for [file in "A.dat B.dat"] for [column=2:*] file using 1:column
        splot for [i=0:*] 'datafile' index i using 1:2:3 with lines
        plot for [i=1:*] file=sprintf("File_%03d.dat",i) file using 2 title file
+
+ Caveat:
+ You can nest iterations where one is open-ended, as in the first example above.
+ However nesting an open-ended iteration inside another open-ended iteration is
+ probably not useful, since both will terminate at the same time when no data is
+ found.  The program will issue a warning if this happens.
 
 3 title
 ?commands plot title

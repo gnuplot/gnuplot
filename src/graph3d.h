@@ -110,7 +110,7 @@ typedef struct surface_points {
     TBOOLEAN pm3d_color_from_column;
     TBOOLEAN has_grid_topology;
     int hidden3d_top_linetype;	/* before any calls to load_linetype() */
-    int iteration;		/* needed for tracking iteration */
+    void *iteration;		/* needed for tracking iteration */
 
     struct vgrid *vgrid;	/* used only for voxel plots */
     double iso_level;		/* used only for voxel plots */
