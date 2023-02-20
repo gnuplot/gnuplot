@@ -113,15 +113,6 @@ struct surface_points *first_3dplot = NULL;
 
 int plot3d_num=0;
 
-/* FIXME:
- * Because this is global, it gets clobbered if there is more than
- * one unbounded iteration in the splot command, e.g.
- *	splot for [i=0:*] A index i, for [j=0:*] B index j
- * Moving it into (struct surface_points) would be nice but would require
- * extra bookkeeping to track which plot header it is stored in.
- */
-static int last_iteration_in_first_pass = INT_MAX;
-
 /*
  * It is a common mistake to try to plot a complex-valued function
  * without reducing it to some derived real value like abs(f(z)).
@@ -1630,7 +1621,6 @@ eval_3dplots()
      */
     plot_iterator = check_for_iteration();
     warn_if_too_many_unbounded_iterations(plot_iterator);
-    last_iteration_in_first_pass = INT_MAX;
 
     while (TRUE) {
 
@@ -1714,9 +1704,9 @@ eval_3dplots()
 		strcpy(c_dummy_var[1], orig_dummy_v_var);
 
 	    /* Make sure there is at least a minimal plot header */
-	    if (*tp_3d_ptr)
+	    if (*tp_3d_ptr) {
 		this_plot = *tp_3d_ptr;
-	    else {
+	    } else {
 		this_plot = sp_alloc(0, 0, 0, 0);
 		*tp_3d_ptr = this_plot;
 	    }
@@ -1801,7 +1791,7 @@ eval_3dplots()
 
 		/* for capture to key */
 		this_plot->token = end_token = c_token - 1;
-		this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
+		this_plot->iteration = plot_iterator;
 
 		/* this_plot->token is temporary, for errors in get_3ddata() */
 
@@ -1822,6 +1812,7 @@ eval_3dplots()
 		plot_num++;
 		this_plot->plot_type = KEYENTRY;
 		this_plot->plot_style = LABELPOINTS;
+		this_plot->title_is_suppressed = FALSE;
 		this_plot->token = end_token = c_token - 1;
 		break;
 
@@ -1868,11 +1859,6 @@ eval_3dplots()
 
 	    } /* End of switch(this_component) */
 
-	    /* clear current title, if it exists */
-	    if (this_plot->title) {
-		free(this_plot->title);
-		this_plot->title = NULL;
-	    }
 
 	    /* default line and point types */
 	    this_plot->lp_properties.l_type = line_num;
@@ -2329,7 +2315,7 @@ eval_3dplots()
 
 		    /* for second pass */
 		    this_plot->token = c_token;
-		    this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
+		    this_plot->iteration = plot_iterator;
 
 		    if (this_plot->num_iso_read == 0)
 			this_plot->plot_type = NODATA;
@@ -2358,24 +2344,18 @@ eval_3dplots()
 		    if (df_return == DF_EOF)
 			break;
 
-		    /* there might be another surface so allocate
-		     * and prepare another surface structure
-		     * This does no harm if in fact there are
-		     * no more surfaces to read
+		    /* There might be another surface so allocate
+		     * and prepare another surface structure.
+		     * This does no harm if in fact there are no more surfaces to read.
+		     * FIXME: There are a lot more flags and setting in the header,
+		     *        like opt_out_of_foo; do we not have to reset them???
+		     *	      I am not sure recycling old headers makes sense any more.
 		     */
-
-		    if ((this_plot = *tp_3d_ptr) != NULL) {
-			if (this_plot->title) {
-			    free(this_plot->title);
-			    this_plot->title = NULL;
-			}
-		    } else {
-			/* Allocate enough isosamples and samples */
+		    if ((this_plot = *tp_3d_ptr) == NULL)
 			this_plot = *tp_3d_ptr = sp_alloc(0, 0, 0, 0);
-		    }
 
 		    this_plot->plot_type = DATA3D;
-		    this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
+		    this_plot->iteration = plot_iterator;
 		    this_plot->plot_style = first_dataset->plot_style;
 		    this_plot->lp_properties = first_dataset->lp_properties;
 		    this_plot->fill_properties = first_dataset->fill_properties;
@@ -2414,13 +2394,13 @@ eval_3dplots()
 		   ||  this_plot->plot_type == NODATA) {
 		tp_3d_ptr = &(this_plot->next_sp);
 		this_plot->token = c_token;	/* store for second pass */
-		this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
+		this_plot->iteration = plot_iterator;
 
 	    } else if (this_plot->plot_type == VOXELDATA){
 		/* voxel data in an active vgrid must already be present */
 		tp_3d_ptr = &(this_plot->next_sp);
 		this_plot->token = c_token;	/* store for second pass */
-		this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
+		this_plot->iteration = plot_iterator;
 		/* FIXME: I worry that vxrange autoscales xrange and xrange autoscales vxrange */
 		autoscale_one_point((&axis_array[FIRST_X_AXIS]), this_plot->vgrid->vxmin);
 		autoscale_one_point((&axis_array[FIRST_X_AXIS]), this_plot->vgrid->vxmax);
@@ -2462,8 +2442,6 @@ eval_3dplots()
 		eof_during_iteration = TRUE;
 	    else if (forever_iteration(plot_iterator) && (this_plot->plot_type != DATA3D))
 		int_error(NO_CARET, "unbounded iteration in something other than a data plot");
-	    else if (forever_iteration(plot_iterator))
-		last_iteration_in_first_pass = plot_iterator->iteration_current;
 
 	    /* restore original value of sample variables */
 	    if (name_str && this_plot->sample_var) {
@@ -2486,7 +2464,7 @@ eval_3dplots()
 	 *    splot for [i=a:b] for [j=c:*] ...
 	 * where eof_during_iteration means the inner loop finished but the
 	 * outer loop continues.
-	 * Then handle the usual cases where eof_during_iterantion means we're done.
+	 * Then handle the usual cases where eof_during_iteration means we're done.
 	 */
 	if (plot_iterator && eof_during_iteration
 	&&  (forever_iteration(plot_iterator->next) < 0)) {
@@ -2507,9 +2485,6 @@ eval_3dplots()
 	    c_token++;
 	    plot_iterator = check_for_iteration();
 	    warn_if_too_many_unbounded_iterations(plot_iterator);
-	    if (forever_iteration(plot_iterator)
-	    &&  last_iteration_in_first_pass != INT_MAX)
-		int_warn(NO_CARET, "splot does not support multiple unbounded iterations");
 	} else
 	    break;
     }			/* end of first pass, while (TRUE) */
@@ -2593,10 +2568,6 @@ eval_3dplots()
 	this_plot = first_3dplot;
 	c_token = begin_token;
 	plot_iterator = check_for_iteration();
-
-	/* We kept track of the last productive iteration in the first pass */
-	if (forever_iteration(plot_iterator))
-	    plot_iterator->iteration_end = last_iteration_in_first_pass;
 
 	if (hidden3d) {
 	    u_step = (u_max - u_min) / (iso_samples_1 - 1);
@@ -2690,17 +2661,27 @@ eval_3dplots()
 		    }
 		    /*}}} */
 		}		/* end of ITS A FUNCTION TO PLOT */
+
 		/* we saved it from first pass */
 		c_token = this_plot->token;
 
-		/* we may have seen this one data file in multiple iterations */
-		i = this_plot->iteration;
-		do {
+		/* We may have seen this one data file in multiple iterations.
+		 * Skip over all the plots it may have generated.
+		 * This is *instead of* executing the iterations so ignore
+		 * the current iterator.
+		 */
+		if (this_plot->plot_type == FUNC3D) {
 		    this_plot = this_plot->next_sp;
-		} while (this_plot
-			&& this_plot->token == c_token
-			&& this_plot->iteration == i
-			);
+		} else {
+		    void *it = this_plot->iteration;
+		    plot_iterator = cleanup_iteration(plot_iterator);
+		    do {
+			this_plot = this_plot->next_sp;
+		    } while (this_plot
+			    && this_plot->token == c_token
+			    && this_plot->iteration == it
+			    );
+		}
 
 	    }			/* !is_definition */
 
@@ -2717,8 +2698,6 @@ eval_3dplots()
 		c_token++;
 		if (crnt_param == 0)
 		    plot_iterator = check_for_iteration();
-		if (forever_iteration(plot_iterator))
-		    plot_iterator->iteration_end = last_iteration_in_first_pass;
 	    } else
 		break;
 
