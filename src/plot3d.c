@@ -1791,7 +1791,7 @@ eval_3dplots()
 
 		/* for capture to key */
 		this_plot->token = end_token = c_token - 1;
-		this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
+		this_plot->iteration = plot_iterator;
 
 		/* this_plot->token is temporary, for errors in get_3ddata() */
 
@@ -2315,7 +2315,7 @@ eval_3dplots()
 
 		    /* for second pass */
 		    this_plot->token = c_token;
-		    this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
+		    this_plot->iteration = plot_iterator;
 
 		    if (this_plot->num_iso_read == 0)
 			this_plot->plot_type = NODATA;
@@ -2355,7 +2355,7 @@ eval_3dplots()
 			this_plot = *tp_3d_ptr = sp_alloc(0, 0, 0, 0);
 
 		    this_plot->plot_type = DATA3D;
-		    this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
+		    this_plot->iteration = plot_iterator;
 		    this_plot->plot_style = first_dataset->plot_style;
 		    this_plot->lp_properties = first_dataset->lp_properties;
 		    this_plot->fill_properties = first_dataset->fill_properties;
@@ -2394,13 +2394,13 @@ eval_3dplots()
 		   ||  this_plot->plot_type == NODATA) {
 		tp_3d_ptr = &(this_plot->next_sp);
 		this_plot->token = c_token;	/* store for second pass */
-		this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
+		this_plot->iteration = plot_iterator;
 
 	    } else if (this_plot->plot_type == VOXELDATA){
 		/* voxel data in an active vgrid must already be present */
 		tp_3d_ptr = &(this_plot->next_sp);
 		this_plot->token = c_token;	/* store for second pass */
-		this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
+		this_plot->iteration = plot_iterator;
 		/* FIXME: I worry that vxrange autoscales xrange and xrange autoscales vxrange */
 		autoscale_one_point((&axis_array[FIRST_X_AXIS]), this_plot->vgrid->vxmin);
 		autoscale_one_point((&axis_array[FIRST_X_AXIS]), this_plot->vgrid->vxmax);
@@ -2661,6 +2661,7 @@ eval_3dplots()
 		    }
 		    /*}}} */
 		}		/* end of ITS A FUNCTION TO PLOT */
+
 		/* we saved it from first pass */
 		c_token = this_plot->token;
 
@@ -2669,15 +2670,18 @@ eval_3dplots()
 		 * This is *instead of* executing the iterations so ignore
 		 * the current iterator.
 		 */
-		if (this_plot->plot_type != FUNC3D)
-		    plot_iterator = cleanup_iteration(plot_iterator);
-		i = this_plot->iteration;
-		do {
+		if (this_plot->plot_type == FUNC3D) {
 		    this_plot = this_plot->next_sp;
-		} while (this_plot
-			&& this_plot->token == c_token
-			&& this_plot->iteration == i
-			);
+		} else {
+		    void *it = this_plot->iteration;
+		    plot_iterator = cleanup_iteration(plot_iterator);
+		    do {
+			this_plot = this_plot->next_sp;
+		    } while (this_plot
+			    && this_plot->token == c_token
+			    && this_plot->iteration == it
+			    );
+		}
 
 	    }			/* !is_definition */
 
