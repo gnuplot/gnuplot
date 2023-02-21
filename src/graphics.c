@@ -4292,6 +4292,8 @@ attach_title_to_plot(struct curve_points *this_plot, legend_key *key)
 	y = map_y(points[index].y);
     }
 
+    term->layer(TERM_LAYER_BEGIN_KEYSAMPLE);
+
     if (key->textcolor.type == TC_VARIABLE)
 	/* Draw key text in same color as plot */
 	;
@@ -4309,6 +4311,8 @@ attach_title_to_plot(struct curve_points *this_plot, legend_key *key)
     write_multiline(x, y, title,
     	(JUSTIFY)this_plot->title_position->y,
 	JUST_TOP, 0, key->font);
+
+    term->layer(TERM_LAYER_END_KEYSAMPLE);
 }
 
 void
