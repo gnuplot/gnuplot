@@ -102,7 +102,7 @@
 \noindent
 This material describes \gnuplot version 5 (up to 5.4)
         \\
-FAQ version: June 2022
+FAQ version: February 2023
         \\
 PDF version of current document: {\http{www.gnuplot.info/faq/faq.pdf}.
 
@@ -247,7 +247,7 @@ about gnuplot", for the most up-to-date list.
 
 The current stable version of \gnuplot is 5.4, first released in July 2020.
 Incremental versions (patchlevel 1, 2, ...) are typically released every six months.
-The development version of \gnuplot is currently 5.5.
+The development version is currently \gnuplot 6.
 
 \subsection{Where can I get \gnuplot?}
 \label{where-get-gnuplot}
@@ -331,7 +331,7 @@ Online copies in English and Japanese are available at
 \subsection{Worked examples}
 
 There is a directory of worked examples in the the source distribution.
-These examples and the resulting plots may also be found online at
+Many of these examples and the resulting plots may also be found online at
 \http{gnuplot.sourceforge.net/demo/}.
 
 
@@ -377,7 +377,7 @@ There is an old-school usenet group devoted to gnuplot questions
 inhabited mostly by users who found it last century.
 
 \item
-A more browser-oriented help forum may be found on StackOverflow
+A more active help forum may be found on StackOverflow
 \http{stackoverflow.com/questions/tagged/gnuplot}
 
 \item
@@ -445,7 +445,7 @@ a plot generated from the command line by changing the terminal type.
 \subsection{How do I include my graphs in my favorite word processor?}
 
 Basically, you save your plot to a file in a format your word processor
-can understand, and then you read in the plot from your word processor. Vector
+can understand, and then you read in the file from your word processor. Vector
 formats (PostScript, emf, svg, pdf, \TeX{}, \LaTeX{}) should be preferred,
 as you can scale your graph later to the right size.
 
@@ -566,7 +566,7 @@ unix-derived command line utilities {\em awk}, {\em sort} and {\em grep}.
 
 On systems supporting pipes, you can pipe commands to \gnuplot from other
 programs. Many applications with gnuplot as the graphics engine, like Octave
-(\http{www.octave.org}), uses this method. This also works from a cgi script to
+(\http{www.octave.org}), use this method. This also works from a cgi script to
 drive \gnuplot from a forms-based web page.
 
 
@@ -602,7 +602,7 @@ surfaces.   However it does not handle plots generated in {\em pm3d} mode.
 This includes styles {\em with pm3d}, {\em with zerror}, {\em with boxes},
 and miscellaneous plot elements generated while {\em set pm3d} is in effect.
 Hidden surface removal for these plots is achieved instead by drawing them
-in order of their distance from the viewer, controlled by
+in order of their distance from the viewer, enabled by the command
 {\em set pm3d depthorder}.
 
 \subsection{How do I force exact positions for the graph borders on the page?}
@@ -692,7 +692,7 @@ set label Y norotate at graph 0.0, 0.5 offset -6
 set terminal gif animate {delay <time>} {loop <N>} {optimize}
 \end{verbatim}
 
-The development version (5.5) also supports animation in webp format.
+The development version also supports animation in webp format.
 Have a look at
 \http{gnuplot.sourceforge.net/demo/animate2.html}
 in the demo collection.
@@ -761,7 +761,7 @@ gnuplot> splot x with pm3d, x*y with points
 
 Labeling individual contours in a contour plot used to require special
 tricks and extra processing steps in \gnuplot version 4.
-In version 5 it is much simpler.  Plot the contours twice,
+Since version 5 it is much simpler.  Plot the contours twice,
 once "with lines" and once "with labels".  To make the labels stand out
 it may help to use
 \begin{verbatim}
@@ -833,7 +833,8 @@ splot 'facets_with_color.dat' using 1:2:3:4 title "explicit colors"
 \normalsize
 
 Gnuplot is not a 3D modeling program.
-The depthorder rendering will not handle inter-penetrating facets.
+The depthorder rendering in version 5 does not handle inter-penetrating facets;
+version 6 does somewhat better.
 For true 3D rendering you would be probably be better off using a ray-tracing program.
 
 \subsection{How do I plot two functions in non-overlapping regions?}
@@ -880,8 +881,8 @@ gnuplot> splot [0:1] [0:1] u,yl(x(u))+(yu(x(u)) - yl(x(u)))*v,\
 
 \subsection{Text markup using "enhanced text" mode}
 
-\Gnuplot version 5 defaults to "enhanced text" mode, in which text markup is
-indicated by a set of special characters embedded in the text.
+Starting with version 5, \gnuplot defaults to "enhanced text" mode,
+in which text markup is indicated by a set of special characters embedded in the text.
 
 \begin{center}
 \begin{tabular}{|clll|} \hline
@@ -925,7 +926,7 @@ If you are not, then you can still tell gnuplot to use UTF-8 for output:
 
 If you cannot enter UTF-8 characters on your keyboard you will have to solve
 that outside of gnuplot. Or you can use octal escape sequences to type them in
-byte-by-byte, or (version 5.4) unicode escape sequences like
+byte-by-byte, or (since version 5.4) unicode escape sequences like
 {\em \verb&\U+221E&} ($\infty$).
 If your keyboard does generate UTF-8 but you don't know what keystrokes would
 produce a specific character, there are probably suitable character selection
@@ -982,7 +983,7 @@ your computer or output device.  \Gnuplot itself does not provide fonts.
 
 The various \LaTeX{} terminal types (\textit{latex, epslatex, tikz, context, cairolatex})
 hand off text generation to \LaTeX{}. In this case you can use normal \LaTeX{}
-markup like \verb+$\alpha_{3}$+ .
+markup like \verb+$\alpha_{3}$+ ($\alpha_{3}$).
 
 \subsection{How do I include accented characters?}
 
@@ -1071,7 +1072,9 @@ Gaston is a julia package that provides an interface to gnuplot for graphical ou
 
 \subsection{What if I need special function that gnuplot doesn't have?}
 
-See above. You may have to use another program or write a custom plugin.
+\Gnuplot version 6 provides a greatly expanded set of complex special functions.
+If the one you need is not included, you may have to use another program or write
+a custom plugin for gnuplot.
 
 
 \subsection{How to use hotkeys in my interactive terminals}
