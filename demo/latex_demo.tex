@@ -17,6 +17,9 @@
 \usepackage{textcomp}
 \usepackage{framed}
 
+% straight single quotes
+\usepackage{upquote}
+
 % symbols
 \usepackage{latexsym}
 \usepackage{amssymb}
@@ -184,26 +187,48 @@ By default it uses {\TeX} arrows, but uses gnuplot point symbols.
 To see the many terminal options available, tell gnuplot {\tt set term tikz help}.
 The options {\tt tex}, {\tt latex} and {\tt context} tailor the output for
 a specific {\TeX} environment.  {\tt latex} is the default.
-Load the corresponding style file at the beginning of your document:
+Load the corresponding style file at the beginning of your document
 \begin{verbatim}
    \input gnuplot-lua-tikz.tex    % (for plain TeX)
    \usepackage{gnuplot-lua-tikz}  % (for LaTeX)
    \usemodule[gnuplot-lua-tikz]   % (for ConTeXt)
 \end{verbatim}
+Other common requirements
+\begin{verbatim}
+   \usepackage{latexsym}
+   \usepackage{amssymb}
+   \usepackage[utf8x]{inputenc}   % needed for pdflatex but not xelatex or lualatex
+   \SetUnicodeOption{mathletters} % needed for pdflatex but not xelatex or lualatex
+\end{verbatim}
+
+The tikz terminal can also be used to create a pdf file, either for use by
+itself of for inclusion as a figure in a larger document.  Note that in this
+case text is rendered at the time you process the gnuplot output to produce
+a pdf file; i.e. if you intend to include this pdf file in a {\TeX} document
+you must take care to choose the size and font to match the local environment
+of the surrounding document.
+The example below uses pdflatex, but lualatex or xelatex should also work. 
+\begin{verbatim}
+   gnuplot> set term tikz standalone size 10cm,7cm font='\small'
+   gnuplot> set output 'figure.tex'
+   gnuplot> ... various plot commands ...
+   gnuplot> unset output
+   gnuplot> !pdflatex figure
+\end{verbatim}
+
+\newpage
 
 \subsection*{context terminal}
 
-The {\tt context} terminal produces Metafun code for use by the 
+The {\em context} terminal produces Metafun code for use by the 
 ConTeXt macro package. Typically this terminal is selected as part of a stream
 of gnuplot commands generated inside a ConTeXt session; the resulting output
 is then fed back into that session.
 For more information, see {\em ctan.org/pkg/context-gnuplot}.
 
-\newpage
-
 \subsection*{Other terminals: pstex epslatex pslatex}
 
-The {\tt pstex}, {\tt epslatex}, and {\tt pslatex} terminals are perhaps
+The {\em pstex}, {\em epslatex}, and {\em pslatex} terminals are perhaps
 best viewed as serving a slightly different purpose.
 Rather than aiding inclusion of gnuplot graphs in a {\LaTeX} document,
 they are primarily intended to enable {\TeX}-set annotation of gnuplot graphs
@@ -227,16 +252,16 @@ set terminal epslatex color 10 size 3.5in,2.4in standalone
 
 \subsection*{Legacy terminals}
 
-Two older gnuplot terminals {\tt pstricks} and {\tt texdraw} remain in the
+Two older gnuplot terminals {\em pstricks} and {\em texdraw} remain in the
 default build configuration.  They offer limited graphics capability
 compared to the terminals described above.
 
-Other older gnuplot terminals {\tt latex}, {\tt eepic}, {\tt emtex}, and {\tt tpic}
+Other older gnuplot terminals {\em latex}, {\em eepic}, {\em emtex}, and {\em tpic}
 have been deprecated and are no longer included by default when gnuplot is built.
 If necessary, the file {\em src/term.h} can be edited to uncomment {\em \#include}
 statements for the corresponding terminal driver files prior to building gnuplot.
 
-The {\tt metapost} and {\tt metafont} terminals have also been deprecated.
+The {\em metapost} and {\em metafont} terminals have also been deprecated.
 They can be including when building gnuplot by adding configuration options
 {\tt --with-metapost --with-metafont}.
 
