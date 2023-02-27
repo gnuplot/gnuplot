@@ -5,16 +5,13 @@
 COMMANDS:
 =========
 
+ -- record/playback of multiplot command sequence
 
 DOCUMENTATION:
 ==============
 
  -- Improve the documentation on fonts
  -- More figures in the manual
- -- We no longer have a working build path for HTML documentation.
-    Is there a suitable replacement?
- -- The LaTeX tutorial is so out of date that it is useless.
-    Update or replace.
 
 PLATFORMS:
 ==========
@@ -22,6 +19,9 @@ PLATFORMS:
  -- We've seen a proof-of-principle build of gnuplot into javascript
     running in a browser.  If the tool chain is simple enough, we could
     make this a build target for autoconf/make.
+ -- Is the VMS code still usable?
+    Last successful build *reported to us* Dec 2013
+    https://vmssoftware.com distributes a 2017 build of 5.0.2
 
 GNUPLOT TOOLS LIBRARY:
 ======================
@@ -65,7 +65,6 @@ Lars' list from way back when
 - add more maintainer checks (eg. file permissions)
 - better documentation format; get rid of the doc2xxx utils
   [SGML. SGML. SGML]
-- tilde and variable expansion to be done by a shared routine gp_fopen()
 
 HBB:
 ===
@@ -73,14 +72,17 @@ HBB:
 [Optional:] See if 16-bit compilations can be made to work again.
 
 
-Ethan's list of ideas for development series 5.5
-================================================
+Ethan's list of ideas for development series 6
+==============================================
 
 Code cleanup
 ------------
-- refactor VMS conditionals so that all the code is in vms.c
-- matrix data should be stored as (double) not (float)
-- audit all FIXMEs, some must be out of date
+- Refactor VMS conditionals so that all the code is in vms.c
+  Drop VMS altogether?
+- Matrix data should be stored as (double) not (float)
+- Audit all FIXMEs, some must be out of date
+- Remove non-IEEE math constants?
+  We no longer claim to support the architectures these conform to.
 
 Build system options
 --------------------
@@ -111,8 +113,27 @@ Math
 - improved support for special functions.
   Better precision, extension to complex values wherever possible,
   document algorithms used with citations and expected precision.
-- specfun.c has many lines of initializing constants for floating
-  point math on platforms that are no longer supported. Delete them?
 - consistent handling of NaN, +Inf, -Inf, and underflow.
-- Savitzky-Golay filtering
+
+Features
+--------
+- Rework image input code so that image data can be processed as data
+  e.g. extract/modify individual channels from ARGB
+       accept 16-bit PNG
+- "record" function to save commands to a file separate from the history.
+  motivation:  recurring requests to allow replot of multiplots
+	set record "filename" {append}
+	...
+	unset record
+	load "filename"
+- "remultiplot" could automate the above idea
+	'set multiplot' places a flag in the history
+	'unset multiplot' places a terminating flag
+	'remultiplot' replays history between the two flags
+- FIR filters
+   Add a new class of smoothing operations that would allow user-provided
+   Savitzky–Golay filters. Smoothed value at point x[i] would be calculated
+   as     i+n/2
+      Sum        Weight[j] * y[j]
+        j=i-n/2
 
