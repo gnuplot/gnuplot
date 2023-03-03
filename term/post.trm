@@ -132,6 +132,7 @@ TERM_PUBLIC char *PS_escape_string(char *origstr, char *escapelist);
 
 TERM_PUBLIC void PS_path(int p);
 static TBOOLEAN PS_newpath = FALSE;
+static TBOOLEAN PS_inpath = FALSE;
 static TBOOLEAN ENHps_opened_string = FALSE;  /* try to cut out empty ()'s */
 
 TERM_PUBLIC void PS_layer(t_termlayer syncpoint);
@@ -1950,6 +1951,7 @@ doclip\n\
 	fprintf(gppsfile, "(%s) findfont %d scalefont setfont\n",
 		ps_params->font, (t->v_char));
     ps_path_count = 0;
+    PS_inpath = FALSE;
     PS_relative_ok = FALSE;
     PS_pen_x = PS_pen_y = -4000;
     PS_taken = 0;
@@ -2196,7 +2198,10 @@ PS_vector(unsigned int x, unsigned int y)
 	fputs(abso, gppsfile);
 	ps_path_count = 1;  /* If we set it to zero, it may never get flushed */
     }
-    /* Ghostscript has a "pile-up of rounding errors" bug: a sequence of many
+
+#define MAX_REL_PATHLEN 250
+    /* -2003-
+     * Ghostscript has a "pile-up of rounding errors" bug: a sequence of many
      * rmove's or rlineto's does not yield the same line as move's or lineto's.
      * Therefore, we periodically force an update of the absolute position.
      * There was a case when 400 rlineto's were too much, so let's set the limit
@@ -2205,10 +2210,14 @@ PS_vector(unsigned int x, unsigned int y)
      * lineto with no intervening 'stroke' is ridiculously slow to render.
      * So we stroke the partial line, update the position in absolute terms,
      * then continue.  This whole section can go away if ghostscript/gv is fixed.
+     * -2023-
+     * This is now causing more problems than justified by accommodating
+     * old versions of ghostscript/gv.  In particular if the "stroke" is added
+     * inside a path it produces an unwanted line back to the path start.
      */
-#define MAX_REL_PATHLEN 250
     if (ps_path_count >= MAX_REL_PATHLEN) {
-	fprintf(gppsfile, "stroke %d %d M\n", x, y);
+	if (!PS_inpath)
+	    fprintf(gppsfile, "stroke %d %d M\n", x, y);
 	ps_path_count = 1;
     }
 
@@ -4324,11 +4333,13 @@ PS_path(int p)
 	case 0:	/* Start new path */
 		PS_FLUSH_PATH;
 		PS_newpath = TRUE;
+		PS_inpath = TRUE;
 		break;
 
 	case 1: /* Close path */
 		fprintf(gppsfile, "Z ");
 		PS_FLUSH_PATH;
+		PS_inpath = FALSE;
 		break;
     }
 
