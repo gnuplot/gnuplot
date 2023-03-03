@@ -4622,9 +4622,7 @@ do_polygon( int dimensions, t_object *this_object, int style, int facing )
 	}
 
     } else { /* Just draw the outline? */
- 	newpath();
 	draw_clip_polygon(nv, corners);
-	closepath();
     }
 
     clip_area = clip_save;
