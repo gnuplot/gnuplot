@@ -142,6 +142,7 @@ static void unset_tics(struct axis *);
 static void unset_ticslevel(void);
 static void unset_timefmt(void);
 static void unset_timestamp(void);
+static void unset_theta(void);
 static void unset_view(void);
 static void unset_zero(void);
 static void unset_timedata(AXIS_INDEX);
@@ -486,6 +487,9 @@ unset_command()
 	break;
     case S_TITLE:
 	unset_axislabel_or_title(&title);
+	break;
+    case S_THETA:
+	unset_theta();
 	break;
     case S_VIEW:
 	unset_view();
@@ -1651,8 +1655,6 @@ unset_polar( TBOOLEAN grid )
 	}
     }
     raxis = FALSE;
-    theta_origin = 0.0;
-    theta_direction = 1.0;
 
     /* Clear and reinitialize THETA axis structure */
     unset_tics(&THETA_AXIS);
@@ -1879,6 +1881,12 @@ unset_timestamp()
     timelabel_bottom = TRUE;
 }
 
+static void
+unset_theta()
+{
+    theta_origin = 0.0;
+    theta_direction = 1.0;
+}
 
 /* process 'unset view' command */
 static void
@@ -2096,6 +2104,7 @@ reset_command()
     unset_polar(TRUE);
     unset_parametric();
     unset_dummy();
+    unset_theta();
 
     unset_spiderplot();
     unset_style_spiderplot();
