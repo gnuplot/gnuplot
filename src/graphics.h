@@ -125,6 +125,8 @@ void autoscale_boxplot(struct curve_points *plot);
 void place_objects(struct object *listhead, int layer, int dimensions);
 void do_ellipse(int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping );
 
+void do_sector(double cx, double cy, double rin, double rout, double arc_begin, double arc_end, double ratio, int style, TBOOLEAN complete_circle);
+
 void place_pixmaps(int layer, int dimensions);
 
 int filter_boxplot(struct curve_points *);

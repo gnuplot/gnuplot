@@ -753,6 +753,7 @@ const struct gen_table plotstyle_tbl[] =
     { "rgbima$ge", RGBIMAGE },
     { "rgba$lpha", RGBA_IMAGE },
     { "cir$cles", CIRCLES },
+    { "sec$tors", SECTORS },
     { "ell$ipses", ELLIPSES },
     { "sur$face", SURFACEGRID },
     { "parallel$axes", PARALLELPLOT },

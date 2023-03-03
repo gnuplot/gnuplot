@@ -1307,6 +1307,13 @@ do_key_sample(
 	} else if (this_plot->plot_style == SURFACEGRID) {
 	    (*t->fillbox)(style,x,y,w,h);
 
+        } else if (this_plot->plot_style == SECTORS && w > 0) {
+            do_sector(xl + key_point_offset, yl-key_sample_height, (3)*key_sample_height/4.0, (3+2)*key_sample_height/4.0, 120.0*DEG2RAD, 60.0*DEG2RAD, 1.0, style, FALSE);
+            /* Retrace the border if the style requests it */
+            if (need_fill_border(fs)) {
+                do_sector(xl + key_point_offset, yl-key_sample_height, (3)*key_sample_height/4.0, (3+2)*key_sample_height/4.0, 120.0*DEG2RAD, 60.0*DEG2RAD, 1.0, 0, FALSE);
+            }
+
 	} else if (w > 0) {    /* All other plot types with fill */
 	    if (style != FS_EMPTY)
 		(*t->fillbox)(style,x,y,w,h);

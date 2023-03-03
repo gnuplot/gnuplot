@@ -3512,6 +3512,7 @@ df_bin_default_columns default_style_cols[] = {
     {RGBIMAGE, 3, 2},
     {RGBA_IMAGE, 4, 2},
     {CIRCLES, 2, 1},
+    {SECTORS, 4, 2},
     {ELLIPSES, 2, 3},
     {TABLESTYLE, 0, 0}
 };
