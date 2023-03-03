@@ -581,6 +581,11 @@ get_data(struct curve_points *current_plot)
 	max_cols = 6;
 	break;
 
+    case SECTORS:	/* 3 + possible variable color, or 4 + possible variable color */
+	min_cols = 4;
+	max_cols = 7;
+	break;
+
     case ELLIPSES:
 	min_cols = 2; /* x, y, major axis, minor axis */
 	max_cols = 6; /* + optional angle, possible variable color */
@@ -815,6 +820,9 @@ get_data(struct curve_points *current_plot)
 			    break;
 	    case CIRCLES:
 			    if (j == 5 || j < 3) int_error(NO_CARET,errmsg);
+			    break;
+	    case SECTORS:
+			    if (j < 4) int_error(NO_CARET,errmsg);
 			    break;
 	    case ELLIPSES:
 	    case BOXES:
@@ -1214,6 +1222,21 @@ get_data(struct curve_points *current_plot)
 	    break;
 	}
 
+	case SECTORS:
+	{   /*  corner_azimuth corner_radius sector_angle annulus_width
+                corner_azimuth corner_radius sector_angle annulus_width center_x center_y
+	     */
+	    coordval x = (j >= 6) ? v[4] : 0.0; /* center_x */
+	    coordval y = (j >= 6) ? v[5] : 0.0; /* center_y */
+	    coordval xlow  = v[0];              /* corner_azimuth */
+	    coordval xhigh = v[1];              /* corner_radius */
+	    coordval ylow  = v[2];              /* sector_angle */
+	    coordval yhigh = v[3];              /* annulus_width */
+	    store2d_point(current_plot, i++, x, y,
+			  xlow, xhigh, ylow, yhigh, 0.0);
+	    break;
+	}
+
 	case ELLIPSES:
 	{   /* x y
 	     * x y diam  (used for both major and minor axis)
@@ -1436,6 +1459,9 @@ store2d_point(
 	    xlow = x - radius;
 	    xhigh = x + radius;
 
+	}
+	else if (current_plot->plot_style == SECTORS) {
+            ;
 	} else {
 	    /* Jan 2017 - now skipping range check on rhigh, rlow */
 	    (void) polar_to_xy(xhigh, yhigh, &xhigh, &yhigh, FALSE);
@@ -1509,6 +1535,12 @@ store2d_point(
 	cp->xhigh = yhigh;	/* arc end */
 	if (fabs(ylow) > 1000. || fabs(yhigh) > 1000.) /* safety check for insane arc angles */
 	    cp->type = UNDEFINED;
+	break;
+    case SECTORS:
+        cp->xlow  = xlow;
+        cp->xhigh = xhigh;
+        cp->ylow  = ylow;
+        cp->yhigh = yhigh;
 	break;
     case ELLIPSES:
 	/* We want to pass the parameters to the ellipse drawing routine as they are, 
@@ -2704,7 +2736,7 @@ eval_plots()
 		}
 
 		/* pick up the special 'units' keyword the 'ellipses' style allows */
-		if (this_plot->plot_style == ELLIPSES) {
+		if (this_plot->plot_style == ELLIPSES || this_plot->plot_style == SECTORS) {
 		    int stored_token = c_token;
 		    
 		    if (!set_ellipseaxes_units)
@@ -2939,6 +2971,7 @@ eval_plots()
 		case FILLEDCURVES:
 		case LABELPOINTS:
 		case CIRCLES:
+		case SECTORS:
 		case YERRORBARS:
 		case YERRORLINES:
 		case SURFACEGRID:

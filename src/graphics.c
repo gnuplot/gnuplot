@@ -137,6 +137,7 @@ static void get_arrow(struct arrow_def* arrow, double* sx, double* sy, double* e
 static void map_position_double(struct position* pos, double* x, double* y, const char* what);
 
 static void plot_circles(struct curve_points *plot);
+static void plot_sectors(struct curve_points *plot);
 static void plot_ellipses(struct curve_points *plot);
 static void do_rectangle(int dimensions, t_object *this_object, fill_style_type *fillstyle);
 static void do_polygon(int dimensions, t_object *this_object, int style, int facing );
@@ -1017,6 +1018,10 @@ do_plot(struct curve_points *plots, int pcount)
 
 	    case CIRCLES:
 		plot_circles(this_plot);
+		break;
+
+	    case SECTORS:
+		plot_sectors(this_plot);
 		break;
 
 	    case ELLIPSES:
@@ -2587,6 +2592,157 @@ plot_circles(struct curve_points *plot)
 		need_fill_border(&plot->fill_properties);
 		do_arc(x,y, radius, arc_begin, arc_end, 0, default_circle.o.circle.wedge);
 	    }
+	}
+    }
+
+    clip_area = clip_save;
+}
+
+/* plot_sectors:
+ * Plot the curves in SECTORS style
+ */
+
+static void
+plot_sectors(struct curve_points *plot)
+{
+    struct fill_style_type *fillstyle = &plot->fill_properties;
+    int style = style_from_fill(fillstyle);
+    double arc_begin, arc_end;
+    double center_x, center_y;
+    double corner_azimuth, corner_radius;
+    double sector_angle, annulus_width;
+    double inner_radius, outer_radius;
+    double ratio;
+    TBOOLEAN complete_circle;
+    TBOOLEAN withborder = FALSE;
+    BoundingBox *clip_save = clip_area;
+    double xmin = axis_array[plot->x_axis].min;
+    double xmax = axis_array[plot->x_axis].max;
+    double ymin = axis_array[plot->y_axis].min;
+    double ymax = axis_array[plot->y_axis].max;
+    double angle, delta_angle = 10*DEG2RAD/ang2rad;
+    double xp, yp;
+    int is_inrange = FALSE;
+    int i, k;
+
+    if (default_circle.clip == OBJ_NOCLIP)
+	clip_area = &canvas;
+
+    if (fillstyle->border_color.type != TC_LT
+    ||  fillstyle->border_color.lt != LT_NODRAW)
+	withborder = TRUE;
+
+    for (i = 0; i < plot->p_count; i++) {
+
+	center_x       = plot->points[i].x;
+	center_y       = plot->points[i].y;
+	corner_azimuth = plot->points[i].xlow;
+	corner_radius  = plot->points[i].xhigh;
+	sector_angle   = plot->points[i].ylow;
+	annulus_width  = plot->points[i].yhigh;
+	complete_circle = FALSE;
+
+        if ( annulus_width >= 0 ) {
+	    inner_radius = corner_radius;
+	    outer_radius = corner_radius + annulus_width;
+        }
+        else {
+	    outer_radius = corner_radius;
+	    inner_radius = corner_radius + annulus_width;
+        }
+
+	if ( outer_radius <= 0 )
+	    continue;
+
+	if ( inner_radius < 0 )
+	    inner_radius = 0;
+
+        if ( sector_angle == 0.0 )
+            continue;
+        else if ( fabs(sector_angle*ang2rad) > 2*M_PI ) {
+            complete_circle = TRUE;
+	    sector_angle = 2*M_PI/ang2rad;
+	}
+
+	if ( sector_angle > 0 ) {
+	    arc_begin = corner_azimuth;
+	    arc_end   = corner_azimuth + sector_angle;
+        }
+        else {
+	    arc_begin = corner_azimuth + sector_angle;
+	    arc_end   = corner_azimuth;
+	    sector_angle = -sector_angle;
+        }
+
+        /* range check */
+        {
+            double aa[5] = { arc_begin+sector_angle/2,     arc_begin,    arc_end,      arc_begin,    arc_end      };
+            double rr[5] = { inner_radius+annulus_width/2, inner_radius, inner_radius, outer_radius, outer_radius };
+            double r2[2] = { inner_radius, outer_radius };
+	    is_inrange = FALSE;
+            /* check of 4-corners */
+            for (k=0; k<5; k++) {
+		polar_to_xy(aa[k], rr[k], &xp, &yp, FALSE);
+                if ( inrange(xp+center_x, xmin, xmax) && inrange(yp+center_y, ymin, ymax) ) {
+                    is_inrange = TRUE;
+                    break;
+                }
+            }
+	    if ( sector_angle > 2*delta_angle ) {
+		for (k=0; k<2; k++) {
+	            for (angle = arc_begin+delta_angle; angle<arc_end; angle += delta_angle) {
+	               polar_to_xy(angle, r2[k], &xp, &yp, FALSE);
+	               if ( inrange(xp+center_x, xmin, xmax) && inrange(yp+center_y, ymin, ymax) ) {
+	                   is_inrange = TRUE;
+	                   break;
+	               }
+		    }
+                    if ( is_inrange == TRUE )
+			break;
+	        }
+	    }
+            if ( is_inrange == FALSE )
+		continue;
+        }
+
+        /* convert center_x, center_y, inner_radius, outer_radius according to units xy|xx|yy */
+        center_x = map_x_double(center_x);
+        center_y = map_y_double(center_y);
+        switch (plot->ellipseaxes_units) {
+	    default:
+            case ELLIPSEAXES_XY:
+                inner_radius = map_x_double(inner_radius) - map_x_double(0.0);
+                outer_radius = map_x_double(outer_radius) - map_x_double(0.0);
+                ratio = (map_y_double(1.0)-map_y_double(0.0))/(map_x_double(1.0)-map_x_double(0.0));
+	        break;
+	    case ELLIPSEAXES_XX:
+                inner_radius = map_x_double(inner_radius) - map_x_double(0.0);
+                outer_radius = map_x_double(outer_radius) - map_x_double(0.0);
+                ratio = 1.0;
+	        break;
+            case ELLIPSEAXES_YY:
+                inner_radius = map_y_double(inner_radius) - map_y_double(0.0);
+                outer_radius = map_y_double(outer_radius) - map_y_double(0.0);
+                ratio = 1.0;
+                break;
+        }
+
+        /* convert arc_begin, arc_end according to setting of 'set theta' */
+	arc_begin = (arc_begin * theta_direction)*ang2rad + theta_origin*DEG2RAD;
+	arc_end   = (arc_end * theta_direction)*ang2rad + theta_origin*DEG2RAD;
+
+	/* rgb variable  -  color read from data column */
+	if (!check_for_variable_color(plot, &plot->varcolor[i]) && withborder)
+	    term_apply_lp_properties(&plot->lp_properties);
+
+	if (style != FS_EMPTY)
+	    do_sector(center_x, center_y, inner_radius, outer_radius,
+			arc_begin, arc_end, ratio, style, complete_circle);
+
+	if (withborder) {
+	    need_fill_border(&plot->fill_properties);
+	    do_sector(center_x, center_y, inner_radius, outer_radius,
+			arc_begin, arc_end, ratio, 0, complete_circle);
 	}
     }
 
@@ -4420,6 +4576,97 @@ do_rectangle( int dimensions, t_object *this_object, fill_style_type *fillstyle 
 	}
 
     return;
+}
+
+/* Generic routine for drawing annular sectors. */
+
+void
+do_sector(
+    double cx, double cy, /* Center */
+    double inner_radius, /* Radius of inner arc */
+    double outer_radius, /* Radius of outer arc */
+    double arc_begin, double arc_end, /* Limits of arcs in Radians */
+    double ratio,        /* Aspect ratio of annulus (units xy|xx|yy)*/
+    int style,
+    TBOOLEAN complete_circle)
+{
+    gpiPoint vertex[1000];
+    int i, k, segments, points;
+    double aspect;
+    double inc, direction;
+
+    inc = 1.0*DEG2RAD;
+
+    if ( complete_circle )
+        arc_end = arc_begin + 2*M_PI;
+
+    direction = ( arc_end > arc_begin ) ? 1.0 : -1.0;
+
+    segments = floor(fabs(arc_end - arc_begin) / inc);
+    if (segments < 1)
+        segments = 1;
+
+    /* Calculate the vertices */
+    aspect = ratio * ( (double)term->v_tic / (double)term->h_tic );
+
+    /* draw inner and outer circles for drawing border line of complete circle (sector_angle > 360). */
+    if ( ! style && complete_circle ) {
+	double radius[2] = { inner_radius, outer_radius };
+	for (k=0; k<2; k++) {
+	    points = 0;
+	    for (i=0; i<segments; i++) {
+	        vertex[points].x = round(cx + cos(arc_begin + i*inc*direction) * radius[k]);
+	        vertex[points].y = round(cy + sin(arc_begin + i*inc*direction) * radius[k] * aspect);
+	        points++;
+	    }
+	    vertex[points].x = round(cx + cos(arc_begin) * radius[k]);
+	    vertex[points].y = round(cy + sin(arc_begin) * radius[k] * aspect);
+	    points++;
+	    draw_clip_polygon(points, vertex);
+	}
+	return;
+    }
+
+    points = 0;
+
+    /* outer arc */
+    for (i=0; i<segments; i++) {
+        vertex[points].x = round(cx + cos(arc_begin + i*inc*direction) * outer_radius);
+        vertex[points++].y = round(cy + sin(arc_begin + i*inc*direction) * outer_radius * aspect);
+    }
+    vertex[points].x = round(cx + cos(arc_end) * outer_radius);
+    vertex[points++].y = round(cy + sin(arc_end) * outer_radius * aspect);
+    /* wedge */
+    vertex[points].x = round(cx + cos(arc_end) * inner_radius);
+    vertex[points++].y = round(cy + sin(arc_end) * inner_radius * aspect);
+    if ( inner_radius != 0 ) {
+        /* inner arc */
+        for (k=segments-1,i=0; k>=0; k--,i++) {
+	    vertex[points].x = round(cx + cos(arc_begin + k*inc*direction) * inner_radius);
+	    vertex[points++].y = round(cy + sin(arc_begin + k*inc*direction) * inner_radius * aspect);
+        }
+        /* wedge */
+        vertex[points].x = round(cx + cos(arc_begin) * outer_radius);
+        vertex[points++].y = round(cy + sin(arc_begin) * outer_radius * aspect);
+    }
+    else {
+       /* wedge */
+       vertex[points].x = round(cx + cos(arc_begin) * outer_radius);
+       vertex[points++].y = round(cy + sin(arc_begin) * outer_radius * aspect);
+    }
+
+    if (style) { /* Fill in the center */
+	gpiPoint fillarea[1000];
+	int in;
+
+	clip_polygon(vertex, fillarea, points, &in);
+	fillarea[0].style = style;
+	if (term->filled_polygon)
+	    term->filled_polygon(in, fillarea);
+
+    } else { /* Draw the sector */
+	draw_clip_polygon(points, vertex);
+    }
 }
 
 void

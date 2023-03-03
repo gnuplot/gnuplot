@@ -1308,6 +1308,7 @@ do_3dplot(
 	    case CANDLESTICKS:
 	    case BOXPLOT:
 	    case FINANCEBARS:
+	    case SECTORS:
 		/* These should have been caught in plot3d */
 		int_error(NO_CARET, "plot style not supported in 3D");
 		break;
