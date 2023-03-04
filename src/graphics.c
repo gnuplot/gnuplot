@@ -512,7 +512,8 @@ place_objects(struct object *listhead, int layer, int dimensions)
 	    ||  (this_object->clip == OBJ_NOCLIP))
 	    	clip_area = &canvas;
 
-	    do_arc((int)x1, (int)y1, radius, e->arc_begin, e->arc_end, style, FALSE);
+	    if (style != FS_EMPTY)
+		do_arc((int)x1, (int)y1, radius, e->arc_begin, e->arc_end, style, FALSE);
 
 	    /* Retrace the border if the style requests it */
 	    if (need_fill_border(fillstyle))
@@ -2580,7 +2581,8 @@ plot_circles(struct curve_points *plot)
 	    /* rgb variable  -  color read from data column */
 	    if (!check_for_variable_color(plot, &plot->varcolor[i]) && withborder)
 		term_apply_lp_properties(&plot->lp_properties);
-	    do_arc(x,y, radius, arc_begin, arc_end, style, FALSE);
+	    if (style != FS_EMPTY)
+		do_arc(x,y, radius, arc_begin, arc_end, style, FALSE);
 	    if (withborder) {
 		need_fill_border(&plot->fill_properties);
 		do_arc(x,y, radius, arc_begin, arc_end, 0, default_circle.o.circle.wedge);
