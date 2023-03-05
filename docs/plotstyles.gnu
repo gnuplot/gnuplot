@@ -222,6 +222,48 @@ unset xtics; unset ytics
 plot 'ellipses.dat' u 1:2:3:4:5 with ellipses units xy title "with ellipses",\
      '' u 1:2:3:4:5 with ellipses units xx notitle,\
      '' u 1:2:3:4:5 with ellipses units yy notitle
+reset
+
+
+#########################################################
+# annular sector definition for "with sectors"
+#########################################################
+#
+set output out . 'figure_sector_definition' . ext
+set title 'A single annular sector in plot style "with sectors"' offset -2,-1
+
+set polar
+set angles degree
+set theta top cw
+set xrange [-3:10]
+set yrange [-3:10]
+set size ratio -1
+unset border
+set lmargin 8
+unset raxis
+unset tics
+unset key
+
+array data[1]
+
+set arrow 1 from 6,0 to 9,0 
+set arrow 1 heads size screen 0.015, 30, 90 filled front lw 1 lc rgb "gray30"
+set arrow 2 from polar 28, 9.7 to polar 62, 9.7
+set arrow 2 heads size screen 0.015, 30, 90 filled front lw 1 lc rgb "gray30"
+
+plot \
+     data using (-30):(6):(300):(3) with sectors lc rgb "gray80" lw 1,\
+     data using (20):(0):(50):(6)   with sectors lc rgb "gray80" lw 1,\
+     data using (20):(6):(50):(3)   with sectors lc rgb "gray30" lw 2 fill solid 0.5 border,\
+     data using (20):(0):(50):(1)   with sectors lc rgb "gray30" lw 1,\
+     data using (20):(6)            with points pt 7 ps 1 lc rgb "gray30", \
+     data using (0):(0)             with points pt 7 ps 1 lc rgb "gray30", \
+     data using (0):(0):("(center_x, center_y)")     with labels offset 0,-1 noenhanced, \
+     data using (45):(10.):("sector_angle") with labels center noenhanced rotate by -45, \
+     data using (90):(7.5):("annular_width") with labels offset 0,1.0 noenhanced, \
+     data using (20):(6):("corner\n(azimuth, radius)") with labels offset -2,-1 right
+
+reset
 
 #
 # Following example plots will be set in colour mode for pdf output
@@ -259,11 +301,103 @@ set x2tics 0,1
 set ytics  0,1
 set palette rgbformula -3,-3,-3
 plot $HEATMAP matrix with image pixels
+reset
+
+#########################################################
+#   polar heatmap positioned in cartesian coordinate
+#   system.  Note that the two halves of the plot
+#   displaced by shifting the center to x = +/- 0.5.
+#########################################################
+#
+set output out . 'figure_sector_heatmap' . ext
+set title "Polar heatmap composed of sectors "\
+          ."positioned on a cartesian x/y plane"
+set title offset 0,-1
+
+rmax = 10
+dr = 0.5
+tmax = 180
+dt = 10
+
+f(t,r) = r*cos(t+20*r)**2
+
+set angle degrees
+set theta top cw
+set xrange [-(rmax+2):(rmax+2)]
+set yrange [-(rmax+2):(rmax+2)]
+set size ratio -1
+set bmargin 0
+set tmargin 2
+unset border
+unset tics
+unset key
+
+set palette viridis
+set colorbox user size 0.05, 0.6 origin 0.85,0.15
+set cbtics
+
+set table $data
+splot sample [t=0:tmax-dt:dt] [r=0:rmax-dr:dr] "++" using (t):(r):(0)
+unset table
+
+plot $data using 1:2:(dt):(dr):(0.5):(0):(f($1+dt/2,$2+dr/2)) with sectors fc palette fill solid, \
+     $data using (-$1):2:(-dt):(dr):(-0.5):(0):(f($1+dt/2,$2+dr/2)) with sectors fc palette fill solid
+reset
+
+#########################################################
+#     Windrose (histgram on polar axis)
+#########################################################
+
+set output out . 'figure_windrose' . ext
+set title "Windrose\n (polar coordinate histogram using sectors)" offset 0,-2
+
+$data <<EOD
+# DIRECTION INDEX COUNT
+N    1  10
+NNE  2  15
+NE   3  21
+ENE  4  24
+E    5  19
+ESE  6  12
+SE   7   8
+SSE  8   4
+S    9   2
+SSW 10   4
+SW  11   7
+WSW 12  10
+W   13  11
+WNW 14   9
+NW  15   5
+NNW 16   7
+EOD
+
+stats $data using 2:3 nooutput
+
+set polar
+set angle degrees
+set theta top cw
+
+set xrange [-0.2:0.2]
+set yrange [-0.2:0.2]
+set size ratio -1
+
+unset border
+unset key
+unset raxis
+unset tics
+set margins -1,-1,0,1
+
+array dummy[1]
+plot $data using (22.5*($2-1-0.5)):(0.01):(22.5):($3/STATS_sum_y) with sectors \
+              fc rgb "blue" fill solid 0.5 border lc bgnd, \
+     for [k=0:15:5] dummy using (0):(0.01):(361):(k/100.0) with sectors lc rgb "gray30" lw 0.5 dt "."
+
+reset
+
 #
 # 3D Plot styles
 # ==============
 #
-reset
 set view 69, 200, 1.18, 0.82
 set view 69, 200, 1.18, 1.00
 set bmargin at screen 0.3
@@ -1119,7 +1253,7 @@ if (!strstrt(GPVAL_COMPILE_OPTIONS, "+POLARGRID")) {
 } else {
       set size square
       set angle degrees
-      unset border; unset tics; unset key
+      unset border; unset tics; unset key; set tmargin 0
       unset colorbox
       set rrange [0:200]
       set rtics 50,50,200

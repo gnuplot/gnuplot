@@ -15,7 +15,7 @@ C
 ^  Ed Kubaitis, Russell Lang, Timothée Lecomte,<br>
 ^  Alexander Lehmann, Alexander Mai, Bastian Märkisch,<br>
 ^  Tatsuro Matsuoka, Ethan A Merritt, Petr Mikulík,<br>
-^  Carsten Steger, Shigeharu Takeno,<br>
+^  Hiroki Motoyoshi, Carsten Steger, Shigeharu Takeno,<br>
 ^  Tom Tkacik, Jos Van der Woude,<br>
 ^  James R. Van Zandt, Alex Woo, Johannes Zellner<br>
 ^</p>
@@ -331,6 +331,10 @@ C
 ## contributions from an arbitrary set of input points. This is analogous to
 ## the use of `dgrid3d` and style `with pm3d` to produce a 3D gridded surface.
 ## See `set polar grid` and `polar heatmap`.
+#b New 2D plot style `with sectors` is an alternative to generating a full
+## polar gridded surface.  For each input data points it generates a single
+## annular wedge in a conceptual polar grid.  Unlike polar mode `with surface`
+## it can be used in either a polar or cartesian coordinate graph. 
 #b Plot style `with lines` now has a filter option `sharpen`.  This filter
 ## detects spikes in a function plot that appear truncated in the output
 ## because the peak lies between two x-coordinates at which the function has
@@ -4616,6 +4620,7 @@ Ffigure_watchpoints
       # determining which of the two previous defined styles to use
       plot DATA using 1:2:3:4:5 with arrows arrowstyle variable
 
+#TeX \newpage
 2 Bee swarm plots
 ?beeswarm
 ?bee swarm
@@ -4812,7 +4817,6 @@ Ffigure_boxplot
  These default properties may be changed using the `set style boxplot` command.
  See `set style boxplot`, `bars`, `boxwidth`, `fillstyle`, `candlesticks`.
 
-#TeX \newpage
 2 boxxyerror
 ?plotting styles boxxyerror
 ?style boxxyerror
@@ -5198,14 +5202,25 @@ Ffigure_histeps
  of which style to use is dictated by the type of data.
 
 Ffigure_heatmap
+ Pixel-based heat maps all have the property that each pixel in the map
+ corresponds exactly to one original data value.
  The pixel-based image styles require a regular rectangular grid of data values;
- see `with image`.  However it is possible to deal with some missing grid values
+ see `with image`.  However it is possible to handle missing grid values
  (see `sparse`) and it is also possible to mask out only a portion of the grid
- for display (see `masking`).  These pixel-based heat maps all have the property
- that each pixel in the map corresponds exactly to one original data value.
- Unless there are a large number of grid elements, it is usually a good idea to
+ for display (see `masking`).
+ Unless there are a large number of grid elements, it is usually good to
  render each rectangular element separately (`with image pixels`) so that
  smoothing or lossy compression is not applied to the resulting "image".
+
+Ffigure_sector_heatmap
+ A polar equivalent to image pixel-based heat maps can be generated using 2D
+ plot style `sectors`.  Each input point corresponds to exactly one annular
+ sector of a polar grid, equivalent to a pixel.  Unlike the polar grid surface
+ option described below, any number of individual grid sectors may be provided.
+ This plot style can be used in either polar or cartesian coordinate plots
+ to place polar sectors anywhere on the graph.  The figure here shows two halves
+ of a polar heat map displaced across the origin by +/- Δx on a cartesian
+ coordinate plot.  See `with sectors`.
 
 Ffigure_mask
  If the data points do not constitute a regular rectangular grid, they can often
@@ -5916,13 +5931,74 @@ Ffigure_polygons
 ?style rgbimage
 ?with rgbimage
  See `image`.
+2 sectors
+?plotting styles sectors
+?with sectors
+?sectors
+?windrose
+Ffigure_sector_definition
+ The 2D plotting style `with sectors` renders one annular segment ("sector")
+ for each line of input data.  The shape of each sector is described by four
+ required data values.  An additional pair of data values can be included to
+ specify the origin of the annulus this sector is taken from.
+ A per-sector color may be provided in an additional column.
+ 
+ The plot style itself can be used in either cartesian or polar mode
+ (`set polar`).  The units and interpretation for the azimuth and the
+ sector angle are controlled using `set angles` and `set theta`.
+
+ Columns 1 and 2 specify the azimuth (theta) and radius (r) of one corner
+ of the sector.
+#TeX \newline
+ Columns 3 and 4 specify the angular and radial extents of the sector
+ ("sector_angle" and "annular_width").
+#TeX \newline
+ Columns 5 and 6, if present, specify the coordinates of the center of the
+ annulus (default [0,0]).  The interpretation is [x,y] in cartesian mode
+ and [theta,r] in polar mode.
+ 
+ Syntax:
+     plot DATA {using specifier} {units xy | units xx | units yy}
+
+ using specifier
+     4 columns: azimuth radius sector_angle annular_width
+     5 columns: azimuth radius sector_angle annular_width color
+     6 columnd: azimuth radius sector_angle annular_width center_x center_y
+     7 columns: azimuth radius sector_angle annular_width center_x center_y color
+
+ Note that if the x and y axis scales are not equal, the envelope of the full
+ annulus in x/y coordinates will appear as an ellipse rather than a circle.
+ The annulus envelope and thus the apparent sector annular width can be adjusted
+ to correct for unequal axis scales using the same mechanism as for ellipses.
+ Adding `units xx` to the command line causes the sector to be rendered as if
+ the current x axis scale applied equally to both x and y.
+ Similarly `units yy` causes the sector to be rendered as if the current
+ y axis scale applied equally to both x and y.
+ See `set isotropic`, `set style ellipse`.
+
+Ffigure_windrose
+ Plotting with sectors can provide polar coordinate equivalents for the
+ cartesian plot styles `boxes` (see windrose figure), `boxxyerror` and
+ `image pixels` (see example in `heatmaps`).  Because sector plots are
+ compatible with cartesian mode plot layout, multiple plots can be placed
+ at different places on a single graph, which would not be possible for
+ other polar mode plot styles.
+
+ An example of using sectors to create a windrose in shown here.
+ Other applications include polar heatmaps, dial charts, pie/donut charts,
+ and annular error boxes for data points in polar coordinates.
+ Worked examples for all of these are given in the 
+^ <a href="http://www.gnuplot.info/demo/sectors.html">
+ sectors demo.
+^ </a>
+
 2 spiderplot
 ?plotting styles spiderplot
 ?with spiderplot
 ?spiderplot
 ?radar chart
  Spider plots are essentially parallel axis plots in which the axes are arranged
- radially rather than vertically. Such plots are sometimes called `rader charts`.
+ radially rather than vertically. Such plots are sometimes called `radar charts`.
  In gnuplot this requires working within a coordinate system established by the
  command `set spiderplot`, analogous to `set polar` except that the angular
  coordinate is determined implicitly by the parallel axis number. The appearance,
@@ -6091,6 +6167,7 @@ Ffigure_xyerrorbars
  An additional input column (5th or 7th) may be used to provide variable color.
  This style does not permit variable point properties.
 
+#TeX \newpage
 2 xerrorlines
 ?plotting styles xerrorlines
 ?style xerrorlines
