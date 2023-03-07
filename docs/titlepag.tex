@@ -32,6 +32,11 @@
   %     ,pdfkeywords={...}
   ]{hyperref}
 
+% Prevent error/warning message
+% found PDF version '1.7' but at most version '1.5' allowed
+  \pdfinclusionerrorlevel=1
+  \pdfminorversion=7
+
 % This replaces the default ugly red boxes around hyperlinks
    \hypersetup{
      colorlinks   = true, %Colours links instead of ugly boxes
