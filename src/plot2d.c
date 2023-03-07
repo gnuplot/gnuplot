@@ -1044,6 +1044,7 @@ get_data(struct curve_points *current_plot)
 	     */
 	    coordval y1 = v[1];
 	    coordval y2;
+	    coordval w = 0.0;	/* only needed for SMOOTH_ACSPLINES */
 	    if (j==2) {
 		if (current_plot->filledcurves_options.closeto == FILLEDCURVES_CLOSED
 		||  current_plot->filledcurves_options.closeto == FILLEDCURVES_DEFAULT)
@@ -1055,8 +1056,10 @@ get_data(struct curve_points *current_plot)
 		if (current_plot->filledcurves_options.closeto == FILLEDCURVES_DEFAULT)
 		    current_plot->filledcurves_options.closeto = FILLEDCURVES_BETWEEN;
 	    }
+	    if (current_plot->plot_smooth == SMOOTH_ACSPLINES)
+		w = (j> 3) ? v[3] : 1.0;
 	    store2d_point(current_plot, i++, v[0], y1,
-			v[0], v[0], y1, y2, 0.0);
+			v[0], v[0], y1, y2, w);
 	    break;
 	}
 
