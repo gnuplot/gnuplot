@@ -5947,15 +5947,15 @@ Ffigure_sector_definition
  (`set polar`).  The units and interpretation for the azimuth and the
  sector angle are controlled using `set angles` and `set theta`.
 
- Columns 1 and 2 hold the azimuth (theta) and radius (r) of one corner
+ Columns 1 and 2 specify the azimuth (theta) and radius (r) of one corner
  of the sector.
 #TeX \newline
- Columns 3 and 4 hold the angular and radial extents of the sector,
- ("sector_angle" and "annular_width" below).
+ Columns 3 and 4 specify the angular and radial extents of the sector
+ ("sector_angle" and "annular_width").
 #TeX \newline
- Columns 5 and 6, if present, specify the [x,y] coordinates of the center
- of the annulus (default [0,0]).
-#TeX \newline
+ Columns 5 and 6, if present, specify the coordinates of the center of the
+ annulus (default [0,0]).  The interpretation is [x,y] in cartesian mode
+ and [theta,r] in polar mode.
  
  Syntax:
      plot DATA {using specifier} {units xy | units xx | units yy}
@@ -5978,8 +5978,8 @@ Ffigure_sector_definition
 
 Ffigure_windrose
  Plotting with sectors can provide polar coordinate equivalents for the
- cartesian plot styles `with boxes` (see figure), `with boxxyerror` and
- `with image` (see example in `heatmaps`).  Because sector plots are
+ cartesian plot styles `boxes` (see windrose figure), `boxxyerror` and
+ `image pixels` (see example in `heatmaps`).  Because sector plots are
  compatible with cartesian mode plot layout, multiple plots can be placed
  at different places on a single graph, which would not be possible for
  other polar mode plot styles.
@@ -5987,12 +5987,10 @@ Ffigure_windrose
  An example of using sectors to create a windrose in shown here.
  Other applications include polar heatmaps, dial charts, pie/donut charts,
  and annular error boxes for data points in polar coordinates.
-
  Worked examples for all of these are given in the 
 ^ <a href="http://www.gnuplot.info/demo/sectors.html">
  sectors demo.
 ^ </a>
-
 
 2 spiderplot
 ?plotting styles spiderplot
