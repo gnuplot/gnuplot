@@ -5,9 +5,11 @@ Table of contents:
     * Use of ./configure script to customize your build
     * More details about ./configure --with-PACKAGE[=OPTION]
     * Inclusion of optional features --enable-FEATURE
-    * Platform-specific issues
-        linux OSX Windows MSDOS
-        OS/2 and WPS
+    * Platform-specific tips
+        linux Ubuntu
+	OSX homebrew
+	Windows MSDOS
+	OS/2 and WPS
     * Environment variables
     * How to test gnuplot
 
@@ -266,8 +268,8 @@ These features may become standard in a subsequent release and will then
 no longer require a special configuration option.
 
 
-Platform-specific issues
-========================
+Platform-specific tips
+======================
 
 Linux
 -----
@@ -285,6 +287,48 @@ Linux
   Note that some people have reported runtime problems with wxgtk 3.0.
   If you have the option of linking to libraries for wxgtk 2.8 instead,
   this may be preferable.  The -lX11 flag is not need in this case.
+
+Ubuntu
+------
+
+  These instructions were tested on Ubuntu 22.04
+
+  Install build tools, libraries, and documentation tools (TeX) for
+  building gnuplot binary (5.4.2).
+	sudo apt build-dep gnuplot
+
+  Install additonal tools and libraries for development version
+
+	sudo apt install gfortran libcerf-dev libwebp-dev adwaita-icon-theme-full \
+		unzip
+
+        # openspecfun provides the Amos routine (except cexint)
+	git clone https://github.com/JuliaMath/openspecfun.git
+	cd openspecfun
+	make
+	sudo make install
+
+  Add the below to ~/.profile
+	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+
+  install picins.sty to LaTeX
+
+	wget https://mirrors.ctan.org/macros/latex209/contrib/picins.zip
+	unzip picins.zip
+	sudo cp -pR ./picins /usr/share/texlive/texmf-dist/tex/latex
+	sudo texhash
+
+  git clone, build, install and documantation
+
+	git clone https://git.code.sf.net/p/gnuplot/gnuplot-main gnuplot-dev
+	cd gnuplot-dev
+	# change configure line according to your condition
+	./configure --enable-function-blocks
+	make
+	sudo make install
+	make check
+	# gnuplot.pdf
+	make pdf
 
 Mac OSX
 -------
@@ -328,6 +372,44 @@ Mac OSX
   NOTE: 10.6 SL by default generates x86_64 code, but wxWidgets stable is using
   Carbon API on Mac which is 32-bit only, that makes compiling gnuplot,
   cairo and pango to i386 necessary.
+
+OSX + homebrew
+--------------
+
+  As of the time of writing (Feb 2023) homebrew provides a bottled gnuplot
+  with Qt support.  However it was not built with all the optional features
+  or terminals that you might want.  This is a quick summary of what is
+  needed to configure and build from source.
+
+  If you have gnuplot installed from homebrew you can do
+	brew info gnuplot
+  to see that it has already installed these dependencies:
+	Build: pkg-config ✔
+	Required: gd ✔, libcerf ✔, lua ✔, pango ✔, qt@5 ✔, readline ✔
+  Otherwise you must install these first.  Depending on what you intend to
+  add to the configuration you may have to install other dependencies also.
+
+  Gnuplot's default ./configure and make will automatically compile gnuplot
+  support for the x11 terminal and for the qt terminal if it finds the Qt
+  libraries.  However, it seems that the Qt installed by homebrew is not
+  found automatically.   If you say, for example,  ./configure --with-qt
+  you get a problem like "fatal error: 'QtCore' file not found".
+  To solve this you can add the homebrew installation path to the environment
+  prior to running ./configure so that it knows where to look:
+
+	$ CXXFLAGS=' -std=c++11 ' \
+	  PKG_CONFIG_PATH='/opt/homebrew/opt/qt5/lib/pkgconfig' \
+	  configure --with-qt
+
+  If for some reason your qt5/lib/pkgconfig is installed somewhere else,
+  change that command accordingly.
+
+  Look carefully at the summary of terminal support printed out by the
+  configure command.  If all looks well, continue with
+
+	$ make
+	$ make check
+	$ sudo make install
 
 MS-Windows
 ----------
