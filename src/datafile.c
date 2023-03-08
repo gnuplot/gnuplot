@@ -831,6 +831,7 @@ df_tokenise(char *s)
 	    if ((*s == '\0') || (*s == '\n'))	{ /* Last field is empty */
 		df_column[df_no_cols].good = DF_MISSING;
 		df_column[df_no_cols].datum = not_a_number();
+		df_column[df_no_cols].position = NULL;
 		++df_no_cols;
 		break;
 	    }
@@ -3086,7 +3087,8 @@ df_parse_string_field(char *field)
     int length;
 
     if (!field) {
-	return NULL;
+	/* treat missing string as empty string */
+	return strdup("");
     } else if (*field == '"') {
 	field++;
 	length = strcspn(field, "\"");
