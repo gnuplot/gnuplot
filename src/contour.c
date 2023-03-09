@@ -70,7 +70,7 @@ typedef enum en_edge_position {
 } t_edge_position;
 
 
-#define EPSILON  1e-5		/* Used to decide if two float are equal. */
+#define EPSILON  1.e-5		/* Used to decide if two floats are equal. */
 
 #ifndef TRUE
 #define TRUE     -1
@@ -543,13 +543,36 @@ update_cntr_pt(edge_struct *p_edge, double z_level)
     return p_cntr;
 }
 
-/* Simple routine to decide if two contour points are equal by
- * calculating the relative error (< EPSILON).  */
+/* Determine if two contour points are effectively on top of each other.
+ * Rewritten for version 6 to handle nonlinear coordinates.
+ */
 static int
 fuzzy_equal(cntr_struct *p_cntr1, cntr_struct *p_cntr2)
 {
-    return ((fabs(p_cntr1->X - p_cntr2->X) < unit_x * EPSILON)
-	    && (fabs(p_cntr1->Y - p_cntr2->Y) < unit_y * EPSILON));
+    double x1 = p_cntr1->X;
+    double x2 = p_cntr2->X;
+    double y1 = p_cntr1->Y;
+    double y2 = p_cntr2->Y;
+
+    if (nonlinear(&X_AXIS)) {
+	x1 = eval_link_function(X_AXIS.linked_to_primary, x1);
+	x2 = eval_link_function(X_AXIS.linked_to_primary, x2);
+    } else {
+	x1 /= unit_x;
+	x2 /= unit_x;
+    }
+    if (nonlinear(&Y_AXIS)) {
+	y1 = eval_link_function(Y_AXIS.linked_to_primary, y1);
+	y2 = eval_link_function(Y_AXIS.linked_to_primary, y2);
+    } else {
+	y1 /= unit_y;
+	y2 /= unit_y;
+    }
+
+    if (fabs(x1-x2) < EPSILON  &&  fabs(y1-y2) < EPSILON)
+	return TRUE;
+    else
+	return FALSE;
 }
 
 /*
