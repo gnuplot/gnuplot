@@ -3048,13 +3048,13 @@ recalc_ruler_pos()
 	ruler.px = -1;
     else {
 	P = ruler.x;
-	ruler.px = AXIS_MAP(FIRST_X_AXIS, P);
+	ruler.px = axis_map(&axis_array[FIRST_X_AXIS], P);
     }
     if (axis_array[FIRST_Y_AXIS].log && ruler.y < 0)
 	ruler.py = -1;
     else {
 	P = ruler.y;
-	ruler.py = AXIS_MAP(FIRST_Y_AXIS, P);
+	ruler.py = axis_map(&axis_array[FIRST_Y_AXIS], P);
     }
     MousePosToGraphPosReal(ruler.px, ruler.py, &dummy, &dummy, &ruler.x2, &ruler.y2);
 }

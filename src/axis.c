@@ -1670,7 +1670,7 @@ axis_output_tics(
 	    && inrange(axis_coord, axis_array[zeroaxis_basis].min,
 		       axis_array[zeroaxis_basis].max)
 	    ) {
-	    tic_start = AXIS_MAP(zeroaxis_basis, axis_coord);
+	    tic_start = axis_map(&axis_array[zeroaxis_basis], axis_coord);
 	    tic_direction = axis_is_second ? 1 : -1;
 	    if (axis_array[axis].ticmode & TICS_MIRROR)
 		tic_mirror = tic_start;
@@ -1744,7 +1744,7 @@ axis_position_zeroaxis(AXIS_INDEX axis)
 	this->term_zero = (this->max < this->min)
 	    ? this->term_lower : this->term_upper;
     } else {
-	this->term_zero = AXIS_MAP(axis, 0.0);
+	this->term_zero = axis_map(this, 0.0);
 	is_inside = TRUE;
     }
 
@@ -2710,8 +2710,10 @@ reconcile_linked_axes(AXIS *primary, AXIS *secondary)
 double
 map_x_double(double value)
 {
-    if (axis_array[x_axis].linked_to_primary) {
-	AXIS *primary = axis_array[x_axis].linked_to_primary;
+    AXIS *xaxis = &axis_array[x_axis];
+
+    if (xaxis->linked_to_primary) {
+	AXIS *primary = xaxis->linked_to_primary;
 	if (primary->link_udf->at) {
 	    value = eval_link_function(primary, value);
 	    if (undefined)
@@ -2719,7 +2721,7 @@ map_x_double(double value)
 	    return axis_map_double(primary, value);
 	}
     }
-    return AXIS_MAP_DOUBLE(x_axis, value);
+    return axis_map_double(xaxis, value);
 }
 
 int
@@ -2734,8 +2736,10 @@ map_x(double value)
 double
 map_y_double(double value)
 {
-    if (axis_array[y_axis].linked_to_primary) {
-	AXIS *primary = axis_array[y_axis].linked_to_primary;
+    AXIS *yaxis = &axis_array[y_axis];
+
+    if (yaxis->linked_to_primary) {
+	AXIS *primary = yaxis->linked_to_primary;
 	if (primary->link_udf->at) {
 	    value = eval_link_function(primary, value);
 	    if (undefined)
@@ -2743,7 +2747,7 @@ map_y_double(double value)
 	    return axis_map_double(primary, value);
 	}
     }
-    return AXIS_MAP_DOUBLE(y_axis, value);
+    return axis_map_double(yaxis, value);
 }
 
 int

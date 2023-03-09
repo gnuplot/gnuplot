@@ -4021,9 +4021,9 @@ map_position_double(
     case polar_axes:
 	{
 	double xx, yy;
-	    (void) polar_to_xy(pos->x, pos->y, &xx, &yy, FALSE);
-	    *x = AXIS_MAP(FIRST_X_AXIS, xx);
-	    *y = AXIS_MAP(FIRST_Y_AXIS, yy);
+	    polar_to_xy(pos->x, pos->y, &xx, &yy, FALSE);
+	    *x = axis_map(&axis_array[FIRST_X_AXIS], xx);
+	    *y = axis_map(&axis_array[FIRST_Y_AXIS], yy);
 	    pos->scaley = polar_axes;	/* Just to make sure */
 	    break;
 	}
