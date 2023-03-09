@@ -1012,7 +1012,7 @@ ENHAQUA_writec(int c)
 
 TERM_TABLE_START(aqua_driver)
   "aqua",
-  "Interface to graphics terminal server for Mac OS X",
+  "Interface to graphics terminal server for MacOS",
   0 /* xmax */ , 0 /* ymax */ , 0 /* vchar */ , 0 /* hchar */ ,
   0 /* vtic */ , 0 /* htic */ ,
   AQUA_options, AQUA_init, AQUA_reset,
@@ -1054,8 +1054,7 @@ START_HELP(aqua)
 "?terminal aqua",
 "?term aqua",
 "?aqua",
-"?Aqua",
-" This terminal relies on AquaTerm.app for display on Mac OS X.",
+" This terminal relies on AquaTerm.app for display on MacOS.",
 "",
 " Syntax:",
 "       set terminal aqua {<n>} {title \"<wintitle>\"} {size <x> <y>}",

@@ -39,7 +39,7 @@ START_HELP(latex)
 " terminals `latex`, `emtex`, `eepic`, and `tpic` present in older versions",
 " of gnuplot. See `pict2e`.",
 "",
-" (5) Others, see `context`, legacy terminals texdraw and mp (metapost).",
+" (5) Others, see `context` and legacy terminal `texdraw`.",
 "",
 " A summary of TeX-friendly terminals is available here:",
 "^ <a href=\"http://www.gnuplot.info/docs/latex_demo.pdf\">",

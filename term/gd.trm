@@ -240,6 +240,7 @@ static struct {
     double    dashfraction;	/* Where in a dot-dash pattern we left off */
     /* Variables for animated gif support: */
     TBOOLEAN  animate;		/* Only gif supports animation */
+				/* But sixel treats it as synonym for "anchor" */
     int       loop_count;	/* Number of times to repeat sequence */
     int       frame_count;	/* Number of frames in animation */
     int       frame_delay;	/* Time between frames in .01 seconds */
@@ -306,6 +307,7 @@ static struct gen_table PNG_opts[] =
     { "notrue$color", PNG_NOTRUECOLOR },
     { "linew$idth", PNG_LINEWIDTH },
     { "anim$ate", GIF_ANIMATE }, /* gif animation options */
+    { "anchor", GIF_ANIMATE },   /* sixel drawn at top left of window */
     { "delay", GIF_DELAY },
     { "loop", GIF_LOOP },
     { "noopt$imize", GIF_NOOPT },
@@ -1108,7 +1110,7 @@ PNG_options()
 
     if (png_state.animate) {
 	if (strncmp("sixel",term->name,5) == 0)
-	    sprintf(term_options + strlen(term_options), "animate ");
+	    sprintf(term_options + strlen(term_options), "anchor ");
 	else
 	    sprintf(term_options + strlen(term_options),
 		"animate delay %d loop %d %soptimize ",
@@ -3003,7 +3005,7 @@ START_HELP(sixelgd)
 "              {linewidth <lw>} {dashlength <dl>}",
 "              {tiny | small | medium | large | giant}",
 "              {font \"<face> {,<pointsize>}\"} {fontscale <scale>}",
-"              {size <x>,<y>} {animate} {{no}transparent}",
+"              {size <x>,<y>} {animate|anchor} {{no}transparent}",
 "              {background <rgb_color>}",
 "",
 " The `sixel` output format was originally used by DEC terminals and printers.",
@@ -3047,12 +3049,16 @@ START_HELP(sixelgd)
 "?set terminal sixelgd animate",
 "?set term sixelgd animate",
 "?term sixelgd animate",
+"?set terminal sixelgd anchor",
+"?set term sixelgd anchor",
+"?term sixelgd anchor",
 "      set term sixel animate",
+"      set term sixel anchor",
 "",
 " The `animate` option resets the cursor position to the terminal top left at",
 " the start of every plot so that successive plots overwrite the same area on",
 " the screen rather than having earlier plots scroll off the top. This can be",
-" used to create an in-place animation.",
+" used to create an in-place animation. `anchor` has the same effect.",
 ""
 END_HELP(sixelgd)
 #endif /* TERM_HELP */
