@@ -563,15 +563,38 @@ update_cntr_pt(edge_struct *p_edge, double z_level)
 }
 
 /* Simple routine to decide if two contour points are equal by
- * calculating the relative error (< EPSILON).  */
+ * calculating the relative error (< EPSILON).
+ * Back-port fix for nonlinear axes from version 6.
+ */
 static int
 fuzzy_equal(cntr_struct *p_cntr1, cntr_struct *p_cntr2)
 {
-    double unit_x, unit_y;
-    unit_x = fabs(x_max - x_min);		/* reference */
-    unit_y = fabs(y_max - y_min);
-    return ((fabs(p_cntr1->X - p_cntr2->X) < unit_x * EPSILON)
-	    && (fabs(p_cntr1->Y - p_cntr2->Y) < unit_y * EPSILON));
+    double unit_x = fabs(x_max - x_min);
+    double unit_y = fabs(y_max - y_min);
+    double x1 = p_cntr1->X;
+    double x2 = p_cntr2->X;
+    double y1 = p_cntr1->Y;
+    double y2 = p_cntr2->Y;
+
+    if (nonlinear(&X_AXIS)) {
+	x1 = eval_link_function(X_AXIS.linked_to_primary, x1);
+	x2 = eval_link_function(X_AXIS.linked_to_primary, x2);
+    } else {
+	x1 /= unit_x;
+	x2 /= unit_x;
+    }
+    if (nonlinear(&Y_AXIS)) {
+	y1 = eval_link_function(Y_AXIS.linked_to_primary, y1);
+	y2 = eval_link_function(Y_AXIS.linked_to_primary, y2);
+    } else {
+	y1 /= unit_y;
+	y2 /= unit_y;
+    }
+
+    if (fabs(x1-x2) < EPSILON  &&  fabs(y1-y2) < EPSILON)
+	return TRUE;
+    else
+	return FALSE;
 }
 
 /*
