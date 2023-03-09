@@ -2816,6 +2816,12 @@ eval_3dplots()
 	    if (this_plot->opt_out_of_contours)
 		continue;
 
+	    if (contour_kind == CONTOUR_KIND_CUBIC_SPL) {
+		if (axis_array[FIRST_X_AXIS].log || axis_array[FIRST_Y_AXIS].log)
+		    int_warn(NO_CARET,
+			"use of cubic spline contours with log scale axes is not recommended");
+	    }
+
 	    if (!this_plot->has_grid_topology) {
 		int_warn(NO_CARET,"Cannot contour non grid data. Please use \"set dgrid3d\".");
 	    } else if (this_plot->plot_type == DATA3D) {
