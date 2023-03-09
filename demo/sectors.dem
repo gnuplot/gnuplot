@@ -1,34 +1,7 @@
 #########################################################
-# Fig.1: annular sector
-#########################################################
-#
-
-set title 'A single annular sector in plot style "with sectors"'
-
-set polar
-set angles degree
-set theta top cw
-set xrange [-3:10]
-set yrange [-3:10]
-set size ratio -1
-unset raxis
-unset rtics
-unset key
-
-set xzeroaxis
-set yzeroaxis
-
-array data[1]
-
-plot data using (20):(6):(50):(3)   with sectors lc rgb "gray30" lw 2 fill solid 0.5 border
-
-pause -1 "<cr> to continue"
-
-#########################################################
 # Fig.5: parameters for specifying an annular sector
 #########################################################
 #
-reset
 
 set title 'A single annular sector in plot style "with sectors"'
 
@@ -99,6 +72,63 @@ unset table
 
 plot $data using 1:2:(dt):(dr):(0.5):(0):(f($1+dt/2,$2+dr/2)) with sectors fc palette fill solid, \
      $data using (-$1):2:(-dt):(dr):(-0.5):(0):(f($1+dt/2,$2+dr/2)) with sectors fc palette fill solid
+
+pause -1 "<cr> to continue"
+
+############################################
+# Yes/No survey results aggregated by groups
+# Illustrates multiple sector plots in polar
+# coordinate mode for the overall graph.
+############################################
+#
+reset
+
+set label 1 at screen 0.1, 0.9
+set label 1 "Multiple sector plots\npositioned on a polar graph"
+set lmargin at screen 0.3
+
+$data <<EOD
+# Group Yes No
+A 12 8 4
+B 20 14 6
+C 25 18 7
+D 21 8 13 
+E 10 2 8
+EOD
+
+stats $data using 2 nooutput
+fac = 360.0/STATS_sum
+
+set table $data2
+plot r=0 $data using (sprintf("%s",strcol(1))):2:3:4:(r):(dr=$2*fac,r=r+dr,dr) with table
+unset table
+
+# print $data2
+
+set polar
+set angle degrees
+set theta top cw
+
+set xrange [-18:18]
+set yrange [-18:18]
+set size ratio -1
+
+unset border
+unset tics
+unset raxis
+unset key
+
+set label 2 sprintf("TOTAL\n%d",STATS_sum) at 0,0 center offset 0,0.5
+
+plot \
+     $data2 using 5:(3):6:(4) with sectors fc rgb 'blue' lw 2 fill solid 0.2 border lc bgnd, \
+     $data2 using 5:(7):6:(8) with sectors fc rgb 'blue' lw 2 fill solid 0.2 border lc bgnd, \
+     $data2 using 5:(15):6:(3) with sectors fc rgb 'blue' lw 2 fill solid 0.2 border lc bgnd, \
+     $data2 using ($5+$6/2):(16.5):(strcol(1)) with labels center font ",9", \
+     $data2 using ($5+$6/2):(5):(sprintf("%.0f%%",100*$2/STATS_sum)) with labels center font ",9", \
+     $data2 using ($5+$6/2):(11.1):(sprintf("%.0f%%",100*$3/$2)) with labels center font ",9", \
+     $data2 using (0):(1.7):(361):(1.3):($5+$6/2):(11) with sectors fill solid 0.1 noborder fc bgnd, \
+     $data2 using (0):(1.7):($3/$2*360):(1.3):($5+$6/2):(11) with sectors fill solid 0.4 noborder fc rgb "red"
 
 pause -1 "<cr> to continue"
 
