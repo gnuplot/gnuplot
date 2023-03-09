@@ -7,7 +7,7 @@ Table of contents:
     * Inclusion of optional features --enable-FEATURE
     * Platform-specific tips
         linux Ubuntu
-	OSX homebrew
+	maxOS homebrew
 	Windows MSDOS
 	OS/2 and WPS
     * Environment variables
@@ -373,8 +373,8 @@ Mac OSX
   Carbon API on Mac which is 32-bit only, that makes compiling gnuplot,
   cairo and pango to i386 necessary.
 
-OSX + homebrew
---------------
+maxOS + homebrew
+----------------
 
   As of the time of writing (Feb 2023) homebrew provides a bottled gnuplot
   with Qt support.  However it was not built with all the optional features

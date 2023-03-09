@@ -1306,9 +1306,9 @@ else
 fi
 
 if test "$gnuplot_framework_AquaTerm" = yes; then
-  AC_MSG_RESULT([    aqua (OSX): yes])
+  AC_MSG_RESULT([    aqua (macOS): yes])
 else
-  AC_MSG_RESULT([    aqua (OSX):  no])
+  AC_MSG_RESULT([    aqua (macOS):  no])
 fi
 
 AC_MSG_RESULT([])
