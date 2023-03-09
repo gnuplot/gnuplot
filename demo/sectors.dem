@@ -67,6 +67,7 @@ set colorbox user size 0.05, 0.5 origin 0.85,0.25
 set cbtics
 
 set table $data
+set view map
 splot sample [t=0:tmax-dt:dt] [r=0:rmax-dr:dr] "++" using (t):(r):(0)
 unset table
 
@@ -244,66 +245,6 @@ plot \
      data using (0.5):(2):("noratio\nunits yy") with labels left
 
 unset multiplot
-
-pause -1 "<cr> to continue"
-
-#########################################################
-# Fig.7: complete annulus
-#########################################################
-#
-reset
-
-set angles degree
-set theta top cw
-set xrange [-11:11]
-set yrange [-11:11]
-set size ratio -1
-unset key
-
-array data[1]
-
-plot data using (0):(2):(359):(2) with sectors fc rgb "gray" fill solid border lc black, \
-     data using (0):(5):(360):(2) with sectors fc rgb "gray" fill solid border lc black, \
-     data using (0):(8):(361):(2) with sectors fc rgb "gray" fill solid border lc black, \
-     data using (0):(3):("359°") with labels left offset 1,-0.3, \
-     data using (0):(6):("360°") with labels left offset 1,0, \
-     data using (0):(9):("361°") with labels left offset 1,0
-     
-pause -1 "<cr> to continue"
-
-#########################################################
-# Fig.8: sector specified by negative angle or width
-#########################################################
-#
-reset
-
-set polar
-set angles degree
-set theta top cw
-set xrange [-4.5:8.5]
-set yrange [-3:10]
-set size ratio -1
-unset key
-unset border
-unset raxis
-unset tics
-
-array data[1]
-
-plot \
-     data using (20):(0):(50):(6)   with sectors lc rgb "gray80" lw 1,\
-     data using (20):(0):(-50):(6)  with sectors lc rgb "gray80" lw 1,\
-     data using (20):(6):(-50):(3)  with sectors lc rgb "red" lw 2 fill solid 0.2 border lc rgb "gray30",\
-     data using (20):(6):(50):(-3)  with sectors lc rgb "green" lw 2 fill solid 0.2 border lc rgb "gray30",\
-     data using (20):(6):(-50):(-3) with sectors lc rgb "blue" lw 2 fill solid 0.2 border lc rgb "gray30",\
-     data using (20):(6):(50):(3)   with sectors lc rgb "gray30" lw 2 fill solid 0.5 border,\
-     data using (20):(6)            with points pt 7 ps 2 lc rgb "gray30", \
-     data using (0):(0)             with points pt 7 ps 2 lc rgb "gray30", \
-     data using (0):(0):("(xc, yc)")     with labels offset -5,0, \
-     data using (45):(7.5):("sector_angle > 0\nannulus_width > 0") with labels offset -1.5,1.2 noenhanced, \
-     data using (45):(4.5):("sector_angle > 0\nannulus_width < 0") with labels offset 0,0.5 noenhanced, \
-     data using (-5):(7.5):("sector_angle < 0\nannulus_width > 0") with labels offset 0,0 noenhanced, \
-     data using (-5):(4.5):("sector_angle < 0\nannulus_width < 0") with labels offset 0,1 noenhanced
 
 pause -1 "<cr> to continue"
 
