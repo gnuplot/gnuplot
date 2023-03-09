@@ -96,6 +96,10 @@ print "******************** file polar_quadrants.dem ********************"
 load "polar_quadrants.dem"
 reset
 
+print "******************** file sectors.dem ********************"
+load "sectors.dem"
+reset
+
 print "******************** file orbits.dem ********************"
 load "orbits.dem"
 reset
