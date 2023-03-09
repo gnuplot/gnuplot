@@ -108,14 +108,12 @@ static double contour_level = 0.0;
 /* Linear, Cubic interp., Bspline: */
 static t_contour_kind interp_kind = CONTOUR_KIND_LINEAR;
 
-static double x_min, y_min, z_min;	/* Minimum values of x, y, and z */
-static double x_max, y_max, z_max;	/* Maximum values of x, y, and z */
+static double z_min, z_max;		/* Coordinate limits */
+static double unit_x, unit_y;		/* Normalization to coord limits */
 
 static void add_cntr_point(double x, double y);
 static void end_crnt_cntr(void);
-static void gen_contours(edge_struct *p_edges, double z_level,
-				  double xx_min, double xx_max,
-				  double yy_min, double yy_max);
+static void gen_contours(edge_struct *p_edges, double z_level);
 static int update_all_edges(edge_struct *p_edges, double z_level);
 static cntr_struct *gen_one_contour(edge_struct *p_edges,
 					     double z_level,
@@ -133,12 +131,7 @@ static void gen_triangle(int num_isolines,
 				  struct iso_curve *iso_lines,
 				  poly_struct **p_polys,
 				  edge_struct **p_edges);
-static void calc_min_max(int num_isolines,
-				  struct iso_curve *iso_lines,
-				  double *xx_min, double *yy_min,
-				  double *zz_min,
-				  double *xx_max, double *yy_max,
-				  double *zz_max);
+static void calc_min_max(int num_isolines, struct iso_curve *iso_lines);
 static edge_struct *add_edge(struct coordinate *point0,
 					     struct coordinate *point1,
 					     edge_struct
@@ -151,14 +144,10 @@ static poly_struct *add_poly(edge_struct *edge0,
 					     poly_struct **pp_tail);
 
 static void put_contour(cntr_struct *p_cntr,
-				 double xx_min, double xx_max,
-				 double yy_min, double yy_max,
 				 TBOOLEAN contr_isclosed);
 static void put_contour_nothing(cntr_struct *p_cntr);
 static int chk_contour_kind(cntr_struct *p_cntr, TBOOLEAN contr_isclosed);
 static void put_contour_cubic(cntr_struct *p_cntr,
-				       double xx_min, double xx_max,
-				       double yy_min, double yy_max,
 				       TBOOLEAN contr_isclosed);
 static void put_contour_bspline(cntr_struct *p_cntr, TBOOLEAN contr_isclosed);
 static void free_contour(cntr_struct *p_cntr);
@@ -166,8 +155,7 @@ static int count_contour(cntr_struct *p_cntr);
 static int gen_cubic_spline(int num_pts, cntr_struct *p_cntr,
 				     double d2x[], double d2y[],
 				     double delta_t[],
-				     TBOOLEAN contr_isclosed,
-				     double unit_x, double unit_y);
+				     TBOOLEAN contr_isclosed);
 static void intp_cubic_spline(int n, cntr_struct *p_cntr,
 				       double d2x[], double d2y[],
 				       double delta_t[], int n_intpol);
@@ -213,9 +201,6 @@ contour(int num_isolines, struct iso_curve *iso_lines)
     double dz = 0;
     struct gnuplot_contours *save_contour_list;
 
-    /* HBB FIXME 20050804: The number of contour_levels as set by 'set
-     * cnrparam lev inc a,b,c' is almost certainly wrong if z axis is
-     * logarithmic */
     num_of_z_levels = contour_levels;
     interp_kind = contour_kind;
 
@@ -224,8 +209,7 @@ contour(int num_isolines, struct iso_curve *iso_lines)
     /*
      * Calculate min/max values :
      */
-    calc_min_max(num_isolines, iso_lines,
-		 &x_min, &y_min, &z_min, &x_max, &y_max, &z_max);
+    calc_min_max(num_isolines, iso_lines);
 
     /*
      * Generate list of edges (p_edges) and list of triangles (p_polys):
@@ -282,7 +266,7 @@ contour(int num_isolines, struct iso_curve *iso_lines)
 	z = zlist[i];
 	contour_level = z;
 	save_contour_list = contour_list;
-	gen_contours(p_edges, z, x_min, x_max, y_min, y_max);
+	gen_contours(p_edges, z);
 	if (contour_list != save_contour_list) {
 	    contour_list->isNewLevel = 1;
 	    /* Nov-2011 Use gprintf rather than sprintf so that LC_NUMERIC is used */
@@ -362,9 +346,7 @@ end_crnt_cntr()
 static void
 gen_contours(
     edge_struct *p_edges,
-    double z_level,
-    double xx_min, double xx_max,
-    double yy_min, double yy_max)
+    double z_level)
 {
     int num_active;		/* Number of edges marked ACTIVE. */
     TBOOLEAN contr_isclosed;	/* Is this contour a closed line? */
@@ -378,7 +360,7 @@ gen_contours(
 	/* Generate One contour (and update NumActive as needed): */
 	p_cntr = gen_one_contour(p_edges, z_level, &contr_isclosed, &num_active);
 	/* Emit it in requested format: */
-	put_contour(p_cntr, xx_min, xx_max, yy_min, yy_max, contr_isclosed);
+	put_contour(p_cntr, contr_isclosed);
     }
 }
 
@@ -566,9 +548,6 @@ update_cntr_pt(edge_struct *p_edge, double z_level)
 static int
 fuzzy_equal(cntr_struct *p_cntr1, cntr_struct *p_cntr2)
 {
-    double unit_x, unit_y;
-    unit_x = fabs(x_max - x_min);		/* reference */
-    unit_y = fabs(y_max - y_min);
     return ((fabs(p_cntr1->X - p_cntr2->X) < unit_x * EPSILON)
 	    && (fabs(p_cntr1->Y - p_cntr2->Y) < unit_y * EPSILON));
 }
@@ -722,17 +701,18 @@ gen_triangle(
 static void
 calc_min_max(
     int num_isolines,		/* number of iso-lines input */
-    struct iso_curve *iso_lines, /* iso-lines input */
-    double *xx_min, double *yy_min, double *zz_min,
-    double *xx_max, double *yy_max, double *zz_max) /* min/max values in/out */
+    struct iso_curve *iso_lines) /* iso-lines input */
 {
     int i, j, grid_x_max;
     struct coordinate *vertex;
 
+    /* These used to be static to the file but no one else is using them */
+    double x_min, x_max, y_min, y_max;
+
     grid_x_max = iso_lines->p_count;	/* number of vertices per iso_line */
 
-    (*xx_min) = (*yy_min) = (*zz_min) = VERYLARGE;	/* clear min/max values */
-    (*xx_max) = (*yy_max) = (*zz_max) = -VERYLARGE;
+    x_min = y_min = z_min = VERYLARGE;	/* clear min/max values */
+    x_max = y_max = z_max = -VERYLARGE;
 
     for (j = 0; j < num_isolines; j++) {
 
@@ -740,28 +720,30 @@ calc_min_max(
 
 	for (i = 0; i < grid_x_max; i++) {
 	    if (vertex[i].type != UNDEFINED) {
-		if (vertex[i].x > (*xx_max))
-		    (*xx_max) = vertex[i].x;
-		if (vertex[i].y > (*yy_max))
-		    (*yy_max) = vertex[i].y;
-		if (vertex[i].z > (*zz_max))
-		    (*zz_max) = vertex[i].z;
-		if (vertex[i].x < (*xx_min))
-		    (*xx_min) = vertex[i].x;
-		if (vertex[i].y < (*yy_min))
-		    (*yy_min) = vertex[i].y;
-		if (vertex[i].z < (*zz_min))
-		    (*zz_min) = vertex[i].z;
+		if (vertex[i].x > x_max)
+		    x_max = vertex[i].x;
+		if (vertex[i].y > y_max)
+		    y_max = vertex[i].y;
+		if (vertex[i].z > z_max)
+		    z_max = vertex[i].z;
+		if (vertex[i].x < x_min)
+		    x_min = vertex[i].x;
+		if (vertex[i].y < y_min)
+		    y_min = vertex[i].y;
+		if (vertex[i].z < z_min)
+		    z_min = vertex[i].z;
 	    }
 	}
 	iso_lines = iso_lines->next;
     }
 
-    /*
-     * fprintf(stderr," x: %g, %g\n", (*xx_min), (*xx_max));
-     * fprintf(stderr," y: %g, %g\n", (*yy_min), (*yy_max));
-     * fprintf(stderr," z: %g, %g\n", (*zz_min), (*zz_max));
-     */
+    /* Width and height of the grid is used as a unit length (2d-norm) */
+    unit_x = x_max - x_min;
+    unit_y = y_max - y_min;
+    /* FIXME HBB 20010121: 'zero' should not be used as an absolute
+     * figure to compare to data */
+    unit_x = (unit_x > zero ? unit_x : zero);	/* should not be zero */
+    unit_y = (unit_y > zero ? unit_y : zero);
 }
 
 /*
@@ -863,8 +845,6 @@ add_poly(
 static void
 put_contour(
     cntr_struct *p_cntr,	/* contour structure input */
-    double xx_min, double xx_max,
-    double yy_min, double yy_max, /* minimum/maximum values input */
     TBOOLEAN contr_isclosed)	/* contour line closed? (input) */
 {
 
@@ -876,7 +856,7 @@ put_contour(
 	put_contour_nothing(p_cntr);
 	break;
     case CONTOUR_KIND_CUBIC_SPL: /* Cubic spline interpolation. */
-	put_contour_cubic(p_cntr, xx_min, xx_max, yy_min, yy_max,
+	put_contour_cubic(p_cntr, 
 			  chk_contour_kind(p_cntr, contr_isclosed));
 
 	break;
@@ -937,12 +917,9 @@ chk_contour_kind(cntr_struct *p_cntr, TBOOLEAN contr_isclosed)
 static void
 put_contour_cubic(
     cntr_struct *p_cntr,
-    double xx_min, double xx_max,
-    double yy_min, double yy_max,
     TBOOLEAN contr_isclosed)
 {
     int num_pts, num_intpol;
-    double unit_x, unit_y;	/* To define norm (x,y)-plane */
     double *delta_t;		/* Interval length t_{i+1}-t_i */
     double *d2x, *d2y;		/* Second derivatives x''(t_i), y''(t_i) */
     cntr_struct *pc_tail;
@@ -964,20 +941,13 @@ put_contour_cubic(
     d2x = gp_alloc(num_pts * sizeof(double), "contour d2x");
     d2y = gp_alloc(num_pts * sizeof(double), "contour d2y");
 
-    /* Width and height of the grid is used as a unit length (2d-norm) */
-    unit_x = xx_max - xx_min;
-    unit_y = yy_max - yy_min;
-    /* FIXME HBB 20010121: 'zero' should not be used as an absolute
-     * figure to compare to data */
-    unit_x = (unit_x > zero ? unit_x : zero);	/* should not be zero */
-    unit_y = (unit_y > zero ? unit_y : zero);
 
     if (num_pts > 2) {
 	/*
 	 * Calculate second derivatives d2x[], d2y[] and interval lengths delta_t[]:
 	 */
 	if (!gen_cubic_spline(num_pts, p_cntr, d2x, d2y, delta_t,
-			      contr_isclosed, unit_x, unit_y)) {
+			      contr_isclosed)) {
 	    free(delta_t);
 	    free(d2x);
 	    free(d2y);
@@ -1083,8 +1053,7 @@ gen_cubic_spline(
     cntr_struct *p_cntr,	/* List of points (x(t_i),y(t_i)), input */
     double d2x[], double d2y[],	/* Second derivatives (x''(t_i),y''(t_i)), output */
     double delta_t[],		/* List of interval lengths t_{i+1}-t_{i}, output */
-    TBOOLEAN contr_isclosed,	/* Closed or open contour?, input  */
-    double unit_x, double unit_y) /* Unit length in x and y (norm=1), input */
+    TBOOLEAN contr_isclosed)	/* Closed or open contour?, input  */
 {
     int n, i;
     double norm;
