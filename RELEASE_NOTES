@@ -94,6 +94,7 @@ For worked examples see http://gnuplot.info/demo_6.0/
 	  "plot FOO using 0:(column($# - 1))" plots the last-but-one field of each row.
 	o keyword binvalue=avg plots the average, rather than the sum, of binned data.
 	o "set colorbox bottom" places the color box underneath the plot.
+	o "set pm3d spotlight" adds a user-controlled spotlight to the lighting model.
 	o New key layout options to force specific width or number of columns.
 	  Automatic positioning of the key on the page can be manually tweaked
 	  by giving an offset.

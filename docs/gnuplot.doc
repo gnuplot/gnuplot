@@ -443,6 +443,8 @@ C
 #b Improved rendering of intersecting pm3d surfaces - overlapping surface tiles
 ## are split into two pieces along the line of intersection so that tiles
 ## from one surface do not incorrectly protrude though the other surface.
+#b User-controlled spotlight added to the pm3d lighting model.
+## See `set pm3d spotlight`.
 #b New options to force total key width and number of columns. See `key layout`.
 #b `set pm3d border retrace` draws a border around each pm3d quadrangle in the
 ## same color as the filled area.  In principle this should have no visible
