@@ -7,7 +7,7 @@ Table of contents:
     * Inclusion of optional features --enable-FEATURE
     * Platform-specific tips
         linux Ubuntu
-	maxOS homebrew
+	macOS homebrew
 	Windows MSDOS
 	OS/2 and WPS
     * Environment variables
