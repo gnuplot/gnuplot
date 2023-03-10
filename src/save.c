@@ -36,6 +36,7 @@
 #include "contour.h"
 #include "datafile.h"
 #include "eval.h"
+#include "filters.h"
 #include "fit.h"
 #include "gp_time.h"
 #include "gplocale.h"
@@ -991,6 +992,10 @@ set origin %g,%g\n",
 		(boxplot_opts.labels == BOXPLOT_FACTOR_LABELS_X2) ? "x2" :
 		(boxplot_opts.labels == BOXPLOT_FACTOR_LABELS_AUTO) ? "auto" :"off",
 		boxplot_opts.sort_factors ? "" : "un");
+
+#ifdef WITH_CHI_SHAPES
+    fprintf(fp, "set chi_shapes fraction %.2f\n", chi_shape_default_fraction);
+#endif
 
     fputs("set loadpath ", fp);
     {
