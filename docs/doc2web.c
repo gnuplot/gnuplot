@@ -478,6 +478,14 @@ process_line(char *line, FILE *b, FILE *d)
 	                fprintf(b, "</p>\n");
 		}
 
+		/* Special case symlink for list of new features */
+		if (newlevel == 2) {
+		    if (!strncmp(&line[2], "New features", 12)) {
+			startpage = TRUE;	/* just to get the symlink processing! */
+			sectionname = "NewFeatures";
+		    }
+		}
+
 		para = FALSE;	/* not in a paragraph */
 		tabl = FALSE;
 

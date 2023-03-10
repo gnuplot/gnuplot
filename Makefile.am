@@ -5,7 +5,7 @@ SUBDIRS = config m4 term src docs man demo share
 
 EXTRA_DIST = BUGS Copyright FAQ.pdf INSTALL INSTALL.gnu \
 PATCHLEVEL PGPKEYS README RELEASE_NOTES \
-configure.vms win
+win
 
 DISTCLEANFILES = stamp-h
 
@@ -19,6 +19,10 @@ dist-hook:
 	  rm -rf $$dir; done
 	@find $(distdir) -type d -name .deps -print | xargs rm -rf
 	@find $(distdir) -type f -name .cvsignore -print | xargs rm -f
+
+ReleaseNotes.html: RELEASE_NOTES
+	txt2html -pm --style_url ReleaseNotes.css RELEASE_NOTES \
+	         --bullets "-=o*\\044" --outfile ReleaseNotes.html
 
 gnuplot:
 	cd src; make binonly

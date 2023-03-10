@@ -1,5 +1,230 @@
-		GNUPLOT VERSION 5.5 NOTES
-		=========================
+		Gnuplot Version 6.0-rc0 Release Notes
+		=====================================
 
-This file is a placeholder for the release notes that accompany a
-stable gnuplot release.  The current stable release series is 5.4.
+Version 6.0 will be the first release in a new major stable release series.
+The final release in the previous stable series was 5.4.
+
+Your feedback from testing of this release candidate will contribute to
+the success of a full 6.0 release expected by the end of 2023.
+
+Gnuplot development is tracked in a git repository on SourceForge.
+You can generate a complete history of changes using "git log"
+after downloading:
+
+<pre>
+    git clone -b branch-6-0-stable git://git.code.sf.net/p/gnuplot/gnuplot-main
+    git log
+</pre>
+
+Release Notes date:  10-Mar-2023
+
+		Features introduced in version 6
+		================================
+For a more detailed list of new features see http://gnuplot.info/docs_6.0/NewFeatures.html
+
+For worked examples see http://gnuplot.info/demo_6.0/
+
+- Function blocks and scoped variables
+- Larger collection of special and complex-valued functions
+- New plot styles
+	o 2D plot style `with surface` works in 2D polar coordinates to produce a
+	  solid-fill gridded representation of the plane. This is analogous to the
+	  use of dgrid3d and pm3d to produce a 3D gridded surface.
+	o 2D plot style `with sectors` renders one annular segment ("sector") for
+	  each line of input data. This style can generate pie and donut charts,
+	  windrose charts, and a polar equivalent to sparse-matrix heatmaps.
+	o 2D plot style `with lines` now has a filter option `sharpen`.
+	  This filter detects spikes in a function plot that would be missed or
+	  under-represented due to coarse sampling.  It adds an additional
+	  sampling point at the location of each such peak.
+- Hulls, masks, and smoothing
+	o A cluster of 2D points can be replaced by a bounding polygon ("hull").
+	  Both convex hulls and concave hulls (χ-shapes) are supported.
+	o Any hull or other closed path can be used as a mask to display only
+	  selected regions of a pm3d surface or image plot.
+	o New smoothing option "smooth path" can be used on 2D and 3D curves
+	  that are not monotonic on x or y.  This allows smoothing of hulls.
+- Named palettes
+	o The current palette can be saved to a named colormap for future us.
+	o A predefined palette named "viridis" is provided.
+	o Plots can specify a previously saved palette by name.
+	  This permits the use of multiple palettes in a single plot command.
+	o Named palettes can be edited to contain an alpha channel.
+- New built-in functions and array operations
+	o palette(z) returns the current RGB palette color mapping for z.
+	o rgbcolor("name") returns the 32bit ARGB value for a named color.
+	o index(Array, element) returns the first index i for which Array[i]
+	  is equal to element.
+	o split("string", "separator") unpacks the fields in a string into
+	  an array of strings.
+	o join(array, "separator") is the complement to split().
+	  It concatenates the elements of a string array into a single string.
+	o `stats <non-existent file>` yields a testable value with no error;
+	  useful to avoid errors or warnings in scripts.
+- Program control flow
+	o New syntax if {...} else if {...} else {...}
+	o XDG base directory conventions for configuration files are supported.
+	o `unset warnings` suppresses output of warning messages to the console.
+	o The `fit` command is protected by exception handling. Control always
+	  returns to the next line of input even in the case of fit errors.
+	  On return FIT_ERROR is non-zero if an error occurred.
+	o "Watchpoints"  are target values associated with individual plots
+	  in a graph. As that plot is drawn, each component line segment is
+	  monitored to see if its endpoints bracket the target value of a
+	  watchpoint coordinate (x, y, or z) or function f(x,y).
+	  If a match is found, the [x,y] coordinates of the match point are
+	  saved for later use.  Possible uses include
+		- find the intersection points of two curves
+		- find zeros of a function
+		- find and notate where a dependent variable or function f(x,y)
+		  crosses a threshold value
+		- use the mouse to track values along multiple plots simultaneously
+- New terminals and terminal options
+	o New terminal block for text-mode pseudo-graphics uses Unicode block
+	  or Braille characters to offer improved resolution compared to the
+	  dumb or caca terminals.
+	o New terminal webp generates a single frame or an animation sequence
+	  using webp encoding. Frames are generated using pngcairo,
+	  then encoded through the WebPAnimEncoder API.
+- Miscellaneous other new features
+	o Time unit settings for major and minor axis tics.  For example,
+	  minor tic marks can be placed at exactly one month intervals.
+	o The character sequence $# in a using specifier evaluates to the total
+	  number of columns available in the current line of data.
+	  "plot FOO using 0:(column($# - 1))" plots the last-but-one field of each row.
+	o keyword binvalue=avg plots the average, rather than the sum, of binned data.
+	o "set colorbox bottom" places the color box underneath the plot.
+	o New key layout options to force specific width or number of columns.
+	  Automatic positioning of the key on the page can be manually tweaked
+	  by giving an offset.
+	o "set isotropic" adjusts the axis scaling in both 2D and 3D plots such
+	  that x, y, and z axes all have the same scale.
+	o Text rotation angles are not limited to integral degree values.
+	o Data-driven color assignments in plot style "histograms".
+
+
+		Notes for packagers and testers
+		===============================
+
+Obsolete or deprecated components
+---------------------------------
+
+The "gnuplot mode" elisp and TeX files for use with emacs are now
+maintained as a separate project: https://github.com/bruceravel/gnuplot-mode
+so there is no longer a configuration option --with-lisp-files.
+
+LaTeX-related terminal drivers latex, emtex, eepic, and tpic are no longer
+built by default.  Their closest equivalent is the new pict2e terminal, but
+LaTeX users who want support for the full range of gnuplot plot styles are
+recommended to use the cairolatex or tikz terminals.
+
+The Japanese man page is provided both in eucJP and UTF-8 encodings.
+Installation into appropriate directories is left to packagers.
+
+Configuration options for interactive use
+-----------------------------------------
+
+The 6.0 source code supports three primary cross-platform interactive
+modes in addition to several platform-specific modes.
+
+1) Qt
+
+   The qt terminal supports interactive display with menu-driven
+   output to png, svg or pdf.  If either Qt4 or Qt5 is detected by the
+   configure script, this will be the default terminal.  It is now the
+   fastest and most full-featured interactive terminal option.
+
+   To disable this terminal or force use of Qt4 even if Qt5 is present
+	$ ./configure --with-qt=qt4
+	$ ./configure --without-qt
+	
+2) Cairo/pango/wxWidgets
+
+   This set of terminals includes pngcairo, pdfcairo, epscairo, and cairolatex
+   for output to a file. The wxt terminal provides interactive display
+   All of these will be built by default if the configuration script finds
+   the required libcairo, libpango, libcairo, libwxgtk, and related
+   support libraries
+
+   To disable these terminals:
+       $ ./configure --without-cairo
+       $ ./configure --with-cairo --disable-wxwidgets
+	
+3) X11 (the "classic" interactive interface)
+   This used to be the preferred interactive interface, but the newer
+   wxt and qt terminals offer nicer output and a wider range of features.
+
+
+Output to files
+---------------
+
+Of course the terminals (output modes) present in previous gnuplot versions
+are also still available. These include, among many more obscure options:
+
+- png/jpeg/gif output via libgd
+- PostScript (*.ps or *.eps)
+- Many flavors of TeX/LaTeX output, including TikZ and ConTeXt
+- Bitmapped output to support older devices (e.g. HP deskjet, epson, and
+  seiko printers, pbm bitmapped graphics files) is available if needed
+  but is no longer configured in by default.
+      ./configure --with-bitmap-terminals
+
+Output of inline graphics to terminal emulator or linux console
+---------------------------------------------------------------
+
+The sixel terminal displays graphics in-line with the commands typed on a
+suitable terminal emulator.  For example "xterm -ti 340" emulates a vt340
+with indexed color graphics.  The KDE desktop "konsole" terminal provides
+full RGB color graphics.  The yaft terminal emulator can be run at linux
+console level with no x11 or other windowing system active.
+
+Generating interactive plots for web display
+--------------------------------------------
+
+- Mouseable output for display on the web can be created using either
+  the canvas terminal (HTML5 2D canvas element) or the svg terminal.
+  Both allow zooming, toggling plot elements on/off, and user-scriptable
+  hot keys.
+
+			Other Notes
+			===========
+
+Installation
+------------
+
+You can download a source tarball for the current gnuplot version
+from the gnuplot development site on SourceForge.
+	http://sourceforge.net/projects/gnuplot
+
+Some platform-specific installation tips are given in the INSTALL
+file of the source package; the short version for linux/unix-like
+systems is to unpack the tarball and then
+<PRE>
+build it:
+      cd gnuplot-6.0.0 ; ./configure ; make
+test it:
+      make check
+install it:
+      make install
+</PRE>
+
+Pay careful attention to the output of the ./configure script.
+It may indicate that some output drivers have been omitted because the
+necessary support libraries were not found.  In general you need to have
+previously installed the "*-devel-*" versions of these libraries.
+
+
+Support
+-------
+Please report all bugs and installation problems to the bug tracker
+on SourceForge:
+	https://sourceforge.net/p/gnuplot/bugs/
+
+Development
+-----------
+Gnuplot development is ongoing. The development branch contains preliminary
+implementations of new features.  The current development version is 6.1
+(odd minor number) and will eventually be released as version 6.2
+(even minor number).  Bugfixes to version 6.0 will appear in patchlevel
+releases 6.0.1, 6.2.2, etc., approximately twice a year or as needed
+to correct a serious regression.
