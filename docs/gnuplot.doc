@@ -278,14 +278,23 @@ C
 ## of the Voigt profile. See `VP`, `VP_fwhm`.
 #end
 
-3 New plot style
-?new style
+3 New plot styles
+?new styles
 #start
 #b The plot style `with surface` works in 2D polar coordinates to produce
 ## a solid-fill gridded representation of the plane, colored by weighted
-## contributions from an arbitrary set of input points. This is analagous to
+## contributions from an arbitrary set of input points. This is analogous to
 ## the use of `dgrid3d` and style `with pm3d` to produce a 3D gridded surface.
 ## See `set polar grid` and `polar heatmap`.
+#b New 2D plot style `with sectors` is an alternative to generating a full
+## polar gridded surface.  For each input data points it generates a single
+## annular wedge in a conceptual polar grid.  Unlike polar mode `with surface`
+## it can be used in either a polar or cartesian coordinate graph.
+#b Plot style `with lines` now has a filter option `sharpen`.  This filter
+## detects spikes in a function plot that appear truncated in the output
+## because the peak lies between two x-coordinates at which the function has
+## been sampled.  It adds a new sample point at the location of each such peak.
+## See `filters`.
 #end
 
 3 Hulls, masks, and smoothing
@@ -321,25 +330,6 @@ C
 #b There is a new predefined color scheme `set palette viridis`.
 #b Palettes read from a file or datablock (`set palette file`) may be specified
 ## either using fractional color components or 24-bit packed RGB values.
-#end
-
-3 New plot styles
-?new styles
-#start
-#b The plot style `with surface` works in 2D polar coordinates to produce
-## a solid-fill gridded representation of the plane, colored by weighted
-## contributions from an arbitrary set of input points. This is analogous to
-## the use of `dgrid3d` and style `with pm3d` to produce a 3D gridded surface.
-## See `set polar grid` and `polar heatmap`.
-#b New 2D plot style `with sectors` is an alternative to generating a full
-## polar gridded surface.  For each input data points it generates a single
-## annular wedge in a conceptual polar grid.  Unlike polar mode `with surface`
-## it can be used in either a polar or cartesian coordinate graph. 
-#b Plot style `with lines` now has a filter option `sharpen`.  This filter
-## detects spikes in a function plot that appear truncated in the output
-## because the peak lies between two x-coordinates at which the function has
-## been sampled.  It adds a new sample point at the location of each such peak.
-## See `filters`.
 #end
 
 3 New data formats
