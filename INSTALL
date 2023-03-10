@@ -373,7 +373,7 @@ Mac OSX
   Carbon API on Mac which is 32-bit only, that makes compiling gnuplot,
   cairo and pango to i386 necessary.
 
-maxOS + homebrew
+macOS + homebrew
 ----------------
 
   As of the time of writing (Feb 2023) homebrew provides a bottled gnuplot
