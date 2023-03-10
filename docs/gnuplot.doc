@@ -1012,7 +1012,7 @@ C  need @ in table, so end and restart the table !
 
  You can specify a character by its Unicode code point as \U+hhhh, where hhhh
  is the 4 or 5 character hexadecimal code point. For example the code point for
- the infinity symbol is \U+221E.  This will be converted to a UTF-8 byte
+ the infinity symbol ∞ is \U+221E.  This will be converted to a UTF-8 byte
  sequence on output if appropriate.  In a UTF-8 environment this mechanism
  is not needed for printable special characters since they are handled in a
  text string like any other character. However it is useful for combining forms
@@ -3371,7 +3371,6 @@ C ... and restart the table:
 
  On many systems libgd can also use generic font handling provided by the
  fontconfig tools (see `fontconfig`).
-
  On most systems without fontconfig, libgd provides access to Adobe fonts
  (*.pfa *.pfb) and to TrueType fonts (*.ttf).  You must give the name of the
  font file, not the name of the font inside it, in the form "<face> {,<size>}".
@@ -3388,7 +3387,6 @@ C ... and restart the table:
  To request a default font size at the same time:
       set term png font "arial,11"
 
- Both TrueType and Adobe Type 1 fonts are fully scalable and rotatable.
  If no specific font is requested in the "set term" command, gnuplot checks
  the environmental variable GNUPLOT_DEFAULT_GDFONT.
 3 postscript  (also encapsulated postscript *.eps)
@@ -5973,13 +5971,13 @@ Ffigure_sector_definition
 
 Ffigure_windrose
  Plotting with sectors can provide polar coordinate equivalents for the
- cartesian plot styles `boxes` (see windrose figure), `boxxyerror` and
+ cartesian plot styles `boxes` (see wind rose figure), `boxxyerror` and
  `image pixels` (see example in `heatmaps`).  Because sector plots are
  compatible with cartesian mode plot layout, multiple plots can be placed
  at different places on a single graph, which would not be possible for
  other polar mode plot styles.
 
- An example of using sectors to create a windrose in shown here.
+ An example of using sectors to create a wind rose in shown here.
  Other applications include polar heatmaps, dial charts, pie/donut charts,
  and annular error boxes for data points in polar coordinates.
  Worked examples for all of these are given in the 
@@ -14156,9 +14154,8 @@ Ffigure_palette2
  Syntax:
        set palette  defined { ( <gray1> <color1> {, <grayN> <colorN>}... ) }
 
- <grayX> are gray values which are mapped to [0,1] and <colorX> are the
- corresponding rgb colors.  The color can be specified in three different
- ways:
+ where N ≥ 2 and <grayN> are gray values which are mapped to [0,1].
+ The corresponding rgb color <colorN> can be specified in three different ways:
 
       <color> :=  { <r> <g> <b> | '<color-name>' | '#rrggbb' }
 

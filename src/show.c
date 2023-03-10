@@ -2995,7 +2995,7 @@ show_mtics(struct axis *axis)
 	break;
     case MINI_USER:
 	fprintf(stderr, "\
-\tminor %stics are drawn with %d subintervals between major xtic marks\n",
+\tminor %stics are drawn with %d subintervals between major tic marks\n",
 		name, axis->mtic_freq);
 	break;
     case MINI_TIME:

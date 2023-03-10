@@ -201,7 +201,7 @@ flow control and iteration using familiar statements
 \subsection{Can I run \gnuplot on my computer?}
 
 \Gnuplot{} is in widespread use on many platforms, including
-MS Windows, linux, unix, and OSX.  The current source code retains
+MS Windows, linux, unix, and macOS.  The current source code retains
 supports for older systems as well, including VMS, Ultrix, OS/2, and
 MS-DOS. However 16-bit platforms are no longer supported.
 
@@ -1137,7 +1137,7 @@ by the system's \textit{fontconfig} utility.
 You may also get an error message about "slow font initialization".
 This is because qt relies on a shared system font cache.
 If you request a font that no one else is using, it takes a while to
-update the cache.  This mostly happens on Windows or OSX, because other
+update the cache.  This mostly happens on Windows or macOS, because other
 programs on those systems tend to use a different font mechanism so the 
 relevant font cache may be empty.
 Try invoking gnuplot with command line option {\em -\@-slow}.
