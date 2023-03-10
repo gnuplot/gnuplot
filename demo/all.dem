@@ -427,7 +427,6 @@ reset
 print "**********************    Image formats    *********************"
 load "image.dem"
 load "image2.dem"
-load "rgbalpha.dem"
 load "imageNaN.dem"
 load "barchart_art.dem"
 reset
@@ -541,8 +540,8 @@ load "named_palettes.dem"
 print "********************** file palette+alpha.dem *********************"
 load "palette+alpha.dem"
 
-print "********************** file rgb_hexdata.dem *********************"
-load "rgb_hexdata.dem"
+print "********************** file argb_hexdata.dem *********************"
+load "argb_hexdata.dem"
 
 print "********************** file vplot.dem *********************"
 load "vplot.dem"

@@ -143,7 +143,7 @@ on mouse-coordinate tracking.
     <h4>Binary and Image data </h4>
     <ul>
     <li><a href="binary.html">binary data</a></li>
-    <li><a href="rgbalpha.html">RGB + alpha channel</a></li>
+    <li><a href="argb_hexdata.html">RGB + alpha channel</a></li>
     <li><a href="barchart_art.html">rescaled images</a></li>
     <li><a href="imageNaN.html">missing/NaN values</a></li>
     <li><a href="pixmap.html">pixmap gradients and icons</a></li>
