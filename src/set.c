@@ -693,11 +693,11 @@ set_command()
 	    break;
 	default:
 #ifdef WITH_CHI_SHAPES
-	    if (almost_equals(c_token,"chi$_shape")
+	    if (almost_equals(c_token,"chi$_shapes")
 	    &&  equals(++c_token,"fraction")) {
-		extern double chi_shape_default_length;
+		extern double chi_shape_default_fraction;
 		c_token++;
-		chi_shape_default_length = real_expression();
+		chi_shape_default_fraction = real_expression();
 		break;
 	    }
 #endif

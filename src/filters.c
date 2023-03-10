@@ -81,12 +81,12 @@ static void cluster_stats(struct coordinate *points, t_cluster *cluster);
  * so keep them together for now.
  *	cluster_outlier_threshold sets criterion for finding outliers
  *	    not currently settable
- *	chi_shape_default_length sets the default choice of chi_length to
- *			chi_shape_default_length * max(edgelengths)
+ *	chi_shape_default_fraction sets the default choice of chi_length to
+ *			chi_shape_default_fraction * max(edgelengths)
  *	    currently controlled by "set chi_shape fraction <value>"
  */
 double cluster_outlier_threshold = 0.0;
-double chi_shape_default_length = 0.6;
+double chi_shape_default_fraction = 0.6;
 
 /*
  * EAM December 2013
@@ -1260,7 +1260,7 @@ static int max_bounding_edges = 0;
  * Free local storage (called also from global reset command)
  */
 void
-reset_hulls()
+reset_hulls( TBOOLEAN reset )
 {
     delete_triangles(&good_triangles);
     delete_triangles(&bad_triangles);
@@ -1269,6 +1269,10 @@ reset_hulls()
     bounding_edges = NULL;
     n_bounding_edges = 0;
     max_bounding_edges = 0;
+    if (reset) {
+	chi_shape_default_fraction = 0.6;
+	del_udv_by_name("chi_length", FALSE);
+    }
 }
 
 /*
@@ -1294,8 +1298,8 @@ delaunay_triangulation( struct curve_points *plot )
     triangle *frozen_tail = NULL;
     int i;
 
-    /* Clear out any previous work */
-    reset_hulls();
+    /* Clear out any previous storage */
+    reset_hulls(FALSE);
 
     /* Pull color out of the varcolor array and copy it into point.CRD_COLOR
      * so that it isn't lost during sort.
@@ -1725,7 +1729,7 @@ concave_hull( struct curve_points *plot )
 	    if (chi_length < bounding_edges[ie].length)
 		chi_length = bounding_edges[ie].length;
 	}
-	chi_length *= chi_shape_default_length;
+	chi_length *= chi_shape_default_fraction;
     }
 
     chi_reduction( plot, chi_length );

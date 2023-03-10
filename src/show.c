@@ -44,6 +44,7 @@
 #include "datablock.h"
 #include "datafile.h"
 #include "eval.h"
+#include "filters.h"
 #include "fit.h"
 #include "gp_time.h"
 #include "graphics.h"
@@ -684,15 +685,17 @@ show_command()
 	show_watchpoints();
 	break;
 
-    /* HBB 20010525: 'set commands' that don't have an
-     * accompanying 'show' version, for no particular reason: */
-    /* --- such case now, all implemented. */
-
     case S_INVALID:
-	error_message = "Unrecognized option. See 'help show'.";
-	break;
     default:
-	error_message = "invalid or deprecated syntax";
+#ifdef WITH_CHI_SHAPES
+	if (almost_equals(c_token,"chi$_shapes")) {
+	    fprintf(stderr,"Default χ-shape parameter = %g of longest edge in convex hull\n",
+		chi_shape_default_fraction);
+	    c_token++;
+	    break;
+	}
+#endif
+	error_message = "Unrecognized option.";
 	break;
     }
 

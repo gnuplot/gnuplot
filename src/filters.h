@@ -39,11 +39,11 @@ void sharpen(struct curve_points *plot);
 void delaunay_triangulation( struct curve_points *plot );
 void save_delaunay_triangles( struct curve_points *plot );
 void concave_hull( struct curve_points *plot );
-void reset_hulls();
+void reset_hulls( TBOOLEAN reset );
 
-extern double chi_shape_default_length;
+extern double chi_shape_default_fraction;	/* This is fraction of longest edge */
 #else
-#define reset_hulls() /* NOOP */
+#define reset_hulls(foo) /* NOOP */
 #endif /* WITH_CHI_SHAPES */
 
 #endif /* GNUPLOT_FILTERS_H */

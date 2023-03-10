@@ -8336,8 +8336,8 @@ Ffigure_convex_hull
  points to generate a smooth closed curve (see `smooth path`). By default
  this smoothed curve runs through the bounding points.
 
- EXPERIMENTAL: The optional `expand` keyword and increment shift the
- edge segments of the hull away from the interior by an incremental distance.
+ The optional `expand` keyword and increment shift the edge segments of
+ the hull away from the interior by an incremental distance.
  The displaced segments are then connected using miter joins; this means
  that each vertex of the original hull is replaced by two vertices, since
  there is now a gap between the to adjoining edges.
@@ -10447,13 +10447,20 @@ Ffigure_smooth_path
 3 chi_shapes
 ?command set chi_shapes
 ?set chi_shapes
+?command unset chi_shapes
+?unset chi_shapes
 ?chi_shapes
       set chi_shapes fraction <value>
+      unset chi_shapes
+
  The concave hull filter creates χ-shapes defined by a characteristic length
  chi_length.  If no chi_length variable has been set, it chooses a value equal
- to some fraction of the longest edge in the bounding polygon (default 0.6).
+ to a fraction of the longest edge in the bounding polygon (the convex hull).
+ The fraction defaults to 0.6 but can be changed using this command. 
  Choosing a value of 1.0 will reduce the resulting hull to the convex hull.
  Smaller values will produce increasingly concave hulls. See `concavehull`.
+ The `unset chi_shapes` command restores the fraction to 0.6 and undefines
+ the chi_length variable.
 3 color
 ?commands set color
 ?set color
