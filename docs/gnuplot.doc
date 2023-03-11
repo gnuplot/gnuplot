@@ -5970,13 +5970,13 @@ Ffigure_sector_definition
 
 Ffigure_windrose
  Plotting with sectors can provide polar coordinate equivalents for the
- cartesian plot styles `boxes` (see windrose figure), `boxxyerror` and
+ cartesian plot styles `boxes` (see wind rose figure), `boxxyerror` and
  `image pixels` (see example in `heatmaps`).  Because sector plots are
  compatible with cartesian mode plot layout, multiple plots can be placed
  at different places on a single graph, which would not be possible for
  other polar mode plot styles.
 
- An example of using sectors to create a windrose in shown here.
+ An example of using sectors to create a wind rose in shown here.
  Other applications include polar heatmaps, dial charts, pie/donut charts,
  and annular error boxes for data points in polar coordinates.
  Worked examples for all of these are given in the 

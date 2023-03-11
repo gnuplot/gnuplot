@@ -280,13 +280,13 @@ plot sample [t=0:360:da] \
 pause -1 "<cr> to continue"
 
 #########################################################
-# Fig.10 Windrose (histgram on polar axis)
+# Fig.10 Wind rose (histgram on polar axis)
 #########################################################
 #
 
 reset
 
-set title "Windrose (polar coordinate histogram using sectors)"
+set title "Wind rose (polar coordinate histogram using sectors)"
 
 $data <<EOD
 # DIRECTION INDEX COUNT

@@ -349,7 +349,7 @@ reset
 #########################################################
 
 set output out . 'figure_windrose' . ext
-set title "Windrose\n (polar coordinate histogram using sectors)" offset 0,-2
+set title "Wind rose\n (polar coordinate histogram using sectors)" offset 0,-2
 
 $data <<EOD
 # DIRECTION INDEX COUNT

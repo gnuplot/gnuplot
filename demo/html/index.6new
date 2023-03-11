@@ -53,6 +53,7 @@
     <li><a href="smooth_splines.html">cubic and Bezier splines</a></li>
     <li><a href="monotonic_spline.html">monotonic csplines</a></li>
     <li>٭<a href="smooth_path.html">along-path splines</a></li>
+    <li>٭<a href="sharpen.html">"sharpen" filter</a></li>
     <li><a href="spline.html">explicit B-splines</a></li>
     <li><a href="airfoil.html">explicit Bezier splines</a></li>
     <li><a href="fit.html">Levenberg-Marquardt</a></li>
@@ -109,12 +110,12 @@
     <li><a href="isosurface.html">3D isosurface</a></li>
     </ul>
 
-    <h4 align=left>Animation (new!)</h4>
+    <h4 align=left>Animation</h4>
     <ul align=left>
     <li>٭<a href="animation.html">Embedded webp animation</a></li>
     </ul>
 
-    <h4 align=left>Hulls and Masks (new!)</h4>
+    <h4 align=left>Hulls and Masks</h4>
     <ul align=left>
     <li>٭<a href="convex_hull.html">convex hulls</a></li>
     <li>٭<a href="mask_pm3d.html">masked pm3d surface</a></li>
@@ -184,6 +185,7 @@
     <li><a href="solar_path.html">solar path diagram</a></li>
     <li><a href="map_projection.html">map projections</a></li>
     <li><a href="violinplot.html">violin plot</a></li>
+    <li>٭<a href="windrose.html">wind rose</a></li>
     </ul>
 
     <h4>Text options</h4>
@@ -233,11 +235,11 @@
 	    </a>
 	    <ul align=left>
 	    <li><a href="complex_trig.html">complex trig functions</a></li>
-	    <li><a href="cerf.html">complex error function</a></li>
+	    <li>٭<a href="cerf.html">complex error function</a></li>
 	    <li>٭<a href="lnGamma.html">complex lnGamma</a></li>
 	    <li><a href="elliptic.html">elliptic integrals</a></li>
-	    <li><a href="expint.html">exponential integral</a></li>
-	    <li><a href="ibeta.html">Incomplete Beta integral</a></li>
+	    <li>٭<a href="expint.html">exponential integral</a></li>
+	    <li>٭<a href="ibeta.html">Incomplete Beta integral</a></li>
 	    <li>٭<a href="igamma.html">Incomplete Gamma function P(a,z)</a></li>
 	    <li>٭<a href="uigamma.html">Incomplete Gamma function Q(a,z)</a></li>
 	    <li>٭<a href="BesselK.html">Bessel functions </a></li>
