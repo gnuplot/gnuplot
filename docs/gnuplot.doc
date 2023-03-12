@@ -6125,6 +6125,8 @@ Ffigure_xerrorbars
  (x,y), a line is drawn from (xlow,y) to (xhigh,y) or from (x-xdelta,y) to
  (x+xdelta,y), depending on how many data columns are provided.  The appearance
  of the tic mark at the ends of the bar is controlled by `set errorbars`.
+ The clearance between the point and the error bars is controlled by
+ `set pointintervalbox`.
  The basic style requires either 3 or 4 columns:
 
       3 columns:  x  y  xdelta
@@ -6145,7 +6147,9 @@ Ffigure_xyerrorbars
  from (x-xdelta,y) to (x+xdelta,y) or from (x,ylow) to (x,yhigh) and from
  (xlow,y) to (xhigh,y), depending upon the number of data columns provided.
  The appearance of the tic mark at the ends of the bar is controlled by
- `set errorbars`.  Either 4 or 6 input columns are required.
+ `set errorbars`.  The clearance between the point and the error bars is
+ controlled by `set pointintervalbox`.
+ Either 4 or 6 input columns are required.
 
       4 columns:  x  y  xdelta  ydelta
       6 columns:  x  y  xlow  xhigh  ylow  yhigh

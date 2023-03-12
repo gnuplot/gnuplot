@@ -2490,14 +2490,22 @@ plot_points(struct curve_points *plot)
 		    pointtype = plot->lp_properties.p_type;
 		}
 
-		/* A negative interval indicates we should try to blank out the */
-		/* area behind the point symbol. This could be done better by   */
-		/* implementing a special point type, but that would require    */
-		/* modification to all terminal drivers. It might be worth it.  */
-		/* term_apply_lp_properties will restore the point type and size*/
+		/* A negative interval indicates we should try to blank out the
+		 * area behind the point symbol. This could be done better by
+		 * implementing a special point type, but that would require
+		 * modification to all terminal drivers. It might be worth it.
+		 * term_apply_lp_properties will restore the point type and size.
+		 *
+		 * Version 6: apply this to all styles with error bars
+		 * Backward-compatibility:
+		 *	pointtype -1 catches "with *errorbars lt -1"
+		 *	which the user almost certainly expected to be a solid line
+		 */
+
 		if ((plot->plot_style == LINESPOINTS && interval < 0)
-		||  (plot->plot_style == YERRORBARS)) {
-		    if (pointintervalbox != 0) {
+		||  (plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)) {
+		    if ((pointtype != -1)
+		    &&  (pointintervalbox != 0)) {
 			(*t->set_color)(&background_fill);
 			(*t->pointsize)(pointsize * pointintervalbox);
 			(*t->point) (x, y, 6);
