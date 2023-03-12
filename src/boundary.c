@@ -1405,6 +1405,7 @@ do_key_sample_point(
     struct termentry *t = term;
     int xl_save = xl;
     int yl_save = yl;
+    int interval = this_plot->lp_properties.p_interval;
 
     /* If the plot this title belongs to specified a non-standard place
      * for the key sample to appear, use that to override xl, yl.
@@ -1419,13 +1420,16 @@ do_key_sample_point(
 
     (t->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
 
-    if (this_plot->plot_style == LINESPOINTS
-	 &&  this_plot->lp_properties.p_interval < 0) {
+    if ((this_plot->plot_style == LINESPOINTS && interval < 0)
+    ||  (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)) {
 	t_colorspec background_fill = BACKGROUND_COLORSPEC;
-	(*t->set_color)(&background_fill);
-	(*t->pointsize)(pointsize * pointintervalbox);
-	(*t->point)(xl + key_point_offset, yl, 6);
-	term_apply_lp_properties(&this_plot->lp_properties);
+	if ((this_plot->lp_properties.p_type != -1)
+	&&  (pointintervalbox != 0)) {
+	    (*t->set_color)(&background_fill);
+	    (*t->pointsize)(pointsize * pointintervalbox);
+	    (*t->point)(xl + key_point_offset, yl, 6);
+	    term_apply_lp_properties(&this_plot->lp_properties);
+	}
     }
 
     if (this_plot->plot_style == BOXPLOT) {
