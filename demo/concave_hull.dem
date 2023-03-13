@@ -2,6 +2,13 @@
 # Debugging / test code for Delaunay triangulation, χ-shapes,
 # and generation of concave hulls.
 #
+if (!strstrt(GPVAL_COMPILE_OPTIONS, "+CHI_SHAPES")) {
+    print "This copy of gnuplot does not support concave hulls"
+    exit  # return to caller
+}
+
+set title "Concave hulls" offset 0,-2 font ":Bold"
+
 if (!exists("N")) { N = 17 }
 
 set sample N*10

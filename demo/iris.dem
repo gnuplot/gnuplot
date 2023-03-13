@@ -1,0 +1,60 @@
+#
+# Illustrate use of concave hull to demarcate overlapping clusters
+#
+if (!strstrt(GPVAL_COMPILE_OPTIONS, "+CHI_SHAPES")) {
+    print "This copy of gnuplot does not support concave hulls"
+    exit  # return to caller
+}
+
+set title "{/:Bold RA Fisher's iris data set}"
+set title offset 0, -2
+
+species(name) = strstrt(name,"setosa") ? 1 \
+              : strstrt(name,"versicolor") ? 2 \
+              : strstrt(name,"virginica") ? 3 \
+              : 0
+
+set datafile separator comma
+set datafile columnhead
+
+set key title "Iris Species" font ":Bold"
+set key outside top right offset screen -0.3, -.2
+set key invert reverse Left
+
+set border 3
+set tics nomirror
+
+set offset 0.5, 0.5, 0.5, 0.5
+set xtics rangelimit
+set ytics rangelimit
+set xlabel "Sepal Width"
+set ylabel "Petal Length"
+set size square
+
+plot 'iris.dat' using 2:3:(species(strcol(5))) with points lc variable notitle, \
+    keyentry with point pt 7 lc species("setosa") title "setosa", \
+    keyentry with point pt 7 lc species("versicolor") title "versicolor", \
+    keyentry with point pt 7 lc species("virginica") title "virginica"
+
+pause -1 "<cr> to continue"
+
+set title '{/:Bold Concave Hull       chi\_length = 1.5 expand 0.1}'
+set title offset 0, -2
+
+set style fill transparent solid 0.3
+
+chi_length = 1.5
+
+plot for [s=1:3] \
+    'iris.dat' using (species(strcol(5)) == s ? $2 : NaN) : 3 \
+    concavehull smooth path expand 0.1 with polygon lc s notitle, \
+    \
+    '' using 2:3:(species(strcol(5))) with points pt 12 lc variable notitle, \
+    \
+    keyentry with ellipse lc species("setosa") title "setosa", \
+    keyentry with ellipse lc species("versicolor") title "versicolor", \
+    keyentry with ellipse lc species("virginica") title "virginica"
+
+pause -1 "<cr> to continue"
+reset
+                                                                                            
