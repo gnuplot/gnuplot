@@ -321,6 +321,9 @@ D sharpen 1
 #b Smoothing options apply to plotting `with filledcurves` {above|below|between}.
 #b New keyword `period` for smoothing periodic data. See `smooth kdensity`.
 #end
+D convex_hull 2
+D mask_pm3d 3
+D smooth_path 2
 
 3 Named palettes
 ?new colormaps
@@ -337,6 +340,8 @@ D sharpen 1
 #b Palettes read from a file or datablock (`set palette file`) may be specified
 ## either using fractional color components or 24-bit packed RGB values.
 #end
+D named_palettes 4
+D viridis 1
 
 3 New data formats
 ?new data_formats
@@ -432,6 +437,7 @@ D sharpen 1
 #b New function `weekdate_cdc(year, week, day)` converts CDC standard week date
 ## to calendar time.
 #end
+D epi_data 1
 
 3 Other new features
 ?new features
@@ -5491,6 +5497,7 @@ Ffigure_newhist
 ^ <a href="http://www.gnuplot.info/demo/histogram_colors.html">
  histogram_colors.dem
 ^ </a>
+D histogram_colors 1
 
 2 image
 ?plotting styles image
@@ -8379,6 +8386,7 @@ Ffigure_convex_hull
  truncated to apparent minimal y values between 0.02 and 0.20. 
  Adding the "sharpen" keyword produces instead a correct representation of
  the function with periodic sharp minima that reach y=0.
+D sharpen 1
 
 5 zsort
 ?commands plot datafile filters zsort
@@ -10708,6 +10716,8 @@ Ffigure_smooth_path
 ^ <a href="http://www.gnuplot.info/demo/discrete.html">
  contours with user defined levels demo (discrete.dem).
 ^ </a>
+D contours 5
+D discrete 3
 3 color box
 ?commands set colorbox
 ?commands show colorbox
@@ -10875,6 +10885,7 @@ Ffigure_colornames
       set linetype 5 dt 5        # always use this dash pattern with linetype 5
       set dashtype 66 "..-"      # define a new dashtype using a string
  See also `dashtype`.
+D dashtypes 2
 3 datafile
 ?set datafile
 ?show datafile
@@ -12090,6 +12101,7 @@ D heatmap_points 3
  normally, making the resulting display hard to understand.  Therefore, the
  default option of `bentover` will turn it visible in this case.  If you don't
  want that, you may choose `nobentover` instead.
+D hidden 6
  See also
 ^ <a href="http://www.gnuplot.info/demo/hidden.html">
  hidden line removal demo (hidden.dem)
@@ -14196,6 +14208,7 @@ Ffigure_palette2
  brightness (luminance).  The colormap version used in gnuplot is based on
        "Viridis - Colorblind-Friendly Color Maps for R", Garnier et al (2021)
        https://CRAN.R-project.org/package=viridis
+D viridis 1
 4 colormap
 ?commands set palette colormap
 ?palette colormap
@@ -14619,6 +14632,7 @@ Ffigure_palette2
  Example:
       set pm3d lighting primary 0.8 spec 0.4 spec2 0.4
       set pm3d spot rgb "blue"
+D spotlight 1
 4 position
 ?pm3d position
 ?set pm3d position
@@ -16303,6 +16317,7 @@ Ffigure_polar_grid
       set ttics -180, 30, 180
       set ttics add ("Theta = 0" 0)
       set ttics font ":Italic" rotate
+D ttics 3
 3 urange
 ?commands set urange
 ?commands show urange
@@ -18402,6 +18417,7 @@ Ffigure_sparsematrix
  It also plots the apparent net intensity as calculated using NTSC coefficients
  to map RGB onto a grayscale.  The command also loads the profile values into a
  datablock named $PALETTE.
+D viridis 1
 2 toggle
 ?commands toggle
 ?toggle
