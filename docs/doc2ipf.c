@@ -362,6 +362,9 @@ process_line(char *line, FILE *b)
 	    }
 	    break;
 	}
+    case 'D':{			/* embedded figure + link to demo */
+	    break;
+	}
     case '#':{			/* latex table entry */
 	    if (!intable) {
 		/* Itemized list outside of table */

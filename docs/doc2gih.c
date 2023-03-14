@@ -130,6 +130,9 @@ process_line(char *line, FILE *b)
     case 'F':{			/* latex embedded figure */
 	    break;		/* ignore */
 	}
+    case 'D':{			/* html embedded figure */
+	    break;		/* ignore */
+	}
     case '%':{			/* troff table entry */
 	    break;		/* ignore */
 	}

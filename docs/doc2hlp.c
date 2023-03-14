@@ -119,6 +119,7 @@ process_line (char *line, FILE *b)
 	}
     case '=':			/* latex index entry */
     case 'F':			/* latex embedded figure */
+    case 'D':			/* html embedded figure */
     case '#':{			/* latex table entry */
 	    break;		/* ignore */
 	}

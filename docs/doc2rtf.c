@@ -226,9 +226,10 @@ process_line(char *line, FILE *b)
     case '@':{			/* start/end table */
 	    break;		/* ignore */
 	}
-    case '^':{			/* html link escape */
+    case 'D':			/* html link to demo figure */
+    case '^':			/* html link escape */
 	    break;		/* ignore */
-	}
+
     case '=':			/* latex index entry */
     case 'F':			/* latex embedded figure */
     case '#':			/* latex table entry */

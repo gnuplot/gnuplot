@@ -68,6 +68,13 @@
  H1   { text-align: center; }
 
  IMG  { border-style: none; }
+ img.demo {
+	text-decoration: none;
+	border-style: none;
+	padding: 0px 0px 0px 0px;
+	height: 300px;
+	width: 450px;
+	}
 
  object.sidebar
 	{

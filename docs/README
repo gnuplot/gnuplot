@@ -51,10 +51,7 @@ See README.emacs in the top directory.
 On OS/2, the Information Presentation Facility Compiler converts the
 file "gnuplot.ipf" to a "gnuplot.inf" file.
 
-The printed document is available in troff/nroff (ms) format, using
-the file "gnuplot.ms".  For nroff, use 'make nroff'. For troff, type
-'make ms' and then 'troff -ms gnuplot.ms' in whatever way you use troff.
-For groff (on linux), use  'groff -t -e -mgs gnuplot.ms'
+Deprecated: troff/nroff output is no longer supported.
 
 On MS-Windows, the Microsoft HTML help compiler converts the file
 "wgnuplot.html" to a 'chm' file which is used by the standard Windows
@@ -72,9 +69,9 @@ makefile.  The interactive help generators use the same set of compiler
 directives in "term.h", and thus interactive help contains information
 for just those terminals actually loaded.
 
-The printed manual generators and the html generator contain information
-about all terminals.  This is accomplished by concatenating all of the
-".trm" files into a single one, "allterm.h".
+However the printed manual generators and the html generator contain
+information about all terminals.  This is accomplished by concatenating
+all of the ".trm" files into a single one, "allterm.h".
 
 The file "termdoc.c" is used by each of the nine processing programs
 ("doc2gih.c", etc.); it #includes either "term.h" or "allterm.h", as is
@@ -118,8 +115,9 @@ Here is an example of the DOC master help format:
 ?functions acos
 ?acos
 4 acos
- This function returns the arc cosine (inverse cosine) of its
- argument.  'acos' returns its argument in radians. 
+Ffigure_acos
+ This function returns the arc cosine of its argument.
+ The figure shows abs(acos(z)) for complex z = x + y*I
 
 
 Some notes about the format:
@@ -158,12 +156,13 @@ Control characters in first column:
 #b   bulleted list entry
 ##   continuation of bulleted item      
 =    used by doc2tex: index entry
-F    used by doc2{tex,html}: embedded figure (followed by base name of the pdf file)
+F    used by doc2{tex,html}: embedded figure (followed by base name of the image file)
 %    used by doc2ms: table entry
 ^    used by doc2{tex,html}: hypertext link / HTML code
 <    the help from the terminal driver files is inserted at this point.
 C    comment (mainly for RCS ID line)
 C#   reserved form of comment (used internally by termdoc.c)
+D    reference, link, or direct inclusion of a figure from the demo collection
 
 
 Tables:
