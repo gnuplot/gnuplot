@@ -223,7 +223,11 @@ typedef enum coord_type {
  * If the C compiler pads struct coordinate to an 8-byte boundary
  * (true for all the compilers I have tested) then there is a hole
  * that we might as well use to hold an extra coordinate property.
+ * The Delaunay triangulation code needs this extra storage.
  */
+#if defined(WITH_CHI_SHAPES) && !(defined(WITH_EXTRA_COORDINATE))
+  #define WITH_EXTRA_COORDINATE
+#endif
 #ifdef WITH_EXTRA_COORDINATE
   #define EXTRA_COORDINATE int extra;
 #else
