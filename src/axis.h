@@ -392,8 +392,6 @@ extern struct axis THETA_AXIS;
 /* Macros to map from user to terminal coordinates and back */
 #define axis_mapback(axis, pos) \
     (((double)(pos) - (axis)->term_lower)/(axis)->term_scale + (axis)->min)
-#define AXIS_MAPBACK(axis, pos) \
-    axis_mapback(&axis_array[axis], pos)
 
 #define axis_map_double(axis, variable)         \
     ((axis)->term_lower + ((variable) - (axis)->min) * (axis)->term_scale)
