@@ -2381,7 +2381,7 @@ void wxt_put_text(unsigned int x, unsigned int y, const char * string)
 		wxt_command_push(temp_command);
 
 		/* set up the global variables needed by enhanced_recursion() */
-		enhanced_fontscale = wxt_set_fontscale;
+		enhanced_fontscale = 1.0;
 		strncpy(enhanced_escape_format, "%c", sizeof(enhanced_escape_format));
 
 		/* Set the recursion going. We say to keep going until a
@@ -2393,7 +2393,7 @@ void wxt_put_text(unsigned int x, unsigned int y, const char * string)
 
 		while (*(string = enhanced_recursion((char*)string, TRUE,
 				wxt_enhanced_fontname,
-				wxt_current_plot->fontsize * wxt_set_fontscale,
+				wxt_current_plot->fontsize,
 				0.0, TRUE, TRUE, 0))) {
 			wxt_enhanced_flush();
 
@@ -2413,8 +2413,9 @@ void wxt_put_text(unsigned int x, unsigned int y, const char * string)
 		return;
 	}
 
-	temp_command.command = command_put_text;
+	/* We reach here only if this is *not* enhanced text */
 
+	temp_command.command = command_put_text;
 	temp_command.x1 = x;
 	temp_command.y1 = term->ymax - y;
 	/* Note : we must take '\0' (EndOfLine) into account */
@@ -2422,6 +2423,7 @@ void wxt_put_text(unsigned int x, unsigned int y, const char * string)
 	strcpy(temp_command.string, string);
 
 	wxt_command_push(temp_command);
+	return;
 }
 
 void wxt_linetype(int lt)
@@ -2475,7 +2477,7 @@ int wxt_set_font (const char *font)
 
 	char *fontname = NULL;
 	gp_command temp_command;
-	int fontsize = 0;
+	double fontsize = 0;
 
 	temp_command.command = command_set_font;
 
@@ -2483,7 +2485,7 @@ int wxt_set_font (const char *font)
 		int sep = strcspn(font,",");
 		fontname = strdup(font);
 		if (font[sep] == ',') {
-			sscanf(&(font[sep+1]), "%d", &fontsize);
+			sscanf(&(font[sep+1]), "%lf", &fontsize);
 			fontname[sep] = '\0';
 		}
 	} else {
@@ -2510,22 +2512,20 @@ int wxt_set_font (const char *font)
 			fontsize = wxt_set_fontsize;
 	}
 
-	/* Reset the term variables (hchar, vchar, h_tic, v_tic).
-	 * They may be taken into account in next plot commands */
+	/* Reset the term variables (hchar, vchar, h_tic, v_tic)
+	 * so that the core code can use them in subsequent plot commands.
+	 */
 	gp_cairo_set_font(wxt_current_plot, fontname, fontsize * wxt_set_fontscale);
-	gp_cairo_set_termvar(wxt_current_plot, &(term->v_char),
-	                                       &(term->h_char));
-	gp_cairo_set_font(wxt_current_plot, fontname, fontsize);
+	gp_cairo_set_termvar(wxt_current_plot, &(term->v_char), &(term->h_char));
 
 	wxt_MutexGuiLeave();
 	wxt_sigint_check();
 	wxt_sigint_restore();
 
-	/* Note : we must take '\0' (EndOfLine) into account */
+	/* Push the equivalent command onto the wxt display list */
 	temp_command.string = new char[strlen(fontname)+1];
 	strcpy(temp_command.string, fontname);
-	temp_command.integer_value = fontsize * wxt_set_fontscale;
-
+	temp_command.double_value = fontsize * wxt_set_fontscale;
 	wxt_command_push(temp_command);
 
 	/* Enhanced text processing needs to know the new font also */
@@ -3189,7 +3189,7 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 		gp_cairo_enhanced_writec(&plot, command.integer_value);
 		return;
 	case command_set_font :
-		gp_cairo_set_font(&plot, command.string, command.integer_value);
+		gp_cairo_set_font(&plot, command.string, command.double_value);
 		return;
 	case command_linewidth :
 		gp_cairo_set_linewidth(&plot, command.double_value);;

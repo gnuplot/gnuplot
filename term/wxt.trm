@@ -70,7 +70,7 @@ t_linecap wxt_linecap = BUTT;
 /* default text font family: */
 char *wxt_set_fontname = NULL;
 /* default text size*/
-int wxt_set_fontsize = 0;
+double wxt_set_fontsize = 0;
 double wxt_set_fontscale = 1.0;
 /* window title */
 char wxt_title[MAX_ID_LEN + 1] = "";
@@ -175,7 +175,7 @@ TERM_PUBLIC void wxt_options()
 			if (*s) {
 				char *sep = strchr(s,',');
 				if (sep) {
-					sscanf(sep+1, "%d", &wxt_set_fontsize);
+					sscanf(sep+1, "%lf", &wxt_set_fontsize);
 					*sep = '\0';
 				}
 				free(wxt_set_fontname);
