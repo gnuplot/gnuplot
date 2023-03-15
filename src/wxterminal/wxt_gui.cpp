@@ -2680,6 +2680,8 @@ void wxt_filled_polygon(int n, gpiPoint *corners)
 
 	temp_command.command = command_filled_polygon;
 	temp_command.integer_value = n;
+	temp_command.x1 = corners[0].x;
+	temp_command.y1 = term->ymax - corners[0].y;
 	temp_command.corners = new gpiPoint[n];
 	/* can't use memcpy() here, as we have to mirror the y axis */
 	gpiPoint *corners_copy = temp_command.corners;
