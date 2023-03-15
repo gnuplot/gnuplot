@@ -1,0 +1,7 @@
+#
+# Show viridis palette
+#
+set palette viridis
+test palette
+pause -1
+reset
