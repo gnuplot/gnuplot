@@ -310,6 +310,11 @@ D sharpen 1
 ## new filter `convexhull`.  A path-smoothed bounding curve can be plotted
 ## as a filled area using "convexhull smooth path with filledcurves".
 ## See `convexhull`.
+#b An alternative experimental filter `concavehull` generates a bounding
+## polygon that is not necessarily convex; instead it forms a χ-shape
+## determined by a characteristic length parameter that controls the degree
+## of concavity.  This essentially draws a blob around the data points.
+## See `concavehull`.
 #b A convex hull or other polygon can be used as a mask to display only
 ## selected portions of a pm3d surface or an image plot.
 ## See new plot style `with mask` (defines a mask) and keyword `mask`
@@ -8024,14 +8029,15 @@ Ffigure_zerror
                           {every <every list>}
                           {skip <number-of-lines>}
                           {using <using list>}
-                          {convexhull}
+                          {convexhull} {concavehull}
                           {smooth <option>}
                           {bins <options>}
                           {mask}
                           {volatile} {zsort} {noautoscale}
 
  The modifiers `binary`, `index`, `every`, `skip`, `using`, `smooth`, `bins`,
- `mask`, `convexhull`, and `zsort` are discussed separately.  In brief
+ `mask`, `convexhull`, `concavehull`, and `zsort` are discussed separately.
+ In brief
 #start
 #b `skip N` tells the program to ignore N lines at the start of the input file
 #b `binary` indicates that the file contains binary data rather than text
@@ -8259,8 +8265,8 @@ Ffigure_zerror
  In general the purpose of a filter is to replace the original full set of 
  input points with a selected subset of points, possibly modified, regrouped,
  or reordered,
- The filters currently supported are `bins`, `convexhull`, `mask`, `sharpen`,
- and `zsort`.
+ The filters currently supported are `bins`, `convexhull`, `concavehull`,
+ `mask`, `sharpen`, and `zsort`.
 5 bins
 ?commands plot datafile filters bins
 ?plot datafile filters bins
@@ -8327,7 +8333,7 @@ Ffigure_zerror
 
       plot FOO using x:y convexhull
       plot FOO using x:y convexhull smooth path
-      plot FOO using x:y convexhull expand 2.0 smooth path
+      plot FOO using x:y convexhull expand <increment> {smooth path}
 
 Ffigure_convex_hull
  The points in FOO are replaced by a subset of the original points that
