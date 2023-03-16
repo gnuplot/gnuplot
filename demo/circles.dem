@@ -63,31 +63,4 @@ plot 'optimize.dat' with circles lc rgb "blue" fs transparent solid 0.15 noborde
 
 pause -1 "Hit return to continue"
 
-
-reset
-set size ratio -1
-set title "Lena's key points"
-unset xlabel
-unset xtics
-unset ytics
-unset key
-unset border
-set yrange [] reverse
-
-plot 'lena.rgb' binary array=(128,128) dx=4 dy=4 format='%uchar' with rgbimage, \
-     'lena-keypoints.bin' binary format='%double' with circles lc rgb "yellow"
-
-pause -1 "Hit return to continue"
-
-
-reset
-set size ratio -1
-set title "Delaunay triangulation of Hemisphere points, some empty circles in red"
-unset key
-
-plot 'empty-circles.dat' with circles lw 2 lc rgb "red", \
-     'delaunay-edges.dat' with lines lc rgb "forest-green", \
-     'hemisphr.dat' u (100*$1):(100*$2) with points pt 7 lc rgb "black"
-
-pause -1 "Hit return to continue"
 reset

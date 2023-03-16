@@ -117,6 +117,7 @@
     <ul align=left>
     <li><a href="convex_hull.html">convex hulls</a></li>
     <li><a href="mask_pm3d.html">masked pm3d surface</a></li>
+    <li><a href="chi_shapes.html">concave hulls (χ-shapes)</a></li>
     </ul>
 
     <h4>Coordinate and<br> axis transforms</h4>
@@ -139,7 +140,7 @@
     <li><a href="binary.html">binary data</a></li>
     <li><a href="image.html">image data</a></li>
     <li><a href="image2.html">binary and image tricks</a></li>
-    <li><a href="rgbalpha.html">RGB + alpha channel</a></li>
+    <li><a href="argb_hexdata.html">RGB + alpha channel</a></li>
     <li><a href="barchart_art.html">bar chart art</a></li>
     <li><a href="imageNaN.html">missing/NaN values</a></li>
     <li><a href="pixmap.html">pixmap gradients and icons</a></li>
@@ -184,6 +185,7 @@
     <li><a href="map_projection.html">map projections</a></li>
     <li><a href="violinplot.html">violin plot</a></li>
     <li><a href="windrose.html">wind rose</a></li>
+    <li><a href="iris.html">overlapping categories</a></li>
     </ul>
 
     <h4>Text options</h4>

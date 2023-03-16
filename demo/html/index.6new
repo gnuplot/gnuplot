@@ -119,6 +119,7 @@
     <ul align=left>
     <li>٭<a href="convex_hull.html">convex hulls</a></li>
     <li>٭<a href="mask_pm3d.html">masked pm3d surface</a></li>
+    <li>٭<a href="chi_shapes.html">concave hulls (χ-shapes)</a></li>
     </ul>
 
     <h4>Coordinate and<br> axis transforms</h4>
@@ -186,6 +187,7 @@
     <li><a href="map_projection.html">map projections</a></li>
     <li><a href="violinplot.html">violin plot</a></li>
     <li>٭<a href="windrose.html">wind rose</a></li>
+    <li>٭<a href="iris.html">overlapping categories</a></li>
     </ul>
 
     <h4>Text options</h4>

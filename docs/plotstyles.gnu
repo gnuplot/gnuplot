@@ -885,6 +885,8 @@ set output out . 'figure_concave_hull_1' . ext
 
 if (!strstrt(GPVAL_COMPILE_OPTIONS, "+CHI_SHAPES")) {
     clear
+    set output out . 'figure_concave_hull_2' . ext
+    clear
 } else {
     unset key
     unset tics; unset border
