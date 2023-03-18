@@ -46,7 +46,7 @@ splot '++' using 1:2:(foo($1,$2)):(blues(foo($1,$2))) with pm3d lc rgb variable 
 pause -1 "<cr> to continue"
 
 #
-# Method 2 (new in development version)
+# Method 2 (new in version 6)
 #	"set pm3d interpolate" works now
 #	"set pm3d lighting" also works
 set title "Version 6 offers a new keyword to access this palette"
