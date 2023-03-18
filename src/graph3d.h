@@ -111,7 +111,9 @@ typedef struct surface_points {
     int num_iso_read;
     struct gnuplot_contours *contours; /* NULL if not doing contours. */
     struct iso_curve *iso_crvs;	/* the actual data */
-    char pm3d_where[7];		/* explicitly given base, top, surface */
+    char pm3d_where[8];		/* explicitly given base, top, surface */
+
+    struct zslice *zclip;	/* pm3d surface z-clipping (contour fill) */
 
 } surface_points;
 

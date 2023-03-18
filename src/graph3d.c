@@ -1100,7 +1100,7 @@ do_3dplot(
 	    fprintf(stderr, "  Warning: Single isoline (scan) is not enough for a pm3d plot.\n\t   Hint: Missing blank lines in the data file? See 'help pm3d' and FAQ.\n");
 
 
-    pm3d_order_depth = (can_pm3d && !draw_contour && pm3d.direction == PM3D_DEPTH);
+    pm3d_order_depth = (can_pm3d && pm3d.direction == PM3D_DEPTH);
 
     /* TODO:
      *   During "refresh" from rotation it would be better to re-use previously
@@ -1127,8 +1127,9 @@ do_3dplot(
 	    (term->layer)(TERM_LAYER_BEFORE_PLOT);
 
 	    if (!key_pass && this_plot->plot_type != KEYENTRY)
-	    if (can_pm3d && PM3D_IMPLICIT == pm3d.implicit)
+	    if (can_pm3d && PM3D_IMPLICIT == pm3d.implicit) {
 		pm3d_draw_one(this_plot);
+	    }
 
 	    lkey = (key->visible && this_plot->title && this_plot->title[0]
 				 && !this_plot->title_is_suppressed);
@@ -1258,10 +1259,12 @@ do_3dplot(
 
 	    case PM3DSURFACE:
 		if (draw_this_surface) {
-		    if (can_pm3d && PM3D_IMPLICIT != pm3d.implicit) {
+		    if (can_pm3d && pm3d.implicit != PM3D_IMPLICIT) {
 			pm3d_draw_one(this_plot);
-			if (!pm3d_order_depth)
-			    pm3d_depth_queue_flush(); /* draw plot immediately */
+			/* Conditions under which we draw the surface immediately */
+			if (!pm3d_order_depth
+			||  ((draw_contour == CONTOUR_SRF) && !(this_plot->zclip)))
+			    pm3d_depth_queue_flush();
 		    }
 		}
 		break;
@@ -1562,9 +1565,10 @@ do_3dplot(
 
 	} /* loop over surfaces */
 
-    if (!key_pass)
-    if (pm3d_order_depth || track_pm3d_quadrangles) {
-	pm3d_depth_queue_flush(); /* draw pending plots */
+    if (!key_pass) {
+	/* draw pending plots */
+	if (pm3d_order_depth || track_pm3d_quadrangles)
+	    pm3d_depth_queue_flush();
     }
 
     if (!key_pass)

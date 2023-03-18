@@ -232,6 +232,7 @@ sp_free(struct surface_points *sp)
 	}
 
 	free_at(sp->plot_function.at);
+	free(sp->zclip);
 
 	free(sp);
 	sp = next;
@@ -1902,6 +1903,25 @@ eval_3dplots()
 			c_token++;
 		    } else
 			int_error(c_token, "this smoothing option not supported");
+		    continue;
+		}
+
+		/* Only pm3d quadrangles are affected by this so there should
+		 * eventually be some check on plot style
+		 */
+		if (equals(c_token, "zclip")) {
+		    double zlow, zhigh;
+		    t_colorspec color = DEFAULT_COLORSPEC;
+		    int start_token = ++c_token;
+		    if (!equals(c_token++,"["))
+			int_error(start_token, "expecting zclip [min:max]");
+		    zlow = parse_one_range_limit( -VERYLARGE );
+		    zhigh = parse_one_range_limit( VERYLARGE );
+		    free(this_plot->zclip);
+		    this_plot->zclip = gp_alloc( sizeof(struct zslice), "zslice" );
+		    this_plot->zclip->zlow = zlow;
+		    this_plot->zclip->zhigh = zhigh;
+		    this_plot->zclip->color = color;
 		    continue;
 		}
 

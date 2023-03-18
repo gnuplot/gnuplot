@@ -143,6 +143,12 @@ typedef struct lighting_model {
 
 extern lighting_model pm3d_shade;
 
+typedef struct zslice {
+  double zlow;
+  double zhigh;
+  t_colorspec color;
+} zslice;
+
 /* Used to initialize `set pm3d border` */
 extern struct lp_style_type default_pm3d_border;
 
