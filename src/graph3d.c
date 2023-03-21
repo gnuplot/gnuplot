@@ -1061,12 +1061,15 @@ do_3dplot(
 	}
     }
 
-
     /* DRAW SURFACES AND CONTOURS */
 
     if (!key_pass)
-    if (hidden3d && (hidden3d_layer == LAYER_BACK) && draw_surface
-    && (replot_mode != AXIS_ONLY_ROTATE)) {
+    if (hidden3d && draw_surface && (replot_mode != AXIS_ONLY_ROTATE)
+    &&  (hidden3d_layer == LAYER_BACK || hidden3d_layer == LAYER_DEPTHORDER)) {
+#ifdef HIDDEN3D_CACHE
+	if (pm3d.direction == PM3D_DEPTH)
+	    hidden3d_layer = LAYER_DEPTHORDER;
+#endif
 	(term->layer)(TERM_LAYER_BEFORE_PLOT);
 	plot3d_hidden(plots, pcount);
 	(term->layer)(TERM_LAYER_AFTER_PLOT);
@@ -1566,17 +1569,22 @@ do_3dplot(
 	} /* loop over surfaces */
 
     if (!key_pass) {
-	/* draw pending plots */
-	if (pm3d_order_depth || track_pm3d_quadrangles)
+	/* draw pending depth-sorted pm3d plots */
+	if (pm3d_order_depth || track_pm3d_quadrangles) {
 	    pm3d_depth_queue_flush();
+#ifdef HIDDEN3D_CACHE
+	    if (hidden3d)
+		flush_hidden3d_cache();
+#endif
+	}
     }
 
-    if (!key_pass)
-    if (hidden3d && (hidden3d_layer == LAYER_FRONT) && draw_surface
-    &&  (replot_mode != AXIS_ONLY_ROTATE)) {
-	(term->layer)(TERM_LAYER_BEFORE_PLOT);
-	plot3d_hidden(plots, pcount);
-	(term->layer)(TERM_LAYER_AFTER_PLOT);
+    if (!key_pass && (replot_mode != AXIS_ONLY_ROTATE)) {
+	if (hidden3d && draw_surface && hidden3d_layer == LAYER_FRONT) {
+	    (term->layer)(TERM_LAYER_BEFORE_PLOT);
+	    plot3d_hidden(plots, pcount);
+	    (term->layer)(TERM_LAYER_AFTER_PLOT);
+	}
     }
 
     /* Add labels that were defered until after depth-sorted pm3d surfaces */
@@ -1601,8 +1609,17 @@ do_3dplot(
 	/* draw_3d_graphbox(plots, pcount, FRONTGRID, LAYER_FRONT) */
 	;
 
-    else if (hidden3d || grid_layer == LAYER_FRONT)
+    else if (hidden3d || grid_layer == LAYER_FRONT) {
+#ifdef HIDDEN3D_CACHE
+	int save_hidden3d_layer = hidden3d_layer;
+	if (hidden3d_layer == LAYER_DEPTHORDER)
+	    hidden3d_layer = LAYER_BACK;
 	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_FRONT);
+	hidden3d_layer = save_hidden3d_layer;
+#else
+	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_FRONT);
+#endif
+    }
 
     else if (grid_layer == LAYER_BEHIND)
 	draw_3d_graphbox(plots, pcount, FRONTGRID, LAYER_FRONT);
@@ -2394,10 +2411,6 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
     int x, y;		/* point in terminal coordinates */
     struct termentry *t = term;
     BoundingBox *clip_save = clip_area;
-
-    FPRINTF((stderr,
-	"draw_3d_graphbox: whichgrid = %d current_layer = %d border_layer = %d\n",
-	whichgrid,current_layer,border_layer));
 
     clip_area = &canvas;
     if (draw_border && splot_map) {

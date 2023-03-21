@@ -63,5 +63,12 @@ void term_hidden_line_removal(void);
 void plot3d_hidden(struct surface_points *plots, int pcount);
 void draw_line_hidden(p_vertex, p_vertex, lp_style_type *);
 void draw_label_hidden(p_vertex, lp_style_type *, int, int);
+void flush_hidden3d_cache(void);
+
+/* Define this for the experimental option to cache hidden3d lines
+ * during pm3d depth processing so that they can be drawn later in
+ * order to superimpose them on a pm3d surface.
+ */
+#undef HIDDEN3D_CACHE
 
 #endif /* GNUPLOT_HIDDEN3D_H */

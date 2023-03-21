@@ -52,6 +52,21 @@
 #include "util.h"
 #include "util3d.h"
 
+#ifdef HIDDEN3D_CACHE
+/* Bookkeeping for line segments found during hidden3d_layer LAYER_BACK
+ * processing but cached for drawing later.
+ * Ethan A Merritt 2023
+ */
+typedef struct  {
+	int x1; int y1; int x2; int y2;	/* terminal coordinates of line segment */
+	lp_style_type *lp;		/* line style this was derived from */
+	t_colorspec color;		/* color was calculated earlier */
+} t_cached_line;
+static t_cached_line *hidden3d_cache = NULL;
+static int hidden3d_cache_size = 0;
+#endif
+static int cached_hidden_lines = 0;
+
 
 /*************************/
 /* Configuration section */
@@ -123,7 +138,6 @@ static long hiddenTriangleLinesdrawnPattern = TRIANGLE_LINESDRAWN_PATTERN;
 static int hiddenHandleUndefinedPoints = HANDLE_UNDEFINED_POINTS;
 static int hiddenShowAlternativeDiagonal = SHOW_ALTERNATIVE_DIAGONAL;
 static int hiddenHandleBentoverQuadrangles = HANDLE_BENTOVER_QUADRANGLES;
-
 
 /**************************************************************/
 /**************************************************************
@@ -277,6 +291,10 @@ static GP_INLINE double area2D(p_vertex v1, p_vertex v2, p_vertex v3);
 static void draw_vertex(p_vertex v);
 static GP_INLINE void draw_edge(p_edge e, p_vertex v1, p_vertex v2);
 static int in_front(long int edgenum, long int vnum1, long int vnum2, long int *firstpoly);
+#ifdef HIDDEN3D_CACHE
+static void cache_hidden_line(int x1, int y1, int x2, int y2,
+			      lp_style_type *lp, t_colorspec color);
+#endif
 
 
 /* Set the options for hidden3d. To be called from set.c, when the
@@ -353,7 +371,7 @@ void
 show_hidden3doptions()
 {
     fprintf(stderr,"\t  Hidden3d elements will be drawn in %s of non-hidden3d elements\n",
-	    hidden3d_layer == LAYER_BACK ? "back" : "front");
+	    hidden3d_layer == LAYER_FRONT ? "front" : "back");
     fprintf(stderr,"\
 \t  Back side of surfaces has linestyle offset of %d\n\
 \t  Bit-Mask of Lines to draw in each triangle is %ld\n\
@@ -433,6 +451,7 @@ reset_hidden_line_removal()
     edges.end = 0;
     polygons.end = 0;
     qtree.end = 0;
+    cached_hidden_lines = 0;
 }
 
 
@@ -445,6 +464,12 @@ term_hidden_line_removal()
     free_dynarray(&edges);
     free_dynarray(&vertices);
     free_dynarray(&qtree);
+#ifdef HIDDEN3D_CACHE
+    free(hidden3d_cache);
+    hidden3d_cache = NULL;
+    hidden3d_cache_size = 0;
+    cached_hidden_lines = 0;
+#endif
 }
 
 
@@ -1759,7 +1784,28 @@ draw_edge(p_edge e, p_vertex v1, p_vertex v2)
 	}
     }
 
+#ifdef HIDDEN3D_CACHE
+    /* In pm3d depthorder mode the pm3d surface would occlude
+     * both hidden3d_layer "back" or "front".  So in this case
+     * we cache the line segments to draw even later than "front".
+     * v2 NULL means this is a point; ignore it for now.
+     */
+    if ((hidden3d_layer == LAYER_DEPTHORDER) && (v2 != NULL)) {
+	double x1, y1, x2, y2;
+
+	TERMCOORD_DOUBLE(v1, x1, y1);
+	TERMCOORD_DOUBLE(v2, x2, y2);
+	if (color.type == TC_Z)
+	    color.value = (v1->real_z + v2->real_z) / 2.;
+
+	cache_hidden_line( x1, y1, x2, y2, e->lp, color );
+	return;
+    }
+#endif
+
+    /* This is the normal case (no strange interaction with pm3d */
     draw3d_line_unconditional(v1, v2, &lptemp, color);
+
     if ((e->lp->flags & LP_SHOW_POINTS)) {
 	draw_vertex(v1);
 	draw_vertex(v2);
@@ -2266,3 +2312,37 @@ reset_hidden3doptions()
     hidden3d_layer = LAYER_BACK;
 }
 
+#ifdef HIDDEN3D_CACHE
+static void
+cache_hidden_line( int x1, int y1, int x2, int y2,
+		   lp_style_type *lp, t_colorspec color )
+{
+    if (hidden3d_cache_size <= cached_hidden_lines) {
+	hidden3d_cache_size += 2500;
+	hidden3d_cache = gp_realloc( hidden3d_cache,
+				    hidden3d_cache_size * sizeof(t_cached_line),
+				    "hidden3d line cache" );
+    }
+    hidden3d_cache[cached_hidden_lines].x1 = x1;
+    hidden3d_cache[cached_hidden_lines].y1 = y1;
+    hidden3d_cache[cached_hidden_lines].x2 = x2;
+    hidden3d_cache[cached_hidden_lines].y2 = y2;
+    hidden3d_cache[cached_hidden_lines].lp = lp;
+    hidden3d_cache[cached_hidden_lines].color = color;
+    cached_hidden_lines++;
+}
+
+void
+flush_hidden3d_cache()
+{
+    for (int i = 0; i < cached_hidden_lines; i++) {
+	t_cached_line *seg = &hidden3d_cache[i];
+	if (seg->color.type != TC_DEFAULT) {
+	    lp_style_type lp = *(seg->lp);
+	    lp.pm3d_color = seg->color;
+	    term_apply_lp_properties(&lp);
+	}
+	draw_clip_line(seg->x1, seg->y1, seg->x2, seg->y2);
+    }
+}
+#endif
