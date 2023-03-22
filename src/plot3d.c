@@ -1186,9 +1186,10 @@ get_3ddata(struct surface_points *this_plot)
 		track_pm3d_quadrangles = TRUE;
 
 	    } else if (this_plot->plot_style == BOXES) {
+
 		/* Pop last using value to use as variable color */
-		if (this_plot->fill_properties.border_color.type == TC_RGB
-		&&  this_plot->fill_properties.border_color.value < 0) {
+		if (this_plot->lp_properties.pm3d_color.type == TC_RGB
+		&&  this_plot->lp_properties.pm3d_color.value < 0) {
 		    color_from_column(TRUE);
 		    color = v[--j];
 
@@ -1321,14 +1322,6 @@ get_3ddata(struct surface_points *this_plot)
 				this_plot->noautoscale, {});
 			STORE_AND_UPDATE_RANGE(dummy, y + boxdepth, cp->type, y_axis,
 				this_plot->noautoscale, {});
-		    }
-		    /* We converted linetype colors (lc variable) to RGB colors on input.
-		     * Most plot styles do not do this.
-		     * When we later call check3d_for_variable_color it needs to know this.
-		     */
-		    if (this_plot->lp_properties.l_type == LT_COLORFROMCOLUMN) {
-			this_plot->lp_properties.pm3d_color.type = TC_RGB;
-			this_plot->lp_properties.pm3d_color.value = -1.0;
 		    }
 		}
 
@@ -2142,7 +2135,6 @@ eval_3dplots()
 			this_plot->fill_properties.fillstyle = default_fillstyle.fillstyle;
 			this_plot->fill_properties.filldensity = default_fillstyle.filldensity;
 			this_plot->fill_properties.fillpattern = 1;
-			this_plot->fill_properties.border_color = this_plot->lp_properties.pm3d_color;
 			parse_fillstyle(&this_plot->fill_properties);
 			set_fillstyle = TRUE;
 		    }
@@ -2236,16 +2228,21 @@ eval_3dplots()
 		}
 	    }
 
-	    /* If this plot style uses a fillstyle and we saw an explicit */
-	    /* fill color, save it in lp_properties now.                  */
-	    if ((this_plot->plot_style & PLOT_STYLE_HAS_FILL) && set_fillcolor)
-		this_plot->fill_properties.border_color = fillcolor;
-
-	    /* No fillcolor given; use the line color for fill also */
-	    if (((this_plot->plot_style & PLOT_STYLE_HAS_FILL) && !set_fillstyle)
-	    &&  !(this_plot->plot_style == PM3DSURFACE))
-		this_plot->fill_properties.border_color
-		    = this_plot->lp_properties.pm3d_color;
+	    /* If this plot style uses a fillstyle and we saw an explicit
+	     * fill color, save it in lp_properties now.
+	     * FIXME: make other plot styles work like BOXES.
+	     *        ZERRORFILL is weird.
+	     */
+	    if ((this_plot->plot_style & PLOT_STYLE_HAS_FILL) && set_fillcolor) {
+		if (this_plot->plot_style == ZERRORFILL) {
+		    this_plot->fill_properties.border_color = this_plot->lp_properties.pm3d_color;
+		    this_plot->lp_properties.pm3d_color = fillcolor;
+		} else if (this_plot->plot_style == BOXES) {
+		    this_plot->lp_properties.pm3d_color = fillcolor;
+		} else {
+		    this_plot->fill_properties.border_color = fillcolor;
+		}
+	    }
 
 	    /* Some low-level routines expect to find the pointflag attribute */
 	    /* in lp_properties (they don't have access to the full header).  */

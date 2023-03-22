@@ -1246,10 +1246,10 @@ do_3dplot(
 		break;
 
 	    case ZERRORFILL:
-		/* Always draw filled areas even if we _also_ do hidden3d processing */
 		if (term->filled_polygon)
 		    plot3d_zerrorfill(this_plot);
 		term_apply_lp_properties(&(this_plot->lp_properties));
+		apply_pm3dcolor(&this_plot->fill_properties.border_color);
 		plot3d_lines(this_plot);
 		break;
 
@@ -1402,9 +1402,11 @@ do_3dplot(
 		break;
 
 	    case ZERRORFILL:
-		apply_pm3dcolor(&this_plot->fill_properties.border_color);
+		/* zerrorfill colors are weird (as in "backwards") */
+		apply_pm3dcolor(&this_plot->lp_properties.pm3d_color);
 		key_sample_fill(xl, yl, this_plot);
 		term_apply_lp_properties(&this_plot->lp_properties);
+		apply_pm3dcolor(&this_plot->fill_properties.border_color);
 		key_sample_line(xl, yl);
 		break;
 
@@ -3984,6 +3986,7 @@ plot3d_zerrorfill(struct surface_points *plot)
  * changes this to draw real boxes (4 sides + top).
  * The boxes are drawn as pm3d rectangles. This means that depth-cueing
  * must be done with "set pm3d depth base" rather than with "set hidden3d".
+ * However the fill style can be set per-plot or taken from "set style fill".
  */
 static void
 plot3d_boxes(struct surface_points *plot)
@@ -3992,7 +3995,6 @@ plot3d_boxes(struct surface_points *plot)
     double dxl, dxh;		/* rectangle extent along X axis */
     double dyl, dyh;		/* rectangle extent along Y axis */
     double zbase, dz;		/* box base and height */
-    fill_style_type save_fillstyle;
 
     struct iso_curve *icrvs = plot->iso_crvs;
     gpdPoint corner[4];
@@ -4002,10 +4004,6 @@ plot3d_boxes(struct surface_points *plot)
      */
     if (pm3d_shade.strength > 0)
 	pm3d_init_lighting_model();
-
-    /* FIXME: fillstyle and border color always come from "set style fill" */
-    pm3d.border = plot->lp_properties;
-    pm3d.border.pm3d_color = default_fillstyle.border_color;
 
     while (icrvs) {
 	struct coordinate *points = icrvs->points;
@@ -4099,11 +4097,6 @@ plot3d_boxes(struct surface_points *plot)
 	icrvs = icrvs->next;
     }
 
-    /* FIXME The only way to get the pm3d flush code to see our fill */
-    /* style is to temporarily copy it to the global fillstyle.      */
-    save_fillstyle = default_fillstyle;
-    default_fillstyle = plot->fill_properties;
-
     /* By default we write out each set of boxes as it is seen.  */
     /* The other option is to let them accummulate and then sort */
     /* them together with all other pm3d elements to draw later. */
@@ -4112,9 +4105,6 @@ plot3d_boxes(struct surface_points *plot)
 	pm3d_depth_queue_flush();
 	pm3d.base_sort = FALSE;
     }
-
-    /* Restore global fillstyle */
-    default_fillstyle = save_fillstyle;
 }
 
 /*

@@ -105,9 +105,9 @@ splot 'dodecahedron.dat' using 1:2:3:($0+100) with polygons lc variable
 
 pause -1 "Hit return to continue"
 
-set title "splot dodecahedron with polygons lc rgb variable"
+set title "splot dodecahedron with polygons fc rgb variable"
 
-splot 'dodecahedron.dat' using 1:2:3:(0xffffff * rand(0)) with polygons lc rgb variable
+splot 'dodecahedron.dat' using 1:2:3:(0xffffff * rand(0)) with polygons fc rgb variable
 
 pause -1 "Hit return to continue"
 

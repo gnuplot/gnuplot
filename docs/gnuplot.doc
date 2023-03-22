@@ -4696,7 +4696,7 @@ Ffigure_boxerrorbars
  coordinate that extends from the plane at z=0 to the given z coordinate.
  The width of the box on x can be provided in a separate input column or via
  `set boxwidth`.  The depth of the box on y is controlled by `set boxdepth`.
- Boxes do not automatically expand to touch each other as in 2D plots.
+ Boxes do not automatically expand to touch each other.
 3 2D boxes
 ?style boxes 2D
 ?boxes 2D
@@ -4772,8 +4772,8 @@ Ffigure_3Dboxes
 
  3D boxes are processed as pm3d quadrangles rather than as surfaces. Because of
  this the front/back order of drawing is not affected by `set hidden3d`.
- Similarly if you want each box face to have a border you must use
- `set pm3d border` rather than `set style fill border`.  See `set pm3d`.
+ See `set pm3d`.  In gnuplot version 6 the edges of the box are colored by
+ the border color of the plot's fill style; this is a change from version 5.
  For best results use a combination of `set pm3d depthorder base` and
  `set pm3d lighting`.
 
