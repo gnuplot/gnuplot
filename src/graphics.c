@@ -994,7 +994,8 @@ do_plot(struct curve_points *plots, int pcount)
 		break;
 
 	    case PM3DSURFACE:
-		int_warn(NO_CARET, "Can't use pm3d or surface for 2d plots");
+	    case CONTOURFILL:
+		int_error(NO_CARET, "This style only available for 'splot'");
 		break;
 
 	    case LABELPOINTS:

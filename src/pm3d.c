@@ -1369,6 +1369,8 @@ set_plot_with_palette(int plot_num, int plot_mode)
 	/* Any surface 'with pm3d', 'with image' or 'with line|dot palette'? */
 	while (surface++ < plot_num) {
 	    int type;
+	    if (this_3dplot->plot_style == CONTOURFILL)
+		return;
 	    if (this_3dplot->plot_style == PM3DSURFACE)
 		return;
 	    if (this_3dplot->plot_style == IMAGE)

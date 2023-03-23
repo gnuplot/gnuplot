@@ -3509,6 +3509,7 @@ df_bin_default_columns default_style_cols[] = {
     {XYERRORLINES, 3, 1},
     {FILLEDCURVES, 1, 1},
     {PM3DSURFACE, 1, 2},
+    {CONTOURFILL, 1, 2},
     {LABELPOINTS, 1, 1},
     {HISTOGRAMS, 1, 0},
     {IMAGE, 1, 2},

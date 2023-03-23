@@ -1018,7 +1018,8 @@ get_3ddata(struct surface_points *this_plot)
 		}
 
 		if (j == 2) {
-		    if (PM3DSURFACE != this_plot->plot_style)
+		    if (this_plot->plot_style != PM3DSURFACE
+		    &&  this_plot->plot_style != CONTOURFILL)
 			int_error(this_plot->token,
 				  "2 columns only possible with explicit pm3d style (line %d)",
 				  df_line_number);
@@ -2059,7 +2060,6 @@ eval_3dplots()
 			set_lpstyle = TRUE;
 			continue;
 		    }
-
 		}
 
 		if (this_plot->plot_style != LABELPOINTS) {
@@ -2265,8 +2265,13 @@ eval_3dplots()
 		this_plot->labels->font = NULL;
 	    }
 
+	    /* Do not try to handle contours two different ways in the same plot */
+	    if (this_plot->plot_style == CONTOURFILL)
+		this_plot->opt_out_of_contours = TRUE;
+
 	    if (crnt_param == 0
 		&& this_plot->plot_style != PM3DSURFACE
+		&& this_plot->plot_style != CONTOURFILL
 		/* don't increment the default line/point properties if
 		 * this_plot is an EXPLICIT pm3d surface plot */
 		&& this_plot->plot_style != IMAGE

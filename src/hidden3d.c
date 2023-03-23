@@ -1066,7 +1066,8 @@ build_networks(struct surface_points *plots, int pcount)
 	 * plot styles are mapped to others, that are genuinely
 	 * available in 3d. */
 	switch (this_plot->plot_style) {
-	case PM3DSURFACE:
+	case PM3DSURFACE:	
+	case CONTOURFILL:
 	case LINESPOINTS:
 	case STEPS:
 	case FSTEPS:
@@ -1171,7 +1172,8 @@ build_networks(struct surface_points *plots, int pcount)
 	/* edges can be used to calculate occlusion of lines, including */
 	/* the plot borders. (NB: the PM3D surface will _not_ be hidden */
 	/* by other non-PM3D surfaces.					*/
-	if (this_plot->plot_style == PM3DSURFACE)
+	if (this_plot->plot_style == PM3DSURFACE
+	||  this_plot->plot_style == CONTOURFILL)
 	    above = below = LT_NODRAW;
 
 	/* calculate the point symbol type: */
@@ -1248,6 +1250,7 @@ build_networks(struct surface_points *plots, int pcount)
 
 		    switch (this_plot->plot_style) {
 		    case PM3DSURFACE:
+		    case CONTOURFILL:
 		    case LINESPOINTS:
 		    case STEPS:
 		    case FSTEPS:
@@ -1341,6 +1344,7 @@ build_networks(struct surface_points *plots, int pcount)
 
 		switch (this_plot->plot_style) {
 		case PM3DSURFACE:
+		case CONTOURFILL:
 		case LINESPOINTS:
 		case STEPS:
 		case FSTEPS:

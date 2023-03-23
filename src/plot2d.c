@@ -1370,6 +1370,7 @@ get_data(struct curve_points *current_plot)
 
 	/* These exist for 3D (splot) but not for 2D (plot) */
 	case PM3DSURFACE:
+	case CONTOURFILL:
 	case ZERRORFILL:
 	case ISOSURFACE:
 	    int_error(NO_CARET, "This plot style only available for splot");

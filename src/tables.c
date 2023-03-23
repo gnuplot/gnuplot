@@ -761,6 +761,7 @@ const struct gen_table plotstyle_tbl[] =
     { "table", TABLESTYLE },
     { "zerror$fill", ZERRORFILL },
     { "mask", POLYGONMASK },
+    { "contourfill", CONTOURFILL },
     { NULL, PLOT_STYLE_NONE }
 };
 

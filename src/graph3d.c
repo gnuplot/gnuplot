@@ -1260,6 +1260,10 @@ do_3dplot(
 		    plot3d_impulses(this_plot);
 		break;
 
+	    case CONTOURFILL:
+		int_error(NO_CARET, "contourfill yet to be implemented");
+		break;
+
 	    case PM3DSURFACE:
 		if (draw_this_surface) {
 		    if (can_pm3d && pm3d.implicit != PM3D_IMPLICIT) {
