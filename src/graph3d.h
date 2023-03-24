@@ -113,7 +113,8 @@ typedef struct surface_points {
     struct iso_curve *iso_crvs;	/* the actual data */
     char pm3d_where[8];		/* explicitly given base, top, surface */
 
-    struct zslice *zclip;	/* pm3d surface z-clipping (contour fill) */
+    struct zslice *zclip;	/* pm3d surface z-clipping array (contour fill) */
+    int zclip_index;		/* index into zclip[] */
 
 } surface_points;
 
