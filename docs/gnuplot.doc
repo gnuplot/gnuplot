@@ -295,6 +295,11 @@ C
 ## because the peak lies between two x-coordinates at which the function has
 ## been sampled.  It adds a new sample point at the location of each such peak.
 ## See `filters`.
+#b 3D plot style `with pm3d` accepts an optional modifier `zclip [zmin:zmax]`
+## that selects only a slice of the full surface.  Successive plots with
+## incremental changes to the clipping limits can be used to animate a
+## cross sectional cutaway view in 3D or to create a filled area contour map
+## in 2D projection.
 #end
 D polargrid 4
 DB
@@ -14601,15 +14606,52 @@ D viridis 1
 
  See also help for `set palette`, `set cbrange`, `set colorbox`,
  and the demo file `demo/pm3d.dem`.
-4 implicit
-?pm3d implicit
+
+4 with pm3d (pm3d explicit)
 ?pm3d explicit
 ?with pm3d
 ?splot with pm3d
- A pm3d color surface is drawn if the splot command specifies `with pm3d`,
- if the data or function `style` is set to pm3d globally, or if the pm3d mode is
- `set pm3d implicit`.  In the latter two cases, the pm3d surface is draw in
- addition to the mesh produced by the style specified in the plot command. E.g.
+?plotting styles pm3d
+?splot with pm3d zclip
+?pm3d zclip
+?zclip
+
+ Syntax
+      splot DATA using (x):(y):(z){:(color)} with pm3d
+                 {fs|fillstyle <fillstyle>} {fc|fillcolor <colorspec>}
+                 {zclip [zmin:zmax]}
+
+ The rendering properties of all pm3d surfaces are controlled using
+ `set pm3d`.  By default the full surface is rendered as a grid of
+ quadrangles, each colored by the palette color mapped to that z coordinate.
+ If you provide a fourth input column, the palette mapping uses that value
+ rather than z.  See `pm3d fillcolor`, `pm3d color_assignment`.
+
+ When you explicitly use `with pm3d` in the plot command rather than using
+ another plot style while `set pm3 implicit` is active, additional rendering
+ options are possible.  This allows you to use separate coloring schemes for
+ different surfaces in the same plot.
+ 
+ EXPERIMENTAL: This gnuplot version introduces an option `zclip` that
+ clips the generated surface smoothly at a pair of limiting z values.
+ The example below animates gradual removal of the top portion of a
+ two-color 3D surface.
+      set style line 101 lc "gray"
+      set style line 102 lc "blue"
+      set pm3d depthorder
+      do for [i=0:N] {
+          splot f(x,y) with pm3d fillcolor ls 101 zclip [* : zmax-(i*delta)] 
+          pause 0.2  # 1/5 second between animation frames
+      }
+
+4 pm3d implicit
+?pm3d implicit
+
+ A pm3d color surface is drawn if the splot command explicitly specifies
+ `with pm3d`, if the data or function `style` is set to pm3d globally,
+ or if the pm3d mode is `set pm3d implicit`.  For the latter two cases
+ the pm3d surface is draw in addition to the mesh produced by the style
+ specified in the plot command. E.g.
        splot 'fred.dat' with lines, 'lola.dat' with lines
  would draw both a mesh of lines and a pm3d surface for each data set.
  If the option `explicit` is on (or `implicit` is off) only plots specified
