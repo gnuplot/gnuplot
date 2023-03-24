@@ -385,6 +385,8 @@ process_line(char *line, FILE *b, FILE *c, FILE *d)
 	    else
 		break;
 	}
+    case 'D':			/* link to online demo figure */
+	    break;
     case 'F':			/* latex embedded figure */
             if (para) fprintf(b, "</p><p align=\"justify\">\n");
             fprintf(b, "<img src=\"%s.png\" alt=\"%s\">\n", line2+1, line2+1);

@@ -296,6 +296,12 @@ C
 ## been sampled.  It adds a new sample point at the location of each such peak.
 ## See `filters`.
 #end
+D polargrid 4
+DB
+D windrose 1
+D sectors 4
+DB
+D sharpen 1
 
 3 Hulls, masks, and smoothing
 ?new hulls
@@ -320,6 +326,9 @@ C
 #b Smoothing options apply to plotting `with filledcurves` {above|below|between}.
 #b New keyword `period` for smoothing periodic data. See `smooth kdensity`.
 #end
+D convex_hull 2
+D mask_pm3d 3
+D smooth_path 2
 
 3 Named palettes
 ?new colormaps
@@ -336,6 +345,8 @@ C
 #b Palettes read from a file or datablock (`set palette file`) may be specified
 ## either using fractional color components or 24-bit packed RGB values.
 #end
+D named_palettes 4
+D viridis 1
 
 3 New data formats
 ?new data_formats
@@ -431,6 +442,7 @@ C
 #b New function `weekdate_cdc(year, week, day)` converts CDC standard week date
 ## to calendar time.
 #end
+D epi_data 1
 
 3 Other new features
 ?new features
@@ -448,6 +460,8 @@ C
 #b Improved rendering of intersecting pm3d surfaces - overlapping surface tiles
 ## are split into two pieces along the line of intersection so that tiles
 ## from one surface do not incorrectly protrude though the other surface.
+#b User-controlled spotlight added to the pm3d lighting model.
+## See `set pm3d spotlight`.
 #b New options to force total key width and number of columns. See `key layout`.
 #b `set pm3d border retrace` draws a border around each pm3d quadrangle in the
 ## same color as the filled area.  In principle this should have no visible
@@ -5486,6 +5500,7 @@ Ffigure_newhist
 ^ <a href="http://www.gnuplot.info/demo/histogram_colors.html">
  histogram_colors.dem
 ^ </a>
+D histogram_colors 1
 
 2 image
 ?plotting styles image
@@ -8429,6 +8444,7 @@ Ffigure_concave_hull_2
  truncated to apparent minimal y values between 0.02 and 0.20. 
  Adding the "sharpen" keyword produces instead a correct representation of
  the function with periodic sharp minima that reach y=0.
+D sharpen 1
 
 5 zsort
 ?commands plot datafile filters zsort
@@ -10775,6 +10791,8 @@ Ffigure_smooth_path
 ^ <a href="http://www.gnuplot.info/demo/discrete.html">
  contours with user defined levels demo (discrete.dem).
 ^ </a>
+D contours 5
+D discrete 3
 3 color box
 ?commands set colorbox
 ?commands show colorbox
@@ -10942,6 +10960,7 @@ Ffigure_colornames
       set linetype 5 dt 5        # always use this dash pattern with linetype 5
       set dashtype 66 "..-"      # define a new dashtype using a string
  See also `dashtype`.
+D dashtypes 2
 3 datafile
 ?set datafile
 ?show datafile
@@ -11300,6 +11319,9 @@ Ffigure_dgrid3d
 ^ <a href="http://www.gnuplot.info/demo/heatmap_points.html">
  heatmap_points
 ^ </a>
+D heatmap_points 1
+D heatmap_points 2
+D heatmap_points 3
 
 3 dummy
 ?commands set dummy
@@ -12154,6 +12176,7 @@ Ffigure_dgrid3d
  normally, making the resulting display hard to understand.  Therefore, the
  default option of `bentover` will turn it visible in this case.  If you don't
  want that, you may choose `nobentover` instead.
+D hidden 6
  See also
 ^ <a href="http://www.gnuplot.info/demo/hidden.html">
  hidden line removal demo (hidden.dem)
@@ -14259,6 +14282,7 @@ Ffigure_palette2
  brightness (luminance).  The colormap version used in gnuplot is based on
        "Viridis - Colorblind-Friendly Color Maps for R", Garnier et al (2021)
        https://CRAN.R-project.org/package=viridis
+D viridis 1
 4 colormap
 ?commands set palette colormap
 ?palette colormap
@@ -14682,6 +14706,7 @@ Ffigure_palette2
  Example:
       set pm3d lighting primary 0.8 spec 0.4 spec2 0.4
       set pm3d spot rgb "blue"
+D spotlight 1
 4 position
 ?pm3d position
 ?set pm3d position
@@ -16366,6 +16391,7 @@ Ffigure_polar_grid
       set ttics -180, 30, 180
       set ttics add ("Theta = 0" 0)
       set ttics font ":Italic" rotate
+D ttics 3
 3 urange
 ?commands set urange
 ?commands show urange
@@ -18465,6 +18491,7 @@ Ffigure_sparsematrix
  It also plots the apparent net intensity as calculated using NTSC coefficients
  to map RGB onto a grayscale.  The command also loads the profile values into a
  datablock named $PALETTE.
+D viridis 1
 2 toggle
 ?commands toggle
 ?toggle

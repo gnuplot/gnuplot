@@ -189,6 +189,9 @@ process_line( char *line, FILE *b)
 	    }
 	    break;
 
+    case 'D':			/* link to demo figure */
+	    break;		/* ignore */
+
     case '@':{			/* start/end table */
 	    if (intable) {
 		(void) fputs("\\hline\n\\end{tabular}\n", b);

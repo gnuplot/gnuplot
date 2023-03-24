@@ -169,6 +169,18 @@ unset raxis
 unset tics
 unset key
 
+plot $data2 using 4:(4):5:(3):($0+1) with sectors lc variable lw 3 fill solid border lc bgnd, \
+     $data2 using ($4+$5/2):(8+0.7*$3):(sprintf("%.1f",$2)) with labels
+
+pause -1 "<cr> to continue"
+
+set title "Pie (donut) chart some slices have radial shift"
+plot $data2 using 4:(4+0.7*$3):5:(3):($0+1) with sectors lc variable lw 3 fill solid border lc bgnd, \
+     $data2 using ($4+$5/2):(8+0.7*$3):(sprintf("%.1f",$2)) with labels
+
+pause -1 "<cr> to continue"
+
+set title "Pie (donut) chart some slices have offset origin"
 plot $data2 using 4:(4):5:(3):($4+$5/2):(0.7*$3):($0+1) with sectors lc variable lw 3 fill solid border lc bgnd, \
      $data2 using ($4+$5/2):(8+0.7*$3):(sprintf("%.1f",$2)) with labels
 
@@ -280,13 +292,13 @@ plot sample [t=0:360:da] \
 pause -1 "<cr> to continue"
 
 #########################################################
-# Fig.10 Windrose (histgram on polar axis)
+# Fig.10 Wind rose (histgram on polar axis)
 #########################################################
 #
 
 reset
 
-set title "Windrose (polar coordinate histogram using sectors)"
+set title "Wind rose (polar coordinate histogram using sectors)"
 
 $data <<EOD
 # DIRECTION INDEX COUNT

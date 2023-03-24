@@ -1,4 +1,4 @@
-Latitude	Longitude	Continent	Source	Color_index	Angle_start_at	Angle	Value	Continent_total
+#Latitude	Longitude	Continent	Source	Color_index	Angle_start_at	Angle	Value	Continent_total
 55.0	85.0	"ASIA (EXCL. MIDDLE EAST)"	Coal	0	215.410	144.590	947639	2362223
 55.0	85.0	"ASIA (EXCL. MIDDLE EAST)"	Oil	1	154.375	61.034	400017	2362223
 55.0	85.0	"ASIA (EXCL. MIDDLE EAST)"	Gas	2	112.828	41.544	272284	2362223

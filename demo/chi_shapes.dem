@@ -1,0 +1,45 @@
+#
+# Illustrate effect of chi_length on construction of concave hull
+#
+# Appropriate choice of `chi_length` depends strongly on the density and
+# distribution of the input data points.
+# Too-large values of chi_length will yield the convex hull.
+# Too-small values of chi_length will make the chi-shape very 'spikey'.
+# If no value for `chi_length` has set, gnuplot will choose one automatically
+# but there is no guarantee that this value is suitable for your data.
+# For the data used here gnuplot would choose chi_length=22.6 by default,
+# which is 0.6 of the length of the longest edge in the convex hull.
+#
+if (!strstrt(GPVAL_COMPILE_OPTIONS, "+CHI_SHAPES")) {
+    print "Your copy of gnuplot was not built with support for chi shapes"
+} else {
+    unset key
+    unset tics; unset border
+    set offsets graph 0, 0, graph 0.1, graph 0.1
+    set style line 2 lc "forest-green" pt 7 ps 0.5
+    set style fill transparent solid 0.1 noborder
+    set xrange [-30:30]
+    set yrange [-30:30]
+
+    set title noenhanced offset 0, -2.0
+
+    set multiplot layout 2,2 spacing 0 margins 0, 1, 0, 0.9 \
+	title "concave hull smooth path expand 3.0    " font ":Bold"
+    chi_length = real("+Inf")
+    set title "chi_length = +Inf  (convex hull)"
+    plot 'hull.dat' index 0 with points ls 2 notitle, \
+	 '' index 0 concavehull with polygons fs empty border lc "black", \
+	 '' index 0 concavehull smooth path expand 3.00 with filledcurve ls 2 \
+		    title sprintf("chi_length = %.1f", GPVAL_CHI_LENGTH)
+    chi_length = 25.; set title sprintf("chi_length = %.1f", chi_length)
+    replot
+    chi_length = 20.; set title sprintf("chi_length = %.1f", chi_length)
+    replot
+    chi_length = 16.; set title sprintf("chi_length = %.1f", chi_length)
+    replot
+    unset multiplot
+}
+
+pause -1 "Hit return to continue"
+
+reset

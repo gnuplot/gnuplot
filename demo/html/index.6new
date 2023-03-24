@@ -1,28 +1,16 @@
-<!DOCTYPE HTML>
-<html>
-<head><title>Demos for gnuplot Version 6.1 (SVG terminal)</title>
-<link type="text/css" href="gnuplot_demo.css" rel="stylesheet">
-<meta charset="UTF-8">
-</head>
+<html><head><title>Demos for gnuplot version 6.1</title>
 
-<body>
+<link text="text/css" href="gnuplot_demo.css" rel="stylesheet"></head><body>
 
-<h2 align=center>
-    Gnuplot Version 6.1 demos (SVG terminal)<br>
-    See also the demo output for the 
-       <a href="../demo_6.1/">PNG</a> and
-       <a href="../demo_canvas_6.1/">canvas</a> terminals.
+
+<h2 align=center>Demos for gnuplot version 6.1 (pngcairo terminal)<br>
+    See also the demo output for the
+    <a href="../demo_svg_6.1/">SVG</a> and
+    <a href="../demo_canvas_6.1/">canvas</a> terminals.
 </h2>
+<p>٭ new in version 6</p>
 
-<p>
-Here are samples of SVG output from demos included with the gnuplot
-distribution.
-Note that individual plots can be toggled on/off by clicking on
-the corresponding key entry.  Clicking in the plot area should turn
-on mouse-coordinate tracking.
-</p>
-
-<table width="100%">
+<table border="0" width="100%">
 <tbody><tr valign="top">
 
 <td rowspan=2>
@@ -42,42 +30,43 @@ on mouse-coordinate tracking.
     <li><a href="piecewise.html">piecewise&nbsp;functions</a></li>
     <li><a href="vector.html">vector fields</a></li>
     <li><a href="circles.html">circles</a></li>
-    <li><a href="boxplot.html">boxplot</a></li>
+    <li><a href="boxplot.html">boxplots</a></li>
     <li><a href="rugplot.html">rug plot</a></li>
-    <li><a href="sectors.html">sectors</a></li>
+    <li>٭<a href="sectors.html">sectors</a></li>
     <li><a href="jitter.html">jitter (bee&nbsp;swarm)</a></li>
     <li><a href="spiderplot.html">spider plot</a></li>
+    <li><a href="cities.html">text</a></li>
     </ul>
 
-    <h4>Math functions</h4>
+    <h4>Probability and Statistics</h4>
     <ul>
-    <li><a href="approximate.html">approximation</a></li>
-    <li><font color=gray>complex trig functions</font></li>
-    <li><a href="cerf.html">complex error function</a></li>
     <li><a href="prob2.html">probability</a></li>
     <li><a href="prob.html">probability (more)</a></li>
     <li><a href="random.html">random numbers</a></li>
     <li><a href="bivariat.html">recursion, etc...</a></li>
     <li><a href="stats.html">data statistics</a></li>
+    <li><a href="approximate.html">approximation</a></li>
     </ul>
 
     <h4>Curve fitting</h4>
     <ul>
     <li><a href="smooth_splines.html">cubic and Bezier splines</a></li>
     <li><a href="monotonic_spline.html">monotonic csplines</a></li>
-    <li><a href="smooth_path.html">along-path splines</a></li>
-    <li><a href="sharpen.html">"sharpen" filter</a></li>
+    <li>٭<a href="smooth_path.html">along-path splines</a></li>
+    <li>٭<a href="sharpen.html">"sharpen" filter</a></li>
     <li><a href="spline.html">explicit B-splines</a></li>
     <li><a href="airfoil.html">explicit Bezier splines</a></li>
+    <li><a href="fit.html">Levenberg-Marquardt</a></li>
     </ul>
 
     <h4>Colors</h4>
     <ul>
     <li><a href="varcolor.html">data-dependent coloring</a></li>
     <li><a href="rgb_variable.html">RGB coloring</a></li>
-    <li><a href="rgba_lines.html">RGB + Alpha</a></li>
+    <li><a href="rgba_lines.html">RGB + alpha channel</a></li>
+    <li>٭<a href="named_palettes.html">named palettes</a></li>
     <li><a href="pm3dcolors.html">pm3d colors</a></li>
-    <li><a href="named_palettes.html">named palettes</a></li>
+    <li><a href="pm3dgamma.html">pm3d gamma</a></li>
     </ul>
 
     <h4>Line and Fill Styles</h4>
@@ -102,7 +91,7 @@ on mouse-coordinate tracking.
     <li><a href="hidden.html">hidden surfaces</a></li>
     <li><a href="pm3d.html">pm3d coloring</a></li>
     <li><a href="hidden2.html">pm3d hidden surfaces</a></li>
-    <li><a href="pm3d_clip.html">pm3d clipping</a></li>
+    <li>٭<a href="pm3d_clip.html">pm3d clipping</a></li>
     <li><a href="projection.html">2D projection of 3D surface</a></li>
     <li><a href="zerror.html">shaded error region</a></li>
     <li><a href="azimuth.html">azimuth</a></li>
@@ -110,7 +99,8 @@ on mouse-coordinate tracking.
     <li><a href="armillary.html">circle and polygon 3D objects</a></li>
     <li><a href="polygons.html">pm3d polygons</a></li>
     <li><a href="pm3d_lighting.html">lighting model</a></li>
-    <li><a href="hidden_compare.html">hidden3d v. pm3d</a></li>
+    <li>٭<a href="spotlight.html">configurable spotlight</a></li>
+    <li><a href="hidden_compare.html">hidden3d vs. pm3d</a></li>
     </ul>
 
     <h4>Volume plots</h4>
@@ -120,11 +110,16 @@ on mouse-coordinate tracking.
     <li><a href="isosurface.html">3D isosurface</a></li>
     </ul>
 
-    <h4 align=left>Hulls and Masks (new!)</h4>
+    <h4 align=left>Animation</h4>
     <ul align=left>
-    <li><a href="convex_hull.html">convex hulls</a></li>
-    <li><a href="mask_pm3d.html">masked pm3d surface</a></li>
-    <li><a href="chi_shapes.html">concave hulls (χ-shapes)</a></li>
+    <li>٭<a href="animation.html">Embedded webp animation</a></li>
+    </ul>
+
+    <h4 align=left>Hulls and Masks</h4>
+    <ul align=left>
+    <li>٭<a href="convex_hull.html">convex hulls</a></li>
+    <li>٭<a href="mask_pm3d.html">masked pm3d surface</a></li>
+    <li>٭<a href="chi_shapes.html">concave hulls (χ-shapes)</a></li>
     </ul>
 
     <h4>Coordinate and<br> axis transforms</h4>
@@ -145,11 +140,14 @@ on mouse-coordinate tracking.
     <h4>Binary and Image data </h4>
     <ul>
     <li><a href="binary.html">binary data</a></li>
+    <li><a href="image.html">image data</a></li>
+    <li><a href="image2.html">binary and image tricks</a></li>
     <li><a href="argb_hexdata.html">RGB + alpha channel</a></li>
-    <li><a href="barchart_art.html">rescaled images</a></li>
+    <li><a href="barchart_art.html">bar chart art</a></li>
     <li><a href="imageNaN.html">missing/NaN values</a></li>
     <li><a href="pixmap.html">pixmap gradients and icons</a></li>
     </ul>
+
 </td>
 
 <td rowspan=2>
@@ -158,13 +156,13 @@ on mouse-coordinate tracking.
     <li><a href="heatmaps.html">Derived from a regular grid</a></li>
     <li><a href="heatmap_points.html">Derived from scattered points</a></li>
     <li><a href="heatmap_4D.html">4D data (3D surface + value)</a></li>
-    <li><a href="polargrid.html">Polar coordinate maps</a></li>
+    <li>٭<a href="polargrid.html">Polar coordinate maps</a></li>
     </ul>
 
     <h4>Histograms</h4>
     <ul>
     <li><a href="histograms.html">clustering options</a></li>
-    <li><a href="histogram_colors.html">user-assigned colors</a></li>
+    <li>٭<a href="histogram_colors.html">user-assigned colors</a></li>
     <li><a href="histerror.html">histogram + errorbars</a></li>
     <li><a href="boxclusters.html">make-your-own with boxes</a>
     <li><a href="bins.html">automatic binning</a></li>
@@ -172,6 +170,7 @@ on mouse-coordinate tracking.
 
     <h4>Sample Applications</h4>
     <ul>
+    <li><a href="epi_data.html">Epidemiological data</a></li>
     <li><a href="controls.html">control models</a></li>
     <li><a href="discrete.html">discrete&nbsp;contours</a></li>
     <li><a href="finance.html">financial data</a></li>
@@ -187,29 +186,30 @@ on mouse-coordinate tracking.
     <li><a href="solar_path.html">solar path diagram</a></li>
     <li><a href="map_projection.html">map projections</a></li>
     <li><a href="violinplot.html">violin plot</a></li>
-    <li><a href="windrose.html">wind rose</a></li>
-    <li><a href="iris.html">overlapping categories</a></li>
+    <li>٭<a href="windrose.html">wind rose</a></li>
+    <li>٭<a href="iris.html">overlapping categories</a></li>
     </ul>
 
     <h4>Text options</h4>
     <ul>
     <li><a href="rotate_labels.html">rotated text</a></li>
-    <li><a href="enhanced_utf8.html">enhanced text</a></li>
+    <li><a href="enhanced_utf8.html">'enhanced' text</a></li>
     <li><a href="datastrings.html">string data</a></li>
-    <li><a href="stringvar.html">string variables</a></li>
-    <li><font color=gray>boxed text (no svg support)</font></li>
+    <li><a href="textbox.html">boxed text</a></li>
     <li><a href="cities.html">variable font size</a></li>
-    <li><a href="hypertext.html">hypertext</a></li>
-    <li><a href="hypertext_surface.html">hypertext on 3D surface</a></li>
+    <li><a href="stringvar.html">string variables</a></li>
+    <li><font color=gray>hypertext (no png support)</font></li>
     <li><a href="unicode.html">unicode as \U+xxxx"</li>
     </ul>
 
     <h4>Page Layout</h4>
     <ul>
+    <!-- li><a href="key.html">plot key</a></li -->
     <li><a href="layout.html">multiplot&nbsp;layout</a></li>
     <li><a href="multiplt.html">multiple plots</a></li>
     <li><a href="margins.html">aligned plots</a></li>
     <li><a href="ellipse.html">axis location</a></li>
+    <li><a href="tics.html">axis ticmarks</a></li>
     <li><a href="walls.html">walls</a></li>
     <li><a href="rectangle.html">rectangles</a></li>
     <li><a href="custom_key.html">customized key</a></li>
@@ -218,36 +218,70 @@ on mouse-coordinate tracking.
 
 </td>
 
-<td align=center valign=bot>
-	<h4></h4>
-	These plots were generated using
-	<pre><font size="-1">set term svg mouse size 600,400</font></pre>
-</td>
-</tr>
+<td rowspan=2 width=500>
+    <table>
+    <tbody>
+	<tr valign=top colspan=2>
+	    <td align=center width=500>
+		<a href="epi_data.html">
+		<img src="showcase_plot_1.png" width=500><br clear=all>
+		</a>
+	    </td>
+	</tr>
 
-<tr valign=top><td align=center>
-	<table width=500><tr><td colspan=3>
-	    	<embed src="showcase_plot.svg" type="image/svg+xml" width=500 height=350 class="float-right">
-	    </td></tr>
-	    <tr> <td width=50></td><td>
-		Left click to enable mouse tracking <br>
-		Drag with left mouse <br>
-		Zoom with mouse wheel <br>
-		Right click to reset plot <br>
-	    	Click on the figure legend text to toggle plot elements on/off 
-	    </td><td>
-		<a href="http://validator.w3.org/check?uri=referer"><img
-		src="http://www.w3.org/Icons/valid-svg11"
-		alt="Valid SVG 1.1"   /></a>
-	    </td></tr>
-	</table>
-</td></tr>
+	<tr valign=top>
+	<td width=500 style="border-style: double none none none; border-color:#006600;">
+	    <h4 align=left>Complex Functions and Special Functions</h4>
+	    <a href="BesselK.html">
+		<img src="BesselK.4.png" width="250" align=right>
+	    </a>
+	    <ul align=left>
+	    <li><a href="complex_trig.html">complex trig functions</a></li>
+	    <li>٭<a href="cerf.html">complex error function</a></li>
+	    <li>٭<a href="lnGamma.html">complex lnGamma</a></li>
+	    <li><a href="elliptic.html">elliptic integrals</a></li>
+	    <li>٭<a href="expint.html">exponential integral</a></li>
+	    <li>٭<a href="ibeta.html">Incomplete Beta integral</a></li>
+	    <li>٭<a href="igamma.html">Incomplete Gamma function P(a,z)</a></li>
+	    <li>٭<a href="uigamma.html">Incomplete Gamma function Q(a,z)</a></li>
+	    <li>٭<a href="BesselK.html">Bessel functions </a></li>
+	    <li>٭<a href="complex_airy.html">Airy functions</a></li>
+	    <li>٭<a href="Dawson.html">Dawson's integral</a></li>
+	    <li>٭<a href="Fresnel.html">Fresnel integral</a></li>
+	    <li>٭<a href="lambert.html">Lambert function</a></li>
+	    <li>٭<a href="zeta.html">Riemann zeta function</a></li>
+	    <li>٭<a href="synchrotron.html">Synchrotron function</a></li>
+	    </ul>
+	</td>
+	</tr>
+
+	<tr>
+	    <td align=center width=500 style="border-style: none none double none; border-color:#006600;">
+	    <table><tbody>
+	    <td>
+		<a href="lnGamma.html">
+		    <img src="lnGamma.1.png" width="250" align=left>
+		</a>
+	    </td>
+	    <td>
+		<a href="complex_airy.html">
+		    <img src="complex_airy.3.png" width="250" align=right>
+		</a>
+	    </td>
+	    </tbody></table>
+	    </td>
+	</tr>
+
+    </tbody>
+    </table>
+</td>
 
 </tbody></table>
+</p>
 <hr>
 
 
-<table width="100%">
+<table border="0" width="100%">
 <tbody><tr valign="top">
 
     <td>
@@ -262,7 +296,7 @@ on mouse-coordinate tracking.
 	<a href="http://gnuplot.sourceforge.net/docs_6.1/gnuplot.pdf">English</a>
 	and
 	<a href="http://gnuplot.sourceforge.net/docs_6.1/gnuplot-ja.pdf">Japanese</a>
-	</li>
+    </li>
     </ul>
     </td>
     
