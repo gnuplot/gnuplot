@@ -2266,8 +2266,3 @@ reset_hidden3doptions()
     hidden3d_layer = LAYER_BACK;
 }
 
-/* Emacs editing help for HBB:
- * Local Variables: ***
- * c-basic-offset: 4 ***
- * End: ***
- */

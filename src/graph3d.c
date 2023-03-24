@@ -481,7 +481,7 @@ boundary3d(struct surface_points *plots, int count)
 		plot_bounds.xleft += key_width;
     }
 
-    /* Make room for the colorbar to the right of the plot */
+    /* Make room for the colorbox to the right of the plot */
     if (splot_map && is_plot_with_colorbox() && rmargin.scalex != screen) {
 	if ((color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER))
 	    plot_bounds.xright -= 0.1 * (plot_bounds.xright-plot_bounds.xleft);
@@ -2065,7 +2065,7 @@ plot3d_points(struct surface_points *plot)
 	    set_rgbcolor_const( plot->lp_properties.pm3d_color.lt );
 
 	for (i = 0; i < icrvs->p_count; i++) {
-	
+
 	    /* Only print 1 point per interval */
 	    if ((plot->plot_style == LINESPOINTS) && (interval) && (i % interval))
 		continue;
@@ -2864,7 +2864,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 			v1.x -= 10. * t->h_tic * tic_unitx;
 			v1.y -= 10. * t->h_tic * tic_unity;
 		    }
-		
+
 		    if (!Y_AXIS.tic_in) {
 			v1.x -= tic_unitx * Y_AXIS.ticscale * t->v_tic;
 			v1.y -= tic_unity * Y_AXIS.ticscale * t->v_tic;

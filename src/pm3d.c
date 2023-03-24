@@ -41,17 +41,17 @@ lighting_model pm3d_shade;
 
 typedef struct {
     double gray;
-    double z; /* z value after rotation to graph coordinates for depth sorting */
+    double depth;		/* line-of-sight z after rotation to graph coordinates */
     union {
 	gpdPoint corners[4];	/* The normal case. vertices stored right here */
 	int array_index;	/* Stored elsewhere if there are more than 4 */
     } vertex;
-    union {		/* Only used by depthorder processing */
+    union {			/* Only used by depthorder processing */
 	t_colorspec *colorspec;
 	unsigned int rgb_color;
     } qcolor;
-    short fillstyle;	/* from plot->fill_properties */
-    short type;		/* QUAD_TYPE_NORMAL or QUAD_TYPE_4SIDES etc */
+    short fillstyle;		/* from plot->fill_properties */
+    short type;			/* QUAD_TYPE_NORMAL or QUAD_TYPE_LARGEPOLYGON etc */
 } quadrangle;
 
 #define QUAD_TYPE_NORMAL   0
@@ -351,20 +351,22 @@ pm3d_rearrange_scan_array(
     }
 }
 
-static int compare_quadrangles(const void* v1, const void* v2)
+static int
+compare_quadrangles(const void* v1, const void* v2)
 {
     const quadrangle* q1 = (const quadrangle*)v1;
     const quadrangle* q2 = (const quadrangle*)v2;
 
-    if (q1->z > q2->z)
+    if (q1->depth > q2->depth)
 	return 1;
-    else if (q1->z < q2->z)
+    else if (q1->depth < q2->depth)
 	return -1;
     else
 	return 0;
 }
 
-void pm3d_depth_queue_clear(void)
+void
+pm3d_depth_queue_clear(void)
 {
     free(quadrangles);
     quadrangles = NULL;
@@ -372,7 +374,8 @@ void pm3d_depth_queue_clear(void)
     current_quadrangle = 0;
 }
 
-void pm3d_depth_queue_flush(void)
+void
+pm3d_depth_queue_flush(void)
 {
     if (pm3d.direction != PM3D_DEPTH && !track_pm3d_quadrangles)
 	return;
@@ -416,7 +419,7 @@ void pm3d_depth_queue_flush(void)
 		    z = out.z;
 	    }
 
-	    qp->z = zmean / nv;
+	    qp->depth = zmean / nv;
 	}
 
 	qsort(quadrangles, current_quadrangle, sizeof (quadrangle), compare_quadrangles);
@@ -1893,7 +1896,8 @@ pm3d_reset_after_error()
  * one of the four corners.  Remember that the other corners may
  * be +/- one grid spacing.
  */
-static int compare_xy_quad(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
+static int
+compare_xy_quad(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
 {
     const quadrangle* q1 = arg1;
     const quadrangle* q2 = arg2;

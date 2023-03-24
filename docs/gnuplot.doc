@@ -9201,9 +9201,9 @@ Ffigure_smooth_path
 5 cbticlabels
 ?using cbticlabels
  EXPERIMENTAL (details may change in a future release version)
- 2D plots: colorbar labels are placed at the palette coordinate used by the
+ 2D plots: colorbox labels are placed at the palette coordinate used by the
  plot for variable coloring "lc palette z".
- 3D plots: colorbar labels are placed at the z coordinate of the point.
+ 3D plots: colorbox labels are placed at the z coordinate of the point.
  Note that in the case of a 3D heat map with variable color that does not
  match z, this is probably not the correct label.
  See also `plot using xticlabels`.
@@ -12716,7 +12716,7 @@ Ffigure_multiple_keys
     `tc lt <n>` sets the text color to that of line type <n>.
     `tc ls <n>` sets the text color to that of line style <n>.
     `tc palette z` selects a palette color corresponding to the label z position.
-    `tc palette cb <val>` selects a color corresponding to <val> on the colorbar.
+    `tc palette cb <val>` selects a color corresponding to <val> on the colorbox.
     `tc palette fraction <val>`, with 0<=val<=1, selects a color corresponding to
         the mapping [0:1] to grays/colors of the `palette`.
     `tc rgb "#RRGGBB"` or `tc rgb "0xRRGGBB"` sets an arbitrary 24-bit RGB color.
