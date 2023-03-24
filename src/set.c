@@ -83,6 +83,7 @@ static void set_clip(void);
 static void set_cntrparam(void);
 static void set_cntrlabel(void);
 static void set_contour(void);
+static void set_contourfill(void);
 static void set_cornerpoles(void);
 static void set_dashtype(void);
 static void set_dgrid3d(void);
@@ -264,6 +265,9 @@ set_command()
 	    break;
 	case S_CONTOUR:
 	    set_contour();
+	    break;
+	case S_CONTOURFILL:
+	    set_contourfill();
 	    break;
 	case S_CORNERPOLES:
 	    set_cornerpoles();
@@ -1416,6 +1420,44 @@ set_contour()
 	    int_error(c_token, "expecting 'base', 'surface', or 'both'");
 	c_token++;
     }
+}
+
+/* Determine criteria for choosing zslice boundaries
+ * during "splot with contourfill"
+ */
+void
+set_contourfill(void)
+{
+    int temp;
+
+    c_token++;
+    if (equals(c_token, "auto")) {
+	c_token++;
+	contourfill.mode = CFILL_AUTO;
+	temp = int_expression();
+	cliptorange(temp,1,MAX_ZSLICES);
+	contourfill.nslices = temp;
+
+    } else if (equals(c_token, "ztics")) {
+	c_token++;
+	contourfill.mode = CFILL_ZTICS;
+	contourfill.tic_level = 0;
+	if (equals(c_token, "level")) {
+	    c_token++;
+	    contourfill.tic_level = int_expression();
+	}
+
+    } else if (equals(c_token, "cbtics")) {
+	c_token++;
+	contourfill.mode = CFILL_CBTICS;
+	contourfill.tic_level = 0;
+	if (equals(c_token, "level")) {
+	    c_token++;
+	    contourfill.tic_level = int_expression();
+	}
+
+    } else
+	int_error(c_token, "Unrecognized option");
 }
 
 /* process 'set colorsequence command */

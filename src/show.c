@@ -241,6 +241,9 @@ show_command()
     case S_CNTRLABEL:
 	show_contour();
 	break;
+    case S_CONTOURFILL:
+	save_contourfill(stderr);
+	break;
     case S_DEBUG:
 	fprintf(stderr,"debug level is %d\n",debug);
 	break;

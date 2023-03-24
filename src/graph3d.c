@@ -81,6 +81,15 @@ int clabel_interval = 20;		/* label every 20th contour segment */
 int clabel_start = 5;			/*       starting with the 5th */
 char *clabel_font = NULL;		/* default to current font */
 
+/* control parameters for contourfill */
+t_contourfill contourfill = {
+    .mode = CFILL_AUTO,
+    .nslices = 5,
+    .tic_level = 0
+};
+static zslice *zslice_array;		/* shared by plot3d_contourfill and zslice_callback */
+static int current_slice = 0;		/* shared index to zslice_array */
+
 /* Draw the surface at all? (FALSE if only contours are wanted) */
 TBOOLEAN draw_surface = TRUE;
 /* Always create a gridded surface when lines are read from a data file */
@@ -133,6 +142,7 @@ static void plot3d_zerrorfill(struct surface_points * plot);
 static void plot3d_boxes(struct surface_points * plot);
 static void plot3d_vectors(struct surface_points * plot);
 static void plot3d_lines_pm3d(struct surface_points * plot);
+static void plot3d_contourfill(struct surface_points * plot);
 static void get_surface_cbminmax(struct surface_points *plot, double *cbmin, double *cbmax);
 static void cntr3d_impulses(struct gnuplot_contours * cntr, struct lp_style_type * lp);
 static void cntr3d_lines(struct gnuplot_contours * cntr, struct lp_style_type * lp);
@@ -151,6 +161,8 @@ static void xtick_callback(struct axis *, double place, char *text, int ticlevel
 static void ytick_callback(struct axis *, double place, char *text, int ticlevel,
 			   struct lp_style_type grid, struct ticmark *userlabels);
 static void ztick_callback(struct axis *, double place, char *text, int ticlevel,
+			   struct lp_style_type grid, struct ticmark *userlabels);
+static void zslice_callback(struct axis *, double place, char *text, int ticlevel,
 			   struct lp_style_type grid, struct ticmark *userlabels);
 
 static int find_maxl_cntr(struct gnuplot_contours * contours, int *count);
@@ -1130,8 +1142,9 @@ do_3dplot(
 	    (term->layer)(TERM_LAYER_BEFORE_PLOT);
 
 	    if (!key_pass && this_plot->plot_type != KEYENTRY)
-	    if (can_pm3d && PM3D_IMPLICIT == pm3d.implicit) {
-		pm3d_draw_one(this_plot);
+	    if (can_pm3d && (pm3d.implicit == PM3D_IMPLICIT)) {
+		if (this_plot->plot_style != CONTOURFILL)
+		    pm3d_draw_one(this_plot);
 	    }
 
 	    lkey = (key->visible && this_plot->title && this_plot->title[0]
@@ -1261,7 +1274,7 @@ do_3dplot(
 		break;
 
 	    case CONTOURFILL:
-		int_error(NO_CARET, "contourfill yet to be implemented");
+		plot3d_contourfill(this_plot);
 		break;
 
 	    case PM3DSURFACE:
@@ -3397,6 +3410,7 @@ ztick_callback(
     }
 }
 
+
 static int
 map3d_getposition(
     struct position *pos,
@@ -4193,6 +4207,127 @@ plot3d_polygons(struct surface_points *plot)
     free(quad);
     quadmax = 0;
     quad = NULL;
+}
+
+/*
+ * splot SURFACE with contourfill
+ *
+ * The basic idea for this plot style is that a single plot structure
+ * describing a pm3d surface can be processed multiple times,
+ * each time selecting only the component quadrangles in a discrete
+ * band of z values.  This band is assigned a single fill color.
+ *
+ * In order for the quadrangles from multiple passes to be merged and
+ * depth-sorted, each quadrangle must retain an index value telling
+ * which pass it came from.  This is used after sorting to retrieve
+ * and apply the clipping limits and fillcolor belonging to that pass.
+ */
+static void
+plot3d_contourfill(struct surface_points *plot)
+{
+    /* Test code - split palette into N intervals, where N was set by
+     * a previous call to "set cntrparam levels N".
+     */
+    int level;
+    unsigned int rgbcolor;
+    struct axis *ticaxis;
+    int nslices = contourfill.nslices;
+    double z_axis_min = GPMIN(axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max);
+    double z_axis_max = GPMAX(axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max);
+    double zrange = z_axis_max - z_axis_min;
+    double zinc = zrange / nslices;
+
+    /* zslice_array is global so that it can be seen by zslice_callback().
+     * The pointer to it in the plot header (plot->zclip) is used by pm3d in
+     * clip_filled_polygon and in pm3d_depth_queue_flush.
+     * This allocation will be freed by sp_free at the end of plotting.
+     * The maximum number of slices is 100.
+     */
+    zslice *slice = gp_alloc( MAX_ZSLICES * sizeof(zslice), "contourfill" );
+    zslice_array = slice;
+    plot->zclip = slice;
+
+    /*
+     * Build a list of contour slices
+     */
+    switch(contourfill.mode) {
+
+	default:
+	case CFILL_AUTO:
+	    for (level = 0; level < nslices; level++) {
+		slice[level].zlow = z_axis_min + zinc * level;
+		slice[level].zhigh = slice[level].zlow + zinc;
+		rgbcolor = rgb_from_gray(cb2gray(slice[level].zlow + zinc/2.));
+		slice[level].color.type = TC_RGB;
+		slice[level].color.lt = rgbcolor;
+		slice[level].color.value = -1;
+	    }
+	    break;
+
+	case CFILL_ZTICS:
+	case CFILL_CBTICS:
+	    ticaxis = (contourfill.mode == CFILL_CBTICS)
+		    ? &axis_array[COLOR_AXIS] : &axis_array[FIRST_Z_AXIS];
+
+	    current_slice = 0;
+	    gen_tics(ticaxis, zslice_callback);
+	    nslices = current_slice;
+	    /* Extend top and bottom slice */
+	    slice[0].zlow = z_axis_min;
+	    slice[nslices-1].zhigh = z_axis_max;
+
+	    for (level = 0; level < nslices; level++) {
+		double zmid = (slice[level].zlow + slice[level].zhigh) / 2.;
+		rgbcolor = rgb_from_gray(cb2gray(zmid));
+		slice[level].color.type = TC_RGB;
+		slice[level].color.lt = rgbcolor;
+		slice[level].color.value = -1;
+	    }
+	    break;
+
+	case CFILL_LIST:
+	    int_error(NO_CARET, "list of contour slices not supported yet");
+	    break;
+    }
+
+    /*
+     * Process the pm3d surface once for each slice in the list
+     */
+    for (level = 0; level < nslices; level++) {
+	plot->zclip_index = level;
+	plot->fill_properties.border_color = slice[level].color;
+	pm3d_draw_one(plot);
+    }
+}
+
+/* helper routine for plot3d_contourfill */
+static void
+zslice_callback(
+    struct axis *this_axis, double place, char *text, int ticlevel,
+    struct lp_style_type grid, struct ticmark *userlabels)
+{
+    /* Clip to zrange, but only if it is known */
+    double zmin = (axis_array[FIRST_Z_AXIS].autoscale & AUTOSCALE_MIN)
+		? axis_array[FIRST_Z_AXIS].min
+		: axis_array[FIRST_Z_AXIS].set_min;
+    double zmax = (axis_array[FIRST_Z_AXIS].autoscale & AUTOSCALE_MAX)
+		? axis_array[FIRST_Z_AXIS].max
+		: axis_array[FIRST_Z_AXIS].set_max;
+    if (debug)
+	FPRINTF((stderr, "zslice %d: clip %g to [%g:%g]\n",
+		ticlevel, place, zmin, zmax));
+
+    if (!inrange(place,zmin,zmax))
+	return;
+
+    if (ticlevel != contourfill.tic_level)
+	return;
+    if (current_slice >= MAX_ZSLICES)
+	return;
+    if (current_slice > 0)
+	zslice_array[current_slice - 1].zhigh = place;
+    zslice_array[current_slice].zlow = place;
+    current_slice++;
 }
 
 

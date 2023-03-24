@@ -62,6 +62,7 @@ static void save_zeroaxis(FILE *,AXIS_INDEX);
 static void save_set_all(FILE *);
 static void save_justification(int just, FILE *fp);
 static void save_pointstyle(FILE *fp, lp_style_type *lp);
+static void save_contours(FILE *fp);
 
 const char *coord_msg[] = {"first ", "second ", "graph ", "screen ", "character ", "polar "};
 /*
@@ -637,34 +638,9 @@ set isosamples %d, %d",
 	    samples_1, samples_2,
 	    iso_samples_1, iso_samples_2);
 
-    fprintf(fp, "\n\
-set surface %s\n\
-%sset surface",
+    fprintf(fp, "\nset surface %s\n%sset surface\n",
 	    (implicit_surface) ? "implicit" : "explicit",
 	    (draw_surface) ? "" : "un");
-
-    fprintf(fp, "\n\
-%sset contour", (draw_contour) ? "" : "un");
-    switch (draw_contour) {
-    case CONTOUR_NONE:
-	fputc('\n', fp);
-	break;
-    case CONTOUR_BASE:
-	fputs(" base\n", fp);
-	break;
-    case CONTOUR_SRF:
-	fputs(" surface\n", fp);
-	break;
-    case CONTOUR_BOTH:
-	fputs(" both\n", fp);
-	break;
-    }
-
-    /* Contour label options */
-    fprintf(fp, "set cntrlabel %s format '%s' font '%s' start %d interval %d\n",
-	clabel_onecolor ? "onecolor" : "", contour_format,
-	clabel_font ? clabel_font : "",
-	clabel_start, clabel_interval);
 
     fputs("set mapping ", fp);
     switch (mapping3d) {
@@ -695,45 +671,8 @@ set surface %s\n\
     fprintf(fp, "set datafile %scolumnheaders\n", df_columnheaders ? "" : "no");
 
     save_hidden3doptions(fp);
-    fprintf(fp, "set cntrparam order %d\n", contour_order);
-    fputs("set cntrparam ", fp);
-    switch (contour_kind) {
-    case CONTOUR_KIND_LINEAR:
-	fputs("linear\n", fp);
-	break;
-    case CONTOUR_KIND_CUBIC_SPL:
-	fputs("cubicspline\n", fp);
-	break;
-    case CONTOUR_KIND_BSPLINE:
-	fputs("bspline\n", fp);
-	break;
-    }
-    fprintf(fp, "set cntrparam levels %d\nset cntrparam levels ", contour_levels);
-    switch (contour_levels_kind) {
-    case LEVELS_AUTO:
-	fprintf(fp, "auto");
-	break;
-    case LEVELS_INCREMENTAL:
-	fprintf(fp, "incremental %g,%g",
-		contour_levels_list[0], contour_levels_list[1]);
-	break;
-    case LEVELS_DISCRETE:
-	{
-	    int i;
-	    fprintf(fp, "discrete %g", contour_levels_list[0]);
-	    for (i = 1; i < contour_levels; i++)
-		fprintf(fp, ",%g ", contour_levels_list[i]);
-	}
-    }
-    fprintf(fp, "\nset cntrparam firstlinetype %d", contour_firstlinetype);
-    fprintf(fp, " %ssorted\n", contour_sortlevels ? "" : "un");
-    fprintf(fp, "\
-set cntrparam points %d\n\
-set size ratio %g %g,%g\n\
-set origin %g,%g\n",
-	    contour_pts,
-	    aspect_ratio, xsize, ysize,
-	    xoffset, yoffset);
+
+    save_contours(fp);
 
     fprintf(fp, "set style data ");
     save_data_func_style(fp,"data",data_style);
@@ -751,12 +690,9 @@ set origin %g,%g\n",
     else
 	fprintf(fp, "set xyplane relative %g\n", xyplane.z);
 
-    {
-    int i;
     fprintf(fp, "set tics scale ");
-    for (i=0; i<MAX_TICLEVEL; i++)
+    for (int i=0; i<MAX_TICLEVEL; i++)
 	fprintf(fp, " %g%c", ticscale[i], i<MAX_TICLEVEL-1 ? ',' : '\n');
-    }
 
     save_mtics(fp, &axis_array[FIRST_X_AXIS]);
     save_mtics(fp, &axis_array[FIRST_Y_AXIS]);
@@ -1965,3 +1901,85 @@ save_walls(FILE *fp)
     }
 }
 
+/*
+ * contour settings of all sorts
+ */
+void
+save_contours(FILE *fp)
+{
+    /* contour settings */
+    fprintf(fp, "\n%sset contour", (draw_contour) ? "" : "un");
+    switch (draw_contour) {
+    case CONTOUR_NONE:
+	fputc('\n', fp);
+	break;
+    case CONTOUR_BASE:
+	fputs(" base\n", fp);
+	break;
+    case CONTOUR_SRF:
+	fputs(" surface\n", fp);
+	break;
+    case CONTOUR_BOTH:
+	fputs(" both\n", fp);
+	break;
+    }
+
+    /* Contour label options */
+    fprintf(fp, "set cntrlabel %s format '%s' font '%s' start %d interval %d\n",
+	clabel_onecolor ? "onecolor" : "", contour_format,
+	clabel_font ? clabel_font : "",
+	clabel_start, clabel_interval);
+    fprintf(fp, "set cntrparam order %d\n", contour_order);
+    fputs("set cntrparam ", fp);
+    switch (contour_kind) {
+    case CONTOUR_KIND_LINEAR:
+	fputs("linear\n", fp);
+	break;
+    case CONTOUR_KIND_CUBIC_SPL:
+	fputs("cubicspline\n", fp);
+	break;
+    case CONTOUR_KIND_BSPLINE:
+	fputs("bspline\n", fp);
+	break;
+    }
+    fprintf(fp, "set cntrparam levels %d\nset cntrparam levels ", contour_levels);
+    switch (contour_levels_kind) {
+    case LEVELS_AUTO:
+	fprintf(fp, "auto");
+	break;
+    case LEVELS_INCREMENTAL:
+	fprintf(fp, "incremental %g,%g",
+		contour_levels_list[0], contour_levels_list[1]);
+	break;
+    case LEVELS_DISCRETE:
+	{
+	    int i;
+	    fprintf(fp, "discrete %g", contour_levels_list[0]);
+	    for (i = 1; i < contour_levels; i++)
+		fprintf(fp, ",%g ", contour_levels_list[i]);
+	}
+    }
+    fprintf(fp, "\nset cntrparam firstlinetype %d", contour_firstlinetype);
+    fprintf(fp, " %ssorted\n", contour_sortlevels ? "" : "un");
+    fprintf(fp, "\
+set cntrparam points %d\n\
+set size ratio %g %g,%g\n\
+set origin %g,%g\n",
+	    contour_pts,
+	    aspect_ratio, xsize, ysize,
+	    xoffset, yoffset);
+
+    save_contourfill(fp);
+}
+
+void
+save_contourfill(FILE *fp)
+{
+    fprintf(fp, "set contourfill ");
+    if (contourfill.mode == CFILL_AUTO)
+	fprintf(fp, "auto %d\n", contourfill.nslices);
+    else if (contourfill.mode == CFILL_ZTICS)
+	fprintf(fp, "ztics level %d\n", contourfill.tic_level);
+    else if (contourfill.mode == CFILL_CBTICS)
+	fprintf(fp, "cbtics level %d\n", contourfill.tic_level);
+}

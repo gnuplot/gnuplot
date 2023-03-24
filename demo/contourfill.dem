@@ -1,0 +1,96 @@
+#
+# Illustrate work in progress on new plot style "with contourfill"
+# At this point the ooptions are
+#   set contourfill
+#	auto N			N evenly spaced slices spanning zrange
+#       ztics {level L} 	slice boundary at every ztic with level L
+#	cbtics {level L}	slice boundary at every cbtic with level L
+#
+# The tics level defaults to 0 (major tics).
+# cbtics are still active even if the colorbox isn't shown,
+# so an arbitrary set of slice boundaries can be constructe via
+#   set cbtics ( z1, z2, z3, z4, ... )
+#   unset colorbox
+#   set contourfill cbtics
+#
+# In all cases the fill color is taken from the palette value for the
+# midpoint z of the slice.  Other coloring methods to come later.
+#
+# pm3d depthorder works, but you can only mix in hidden3d lines if you
+# also enable the experimental compilation option in file hidden3d.h
+#	#define HIDDEN3D_CACHE
+#
+# Feature Request #553
+#
+
+set key at screen 1, 0.9 right top
+unset colorbox
+set samples 51
+set isosamples 51
+set contour surface
+set xyplane 0
+set xlabel "X axis" 
+set ylabel "Y axis" 
+set zlabel "Z " 
+set zlabel  offset character 1, 0, 0 font "" textcolor lt -1 norotate
+
+set palette viridis
+set cntrparam levels 5
+
+f(x,y) = sinc( sqrt(x*x + y*y) )
+
+set hidden3d back offset 0
+set pm3d scansauto border lc "black" lw 0.5
+set view 103, 44
+
+set title "contourfill - no depth sorting"
+splot f(x,y) with contourfill
+
+pause -1 "Turn on depth sorting"
+
+set title "contourfill - pm3d depthorder"
+set pm3d depth
+splot f(x,y) with contourfill
+
+pause -1 "Another function"
+
+set title "set contourfill ztics"
+
+g(x,y) = x**2 + y**2 * (1 - x)**3
+
+set xrange [-1 : 5]
+set yrange [-3 : 3]
+set zrange [-10 : 10]
+set view 60, 30
+
+set contourfill ztics
+splot g(x,y) with contourfill
+
+pause -1 "<cr> for 2D projection"
+
+#
+# cbtics must match cntrparam increments
+# cbrange must match zrange
+# turn off "pm3d depth" to superimpose contour lines
+#
+set title "set contourfill + contour lines"
+set zrange [-28:28]
+set cbrange [-21:21]
+set cbtics -21, 3, 21
+set contours
+set cntrparam cubic
+set cntrparam levels incremental -21, 3, 21
+set cntrlabel onecolor
+unset colorbox
+unset hidden3d
+set palette viridis positive
+set contourfill cbtics
+set pm3d scansauto noborder
+set view map
+set tics scale 0
+set key inside samplen 0.1 reverse
+splot g(x,y) with contourfill notitle, \
+      g(x,y) nosurface lt black title "Contour levels Δz = 3"
+
+pause -1 "<cr> to continue"
+reset

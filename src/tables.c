@@ -186,6 +186,7 @@ const struct gen_table set_tbl[] =
     { "cntrl$abel", S_CNTRLABEL },
     { "colormap$s", S_COLORMAP },
     { "cont$ours", S_CONTOUR },
+    { "contourfill", S_CONTOURFILL },
     { "cornerp$oles", S_CORNERPOLES },
     { "dasht$ype", S_DASHTYPE },
     { "dt", S_DASHTYPE },
