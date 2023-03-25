@@ -1704,6 +1704,11 @@ clip_filled_polygon( gpdPoint *inpts, gpdPoint *outpts, int nv )
 	maxvert = nv;
 	outrange = gp_realloc(outrange, maxvert * sizeof(int), NULL);
     }
+    if (zmin > zmax) {
+	zmax = axis_array[FIRST_Z_AXIS].min;
+	zmin = axis_array[FIRST_Z_AXIS].max;
+    }
+
     for (current = 0; current < nv; current++) {
 	if (inrange( inpts[current].z, zmin, zmax )) {
 	    outrange[current] = 0;
