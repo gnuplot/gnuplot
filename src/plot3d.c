@@ -1193,12 +1193,7 @@ get_3ddata(struct surface_points *this_plot)
 
 		} else if (this_plot->fill_properties.border_color.type == TC_Z
 			&& j >= 4) {
-		    rgb255_color rgbcolor;
-		    unsigned int rgb;
-		    rgb255maxcolors_from_gray(cb2gray(v[--j]), &rgbcolor);
-		    rgb = (unsigned int)rgbcolor.r << 16
-			| (unsigned int)rgbcolor.g << 8
-			| (unsigned int)rgbcolor.b;
+		    unsigned int rgb = rgb_from_gray( cb2gray(v[--j]) );
 		    color_from_column(TRUE);
 		    color = rgb;
 

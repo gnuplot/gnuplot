@@ -836,9 +836,8 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    else if (private_colormap) {
 			gray = rgb_from_colormap(gray, private_colormap);
 		    } else if (!color_from_rgbvar) {
-			rgb255_color temp;
-			rgb255maxcolors_from_gray(gray, &temp);
-			gray = (long)((temp.r << 16) + (temp.g << 8) + (temp.b));
+			unsigned int temp = rgb_from_gray(gray);
+			gray = (long)temp;
 		    }
 		}
 
@@ -1029,9 +1028,8 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			    /* since that is what would have been returned from the  */
 			    /* lighting code.					     */
 			    } else if (!color_from_rgbvar) {
-				rgb255_color temp;
-				rgb255maxcolors_from_gray(gray, &temp);
-				gray = (long)((temp.r << 16) + (temp.g << 8) + (temp.b));
+				unsigned int temp = rgb_from_gray(gray);
+				gray = (long)temp;
 			    }
 			}
 

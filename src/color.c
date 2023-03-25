@@ -907,7 +907,6 @@ f_palette(union argument *arg)
 {
     struct value result;
     double z;
-    rgb255_color color;
     unsigned int rgb;
 
     pop(&result);
@@ -915,8 +914,7 @@ f_palette(union argument *arg)
     if (((CB_AXIS.set_autoscale & AUTOSCALE_BOTH) != 0)
     && (fabs(CB_AXIS.min) >= VERYLARGE || fabs(CB_AXIS.max) >= VERYLARGE))
 	int_error(NO_CARET, "palette(z) requires known cbrange");
-    rgb255maxcolors_from_gray(cb2gray(z), &color);
-    rgb = (unsigned int)color.r << 16 | (unsigned int)color.g << 8 | (unsigned int)color.b;
+    rgb = rgb_from_gray(cb2gray(z));
 
     push(Ginteger(&result, rgb));
 }
@@ -944,6 +942,13 @@ f_rgbcolor(union argument *arg)
     push(Ginteger(&a, rgb));
 }
 
+unsigned int
+rgb_from_gray( double gray )
+{
+    rgb255_color color;
+    rgb255maxcolors_from_gray( gray, &color );
+    return (unsigned int)color.r << 16 | (unsigned int)color.g << 8 | (unsigned int)color.b;
+}
 
 /*
  * A colormap can have specific min/max stored internally,
@@ -997,7 +1002,6 @@ unsigned int
 rgb_from_colorspec(struct t_colorspec *tc)
 {
     double cbval;
-    rgb255_color color;
 
     switch (tc->type) {
 	case TC_DEFAULT:
@@ -1021,8 +1025,7 @@ rgb_from_colorspec(struct t_colorspec *tc)
 		return 0;
     }
 
-    rgb255maxcolors_from_gray( cbval, &color );
-    return (unsigned int)color.r << 16 | (unsigned int)color.g << 8 | (unsigned int)color.b;
+    return rgb_from_gray(cbval);
 }
 
 /*

@@ -264,6 +264,7 @@ void f_palette(union argument *);
  * miscellaneous color conversions
  */
 unsigned int rgb_from_colorspec(struct t_colorspec *tc);
+unsigned int rgb_from_gray( double gray );
 
 /*
  * Support for colormaps (named palettes)
