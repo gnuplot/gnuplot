@@ -3227,6 +3227,11 @@ eval_plots()
 		    }
 		}
 
+		/* The file was not really empty, but "plot with table" bypasses  */
+		/* filters, smoothing, range checks, and graphics, so we're done. */
+		if (this_plot->plot_style == TABLESTYLE)
+		    goto SKIPPED_EMPTY_FILE;
+
 		/* Jan 2022: Filter operations are performed immediately after
 		 * reading in the data, before any smoothing.
 		 */

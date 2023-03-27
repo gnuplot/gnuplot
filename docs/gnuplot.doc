@@ -15872,10 +15872,11 @@ Ffigure_polar_grid
  This discussion applies only to the special plot style `with table`.
 
  To avoid any style-dependent processing of the input data being tabulated
- (smoothing, errorbar expansion, secondary range checking, etc), or to increase
- the number of columns that can be tabulated, use the keyword "table" instead of
- a normal plot style.  In this case the output does not contain an extra, last,
- column of flags `i`, `o`, `u` indicated inrange/outrange/undefined.
+ (filters, smoothing, errorbar expansion, secondary range checking, etc),
+ or to increase the number of columns that can be tabulated, use the keyword
+ "table" instead of a normal plot style.
+ In this case the output does not contain an extra column containing a
+ flag `i`, `o`, `u` indicating inrange/outrange/undefined.
  The destination for output must first be specified with `set table <where>`.
  For example
 
