@@ -300,9 +300,9 @@ Ubuntu
   Install additonal tools and libraries for development version
 
 	sudo apt install gfortran libcerf-dev libwebp-dev adwaita-icon-theme-full \
-		unzip
+		unzip texlive-science
 
-        # openspecfun provides the Amos routine (except cexint)
+        # openspecfun provides the Amos routines (except for cexint)
 	git clone https://github.com/JuliaMath/openspecfun.git
 	cd openspecfun
 	make
