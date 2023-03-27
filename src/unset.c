@@ -77,6 +77,7 @@ static void unset_clip(void);
 static void unset_cntrparam(void);
 static void unset_cntrlabel(void);
 static void unset_contour(void);
+static void unset_contourfill(void);
 static void unset_dashtype(void);
 static void unset_dgrid3d(void);
 static void unset_dummy(void);
@@ -224,6 +225,9 @@ unset_command()
 	break;
     case S_CONTOUR:
 	unset_contour();
+	break;
+    case S_CONTOURFILL:
+	unset_contourfill();
 	break;
     case S_CORNERPOLES:
 	cornerpoles = FALSE;
@@ -955,6 +959,13 @@ unset_cntrlabel()
     clabel_font = NULL;
 }
 
+static void
+unset_contourfill()
+{
+    contourfill.mode = CFILL_AUTO;
+    contourfill.nslices = 5;
+    contourfill.tic_level = 0;
+}
 
 /* process 'unset contour' command */
 static void
@@ -2222,6 +2233,7 @@ reset_command()
     unset_contour();
     unset_cntrparam();
     unset_cntrlabel();
+    unset_contourfill();
     unset_zero();
     unset_dgrid3d();
     unset_ticslevel();
