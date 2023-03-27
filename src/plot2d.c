@@ -2994,6 +2994,11 @@ eval_plots()
 		    }
 		}
 
+		/* The file was not really empty, but "plot with table" bypasses  */
+		/* filters, smoothing, range checks, and graphics, so we're done. */
+		if (this_plot->plot_style == TABLESTYLE)
+		    goto SKIPPED_EMPTY_FILE;
+
 		/* If we are to bin the data, do that first */
 		if (this_plot->plot_smooth == SMOOTH_BINS) {
 		    make_bins(this_plot, nbins, binlow, binhigh, binwidth, binopt);
