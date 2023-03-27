@@ -4946,7 +4946,7 @@ Ffigure_polygons
 ?spiderplot
 ?radar chart
  Spider plots are essentially parallel axis plots in which the axes are arranged
- radially rather than vertically. Such plots are sometimes called `rader charts`.
+ radially rather than vertically. Such plots are sometimes called `radar charts`.
  In gnuplot this requires working within a coordinate system established by the
  command `set spiderplot`, analogous to `set polar` except that the angular
  coordinate is determined implicitly by the parallel axis number. The appearance,
@@ -14412,7 +14412,7 @@ Ffigure_multiple_keys
  (smoothing, errorbar expansion, secondary range checking, etc), or to increase
  the number of columns that can be tabulated, use the keyword "table" instead of
  a normal plot style.  In this case the output does not contain an extra, last,
- column of flags `i`, `o`, `u` indicated inrange/outrange/undefined.
+ column of flags `i`, `o`, `u` indicating inrange/outrange/undefined.
  The destination for output must first be specified with `set table <where>`.
  For example
 
