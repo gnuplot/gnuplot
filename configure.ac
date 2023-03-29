@@ -733,14 +733,6 @@ dnl end caca
 
 dnl Process rest of with and enable options
 
-dnl without-extra-coordinate may leave a hole in "struct coordinate"
-AC_ARG_WITH(extra-coordinate,dnl
-[  --without-extra-coordinate    leave possible hole in struct coordinate],,)
-if test "$with_extra_coordinate" != no; then
-     AC_DEFINE(WITH_EXTRA_COORDINATE,1,
-               [ Define to make use of otherwise empty space in struct coordinate ])
-fi
-
 dnl EXPERIMENTAL support for concave hulls via Delaunay triangulation and chi-shapes
 AC_ARG_ENABLE(chi-shapes,dnl
 [  --disable-chi-shapes    no support for Delaunay triangulation or chi-shapes],,)
@@ -748,6 +740,14 @@ if test "$enable_chi_shapes" != no; then
     AC_DEFINE(WITH_CHI_SHAPES,1,
               [ Define to support Delaunay triangulation and chi-shapes ])
 fi
+dnl without-extra-coordinate may leave a hole in "struct coordinate"
+AC_ARG_ENABLE(extra-coordinate,dnl
+[  --disable-extra-coordinate    leave possible hole in struct coordinate],,)
+if test "$enable_extra_coordinate" != no -o "$enable_chi_shapes" != no; then
+     AC_DEFINE(WITH_EXTRA_COORDINATE,1,
+               [ Define to make use of otherwise empty space in struct coordinate ])
+fi
+
 
 dnl Whether we want to create the LaTeX tutorial
 dnl TUTORIAL=notutorial
