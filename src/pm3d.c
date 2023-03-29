@@ -52,6 +52,9 @@ typedef struct {
     } qcolor;
     short fillstyle;	/* from plot->fill_properties */
     short type;		/* QUAD_TYPE_NORMAL or QUAD_TYPE_4SIDES etc */
+#ifdef WITH_2ND_SORTKEY
+    int sequence;		/* The original order of added quadrangles */
+#endif
 } quadrangle;
 
 #define QUAD_TYPE_NORMAL   0
@@ -360,6 +363,12 @@ static int compare_quadrangles(const void* v1, const void* v2)
 	return 1;
     else if (q1->z < q2->z)
 	return -1;
+#ifdef WITH_2ND_SORTKEY
+    else if (q1->sequence > q2->sequence)
+	return 1;
+    else if (q1->sequence < q2->sequence)
+	return -1;
+#endif
     else
 	return 0;
 }
@@ -416,7 +425,7 @@ void pm3d_depth_queue_flush(void)
 	    qp->z = zmean / nv;
 	}
 
-	qsort(quadrangles, current_quadrangle, sizeof (quadrangle), compare_quadrangles);
+	gp_qsort(quadrangles, current_quadrangle, sizeof (quadrangle), compare_quadrangles);
 
 	for (qp = quadrangles, qe = &quadrangles[current_quadrangle]; qp != qe; qp++) {
 
@@ -1051,6 +1060,9 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			    }
 			    qp->fillstyle = plot_fillstyle;
 			    qp->type = QUAD_TYPE_NORMAL;
+#ifdef WITH_2ND_SORTKEY
+			    qp->sequence = current_quadrangle;
+#endif
 			    current_quadrangle++;
 			} else {
 			    if (pm3d_shade.strength > 0 || color_from_rgbvar)
@@ -1088,6 +1100,9 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    }
 		    qp->fillstyle = plot_fillstyle;
 		    qp->type = QUAD_TYPE_NORMAL;
+#ifdef WITH_2ND_SORTKEY
+		    qp->sequence = current_quadrangle;
+#endif
 		    current_quadrangle++;
 		}
 	    } /* interpolate between points */
@@ -1188,7 +1203,11 @@ pm3d_add_polygon(struct surface_points *plot, gpdPoint corners[], int vertices)
     else
 	reserve_quadrangles(plot->iso_crvs->p_count, 0);
 
-    q = &quadrangles[current_quadrangle++];
+    q = &quadrangles[current_quadrangle];
+#ifdef WITH_2ND_SORTKEY
+    q->sequence = current_quadrangle;
+#endif
+    current_quadrangle++;
     memcpy(q->vertex.corners, corners, 4*sizeof(gpdPoint));
     if (plot)
 	q->fillstyle = style_from_fill(&plot->fill_properties);
@@ -1965,7 +1984,7 @@ split_intersecting_surface_tiles()
 	return;
 
     /* Sort quadrangles on x and y */
-    qsort(quadrangles, current_quadrangle, sizeof(quadrangle), compare_xy_quad);
+    gp_qsort(quadrangles, current_quadrangle, sizeof(quadrangle), compare_xy_quad);
 
     /* Step through the list of quadrangles.
      * For each quadrangle look ahead to find another with the same [x,y] corners.
@@ -2068,6 +2087,9 @@ split_intersecting_surface_tiles()
 		    qnew->gray = qt->gray;
 		    qnew->fillstyle = qt->fillstyle;
 		    qnew->qcolor = qt->qcolor;
+#ifdef WITH_2ND_SORTKEY
+		    qnew->sequence = qt->sequence;
+#endif
 
 		    qnew->vertex.corners[0] = piece1[0];
 		    qnew->vertex.corners[1] = piece1[1];
@@ -2093,6 +2115,9 @@ split_intersecting_surface_tiles()
 		    qnew->gray = qt->gray;
 		    qnew->fillstyle = qt->fillstyle;
 		    qnew->qcolor = qt->qcolor;
+#ifdef WITH_2ND_SORTKEY
+		    qnew->sequence = qt->sequence;
+#endif
 
 		    qnew->vertex.corners[0] = piece2[0];
 		    qnew->vertex.corners[1] = piece2[1];

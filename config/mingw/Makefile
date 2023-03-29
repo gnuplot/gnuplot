@@ -173,6 +173,9 @@ OPENSPECFUN=1
 # Uncomment if you want to use functionblocks
 #FUNCTIONBLOCKS=1
 
+# Uncomment if you want a stable sort for pm3d and hidden3d surfaces
+#STABLE_SORT=1
+
 # Uncomment if you want to use Direct2D 1.1 (Windows 8 and Windows 7 Platform Update)
 DIRECT2D11=1
 
@@ -563,6 +566,10 @@ endif
 
 ifdef FUNCTIONBLOCKS
 	CFLAGS += -DUSE_FUNCTIONBLOCKS
+endif
+
+ifdef STABLE_SORT
+	CFLAGS += -DWITH_STABLE_SORT
 endif
 
 ifdef DIRECT2D11
