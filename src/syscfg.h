@@ -409,4 +409,16 @@ typedef unsigned char _Bool;
 # endif
 #endif
 
+/* macOS and some BSD variants provide a qsort that is unstable;
+ * i.e. elements that test as equal are not guaranteed to retain their origin order.
+ * Those systems may also provide a mergesort that is stable.
+ * A downside is that it requires more memory.
+ */
+#if defined(WITH_MERGESORT)
+# define gp_qsort(base, n, size, compare) mergesort(base, n, size, compare)
+#else
+# define gp_qsort(base, n, size, compare) qsort(base, n, size, compare)
+#endif
+
+
 #endif /* !SYSCFG_H */

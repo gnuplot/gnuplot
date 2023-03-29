@@ -542,6 +542,19 @@ please add path to history.h to CPPFLAGS in Makefile]))
 fi
 dnl end readline
 
+dnl the "qsort" provided by macOS is not stable (items that evaluate equal are not
+dnl guaranteed to retain their original ordering).
+dnl This option allows you to replace it with mergesort.
+AC_ARG_WITH(mergesort, dnl
+  [--with-mergesort        use mergesort rather than qsort if available],
+  if test $with_mergesort = yes; then
+    AC_CHECK_FUNCS(mergesort,
+     [AC_DEFINE(WITH_MERGESORT,1,[ Define to replace qsort with mergesort ])
+      with_mergesort=yes],
+    with_mergesort=notfound)
+  fi
+)
+
 dnl check presence of z library
 dnl TODO: path to zlib includes; -lz -lm specified multiple times
 dnl       we don't do anything about missing png/gd includes either
@@ -747,7 +760,6 @@ if test "$enable_extra_coordinate" != no -o "$enable_chi_shapes" != no; then
      AC_DEFINE(WITH_EXTRA_COORDINATE,1,
                [ Define to make use of otherwise empty space in struct coordinate ])
 fi
-
 
 dnl Whether we want to create the LaTeX tutorial
 dnl TUTORIAL=notutorial
@@ -1432,6 +1444,14 @@ else
   AC_MSG_RESULT([  Command-line history file:                       no])
 fi
 
+if test "$with_mergesort" = yes; then
+  AC_MSG_RESULT([  Use mergesort rather than qsort:                 yes])
+elif test "$with_mergesort" = notfound; then
+  AC_MSG_RESULT([  Use mergesort rather than qsort:                 no (not found in library)])
+else
+  AC_MSG_RESULT([  Use mergesort rather than qsort:                 no])
+fi
+
 if test "$enable_mouse" = yes; then
   AC_MSG_RESULT([  Mouse support in interactive terminals:          yes])
 else
@@ -1502,7 +1522,6 @@ if test "$enable_chi_shapes" != no; then
 else
   AC_MSG_RESULT([  Support concave hulls:                           no (--enable-chi-shapes to enable)])
 fi
-
 
 AC_MSG_RESULT([])
 AC_MSG_RESULT([gnuplot will install the following additional materials:])

@@ -423,7 +423,7 @@ pm3d_depth_queue_flush(void)
 	    qp->depth = zmean / nv;
 	}
 
-	qsort(quadrangles, current_quadrangle, sizeof (quadrangle), compare_quadrangles);
+	gp_qsort(quadrangles, current_quadrangle, sizeof (quadrangle), compare_quadrangles);
 
 	for (qp = quadrangles, qe = &quadrangles[current_quadrangle]; qp != qe; qp++) {
 
@@ -1995,7 +1995,7 @@ split_intersecting_surface_tiles()
 	return;
 
     /* Sort quadrangles on x and y */
-    qsort(quadrangles, current_quadrangle, sizeof(quadrangle), compare_xy_quad);
+    gp_qsort(quadrangles, current_quadrangle, sizeof(quadrangle), compare_xy_quad);
 
     /* Step through the list of quadrangles.
      * For each quadrangle look ahead to find another with the same [x,y] corners.

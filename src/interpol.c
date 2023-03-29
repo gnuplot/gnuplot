@@ -1242,8 +1242,8 @@ sort_points(struct curve_points *plot)
 
     first_point = 0;
     while ((num_points = next_curve(plot, &first_point)) > 0) {
-	/* Sort this set of points, does qsort handle 1 point correctly? */
-	qsort(plot->points + first_point, num_points,
+	/* Sort this set of points */
+	gp_qsort(plot->points + first_point, num_points,
 	      sizeof(struct coordinate), compare_x);
 	first_point += num_points;
     }
@@ -1272,7 +1272,7 @@ zsort_points(struct curve_points *plot)
 
     first_point = 0;
     while ((num_points = next_curve(plot, &first_point)) > 0) {
-	qsort(plot->points + first_point, num_points,
+	gp_qsort(plot->points + first_point, num_points,
 	      sizeof(struct coordinate), compare_z);
 	first_point += num_points;
     }

@@ -1541,7 +1541,7 @@ sort_edges_by_z()
     for (i = 0; i < edges.end; i++)
 	sortarray[i] = i;
     /* sort it */
-    qsort(sortarray, (size_t) edges.end, sizeof(long), compare_edges_by_zmin);
+    gp_qsort(sortarray, (size_t) edges.end, sizeof(long), compare_edges_by_zmin);
 
     /* traverse plist in the order given by sortarray, and set the
      * 'next' pointers */
@@ -1581,7 +1581,7 @@ sort_polys_by_z()
 	sortarray[i] = i;
 
     /* sort it */
-    qsort(sortarray, (size_t) polygons.end, sizeof(long),
+    gp_qsort(sortarray, (size_t) polygons.end, sizeof(long),
 	  compare_polys_by_zmax);
 
     /* traverse plist in the order given by sortarray, and set the

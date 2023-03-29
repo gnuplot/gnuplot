@@ -118,7 +118,7 @@ mcs_interp(struct curve_points *plot)
     for ( ; i<Ntot; i++)
 	new_points[i].x = xstart + (i-N)*xstep;
     /* Sort output x coords */
-    qsort(new_points, Ntot, sizeof(struct coordinate), compare_x);
+    gp_qsort(new_points, Ntot, sizeof(struct coordinate), compare_x);
     /* Displace any collisions */
     for (i=1; i<Ntot-1; i++) {
 	double delta = new_points[i].x - new_points[i-1].x;
@@ -805,7 +805,7 @@ convex_hull(struct curve_points *plot)
     winnow_interior_points(plot, &cluster);
 
     /* Sort the remaining points (probably only need to sort on x?) */
-    qsort(plot->points, plot->p_count,
+    gp_qsort(plot->points, plot->p_count,
 	  sizeof(struct coordinate), compare_xyz);
 
     /* Find hull points using a variant of Graham's algorithm.
@@ -1166,7 +1166,7 @@ sharpen(struct curve_points *plot)
     /* Move new points into proper order */
     if (newcount > plot->p_count) {
 	plot->p_count = newcount;
-	qsort(plot->points, newcount, sizeof(struct coordinate), compare_x);
+	gp_qsort(plot->points, newcount, sizeof(struct coordinate), compare_x);
     }
 }
 
@@ -1312,7 +1312,7 @@ delaunay_triangulation( struct curve_points *plot )
      * This allows us to reduce the time required from O(N^2) to
      * approximately O(NlogN).
      */
-    qsort(plot->points, N, sizeof(struct coordinate), compare_xyz);
+    gp_qsort(plot->points, N, sizeof(struct coordinate), compare_xyz);
 
     /* Construct a triangle "sufficiently big" to enclose the set of points.
      * That means each bounding vertex must be far enough away from the data
@@ -1411,7 +1411,7 @@ delaunay_triangulation( struct curve_points *plot )
 	    i++;
 	}
 	nedges = i;
-	qsort(edges, nedges, sizeof(t_edge), compare_edges);
+	gp_qsort(edges, nedges, sizeof(t_edge), compare_edges);
 	for (i = 0; i < nedges-1; i++) {
 	    if (edges[i].v1 == edges[i+1].v1 && edges[i].v2 == edges[i+1].v2)
 		edges[i].v1 = edges[i+1].v1 = -1;
@@ -1618,9 +1618,9 @@ chi_reduction( struct curve_points *plot, double l_chi )
 				"bounding_edges");
     max_bounding_edges = 2*n_bounding_edges;
 
-    qsort(bounding_edges, n_bounding_edges, sizeof(t_edge), compare_edgelength);
+    gp_qsort(bounding_edges, n_bounding_edges, sizeof(t_edge), compare_edgelength);
     while (dig_one_hole( plot, l_chi )) {
-	qsort(bounding_edges, n_bounding_edges, sizeof(t_edge), compare_edgelength);
+	gp_qsort(bounding_edges, n_bounding_edges, sizeof(t_edge), compare_edgelength);
     }
 
 }
