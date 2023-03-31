@@ -51,6 +51,9 @@ typedef struct {
     short index;		/* Index into from_plot->zclip, if it exists */
 				/* this is really the fillstyle if this is an object */
     short type;			/* QUAD_TYPE_NORMAL or QUAD_TYPE_LARGEPOLYGON etc */
+#ifdef WITH_2ND_SORTKEY
+    int sequence;		/* The original order of added quadrangles */
+#endif
 } quadrangle;
 
 #define QUAD_TYPE_NORMAL   0
@@ -362,6 +365,12 @@ compare_quadrangles(const void* v1, const void* v2)
 	return 1;
     else if (q1->depth < q2->depth)
 	return -1;
+#ifdef WITH_2ND_SORTKEY
+    else if (q1->sequence > q2->sequence)
+	return 1;
+    else if (q1->sequence < q2->sequence)
+	return -1;
+#endif
     else
 	return 0;
 }
@@ -1053,6 +1062,9 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			    }
 			    qp->index = this_plot->zclip_index;
 			    qp->type = QUAD_TYPE_NORMAL;
+#ifdef WITH_2ND_SORTKEY
+			    qp->sequence = current_quadrangle;
+#endif
 			    current_quadrangle++;
 			} else {
 			    if (pm3d_shade.strength > 0 || color_from_rgbvar)
@@ -1094,6 +1106,9 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    }
 		    qp->index = this_plot->zclip_index;
 		    qp->type = QUAD_TYPE_NORMAL;
+#ifdef WITH_2ND_SORTKEY
+		    qp->sequence = current_quadrangle;
+#endif
 		    current_quadrangle++;
 		}
 	    } /* interpolate between points */
@@ -1194,7 +1209,11 @@ pm3d_add_polygon(struct surface_points *plot, gpdPoint corners[], int vertices)
     else
 	reserve_quadrangles(plot->iso_crvs->p_count, 0);
 
-    q = &quadrangles[current_quadrangle++];
+    q = &quadrangles[current_quadrangle];
+#ifdef WITH_2ND_SORTKEY
+    q->sequence = current_quadrangle;
+#endif
+    current_quadrangle++;
     memcpy(q->vertex.corners, corners, 4*sizeof(gpdPoint));
     q->from_plot = plot;
     if (plot)
@@ -2099,6 +2118,9 @@ split_intersecting_surface_tiles()
 		    qnew->gray = qt->gray;
 		    qnew->index = qt->index;
 		    qnew->qcolor = qt->qcolor;
+#ifdef WITH_2ND_SORTKEY
+		    qnew->sequence = qt->sequence;
+#endif
 
 		    qnew->vertex.corners[0] = piece1[0];
 		    qnew->vertex.corners[1] = piece1[1];
@@ -2125,6 +2147,9 @@ split_intersecting_surface_tiles()
 		    qnew->gray = qt->gray;
 		    qnew->index = qt->index;
 		    qnew->qcolor = qt->qcolor;
+#ifdef WITH_2ND_SORTKEY
+		    qnew->sequence = qt->sequence;
+#endif
 
 		    qnew->vertex.corners[0] = piece2[0];
 		    qnew->vertex.corners[1] = piece2[1];

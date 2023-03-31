@@ -544,16 +544,15 @@ dnl end readline
 
 dnl the "qsort" provided by macOS is not stable (items that evaluate equal are not
 dnl guaranteed to retain their original ordering).
-dnl This option allows you to replace it with mergesort.
-AC_ARG_WITH(mergesort, dnl
-  [--with-mergesort        use mergesort rather than qsort if available],
-  if test $with_mergesort = yes; then
-    AC_CHECK_FUNCS(mergesort,
-     [AC_DEFINE(WITH_MERGESORT,1,[ Define to replace qsort with mergesort ])
-      with_mergesort=yes],
-    with_mergesort=notfound)
-  fi
-)
+dnl This option allows you to replace it with mergesort, if found,
+dnl or add code in gnuplot to make the sort stable with respect to pm3d depthorder
+AC_ARG_ENABLE(stable-sort, dnl
+[  --enable-stable-sort    guarantee that pm3d depth-sorting retains object order],
+  [AC_DEFINE(WITH_STABLE_SORT,1,
+             [ Define if qsort on your O/S is unstable and that bothers you. ])
+   AC_CHECK_FUNCS(mergesort)
+  ]
+  ,)
 
 dnl check presence of z library
 dnl TODO: path to zlib includes; -lz -lm specified multiple times
@@ -1444,12 +1443,10 @@ else
   AC_MSG_RESULT([  Command-line history file:                       no])
 fi
 
-if test "$with_mergesort" = yes; then
-  AC_MSG_RESULT([  Use mergesort rather than qsort:                 yes])
-elif test "$with_mergesort" = notfound; then
-  AC_MSG_RESULT([  Use mergesort rather than qsort:                 no (not found in library)])
+if test "enable_stable_sort" = yes; then
+  AC_MSG_RESULT([  Add code to ensure pm3d depth sorting is stable: yes])
 else
-  AC_MSG_RESULT([  Use mergesort rather than qsort:                 no])
+  AC_MSG_RESULT([  Add code to ensure pm3d depth sorting is stable: no])
 fi
 
 if test "$enable_mouse" = yes; then
