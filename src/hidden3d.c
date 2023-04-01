@@ -1198,7 +1198,7 @@ build_networks(struct surface_points *plots, int pcount)
 	 * look at the p_number property, we can store a key there for later
 	 * access by compare_edges_by_zmin() when the vertices are sorted.
 	 */
-	if (this_plot->plot_style == LINES)
+	if (this_plot->plot_style == LINES || this_plot->plot_style == POINTSTYLE)
 	    this_plot->lp_properties.p_number = surface;
 
 	/* HBB 20000715: Code block for non-grid structured datasets.
