@@ -546,11 +546,12 @@ dnl the "qsort" provided by macOS is not stable (items that evaluate equal are n
 dnl guaranteed to retain their original ordering).
 dnl This option allows you to replace it with mergesort, if found,
 dnl or add code in gnuplot to make the sort stable with respect to pm3d depthorder
+AC_CHECK_FUNCS(mergesort, have_stable_sort=yes)
+AC_CHECK_FUNCS(gnu_get_libc_version, have_stable_sort=yes)
 AC_ARG_ENABLE(stable-sort, dnl
 [  --enable-stable-sort    guarantee that pm3d depth-sorting retains object order],
   [AC_DEFINE(WITH_STABLE_SORT,1,
              [ Define if qsort on your O/S is unstable and that bothers you. ])
-   AC_CHECK_FUNCS(mergesort)
   ]
   ,)
 
@@ -1443,8 +1444,10 @@ else
   AC_MSG_RESULT([  Command-line history file:                       no])
 fi
 
-if test "enable_stable_sort" = yes; then
+if test "${enable_stable_sort}" = yes; then
   AC_MSG_RESULT([  Add code to ensure pm3d depth sorting is stable: yes])
+elif test "${have_stable_sort}" = yes; then
+  AC_MSG_RESULT([  Add code to ensure pm3d depth sorting is stable: no (not needed)])
 else
   AC_MSG_RESULT([  Add code to ensure pm3d depth sorting is stable: no])
 fi
