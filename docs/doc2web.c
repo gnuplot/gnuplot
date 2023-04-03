@@ -149,7 +149,7 @@ header(FILE *a, char * title)
     fprintf(a, "</head>\n");
     fprintf(a, "<body>\n");
     fputs( 
-"<table class=\"center\" style=\"font-size:150%;\" width=\"80%\" >\n"
+"<table class=\"center\" style=\"font-size:150%\">\n"
 "<th class=\"center\"><a href=\"gnuplot6.html\">Credits</a></td>\n"
 "<th class=\"center\"><a href=\"Overview.html\">Overview</a></td>\n"
 "<th class=\"center\"><a href=\"Plotting_Styles.html\">Plotting Styles</a></td>\n"
