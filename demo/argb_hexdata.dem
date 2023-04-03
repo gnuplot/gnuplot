@@ -20,6 +20,7 @@ plot 1+2*sin(x*x) lw 4 lc "black", $BITS matrix using 1:2:3 with rgbalpha pixels
 pause -1 "<cr> to continue"
 
 set grid x y z vertical
+set view 33, 46
 splot $BITS matrix using 1:2:(1.0):3 with rgbalpha pixels
 
 pause -1 "<cr> to continue"

@@ -295,6 +295,10 @@ C
 ## because the peak lies between two x-coordinates at which the function has
 ## been sampled.  It adds a new sample point at the location of each such peak.
 ## See `filters`.
+#b Although it is not strictly speaking a new plot style, the combination
+## of the concave hull filter with along-path smoothing of filled areas
+## allows creation of 'blobby region' plots showing, for example,
+## the extents of overlapping data clusters. See `concavehull`.
 #b 3D plot style `with pm3d` accepts an optional modifier `zclip [zmin:zmax]`
 ## that selects only a slice of the full surface.  Successive plots with
 ## incremental changes to the clipping limits can be used to animate a
@@ -307,6 +311,7 @@ D windrose 1
 D sectors 4
 DB
 D sharpen 1
+D iris 2
 
 3 Hulls, masks, and smoothing
 ?new hulls
@@ -5589,6 +5594,7 @@ Ffigure_scaled_image
  extreme cases.  A pixel with 0 < alpha < 255 is partially transparent.
  Terminal types that do not support partial transparency will round this value
  to 0 or 255.
+D argb_hexdata 2
 3 image pixels
 ?plotting styles image pixels
 ?style image pixels
@@ -7315,9 +7321,9 @@ Ffigure_zerror
 
  The primary motivation for function block support is to allow definition of
  complicated functions directly in gnuplot.  Execution is of course slower
- than if the same function were coded directly in C or Fortran, but this is
- acceptable for many purposes.  If execution speed matters then the function
- can be implemented later as a plugin instead (see `plugins`).
+ than if the same function were coded in C or Fortran, but this is acceptable
+ for many purposes.  If execution speed matters then the function can be
+ implemented later as a plugin instead (see `plugins`).
 
  A non-trivial example of using function blocks to implement and plot
  a 15-term Lanczos approximation for the complex lngamma function is
