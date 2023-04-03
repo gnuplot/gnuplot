@@ -985,10 +985,13 @@ get_3ddata(struct surface_points *this_plot)
 
 	    if (j == DF_UNDEFINED || j == DF_MISSING) {
 		cp->type = UNDEFINED;
-		/* Version 5.5
-		 * Store all available info even if one of the requested columns
-		 * is missing or undefined.
+		/* Version 6: Store all available info even if one of the
+		 * requested columns is missing or undefined.
+		 * FIXME: However dgrid3d cannot deal with z = NaN or Inf.
+		 *        Fall back to ignoring it as version 5 did.
 		 */
+		if (dgrid3d && isnan(v[2]))
+		    goto come_here_if_undefined;
 		j = df_no_use_specs;
 	    }
 	    if (j == DF_COMPLEX_VALUE) {
