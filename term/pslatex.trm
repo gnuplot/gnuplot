@@ -1075,7 +1075,8 @@ TERM_TABLE_START(epslatex_driver)
     PS_text, null_scale, PS_graphics, PS_move,
     PS_vector, EPSLATEX_linetype, EPSLATEX_put_text, PS_text_angle,
     PS_justify_text, PS_point, do_arrow, PS_set_font,
-    PS_pointsize, TERM_BINARY|TERM_IS_POSTSCRIPT|TERM_CAN_CLIP|TERM_IS_LATEX /*flags */,
+    PS_pointsize,
+    TERM_BINARY|TERM_IS_POSTSCRIPT|TERM_CAN_CLIP|TERM_IS_LATEX|TERM_REUSES_BOXTEXT,
     0 /*suspend */, 0 /*resume */,
     PS_fillbox, PS_linewidth,
 #ifdef USE_MOUSE

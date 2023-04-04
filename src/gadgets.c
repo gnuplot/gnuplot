@@ -961,18 +961,23 @@ write_label(int x, int y, struct text_label *this_label)
 	    if (textbox->opaque) {
 		apply_pm3dcolor(&textbox->fillcolor);
 		(*term->boxed_text)(0,0, TEXTBOX_BACKGROUNDFILL);
-		apply_pm3dcolor(&(this_label->textcolor));
-		/* Init for each of fill and border */
-		if (!textbox->noborder)
-		    (*term->boxed_text)(x + htic, y + vtic, TEXTBOX_INIT);
-		if (this_label->rotate && (*term->text_angle) (this_label->rotate)) {
-		    write_multiline(x + htic, y + vtic, this_label->text,
-				this_label->pos, justify, this_label->rotate,
-				this_label->font);
-		    (*term->text_angle) (0);
-		} else {
-		    write_multiline(x + htic, y + vtic, this_label->text,
-				this_label->pos, justify, 0, this_label->font);
+		/* The epslatex/cairolatex terminals reuse a previously saved textbox
+		 * so explicitly re-writing it here is at best redundant.
+		 */
+		if ((term->flags & TERM_REUSES_BOXTEXT) == 0) {
+		    apply_pm3dcolor(&(this_label->textcolor));
+		    /* Init for each of fill and border */
+		    if (!textbox->noborder)
+			(*term->boxed_text)(x + htic, y + vtic, TEXTBOX_INIT);
+		    if (this_label->rotate && (*term->text_angle) (this_label->rotate)) {
+			write_multiline(x + htic, y + vtic, this_label->text,
+				    this_label->pos, justify, this_label->rotate,
+				    this_label->font);
+			(*term->text_angle) (0);
+		    } else {
+			write_multiline(x + htic, y + vtic, this_label->text,
+				    this_label->pos, justify, 0, this_label->font);
+		    }
 		}
 	    }
 
