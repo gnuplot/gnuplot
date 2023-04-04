@@ -277,6 +277,7 @@ typedef enum t_imagecolor { IC_PALETTE, IC_RGB, IC_RGBA }
 #define TERM_EXTENDED_COLOR  (1<<15)	/* uses EXTENDED_COLOR_SPECS       */
 #define TERM_NULL_SET_COLOR  (1<<16)	/* no support for RGB color        */
 #define TERM_POLYGON_PIXELS  (1<<17)	/* filledpolygon rather than fillbox */
+#define TERM_REUSES_BOXTEXT  (1<<18)    /* epslatex/cairolatex             */
 
 /* The terminal interface structure --- heart of the terminal layer.
  *
