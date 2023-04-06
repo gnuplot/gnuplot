@@ -1926,12 +1926,12 @@ save_contours(FILE *fp)
 
     /* Contour label options */
     fprintf(fp, "set cntrlabel %s format '%s' font '%s' start %d interval %d\n",
-	clabel_onecolor ? "onecolor" : "", contour_format,
+	clabel_onecolor ? "onecolor" : "", contour_params.format,
 	clabel_font ? clabel_font : "",
 	clabel_start, clabel_interval);
-    fprintf(fp, "set cntrparam order %d\n", contour_order);
+    fprintf(fp, "set cntrparam order %d\n", contour_params.order);
     fputs("set cntrparam ", fp);
-    switch (contour_kind) {
+    switch (contour_params.kind) {
     case CONTOUR_KIND_LINEAR:
 	fputs("linear\n", fp);
 	break;
@@ -1942,8 +1942,8 @@ save_contours(FILE *fp)
 	fputs("bspline\n", fp);
 	break;
     }
-    fprintf(fp, "set cntrparam levels %d\nset cntrparam levels ", contour_levels);
-    switch (contour_levels_kind) {
+    fprintf(fp, "set cntrparam levels %d\nset cntrparam levels ", contour_params.levels);
+    switch (contour_params.levels_kind) {
     case LEVELS_AUTO:
 	fprintf(fp, "auto");
 	break;
@@ -1955,17 +1955,17 @@ save_contours(FILE *fp)
 	{
 	    int i;
 	    fprintf(fp, "discrete %g", contour_levels_list[0]);
-	    for (i = 1; i < contour_levels; i++)
+	    for (i = 1; i < contour_params.levels; i++)
 		fprintf(fp, ",%g ", contour_levels_list[i]);
 	}
     }
-    fprintf(fp, "\nset cntrparam firstlinetype %d", contour_firstlinetype);
-    fprintf(fp, " %ssorted\n", contour_sortlevels ? "" : "un");
+    fprintf(fp, "\nset cntrparam firstlinetype %d", contour_params.firstlinetype);
+    fprintf(fp, " %ssorted\n", contour_params.sortlevels ? "" : "un");
     fprintf(fp, "\
 set cntrparam points %d\n\
 set size ratio %g %g,%g\n\
 set origin %g,%g\n",
-	    contour_pts,
+	    contour_params.npoints,
 	    aspect_ratio, xsize, ysize,
 	    xoffset, yoffset);
 

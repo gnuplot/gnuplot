@@ -50,14 +50,16 @@
 
 /* exported variables (to be handled by the 'set' and friends): */
 
-char contour_format[32] = "%8.3g";	/* format for contour key entries */
-t_contour_kind contour_kind = CONTOUR_KIND_LINEAR;
-t_contour_levels_kind contour_levels_kind = LEVELS_AUTO;
-int contour_levels = DEFAULT_CONTOUR_LEVELS;
-int contour_order = DEFAULT_CONTOUR_ORDER;
-int contour_pts = DEFAULT_NUM_APPROX_PTS;
-int contour_firstlinetype = -1;
-TBOOLEAN contour_sortlevels = FALSE;
+struct contour_params contour_params = {
+    .kind = CONTOUR_KIND_LINEAR,
+    .levels_kind = LEVELS_AUTO,
+    .levels = DEFAULT_CONTOUR_LEVELS,
+    .order = DEFAULT_CONTOUR_ORDER,
+    .npoints = DEFAULT_NUM_APPROX_PTS,
+    .firstlinetype = -1,
+    .sortlevels = FALSE,
+    .format = "%8.3g"
+};
 
 /* storage for z levels to draw contours at */
 dynarray dyn_contour_levels_list;
@@ -201,8 +203,8 @@ contour(int num_isolines, struct iso_curve *iso_lines)
     double dz = 0;
     struct gnuplot_contours *save_contour_list;
 
-    num_of_z_levels = contour_levels;
-    interp_kind = contour_kind;
+    num_of_z_levels = contour_params.levels;
+    interp_kind = contour_params.kind;
 
     contour_list = NULL;
 
@@ -217,7 +219,7 @@ contour(int num_isolines, struct iso_curve *iso_lines)
     gen_triangle(num_isolines, iso_lines, &p_polys, &p_edges);
     crnt_cntr_pt_index = 0;
 
-    if (contour_levels_kind == LEVELS_AUTO) {
+    if (contour_params.levels_kind == LEVELS_AUTO) {
 	if (nonlinear(&Z_AXIS)) {
 	    z_max = eval_link_function(Z_AXIS.linked_to_primary, z_max);
 	    z_min = eval_link_function(Z_AXIS.linked_to_primary, z_min);
@@ -228,7 +230,7 @@ contour(int num_isolines, struct iso_curve *iso_lines)
 	/* Find a tic step that will generate approximately the
 	 * desired number of contour levels. The "* 2" is historical.
 	 * */
-	dz = quantize_normal_tics(dz, ((int) contour_levels + 1) * 2);
+	dz = quantize_normal_tics(dz, (contour_params.levels + 1) * 2);
 	z0 = floor(z_min / dz) * dz;
 	num_of_z_levels = (int) floor((z_max - z0) / dz);
 	if (num_of_z_levels <= 0)
@@ -238,7 +240,7 @@ contour(int num_isolines, struct iso_curve *iso_lines)
     /* Build a list of contour levels */
     zlist = gp_alloc(num_of_z_levels * sizeof(double), NULL);
     for (i = 0; i < num_of_z_levels; i++) {
-	switch (contour_levels_kind) {
+	switch (contour_params.levels_kind) {
 	case LEVELS_AUTO:
 	    z = z0 + (i+1) * dz;
 	    z = CheckZero(z,dz);
@@ -258,7 +260,7 @@ contour(int num_isolines, struct iso_curve *iso_lines)
 	zlist[i] = z;
     }
     /* Sort the list high-to-low if requested */
-    if (contour_sortlevels)
+    if (contour_params.sortlevels)
 	qsort(zlist, num_of_z_levels, sizeof(double), reverse_sort);
 
     /* Create contour line for each z value in the list */
@@ -271,7 +273,7 @@ contour(int num_isolines, struct iso_curve *iso_lines)
 	    contour_list->isNewLevel = 1;
 	    /* Nov-2011 Use gprintf rather than sprintf so that LC_NUMERIC is used */
 	    gprintf(contour_list->label, sizeof(contour_list->label),
-		    contour_format, 1.0, z);
+		    contour_params.format, 1.0, z);
 	    contour_list->z = z;
 	}
     }
@@ -997,7 +999,7 @@ put_contour_cubic(
     }
 
     /* Calculate "num_intpol" interpolated values */
-    num_intpol = 1 + (num_pts - 1) * contour_pts;	/* global: contour_pts */
+    num_intpol = 1 + (num_pts - 1) * contour_params.npoints;
     intp_cubic_spline(num_pts, p_cntr, d2x, d2y, delta_t, num_intpol);
 
     free(delta_t);
@@ -1013,7 +1015,7 @@ put_contour_cubic(
 
 /*
  * Find Bspline approximation for this data set.
- * Uses global variable contour_pts to determine number of samples per
+ * Uses global variable contour_params.npoints to determine number of samples per
  * interval, where the knot vector intervals are assumed to be uniform, and
  * global variable contour_order for the order of Bspline to use.
  */
@@ -1021,7 +1023,7 @@ static void
 put_contour_bspline(cntr_struct *p_cntr, TBOOLEAN contr_isclosed)
 {
     int num_pts;
-    int order = contour_order - 1;
+    int order = contour_params.order - 1;
 
     num_pts = count_contour(p_cntr);	/* Number of points in contour. */
     if (num_pts < 2)
@@ -1363,7 +1365,7 @@ gen_bspline_approx(
     t_max = fetch_knot(contr_isclosed, num_of_points, order, num_of_points);
     next_t = t_min + 1.0;
     knot_index = order;
-    dt = 1.0 / contour_pts;	/* Number of points per one section. */
+    dt = 1.0 / contour_params.npoints;	/* Number of points per one section. */
 
 
     while (t < t_max) {
@@ -1378,7 +1380,7 @@ gen_bspline_approx(
 	pts_count++;
 	/* As we might have some real number round off problems we do      */
 	/* the last point outside the loop                                 */
-	if (pts_count == contour_pts * (num_of_points - order) + 1)
+	if (pts_count == contour_params.npoints * (num_of_points - order) + 1)
 	    break;
 	t += dt;
     }

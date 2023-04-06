@@ -938,13 +938,13 @@ unset_clip()
 static void
 unset_cntrparam()
 {
-    contour_pts = DEFAULT_NUM_APPROX_PTS;
-    contour_kind = CONTOUR_KIND_LINEAR;
-    contour_order = DEFAULT_CONTOUR_ORDER;
-    contour_levels = DEFAULT_CONTOUR_LEVELS;
-    contour_levels_kind = LEVELS_AUTO;
-    contour_firstlinetype = 0;
-    contour_sortlevels = FALSE;
+    contour_params.npoints = DEFAULT_NUM_APPROX_PTS;
+    contour_params.kind = CONTOUR_KIND_LINEAR;
+    contour_params.order = DEFAULT_CONTOUR_ORDER;
+    contour_params.levels = DEFAULT_CONTOUR_LEVELS;
+    contour_params.levels_kind = LEVELS_AUTO;
+    contour_params.firstlinetype = 0;
+    contour_params.sortlevels = FALSE;
 }
 
 /* process 'unset cntrlabel' command */
@@ -954,7 +954,7 @@ unset_cntrlabel()
     clabel_onecolor = FALSE;
     clabel_start = 5;
     clabel_interval = 20;
-    strcpy(contour_format, "%8.3g");
+    strcpy(contour_params.format, "%8.3g");
     free(clabel_font);
     clabel_font = NULL;
 }

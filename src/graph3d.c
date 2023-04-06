@@ -1484,8 +1484,8 @@ do_3dplot(
 
 			    /* First contour line type defaults to surface linetype + 1  */
 			    /* but can be changed using 'set cntrparams firstlinetype N' */
-			    if (contour_firstlinetype > 0)
-				contour_linetype = contour_firstlinetype + ic - 2;
+			    if (contour_params.firstlinetype > 0)
+				contour_linetype = contour_params.firstlinetype + ic - 2;
 			    else
 				contour_linetype = this_plot->hidden3d_top_linetype + ic;
 

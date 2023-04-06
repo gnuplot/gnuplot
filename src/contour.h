@@ -67,15 +67,18 @@ typedef enum en_contour_levels_kind {
 typedef double tri_diag[3];
 
 /* Variables of contour.c needed by other modules: */
+struct contour_params {
+    t_contour_kind kind;
+    t_contour_levels_kind levels_kind;
+    int levels;
+    int order;
+    int npoints;
+    int firstlinetype;
+    TBOOLEAN sortlevels;
+    char format[32];
+};
 
-extern char contour_format[32];
-extern t_contour_kind contour_kind;
-extern t_contour_levels_kind contour_levels_kind;
-extern int contour_levels;
-extern int contour_order;
-extern int contour_pts;
-extern int contour_firstlinetype;
-extern TBOOLEAN contour_sortlevels;
+extern struct contour_params contour_params;
 
 /* storage for z levels to draw contours at */
 extern dynarray dyn_contour_levels_list;

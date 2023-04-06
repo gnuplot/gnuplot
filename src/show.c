@@ -1376,7 +1376,7 @@ show_contour()
 	    (draw_contour) ? "drawn" : "not drawn\n");
 
     if (draw_contour) {
-	fprintf(stderr, " in %d levels on ", contour_levels);
+	fprintf(stderr, " in %d levels on ", contour_params.levels);
 	switch (draw_contour) {
 	case CONTOUR_BASE:
 	    fputs("grid base\n", stderr);
@@ -1391,35 +1391,35 @@ show_contour()
 	    /* should not happen --- be easy: don't complain... */
 	    break;
 	}
-	switch (contour_kind) {
+	switch (contour_params.kind) {
 	case CONTOUR_KIND_LINEAR:
 	    fputs("\t\tas linear segments\n", stderr);
 	    break;
 	case CONTOUR_KIND_CUBIC_SPL:
-	    fprintf(stderr, "\t\tas cubic spline interpolation segments with %d pts\n", contour_pts);
+	    fprintf(stderr, "\t\tas cubic spline interpolation segments with %d pts\n", contour_params.npoints);
 	    break;
 	case CONTOUR_KIND_BSPLINE:
-	    fprintf(stderr, "\t\tas bspline approximation segments of order %d with %d pts\n", contour_order, contour_pts);
+	    fprintf(stderr, "\t\tas bspline approximation segments of order %d with %d pts\n", contour_params.order, contour_params.npoints);
 	    break;
 	}
-	switch (contour_levels_kind) {
+	switch (contour_params.levels_kind) {
 	case LEVELS_AUTO:
-	    fprintf(stderr, "\t\tapprox. %d automatic levels\n", contour_levels);
+	    fprintf(stderr, "\t\tapprox. %d automatic levels\n", contour_params.levels);
 	    break;
 	case LEVELS_DISCRETE:
 	    {
 		int i;
-		fprintf(stderr, "\t\t%d discrete levels at ", contour_levels);
+		fprintf(stderr, "\t\t%d discrete levels at ", contour_params.levels);
 		fprintf(stderr, "%g", contour_levels_list[0]);
-		for (i = 1; i < contour_levels; i++)
+		for (i = 1; i < contour_params.levels; i++)
 		    fprintf(stderr, ",%g ", contour_levels_list[i]);
 		putc('\n', stderr);
 		break;
 	    }
 	case LEVELS_INCREMENTAL:
-	    fprintf(stderr, "\t\t%d incremental levels starting at %g, step %g, end %g\n", contour_levels, contour_levels_list[0],
+	    fprintf(stderr, "\t\t%d incremental levels starting at %g, step %g, end %g\n", contour_params.levels, contour_levels_list[0],
 		    contour_levels_list[1],
-		    contour_levels_list[0] + (contour_levels - 1) * contour_levels_list[1]);
+		    contour_levels_list[0] + (contour_params.levels - 1) * contour_levels_list[1]);
 	    /* contour-levels counts both ends */
 	    break;
 	}
@@ -1428,14 +1428,14 @@ show_contour()
 	fprintf(stderr, "\tcontour lines are drawn in %s linetypes\n",
 		clabel_onecolor ? "the same" : "individual");
 	fprintf(stderr, "\tformat for contour labels is '%s' font '%s'\n",
-		contour_format, clabel_font ? clabel_font : "");
+		contour_params.format, clabel_font ? clabel_font : "");
 	fprintf(stderr, "\ton-plot labels placed at segment %d with interval %d\n",
 		clabel_start, clabel_interval);
-	if (contour_firstlinetype > 0)
-		fprintf(stderr, "\tfirst contour linetype will be %d\n", contour_firstlinetype);
+	if (contour_params.firstlinetype > 0)
+		fprintf(stderr, "\tfirst contour linetype will be %d\n", contour_params.firstlinetype);
 	else
 		fprintf(stderr, "\tfirst contour linetype will be chosen automatically\n");
-	fprintf(stderr, "\tcontour levels will be %ssorted\n", contour_sortlevels ? "" : "un");
+	fprintf(stderr, "\tcontour levels will be %ssorted\n", contour_params.sortlevels ? "" : "un");
     }
 }
 
