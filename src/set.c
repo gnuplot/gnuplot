@@ -1456,6 +1456,14 @@ set_contourfill(void)
 	    contourfill.tic_level = int_expression();
 	}
 
+    } else if (almost_equals(c_token, "pal$ette")) {
+	c_token++;
+	contourfill.firstlinetype = -1;
+
+    } else if (almost_equals(c_token, "first$linetype")) {
+	c_token++;
+	contourfill.firstlinetype = int_expression();
+
     } else
 	int_error(c_token, "Unrecognized option");
 }

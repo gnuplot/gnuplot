@@ -965,6 +965,7 @@ unset_contourfill()
     contourfill.mode = CFILL_AUTO;
     contourfill.nslices = 5;
     contourfill.tic_level = 0;
+    contourfill.firstlinetype = -1;
 }
 
 /* process 'unset contour' command */

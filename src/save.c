@@ -1982,4 +1982,8 @@ save_contourfill(FILE *fp)
 	fprintf(fp, "ztics level %d\n", contourfill.tic_level);
     else if (contourfill.mode == CFILL_CBTICS)
 	fprintf(fp, "cbtics level %d\n", contourfill.tic_level);
+    if (contourfill.firstlinetype > 0)
+	fprintf(fp, "set contourfill firstlinetype %d\n", contourfill.firstlinetype);
+    else
+	fprintf(fp, "set contourfill palette\n");
 }

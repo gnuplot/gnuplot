@@ -73,6 +73,7 @@ typedef struct contourfill {
     t_cfill_mode mode;
     int nslices;
     int tic_level;
+    int firstlinetype;
 } t_contourfill;
 #define MAX_ZSLICES 100
 
