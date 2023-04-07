@@ -1,7 +1,8 @@
 %% Don't forget to change the paper format in the next line
 %
+% $Id: faq-ja.tex,v 1.38 2023-04-07 10:10:40+09 shige Exp $
 % translated to Japanese by Shigeharu TAKENO
-% Original: Id: faq.tex updated at 2022-06-14
+% Original: Id: faq.tex updated at 2023-04-05
 %
 %%%% \documentclass[a4paper,11pt]{article}
 %%% \documentclass[letter,11pt]{article}
@@ -119,9 +120,8 @@
 この文書は、\gnuplot バージョン 5 (5.4 まで) についての記述です。
 %% end Japanese
         \\
-%%% FAQ version: December 2021
-%%% FAQ version: June 2022
-FAQ バージョン: 2022 6 月
+%%% FAQ version: February 2023
+FAQ バージョン: 2023 2 月
 
 %%% PDF version of current document: {\http{www.gnuplot.info/faq/faq.pdf}.
 現文書の PDF 版: \http{www.gnuplot.info/faq/faq.pdf} (訳注: 英語版)。
@@ -303,10 +303,10 @@ gnuplot は、なじみのある命令 {\em if else continue break while for} を
 \subsection{\gnuplot は私のコンピュータで動かすことができますか}
 
 %%% \Gnuplot{} is in widespread use on many platforms, including
-%%% MS Windows, linux, unix, and OSX.  The current source code retains
+%%% MS Windows, linux, unix, and macOS.  The current source code retains
 %%% supports for older systems as well, including VMS, Ultrix, OS/2, and
 %%% MS-DOS. However 16-bit platforms are no longer supported.
-\gnuplot は、MS Windows, linux, unix, OSX などの
+\gnuplot は、MS Windows, linux, unix, macOS などの
 多くのプラットホーム上で、広く利用できます。
 現在のソースコードは、VMS, Ultrix, OS/2, %
 MS-DOS などの古いシステムのサポートも保持していますが、
@@ -388,11 +388,11 @@ gnuplot Web ページ \http{www.gnuplot.info} を見てください。
 %%% July 2020.
 %%% Incremental versions (patchlevel 1, 2, ...) are typically released 
 %%% every six months.
-%%% The development version of \gnuplot is currently 5.5.
+%%% The development version is currently \gnuplot 6.
 \gnuplot の最新の安定版は、2020 年 7 月に最初にリリースされた 5.4 です。
 更新バージョン (パッチレベル 1, 2, ...) は、だいたい 6 ヶ月毎に
 リリースされます。
-\gnuplot の開発版は、現在は 5.5 となっています。
+現在の開発版は \gnuplot 6 です。
 
 %%% \subsection{Where can I get \gnuplot?}
 \subsection{\gnuplot はどこで手に入れられますか}
@@ -554,10 +554,10 @@ makefile のヘッダにあるオプションを必要なら更新して、
 \subsection{動作するサンプル}
 
 %%% There is a directory of worked examples in the the source distribution.
-%%% These examples and the resulting plots may also be found online at
+%%% Many of these examples and the resulting plots may also be found online at
 %%% \http{gnuplot.sourceforge.net/demo/}.
 ソース配布物には動作するサンプルのディレクトリが含まれています。
-これらサンプル、およびその結果の描画グラフは %
+これらのサンプルの多く、およびその結果の描画グラフは %
 \http{gnuplot.sourceforge.net/demo/} でも見ることができます。
 
 
@@ -625,9 +625,9 @@ gnuplot に関する質問を議論する Usenet グループ %
 が古くからありますが、そこの住民はほとんど前世紀の人々です。
 
 \item
-%%% A more browser-oriented help forum may be found on StackOverflow
+%%% A more active help forum may be found on StackOverflow
 %%% \http{stackoverflow.com/questions/tagged/gnuplot}
-よりブラウザ指向のヘルプフォーラムが StackOverflow にあります。
+より活発なヘルプフォーラムが StackOverflow にあります。
 \http{stackoverflow.com/questions/tagged/gnuplot}
 
 \item
@@ -758,7 +758,7 @@ gnuplot> set term pop        # 保存した出力形式を復帰
 \subsection{どうすればグラフを私のワープロソフトに取り込めますか}
 
 %%% Basically, you save your plot to a file in a format your word
-%%% processor can understand, and then you read in the plot from your 
+%%% processor can understand, and then you read in the file from your 
 %%% word processor. Vector formats (PostScript, emf, svg, pdf, \TeX{},
 %%% \LaTeX{}) should be preferred,
 %%% as you can scale your graph later to the right size.
@@ -968,7 +968,7 @@ gnuplot> plot "< sort +2 file.in"  # 2 列目のデータで事前にソート
 %%% other
 %%% programs. Many applications with gnuplot as the graphics engine, like 
 %%% Octave
-%%% (\http{www.octave.org}), uses this method. This also works from a 
+%%% (\http{www.octave.org}), use this method. This also works from a 
 %%% cgi script to
 %%% drive \gnuplot from a forms-based web page.
 パイプをサポートしているシステムでは、
@@ -1053,12 +1053,12 @@ gnuplot をグラフィックエンジンとして使用している多くのアプリケーションが
 %% end Japanese
 %%% Hidden surface removal for these plots is achieved instead by drawing 
 %%% them
-%%% in order of their distance from the viewer, controlled by
+%%% in order of their distance from the viewer, enabled by the command
 %%% {\em set pm3d depthorder}.
 これらのグラフに対する隠面処理は、
 見る側からの距離の順番で
 それらを描画することによって代用的に達成されていますが、
-その順番は、{\em set pm3d depthorder} で制御できます。
+その順番は、コマンド {\em set pm3d depthorder} で制御できます。
 
 %%% \subsection{How do I force exact positions for the graph borders 
 %%% on the page?}
@@ -1194,8 +1194,8 @@ set label Y norotate at graph 0.0, 0.5 offset -6
 set terminal gif animate {delay <time>} {loop <N>} {optimize}
 \end{verbatim}
 
-%%% The development version (5.5) also supports animation in webp format.
-開発版 (5.5) では、webp フォーマットでもアニメーションを
+%%% The development version also supports animation in webp format.
+開発版では、webp フォーマットでもアニメーションを
 サポートしています。
 %%% Have a look at
 %%% \http{gnuplot.sourceforge.net/demo/animate2.html}
@@ -1320,12 +1320,12 @@ gnuplot> splot x with pm3d, x*y with points
 
 %%% Labeling individual contours in a contour plot used to require special
 %%% tricks and extra processing steps in \gnuplot version 4.
-%%% In version 5 it is much simpler.  Plot the contours twice,
+%%% Since version 5 it is much simpler.  Plot the contours twice,
 %%% once "with lines" and once "with labels".  To make the labels stand out
 %%% it may help to use
 個々の等高線にラベルをつけたグラフは、\gnuplot バージョン 4 では
 ある種の裏技と余分な処理手順が必要でしたが、
-バージョン 5 ではその手順はとても簡単です。
+バージョン 5 以降その手順はとても簡単です。
 等高線を、1 回目は "with lines" で、2 回目は "with labels" で %
 2 回描画するだけです。
 目立つラベルを作成したい場合は、以下のようにするといいでしょう。
@@ -1453,11 +1453,13 @@ splot 'facets_with_color.dat' using 1:2:3:4 title "explicit colors"
 \latex{\normalsize}
 
 %%% Gnuplot is not a 3D modeling program.
-%%% The depthorder rendering will not handle inter-penetrating facets.
+%%% The depthorder rendering in version 5 does not handle inter-penetrating
+%%% facets; version 6 does somewhat better.
 %%% For true 3D rendering you would be probably be better off using a 
 %%% ray-tracing program.
 gnuplot は 3 次元モデリングソフトではありませんので、
-depthorder による描画では、面同士の貫通は処理されません。
+バージョン 5 の depthorder による描画では、面同士の貫通は処理しません。
+バージョン 6 は多少は行います。
 本当の 3 次元描画のためには、
 多分レイトレーシングソフトを使う方がいいでしょう。
 
@@ -1529,11 +1531,11 @@ gnuplot> splot [0:1] [0:1] u,yl(x(u))+(yu(x(u)) - yl(x(u)))*v,\
 %%% \subsection{Text markup using "enhanced text" mode}
 \subsection{"enhanced text" モードによる文字列のマークアップ}
 
-%%% \Gnuplot version 5 defaults to "enhanced text" mode, in which text 
-%%% markup is
-%%% indicated by a set of special characters embedded in the text.
-\gnuplot バージョン 5 では拡張文字列モード (enhanced text) が
-デフォルトで、それは特殊文字を文字列内に埋めこむことによって
+%%% Starting with version 5, \gnuplot defaults to "enhanced text" mode,
+%%% in which text markup is indicated by a set of special characters 
+%%% embedded in the text.
+バージョン 5 以降、\gnuplot はデフォルトで拡張文字列モード
+(enhanced text) で、それは特殊文字を文字列内に埋めこむことによって
 文字列のマークアップを示します。
 
 \begin{center}
@@ -1620,7 +1622,7 @@ gnuplot でそれを使用する場合には、多分何か特別なことを
 %%% to solve
 %%% that outside of gnuplot. Or you can use octal escape sequences to 
 %%% type them in
-%%% byte-by-byte, or (version 5.4) unicode escape sequences like
+%%% byte-by-byte, or (since version 5.4) unicode escape sequences like
 %%% {\em \verb&\U+221E&} ($\infty$).
 %%% If your keyboard does generate UTF-8 but you don't know what 
 %%% keystrokes would
@@ -1631,7 +1633,7 @@ gnuplot でそれを使用する場合には、多分何か特別なことを
 UTF-8 文字列をあなたのキーボードで入力できない場合は、
 gnuplot の外でそれを解決する必要があるでしょう。
 またはその 8 進のエスケープ文字列を 1 バイト毎入力するか、
-(バージョン 5.4 ならば) {\em \verb&\U+221E&} ($\infty$) のような
+(バージョン 5.4 以降は) {\em \verb&\U+221E&} ($\infty$) のような
 Unicode のエスケープシーケンスを使うことができます。
 あなたのキーボードで UTF-8 を生成できるが
 どのキーストロークで特定の文字列を生成できるかを知らない場合は、
@@ -1753,10 +1755,10 @@ Planck 定数と同様、最も自然な方法は UTF-8 フォントを使い、文字 $\odot$ %
 %%% context, cairolatex})
 %%% hand off text generation to \LaTeX{}. In this case you can 
 %%% use normal \LaTeX{}
-%%% markup like \verb+$\alpha_{3}$+ .
+%%% markup like \verb+$\alpha_{3}$+ ($\alpha_{3}$).
 いくつかの \LaTeX{} 系出力形式 (\textit{latex, epslatex, tikz, 
 context, cairolatex}) は、生成した文字列を \LaTeX{} に渡します。
-この場合は、\verb+$\alpha_{3}$+ のような、
+この場合は、\verb+$\alpha_{3}$+ ($\alpha_{3}$) のような、
 通常の \LaTeX{} 風の記述が利用できます。
 
 %%% \subsection{How do I include accented characters?}
@@ -1916,9 +1918,15 @@ julia パッケージです。
 %%% \subsection{What if I need special function that gnuplot doesn't have?}
 \subsection{gnuplot が持たない特殊関数が必要な場合は}
 
-%%% See above. You may have to use another program or write a custom plugin.
-上を見てください。
-他のソフトを使うか、カスタムプラグインを書くか、のいずれかが必要です。
+%%% \Gnuplot version 6 provides a greatly expanded set of complex 
+%%% special functions.
+%%% If the one you need is not included, you may have to use another 
+%%% program or write
+%%% a custom plugin for gnuplot.
+\gnuplot バージョン 6 では、複素特殊関数のとても広いセットを提供しています。
+もしあなたが必要とするものが含まれていなければ、
+他のプログラムを使うか、gnuplot 用にカスタムプラグインを書くか、
+のいずれかが必要でしょう。
 
 
 %%% \subsection{How to use hotkeys in my interactive terminals}
@@ -2039,7 +2047,7 @@ Linux システムでは、これらの出力形式はシステムの fontconfig ユーティリティが
 %%% You may also get an error message about "slow font initialization".
 %%% This is because qt relies on a shared system font cache.
 %%% If you request a font that no one else is using, it takes a while to
-%%% update the cache.  This mostly happens on Windows or OSX, because other
+%%% update the cache.  This mostly happens on Windows or macOS, because other
 %%% programs on those systems tend to use a different font mechanism so the 
 %%% relevant font cache may be empty.
 %%% Try invoking gnuplot with command line option {\em -\@-slow}.
@@ -2047,7 +2055,7 @@ Linux システムでは、これらの出力形式はシステムの fontconfig ユーティリティが
 これは、qt が共有システムフォントキャッシュに依存しているからです。
 もし、他の誰も使っていないフォントを要求すると、
 そのキャッシュの更新に時間がかかります。
-これは、Windows や OSX ではよく起こるのですが、
+これは、Windows や macOS ではよく起こるのですが、
 それらのシステムでは他のソフトが異なるフォントの仕組みを
 使用する傾向にあるため、関連するフォントキャッシュが空になるからです。
 gnuplot の呼び出し時に、コマンドラインオプション {\em -\@-slow} を

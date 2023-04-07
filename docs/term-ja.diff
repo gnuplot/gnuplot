@@ -1,6 +1,6 @@
 diff -ru term/ai.trm.ORG term/ai.trm
---- term/ai.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/ai.trm	2023-01-23 14:02:55.768434000 +0900
+--- term/ai.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/ai.trm	2023-04-06 16:41:47.736309000 +0900
 @@ -526,6 +526,7 @@
  
  #ifdef TERM_HELP
@@ -33,8 +33,8 @@ diff -ru term/ai.trm.ORG term/ai.trm
  END_HELP(ai)
  #endif /* TERM_HELP */
 diff -ru term/aquaterm.trm.ORG term/aquaterm.trm
---- term/aquaterm.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/aquaterm.trm	2023-01-23 14:02:55.768536000 +0900
+--- term/aquaterm.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/aquaterm.trm	2023-04-06 16:41:47.742060000 +0900
 @@ -1047,6 +1047,7 @@
  
  #ifdef TERM_HELP
@@ -85,8 +85,8 @@ diff -ru term/aquaterm.trm.ORG term/aquaterm.trm
  #endif /* TERM_HELP */
  
 diff -ru term/be.trm.ORG term/be.trm
---- term/be.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/be.trm	2023-01-23 14:02:55.768648000 +0900
+--- term/be.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/be.trm	2023-04-06 16:41:47.750890000 +0900
 @@ -387,6 +387,7 @@
  
  #ifdef TERM_HELP
@@ -398,8 +398,8 @@ diff -ru term/be.trm.ORG term/be.trm
  END_HELP(be)
  #endif /* TERM_HELP */
 diff -ru term/block.trm.ORG term/block.trm
---- term/block.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/block.trm	2023-01-23 14:02:55.768766000 +0900
+--- term/block.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/block.trm	2023-04-06 16:41:47.754138000 +0900
 @@ -1370,6 +1370,7 @@
  
  #ifdef TERM_HELP
@@ -496,8 +496,8 @@ diff -ru term/block.trm.ORG term/block.trm
  END_HELP(block)
  #endif
 diff -ru term/caca.trm.ORG term/caca.trm
---- term/caca.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/caca.trm	2023-01-23 14:02:55.768949000 +0900
+--- term/caca.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/caca.trm	2023-04-06 16:41:47.755902000 +0900
 @@ -1263,7 +1263,7 @@
  	if (CACA_charset == CACA_ASCII)
  		symbol = (point <= -1) ? L'.' : point % 26 + 'A';
@@ -674,9 +674,9 @@ diff -ru term/caca.trm.ORG term/caca.trm
  #endif /* TERM_HELP */
  
 diff -ru term/cairo.trm.ORG term/cairo.trm
---- term/cairo.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/cairo.trm	2023-01-23 14:02:55.769114000 +0900
-@@ -1520,6 +1520,7 @@
+--- term/cairo.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/cairo.trm	2023-04-06 16:41:47.765055000 +0900
+@@ -1519,6 +1519,7 @@
  
  #ifdef TERM_HELP
  START_HELP(epscairo)
@@ -684,7 +684,7 @@ diff -ru term/cairo.trm.ORG term/cairo.trm
  "1 epscairo",
  "?set terminal epscairo",
  "?terminal epscairo",
-@@ -1531,11 +1532,26 @@
+@@ -1530,11 +1531,26 @@
  "",
  " Please read the help for the `pdfcairo` terminal."
  ""
@@ -711,7 +711,7 @@ diff -ru term/cairo.trm.ORG term/cairo.trm
  "1 cairolatex",
  "?set terminal cairolatex",
  "?terminal cairolatex",
-@@ -1698,11 +1714,178 @@
+@@ -1697,11 +1713,178 @@
  " by the `header` command.  Thus, you can use `header` to overwrite some of",
  " settings performed using \"gnuplot.cfg\"",
  ""
@@ -890,7 +890,7 @@ diff -ru term/cairo.trm.ORG term/cairo.trm
  "1 pdfcairo",
  "?set terminal pdfcairo",
  "?terminal pdfcairo",
-@@ -1786,11 +1969,99 @@
+@@ -1785,11 +1968,99 @@
  " so that gnuplot can draw a line from non-integer coordinates. This avoids",
  " wobbling effects on diagonal lines ('plot x' for example).",
  ""
@@ -990,7 +990,7 @@ diff -ru term/cairo.trm.ORG term/cairo.trm
  "1 pngcairo",
  "?set terminal pngcairo",
  "?terminal pngcairo",
-@@ -1863,6 +2134,85 @@
+@@ -1862,6 +2133,85 @@
  " Rendering uses oversampling, antialiasing, and font hinting to the extent",
  " supported by the cairo and pango libraries.",
  ""
@@ -1077,8 +1077,8 @@ diff -ru term/cairo.trm.ORG term/cairo.trm
  #endif /* TERM_HELP */
  
 diff -ru term/canvas.trm.ORG term/canvas.trm
---- term/canvas.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/canvas.trm	2023-01-23 14:02:55.769253000 +0900
+--- term/canvas.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/canvas.trm	2023-04-06 16:41:47.772469000 +0900
 @@ -1670,6 +1670,7 @@
  
  #ifdef TERM_HELP
@@ -1174,8 +1174,8 @@ diff -ru term/canvas.trm.ORG term/canvas.trm
  END_HELP(canvas)
  #endif /* TERM_HELP */
 diff -ru term/cgm.trm.ORG term/cgm.trm
---- term/cgm.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/cgm.trm	2023-01-23 14:02:55.769408000 +0900
+--- term/cgm.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/cgm.trm	2023-04-06 16:41:47.773289000 +0900
 @@ -1743,6 +1743,7 @@
  
  #ifdef TERM_HELP
@@ -1498,8 +1498,8 @@ diff -ru term/cgm.trm.ORG term/cgm.trm
  END_HELP(cgm)
  #endif /* TERM_HELP */
 diff -ru term/context.trm.ORG term/context.trm
---- term/context.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/context.trm	2023-01-23 14:02:55.769562000 +0900
+--- term/context.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/context.trm	2023-04-06 16:41:47.774089000 +0900
 @@ -1971,6 +1971,7 @@
  
  #ifdef TERM_HELP
@@ -1668,8 +1668,8 @@ diff -ru term/context.trm.ORG term/context.trm
  #endif /* TERM_HELP */
  
 diff -ru term/corel.trm.ORG term/corel.trm
---- term/corel.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/corel.trm	2023-01-23 14:02:55.769636000 +0900
+--- term/corel.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/corel.trm	2023-04-06 16:41:47.774317000 +0900
 @@ -431,6 +431,7 @@
  
  #ifdef TERM_HELP
@@ -1703,8 +1703,8 @@ diff -ru term/corel.trm.ORG term/corel.trm
  END_HELP(corel)
  #endif /* TERM_HELP */
 diff -ru term/debug.trm.ORG term/debug.trm
---- term/debug.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/debug.trm	2023-01-23 14:02:55.769709000 +0900
+--- term/debug.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/debug.trm	2023-04-06 16:41:47.774594000 +0900
 @@ -372,6 +372,7 @@
  
  #ifdef TERM_HELP
@@ -1731,8 +1731,8 @@ diff -ru term/debug.trm.ORG term/debug.trm
  END_HELP(debug)
  #endif
 diff -ru term/djsvga.trm.ORG term/djsvga.trm
---- term/djsvga.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/djsvga.trm	2023-01-23 14:02:55.769843000 +0900
+--- term/djsvga.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/djsvga.trm	2023-04-06 16:41:47.775358000 +0900
 @@ -2237,6 +2237,7 @@
  
  #ifdef TERM_HELP
@@ -1781,8 +1781,8 @@ diff -ru term/djsvga.trm.ORG term/djsvga.trm
  END_HELP(svga)
  #endif /* TERM_HELP */
 diff -ru term/dumb.trm.ORG term/dumb.trm
---- term/dumb.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/dumb.trm	2023-01-23 14:02:55.769949000 +0900
+--- term/dumb.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/dumb.trm	2023-04-06 16:41:47.775902000 +0900
 @@ -1206,6 +1206,7 @@
  
  #ifdef TERM_HELP
@@ -1889,8 +1889,8 @@ diff -ru term/dumb.trm.ORG term/dumb.trm
  END_HELP(dumb)
  #endif /* TERM_HELP */
 diff -ru term/dxf.trm.ORG term/dxf.trm
---- term/dxf.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/dxf.trm	2023-01-23 14:02:55.770025000 +0900
+--- term/dxf.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/dxf.trm	2023-04-06 16:41:47.776224000 +0900
 @@ -400,6 +400,7 @@
  
  #ifdef TERM_HELP
@@ -1922,8 +1922,8 @@ diff -ru term/dxf.trm.ORG term/dxf.trm
  END_HELP(dxf)
  #endif /* TERM_HELP */
 diff -ru term/dxy.trm.ORG term/dxy.trm
---- term/dxy.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/dxy.trm	2023-01-23 14:02:55.770091000 +0900
+--- term/dxy.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/dxy.trm	2023-04-06 16:41:47.776424000 +0900
 @@ -188,6 +188,7 @@
  
  #ifdef TERM_HELP
@@ -1951,8 +1951,8 @@ diff -ru term/dxy.trm.ORG term/dxy.trm
  END_HELP(dxy800a)
  #endif
 diff -ru term/eepic.trm.ORG term/eepic.trm
---- term/eepic.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/eepic.trm	2023-01-23 14:02:55.770184000 +0900
+--- term/eepic.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/eepic.trm	2023-04-06 16:41:47.776838000 +0900
 @@ -578,6 +578,7 @@
  
  #ifdef TERM_HELP
@@ -2069,8 +2069,8 @@ diff -ru term/eepic.trm.ORG term/eepic.trm
  END_HELP(eepic)
  #endif /* TERM_HELP */
 diff -ru term/emf.trm.ORG term/emf.trm
---- term/emf.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/emf.trm	2023-01-23 14:02:55.770319000 +0900
+--- term/emf.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/emf.trm	2023-04-06 16:41:47.777505000 +0900
 @@ -1981,6 +1981,7 @@
  
  #ifdef TERM_HELP
@@ -2127,8 +2127,8 @@ diff -ru term/emf.trm.ORG term/emf.trm
  END_HELP(emf)
  #endif /* TERM_HELP */
 diff -ru term/epson.trm.ORG term/epson.trm
---- term/epson.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/epson.trm	2023-01-23 14:02:55.770415000 +0900
+--- term/epson.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/epson.trm	2023-04-06 16:41:47.778004000 +0900
 @@ -1081,6 +1081,7 @@
  
  #ifdef TERM_HELP
@@ -2238,8 +2238,8 @@ diff -ru term/epson.trm.ORG term/epson.trm
  END_HELP(epson_180dpi)
  #endif /* TERM_HELP */
 diff -ru term/excl.trm.ORG term/excl.trm
---- term/excl.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/excl.trm	2023-01-23 14:02:55.770557000 +0900
+--- term/excl.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/excl.trm	2023-04-06 16:41:47.778542000 +0900
 @@ -270,6 +270,7 @@
  
  #ifdef TERM_HELP
@@ -2267,8 +2267,8 @@ diff -ru term/excl.trm.ORG term/excl.trm
  END_HELP(excl)
  #endif
 diff -ru term/fig.trm.ORG term/fig.trm
---- term/fig.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/fig.trm	2023-01-23 14:02:55.770694000 +0900
+--- term/fig.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/fig.trm	2023-04-06 16:41:47.779201000 +0900
 @@ -1314,6 +1314,7 @@
  
  #ifdef TERM_HELP
@@ -2352,8 +2352,8 @@ diff -ru term/fig.trm.ORG term/fig.trm
  #endif /* TERM_HELP */
  
 diff -ru term/gd.trm.ORG term/gd.trm
---- term/gd.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/gd.trm	2023-01-23 14:02:55.770880000 +0900
+--- term/gd.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/gd.trm	2023-04-06 16:41:47.779415000 +0900
 @@ -2482,6 +2482,7 @@
  #ifndef JPEG_HELP_ONLY
  #ifdef TERM_HELP
@@ -2647,9 +2647,9 @@ diff -ru term/gd.trm.ORG term/gd.trm
  "1 sixelgd",
  "?commands set terminal sixelgd",
  "?set terminal sixelgd",
-@@ -3057,6 +3301,79 @@
- " the screen rather than having earlier plots scroll off the top. This may be",
- " desirable in order to create an in-place animation.",
+@@ -3054,6 +3298,75 @@
+ " the screen rather than having earlier plots scroll off the top. This can be",
+ " used to create an in-place animation.",
  ""
 +#else /* JAPANESE_DOC */
 +"1 sixelgd",
@@ -2661,57 +2661,53 @@ diff -ru term/gd.trm.ORG term/gd.trm
 +"?sixelgd",
 +" 書式:",
 +"       set terminal sixelgd",
-+"              {{no}enhanced} {{no}truecolor}",
-+"              {{no}transparent} {rounded|butt}",
++"              {{no}enhanced} {{no}truecolor} {rounded|butt}",
 +"              {linewidth <lw>} {dashlength <dl>}",
 +"              {tiny | small | medium | large | giant}",
 +"              {font \"<face> {,<pointsize>}\"} {fontscale <scale>}",
-+"              {size <x>,<y>} {{no}crop} {animate}",
++"              {size <x>,<y>} {animate} {{no}transparent}",
 +"              {background <rgb_color>}",
 +"",
-+" `sixel` 出力フォーマットは、元々 DEC のターミナル、プリンタで使われて",
-+" いたものです。このドライバは、gd ライブラリを内部的に使用して作成した",
-+" PNG 画像を変換して sixel 出力列を生成します。sixel 出力列は、それを作",
-+" 成したときにターミナル上に表示させることができますが、またはその出力列",
-+" をファイルに書きだしておいて、後からそのファイルをターミナルに吐き出す",
-+" ことで表示に置き換えることもできます。",
++" `sixel` 出力フォーマットは、元々 DEC のターミナルやプリンタで使われて",
++" いたものです。gnuplot の sixelgd ドライバは、gd ライブラリを内部的に使",
++" 用して作成した PNG 画像を変換して sixel 出力列を生成します。sixel 出力",
++" 列は、それを作成したときにターミナル上に表示させることができますが、ま",
++" たはその出力列をファイルに書きだしておいて、後からそのファイルをターミ",
++" ナルに吐き出すことで表示に置き換えることもできます。",
 +"",
 +" sixel 出力形式は、ウィンドウシステムか、またはグラフィックディスプレイ",
 +" マネージャが有効でない場合に、gnuplot のグラフを linux コンソールで表",
 +" 示させたい場合にも便利です。以下参照: `linux console`。",
-+"",
-+" `transparent` は、ドライバに背景色の透明化 (transparent) を行うよう指",
-+" 示します。デフォルトは `notransparent` です。",
 +"",
 +" オプション `linewidth` と `dashlength` は拡大率で、描画されるすべての",
 +" 線に影響を与えます。これらは、描画コマンドで要求される値にかけ算されま",
 +" す。",
 +"",
 +" デフォルトでは、sixel 出力は、番号付きの 16 色を使用します。オプション",
-+" `truecolor` では、TrueColor PNG 画像を作成し、それを 256 色の sixel 画",
++" `truecolor` では、24bit RGB PNG 画像を作成し、それを 256 色の sixel 画",
 +" 像出力に減色します。透過型塗り潰しスタイルには、オプション `truecolor`",
 +" が必要です。以下参照: `fillstyle`。",
-+" `transparent` の背景は、番号付きの色画像、TrueColor 画像のどちらでも可",
-+" 能です。",
 +"",
 +" `butt` は線分の描画で、その端の点でのはみだしを起こさない描画メソッド",
 +" を使うようドライバに指示します。この設定は、線幅が 1 より大きい場合に",
 +" のみ意味があります。これの逆が `rounded` で、多少より均一な曲線を生成",
 +" しますが、より遅くなります。",
 +"",
-+" フォントの選択の詳細は、やや複雑です。",
++" gdlib を使用する出力形式におけるフォントの選択の詳細は、やや複雑です。",
 +" 詳細は、以下参照: `fonts`。",
 +"",
 +" 出力描画サイズ <x,y> はピクセル単位で与えます。デフォルトは 640x480 で",
-+" す。以下も参照: `canvas`, `set size`。",
-+" 描画終了後の端の余白は、オプション `crop` で取り除くことができ、その結",
-+" 果としてその画像サイズは小さくなります。デフォルトは `nocrop` です。",
++" すが、あなたのターミナルウィンドウのサイズより多分小さいでしょう。",
 +"",
-+" この出力形式は、xterm, mlterm, mintty ターミナルではテストされ、動作確",
-+" 認されています。最後の 2 つでは、256 色の sixel カラーを丸々使用する",
-+" `truecolor` モードもサポートしますが、配布されている xterm は、sixel",
-+" グラフィックスをサポートする/しないように作られたものかもしれませんし、",
-+" 16 色に制限されているかもしれません。",
++" `transparent` は、ドライバに背景色の透明化 (transparent) を行うよう指示",
++" しますが、ほとんどの端末エミュレータはこれをサポートしていません。デフ",
++" ォルトは `notransparent` です。",
++"",
++" gnuplot の sixelgd 出力は、以下の端末エミュレータ上でテストされ正常動",
++" 作しています: konsole, mlterm, mintty, vt340 モードの xterm (注意: 元",
++" 々付属する xterm は sixel グラフィックをサポートするようにビルドされて",
++" いないかもしれません)。KDE konsole terminal の sixel サポートは、バー",
++" ジョン 22.04.0 で追加されました。",
 +"",
 +"?set terminal sixelgd animate",
 +"?set term sixelgd animate",
@@ -2721,15 +2717,15 @@ diff -ru term/gd.trm.ORG term/gd.trm
 +" オプション `animate` は、連続する plot 命令で前のグラフが上にスクロー",
 +" ルして消える代わりに、各 plot がスクリーンの同じ領域を上書きするように",
 +" 各 plot の開始時にカーソル位置をターミナルの左上にリセットします。これ",
-+" は場所固定式アニメーション (in-place animation) の生成用の仕組みです。",
++" は場所固定式アニメーション (in-place animation) を作るのに使えます。",
 +""
 +#endif /* JAPANESE_DOC */
  END_HELP(sixelgd)
  #endif /* TERM_HELP */
  #endif /* WITH_GD_SIXEL */
 diff -ru term/ggi.trm.ORG term/ggi.trm
---- term/ggi.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/ggi.trm	2023-01-23 14:02:55.770988000 +0900
+--- term/ggi.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/ggi.trm	2023-04-06 16:41:47.779870000 +0900
 @@ -1508,6 +1508,7 @@
  
  #ifdef TERM_HELP
@@ -2782,8 +2778,8 @@ diff -ru term/ggi.trm.ORG term/ggi.trm
  END_HELP(ggi)
  #endif
 diff -ru term/gpic.trm.ORG term/gpic.trm
---- term/gpic.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/gpic.trm	2023-01-23 14:02:55.771065000 +0900
+--- term/gpic.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/gpic.trm	2023-04-06 16:41:47.780143000 +0900
 @@ -291,6 +291,7 @@
  
  #ifdef TERM_HELP
@@ -2860,8 +2856,8 @@ diff -ru term/gpic.trm.ORG term/gpic.trm
  END_HELP(gpic)
  #endif /* TERM_HELP */
 diff -ru term/grass.trm.ORG term/grass.trm
---- term/grass.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/grass.trm	2023-01-23 14:02:55.771148000 +0900
+--- term/grass.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/grass.trm	2023-04-06 16:41:47.780440000 +0900
 @@ -601,6 +601,7 @@
  
  #ifdef TERM_HELP
@@ -2891,8 +2887,8 @@ diff -ru term/grass.trm.ORG term/grass.trm
  END_HELP(grass)
  #endif
 diff -ru term/hp26.trm.ORG term/hp26.trm
---- term/hp26.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/hp26.trm	2023-01-23 14:02:55.771237000 +0900
+--- term/hp26.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/hp26.trm	2023-04-06 16:41:47.780763000 +0900
 @@ -689,6 +689,7 @@
  
  #ifdef TERM_HELP
@@ -2919,8 +2915,8 @@ diff -ru term/hp26.trm.ORG term/hp26.trm
  END_HELP(hp2623a)
  #endif
 diff -ru term/hp2648.trm.ORG term/hp2648.trm
---- term/hp2648.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/hp2648.trm	2023-01-23 14:02:55.771305000 +0900
+--- term/hp2648.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/hp2648.trm	2023-04-06 16:41:47.781020000 +0900
 @@ -185,6 +185,7 @@
  
  #ifdef TERM_HELP
@@ -2947,8 +2943,8 @@ diff -ru term/hp2648.trm.ORG term/hp2648.trm
  END_HELP(hp2648)
  #endif
 diff -ru term/hp500c.trm.ORG term/hp500c.trm
---- term/hp500c.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/hp500c.trm	2023-01-23 14:02:55.771384000 +0900
+--- term/hp500c.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/hp500c.trm	2023-04-06 16:41:47.781271000 +0900
 @@ -516,6 +516,7 @@
  
  #ifdef TERM_HELP
@@ -2985,8 +2981,8 @@ diff -ru term/hp500c.trm.ORG term/hp500c.trm
  END_HELP(hp500c)
  #endif /* TERM_HELP */
 diff -ru term/hpgeneric.h.ORG term/hpgeneric.h
---- term/hpgeneric.h	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/hpgeneric.h	2023-01-23 14:02:55.777562000 +0900
+--- term/hpgeneric.h	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/hpgeneric.h	2023-04-06 16:41:47.821694000 +0900
 @@ -4,6 +4,7 @@
   */
  #ifdef TERM_HELP
@@ -3016,8 +3012,8 @@ diff -ru term/hpgeneric.h.ORG term/hpgeneric.h
  END_HELP(hpgeneric)
  #endif
 diff -ru term/hpgl.trm.ORG term/hpgl.trm
---- term/hpgl.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/hpgl.trm	2023-01-23 14:02:55.771571000 +0900
+--- term/hpgl.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/hpgl.trm	2023-04-06 16:41:47.782337000 +0900
 @@ -3296,6 +3296,7 @@
  
  #ifdef TERM_HELP
@@ -3153,8 +3149,8 @@ diff -ru term/hpgl.trm.ORG term/hpgl.trm
  END_HELP(pcl5)
  #endif /* TERM_HELP */
 diff -ru term/hpljii.trm.ORG term/hpljii.trm
---- term/hpljii.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/hpljii.trm	2023-01-23 14:02:55.771655000 +0900
+--- term/hpljii.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/hpljii.trm	2023-04-06 16:41:47.786224000 +0900
 @@ -388,6 +388,7 @@
  
  #ifdef TERM_HELP
@@ -3199,8 +3195,8 @@ diff -ru term/hpljii.trm.ORG term/hpljii.trm
  END_HELP(hpljii)
  #endif /* TERM_HELP */
 diff -ru term/hppj.trm.ORG term/hppj.trm
---- term/hppj.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/hppj.trm	2023-01-23 14:02:55.771730000 +0900
+--- term/hppj.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/hppj.trm	2023-04-06 16:41:47.786503000 +0900
 @@ -268,6 +268,7 @@
  
  #ifdef TERM_HELP
@@ -3233,8 +3229,8 @@ diff -ru term/hppj.trm.ORG term/hppj.trm
  END_HELP(hppj)
  #endif
 diff -ru term/imagen.trm.ORG term/imagen.trm
---- term/imagen.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/imagen.trm	2023-01-23 14:02:55.771819000 +0900
+--- term/imagen.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/imagen.trm	2023-04-06 16:41:47.787527000 +0900
 @@ -886,6 +886,7 @@
  
  #ifdef TERM_HELP
@@ -3275,8 +3271,8 @@ diff -ru term/imagen.trm.ORG term/imagen.trm
  END_HELP(imagen)
  #endif
 diff -ru term/kyo.trm.ORG term/kyo.trm
---- term/kyo.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/kyo.trm	2023-01-23 14:02:55.771888000 +0900
+--- term/kyo.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/kyo.trm	2023-04-06 16:41:47.787768000 +0900
 @@ -201,6 +201,7 @@
  
  #ifdef TERM_HELP
@@ -3311,8 +3307,8 @@ diff -ru term/kyo.trm.ORG term/kyo.trm
  END_HELP(kyo)
  #endif
 diff -ru term/latex.trm.ORG term/latex.trm
---- term/latex.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/latex.trm	2023-01-23 14:02:55.771999000 +0900
+--- term/latex.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/latex.trm	2023-04-06 16:41:47.788664000 +0900
 @@ -1164,6 +1164,7 @@
  
  #ifdef TERM_HELP
@@ -3403,8 +3399,8 @@ diff -ru term/latex.trm.ORG term/latex.trm
  END_HELP(latex)
  #endif /* TERM_TABLE */
 diff -ru term/latex_old.h.ORG term/latex_old.h
---- term/latex_old.h	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/latex_old.h	2023-01-23 14:02:55.777495000 +0900
+--- term/latex_old.h	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/latex_old.h	2023-04-06 16:41:47.821473000 +0900
 @@ -5,6 +5,7 @@
   */
  #ifdef TERM_HELP
@@ -3464,8 +3460,8 @@ diff -ru term/latex_old.h.ORG term/latex_old.h
  END_HELP(latex)
  #endif
 diff -ru term/linux-vgagl.trm.ORG term/linux-vgagl.trm
---- term/linux-vgagl.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/linux-vgagl.trm	2023-01-23 14:02:55.772064000 +0900
+--- term/linux-vgagl.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/linux-vgagl.trm	2023-04-06 16:41:47.788892000 +0900
 @@ -1,5 +1,6 @@
  #ifdef TERM_HELP
  START_HELP(linux)
@@ -3504,8 +3500,8 @@ diff -ru term/linux-vgagl.trm.ORG term/linux-vgagl.trm
  END_HELP(linux)
  #endif
 diff -ru term/lua.trm.ORG term/lua.trm
---- term/lua.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/lua.trm	2023-01-23 14:02:55.772183000 +0900
+--- term/lua.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/lua.trm	2023-04-06 16:41:47.789391000 +0900
 @@ -1480,6 +1480,7 @@
  
  #ifdef TERM_HELP
@@ -3581,8 +3577,8 @@ diff -ru term/lua.trm.ORG term/lua.trm
  END_HELP(tikz)
  #endif /* TERM_HELP */
 diff -ru term/metafont.trm.ORG term/metafont.trm
---- term/metafont.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/metafont.trm	2023-01-23 14:02:55.772274000 +0900
+--- term/metafont.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/metafont.trm	2023-04-06 16:41:47.789750000 +0900
 @@ -538,6 +538,7 @@
  
  #ifdef TERM_HELP
@@ -3697,8 +3693,8 @@ diff -ru term/metafont.trm.ORG term/metafont.trm
  END_HELP(mf)
  #endif /* TERM_HELP */
 diff -ru term/metapost.trm.ORG term/metapost.trm
---- term/metapost.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/metapost.trm	2023-01-23 14:02:55.772395000 +0900
+--- term/metapost.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/metapost.trm	2023-04-06 16:41:47.791531000 +0900
 @@ -1054,6 +1054,7 @@
  
  #ifdef TERM_HELP
@@ -3910,8 +3906,8 @@ diff -ru term/metapost.trm.ORG term/metapost.trm
  END_HELP(mp)
  #endif				/* TERM_HELP */
 diff -ru term/mif.trm.ORG term/mif.trm
---- term/mif.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/mif.trm	2023-01-23 14:02:55.772504000 +0900
+--- term/mif.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/mif.trm	2023-04-06 16:41:47.791940000 +0900
 @@ -963,6 +963,7 @@
  
  #ifdef TERM_HELP
@@ -3962,8 +3958,8 @@ diff -ru term/mif.trm.ORG term/mif.trm
  END_HELP(mif)
  #endif /* TERM_HELP */
 diff -ru term/pbm.trm.ORG term/pbm.trm
---- term/pbm.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/pbm.trm	2023-01-23 14:02:55.772583000 +0900
+--- term/pbm.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/pbm.trm	2023-04-06 16:41:47.792264000 +0900
 @@ -534,6 +534,7 @@
  
  #ifdef TERM_HELP
@@ -4013,8 +4009,8 @@ diff -ru term/pbm.trm.ORG term/pbm.trm
  END_HELP(pbm)
  #endif /* TERM_HELP */
 diff -ru term/pc.trm.ORG term/pc.trm
---- term/pc.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/pc.trm	2023-01-23 14:02:55.772700000 +0900
+--- term/pc.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/pc.trm	2023-04-06 16:41:47.792826000 +0900
 @@ -1587,6 +1587,7 @@
  
  #ifdef TERM_HELP
@@ -4068,8 +4064,8 @@ diff -ru term/pc.trm.ORG term/pc.trm
  END_HELP(dospc)
  #endif /* TERM_HELP */
 diff -ru term/pdf.trm.ORG term/pdf.trm
---- term/pdf.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/pdf.trm	2023-01-23 14:02:55.772841000 +0900
+--- term/pdf.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/pdf.trm	2023-04-06 16:41:47.799005000 +0900
 @@ -1716,6 +1716,7 @@
  
  #ifdef TERM_HELP
@@ -4136,8 +4132,8 @@ diff -ru term/pdf.trm.ORG term/pdf.trm
  END_HELP(pdf)
  #endif
 diff -ru term/pict2e.trm.ORG term/pict2e.trm
---- term/pict2e.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/pict2e.trm	2023-01-23 14:02:55.772965000 +0900
+--- term/pict2e.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/pict2e.trm	2023-04-06 16:41:47.802610000 +0900
 @@ -1092,6 +1092,7 @@
  
  #ifdef TERM_HELP
@@ -4224,8 +4220,8 @@ diff -ru term/pict2e.trm.ORG term/pict2e.trm
  END_HELP(pict2e)
  #endif /* TERM_HELP */
 diff -ru term/pm.trm.ORG term/pm.trm
---- term/pm.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/pm.trm	2023-01-23 14:02:55.773088000 +0900
+--- term/pm.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/pm.trm	2023-04-06 16:41:47.803068000 +0900
 @@ -1579,6 +1579,7 @@
  
  #ifdef TERM_HELP
@@ -4290,9 +4286,9 @@ diff -ru term/pm.trm.ORG term/pm.trm
  END_HELP(pm)
  #endif /* TERM_HELP */
 diff -ru term/post.trm.ORG term/post.trm
---- term/post.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/post.trm	2023-01-23 14:02:55.780476000 +0900
-@@ -4454,6 +4454,7 @@
+--- term/post.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/post.trm	2023-04-06 16:41:47.826467000 +0900
+@@ -4470,6 +4470,7 @@
   * of "text" that is necessary to avoid errors.
   */
  START_HELP(00psglobal)
@@ -4300,7 +4296,7 @@ diff -ru term/post.trm.ORG term/post.trm
  #define PS_COMMON_OPTS1 \
  "                               {level1 | leveldefault | level3}",\
  "                               {color | colour | monochrome}",\
-@@ -4525,9 +4526,85 @@
+@@ -4541,9 +4542,85 @@
  " actual limits of the plot.",\
  "",
  ""
@@ -4386,7 +4382,7 @@ diff -ru term/post.trm.ORG term/post.trm
  "1 epslatex",
  "?commands set terminal epslatex",
  "?set terminal epslatex",
-@@ -4695,9 +4772,184 @@
+@@ -4711,9 +4788,184 @@
  " by the `header` command.  Thus, you can use `header` to overwrite some of",
  " settings performed using \"gnuplot.cfg\"",
  ""
@@ -4571,7 +4567,7 @@ diff -ru term/post.trm.ORG term/post.trm
  "1 pslatex and pstex",
  "?commands set terminal pslatex",
  "?set terminal pslatex",
-@@ -4777,9 +5029,89 @@
+@@ -4793,9 +5045,89 @@
  "",
  " Linewidths and pointsizes may be changed with `set style line`."
  ""
@@ -4661,7 +4657,7 @@ diff -ru term/post.trm.ORG term/post.trm
  "1 postscript",
  "?commands set terminal postscript",
  "?set terminal postscript",
-@@ -5044,5 +5376,269 @@
+@@ -5060,5 +5392,269 @@
  " other fonts you may have to try both settings.  See also `fontfile`.",
  "",
  ""
@@ -4932,8 +4928,8 @@ diff -ru term/post.trm.ORG term/post.trm
  END_HELP(post)
  #endif /* TERM_HELP */
 diff -ru term/pstricks.trm.ORG term/pstricks.trm
---- term/pstricks.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/pstricks.trm	2023-01-23 14:02:55.773702000 +0900
+--- term/pstricks.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/pstricks.trm	2023-04-06 16:41:47.811766000 +0900
 @@ -1323,6 +1323,7 @@
  
  #ifdef TERM_HELP
@@ -5012,8 +5008,8 @@ diff -ru term/pstricks.trm.ORG term/pstricks.trm
  END_HELP(pstricks)
  #endif /* TERM_HELP */
 diff -ru term/qms.trm.ORG term/qms.trm
---- term/qms.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/qms.trm	2023-01-23 14:02:55.773769000 +0900
+--- term/qms.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/qms.trm	2023-04-06 16:41:47.812012000 +0900
 @@ -223,6 +223,7 @@
  
  #ifdef TERM_HELP
@@ -5040,8 +5036,8 @@ diff -ru term/qms.trm.ORG term/qms.trm
  END_HELP(qms)
  #endif
 diff -ru term/qt.trm.ORG term/qt.trm
---- term/qt.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/qt.trm	2023-01-23 14:02:55.773847000 +0900
+--- term/qt.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/qt.trm	2023-04-06 16:41:47.812309000 +0900
 @@ -76,6 +76,7 @@
  
  #ifdef TERM_HELP
@@ -5178,8 +5174,8 @@ diff -ru term/qt.trm.ORG term/qt.trm
  END_HELP(qt)
  #endif /* TERM_HELP */
 diff -ru term/regis.trm.ORG term/regis.trm
---- term/regis.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/regis.trm	2023-01-23 14:02:55.773918000 +0900
+--- term/regis.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/regis.trm	2023-04-06 16:41:47.812509000 +0900
 @@ -255,6 +255,7 @@
  
  #ifdef TERM_HELP
@@ -5211,8 +5207,8 @@ diff -ru term/regis.trm.ORG term/regis.trm
  END_HELP(regis)
  #endif
 diff -ru term/svg.trm.ORG term/svg.trm
---- term/svg.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/svg.trm	2023-01-23 14:02:55.774092000 +0900
+--- term/svg.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/svg.trm	2023-04-06 16:41:47.813368000 +0900
 @@ -2317,6 +2317,7 @@
  
  #ifdef TERM_HELP
@@ -5323,8 +5319,8 @@ diff -ru term/svg.trm.ORG term/svg.trm
  END_HELP(domterm)
  #endif /* TERM_HELP */
 diff -ru term/t410x.trm.ORG term/t410x.trm
---- term/t410x.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/t410x.trm	2023-01-23 14:02:55.774163000 +0900
+--- term/t410x.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/t410x.trm	2023-04-06 16:41:47.813637000 +0900
 @@ -312,6 +312,7 @@
  
  #ifdef TERM_HELP
@@ -5351,8 +5347,8 @@ diff -ru term/t410x.trm.ORG term/t410x.trm
  END_HELP(tek410x)
  #endif
 diff -ru term/tek.trm.ORG term/tek.trm
---- term/tek.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/tek.trm	2023-01-23 14:02:55.774271000 +0900
+--- term/tek.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/tek.trm	2023-04-06 16:41:47.814179000 +0900
 @@ -1359,6 +1359,7 @@
  
  #ifdef TERM_HELP
@@ -5453,8 +5449,8 @@ diff -ru term/tek.trm.ORG term/tek.trm
  END_HELP(tek40)
  #endif /* TERM_HELP */
 diff -ru term/texdraw.trm.ORG term/texdraw.trm
---- term/texdraw.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/texdraw.trm	2023-01-23 14:02:55.774368000 +0900
+--- term/texdraw.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/texdraw.trm	2023-04-06 16:41:47.814565000 +0900
 @@ -883,6 +883,7 @@
  
  #ifdef TERM_HELP
@@ -5523,8 +5519,8 @@ diff -ru term/texdraw.trm.ORG term/texdraw.trm
  END_HELP(texdraw)
  #endif /* TERM_HELP */
 diff -ru term/tgif.trm.ORG term/tgif.trm
---- term/tgif.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/tgif.trm	2023-01-23 14:02:55.782947000 +0900
+--- term/tgif.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/tgif.trm	2023-04-06 16:41:47.829481000 +0900
 @@ -1678,6 +1678,7 @@
  
  #ifdef TERM_HELP
@@ -5614,8 +5610,8 @@ diff -ru term/tgif.trm.ORG term/tgif.trm
  #endif
  /*{{{}}}*/
 diff -ru term/tkcanvas.trm.ORG term/tkcanvas.trm
---- term/tkcanvas.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/tkcanvas.trm	2023-01-23 14:02:55.774693000 +0900
+--- term/tkcanvas.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/tkcanvas.trm	2023-04-06 16:41:47.815954000 +0900
 @@ -2116,6 +2116,7 @@
  
  #ifdef TERM_HELP
@@ -5778,8 +5774,8 @@ diff -ru term/tkcanvas.trm.ORG term/tkcanvas.trm
  #endif
  
 diff -ru term/tpic.trm.ORG term/tpic.trm
---- term/tpic.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/tpic.trm	2023-01-23 14:02:55.774790000 +0900
+--- term/tpic.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/tpic.trm	2023-04-06 16:41:47.816338000 +0900
 @@ -926,6 +926,7 @@
  
  #ifdef TERM_HELP
@@ -5840,8 +5836,8 @@ diff -ru term/tpic.trm.ORG term/tpic.trm
  END_HELP(tpic)
  #endif /* TERM_TABLE */
 diff -ru term/webp.trm.ORG term/webp.trm
---- term/webp.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/webp.trm	2023-01-23 14:02:55.774871000 +0900
+--- term/webp.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/webp.trm	2023-04-06 16:41:47.816658000 +0900
 @@ -372,6 +372,7 @@
  
  #ifdef TERM_HELP
@@ -5904,8 +5900,8 @@ diff -ru term/webp.trm.ORG term/webp.trm
  #endif /* TERM_HELP */
  
 diff -ru term/win.trm.ORG term/win.trm
---- term/win.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/win.trm	2023-01-23 14:02:55.775017000 +0900
+--- term/win.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/win.trm	2023-04-06 16:41:47.817290000 +0900
 @@ -1190,6 +1190,7 @@
  
  #ifdef TERM_HELP
@@ -6243,8 +6239,8 @@ diff -ru term/win.trm.ORG term/win.trm
  END_HELP(windows)
  #endif /* TERM_HELP */
 diff -ru term/wxt.trm.ORG term/wxt.trm
---- term/wxt.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/wxt.trm	2023-01-23 14:02:55.775114000 +0900
+--- term/wxt.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/wxt.trm	2023-04-06 16:41:47.817709000 +0900
 @@ -499,6 +499,7 @@
  
  #ifdef TERM_HELP
@@ -6385,8 +6381,8 @@ diff -ru term/wxt.trm.ORG term/wxt.trm
  END_HELP(wxt)
  #endif /* TERM_HELP */
 diff -ru term/x11.trm.ORG term/x11.trm
---- term/x11.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/x11.trm	2023-01-23 14:02:55.775344000 +0900
+--- term/x11.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/x11.trm	2023-04-06 16:41:47.818835000 +0900
 @@ -2389,6 +2389,7 @@
  
  #ifdef TERM_HELP
@@ -6912,8 +6908,8 @@ diff -ru term/x11.trm.ORG term/x11.trm
  END_HELP(x11)
  #endif				/* TERM_HELP */
 diff -ru term/xlib.trm.ORG term/xlib.trm
---- term/xlib.trm	2023-01-23.ORG 12:13:49.000000000 +0900
-+++ term/xlib.trm	2023-01-23 14:02:55.775407000 +0900
+--- term/xlib.trm	2023-04-05.ORG 09:08:49.000000000 +0900
++++ term/xlib.trm	2023-04-06 16:41:47.819019000 +0900
 @@ -96,6 +96,7 @@
  
  #ifdef TERM_HELP
