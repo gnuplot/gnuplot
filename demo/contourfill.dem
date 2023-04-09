@@ -70,16 +70,15 @@ pause -1 "<cr> for 2D projection"
 
 #
 # cbtics must match cntrparam increments
-# cbrange must match zrange
 # turn off "pm3d depth" to superimpose contour lines
 #
-set title "set contourfill + contour lines"
-set zrange [-28:28]
+set title "contourfill + contour lines"
+set zrange [-25:25]
 set cbrange [-21:21]
-set cbtics -21, 3, 21
+set cbtics -20, 5, 20
 set contours
 set cntrparam cubic
-set cntrparam levels incremental -21, 3, 21
+set cntrparam levels incremental -20, 5, 20
 set cntrlabel onecolor
 unset colorbox
 unset hidden3d
@@ -90,7 +89,7 @@ set view map
 set tics scale 0
 set key inside samplen 0.1 reverse
 splot g(x,y) with contourfill notitle, \
-      g(x,y) nosurface lt black title "Contour levels Δz = 3"
+      g(x,y) nosurface lt black title "Contour levels Δz = 5"
 
 pause -1 "<cr> to continue"
 reset

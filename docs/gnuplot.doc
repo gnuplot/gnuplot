@@ -302,8 +302,10 @@ C
 #b 3D plot style `with pm3d` accepts an optional modifier `zclip [zmin:zmax]`
 ## that selects only a slice of the full surface.  Successive plots with
 ## incremental changes to the clipping limits can be used to animate a
-## cross sectional cutaway view in 3D or to create a filled area contour map
-## in 2D projection.
+## cross-sectional cutaway view in 3D or to create a filled area contour map.
+## This is automated by a new plot style `with contourfill`, that is
+## particularly useful in 2D projection. See `set contourfill`.
+
 #end
 D polargrid 4
 DB
@@ -312,6 +314,8 @@ D sectors 4
 DB
 D sharpen 1
 D iris 2
+DB
+D contourfill 4
 
 3 Hulls, masks, and smoothing
 ?new hulls
@@ -4991,6 +4995,33 @@ Ffigure_piechart
      0    0    5  230   360    5
      e
 
+2 contourfill
+?plotting styles contourfill
+?style contourfill
+?with contourfill
+?contourfill
+Ffigure_contourfill
+ Contourfill is a 3D plotting style used to color a pm3d surface in slices
+ along the z axis.  It can be used in 2D projection (`set view map`) to create
+ 2D contour plots with solid color between contour lines.
+ The slice boundaries and the assigned colors are both controlled using
+ `set contourfill`.  See also `pm3d`, `zclip`.
+
+ This style can be combined with `set contours` to superimpose contour
+ lines that bound the slices.  Care must be taken that the slice boundaries
+ from `set contourfill` match the contour bounaries from `set cntrparam`.
+ 
+      # slice boundaries determined by ztics
+      # coloring set by palette mapping the slice midpoint z value
+      set pm3d border retrace
+      set contourfill ztics
+      set ztics -20, 5, 20
+      set contour
+      set cntrparam cubic levels increment -20, 5, 20
+      set cntrlabel onecolor
+      set view map
+      splot g(x,y) with contourfill, g(x,y) with lines nosurface
+
 2 ellipses
 ?plotting styles ellipses
 ?style ellipses
@@ -5695,11 +5726,11 @@ Ffigure_lines
  variable line color (see `rgbcolor variable`).
 
  2D form (no "using" spec)
-      1 column:   y       # implicit x from row number
-      2 columns:  x  y
+    1 column:   y     # implicit x from row number
+    2 columns:  x y
  3D form (no "using" spec)
-      1 column:   z       # implicit x from row, y from index
-      3 columns:  x  y  z
+    1 column:   z     # implicit x from row, y from index
+    3 columns:  x y z
 
  See also `linetypes`, `linewidth`, and `linestyle`.
 2 linespoints
@@ -6141,6 +6172,7 @@ Ffigure_vectors
  See also the 2D plot style `with arrows` that is identical to `with vectors`
  except that each arrow is specified using x:y:length:angle.
 
+#TeX \newpage
 2 xerrorbars
 ?plotting styles xerrorbars
 ?style xerrorbars
@@ -10893,10 +10925,15 @@ Ffigure_colornames
 ?contour
 ?contours
 ?nocontour
- `set contour` enables contour drawing for surfaces.  This option is available
- for `splot` only.  It requires grid data, see `grid_data` for more details.
- If contours are desired from non-grid data, `set dgrid3d` can be used to
- create an appropriate grid.
+ `set contour` enables placement of contour lines on 3D surfaces.
+ This option is available only for `splot`.  It requires grid data,
+ e.g. a file in which all the points for a single y-isoline are listed,
+ then all the points for the next y-isoline, and so on.  A single blank line
+ (containing no characters other than blank spaces) separates one y-isoline
+ from the next.  see `grid_data` for more details.
+
+ If the data is not already gridded, `set dgrid3d` can be used to first
+ create and populate an appropriate grid.
 
  Syntax:
        set contour {base | surface | both}
@@ -10911,26 +10948,10 @@ Ffigure_colornames
  See also `set cntrparam` for the parameters that affect the drawing of
  contours, and `set cntrlabel` for control of labeling of the contours.
 
- The surface can be switched off (see `unset surface`), giving a contour-only
- graph.  Though it is possible to use `set size` to enlarge the plot to fill
- the screen, more control over the output format can be obtained by writing
- the contour information to a datablock, and rereading it as a 2D datafile plot:
-
-       unset surface
-       set contour
-       set cntrparam ...
-       set table $datablock
-       splot ...
-       unset table
-       # contour info now in $datablock
-       set term <whatever>
-       plot $datablock
-
- In order to draw contours, the data should be organized as "grid data".  In
- such a file all the points for a single y-isoline are listed, then all the
- points for the next y-isoline, and so on.  A single blank line (a line
- containing no characters other than blank spaces and a carriage return and/or
- a line feed) separates one y-isoline from the next.
+ Note that this option places lines or labels without otherwise changing
+ the appearance of the surface itself.  If you want to recolor the surface
+ so that the areas bounded by contour lines are assigned distinct colors,
+ use instead the contourfill plot style.  See `contourfill`.
 
  While `set contour` is in effect, `splot with <style>` will place the
  style elements (points, lines, impulses, labels, etc) along the contour lines.
@@ -10939,15 +10960,31 @@ Ffigure_colornames
  the contours generated while `set contour` is active you must append the
  keyword `nocontours` after that clause in the splot command.
 
- See also `splot datafile`.
+ The surface can be switched off (see `unset surface`) to give a contour-only
+ graph.  A 2D projection of the contour lines and optional labels can be
+ generated by
 
- See also
+      set view map
+      splot DATA with lines nosurface, DATA with labels
+
+ Older gnuplot versions used an alternative multi-step method to save the
+ 3D contour lines into a file or datablock and then plot them using a
+ 2D plot command as shown below.
+
+       set contour
+       set table $datablock
+       splot DATA with lines nosurface
+       unset table
+       # contour lines are now in $datablock, one contour per index
+       plot for [level=0:*] $datablock index level with lines
+
+ See also `splot datafile` and demos for
 ^ <a href="http://www.gnuplot.info/demo/contours.html">
- contours demo (contours.dem)
+ contours (contours.dem)
 ^ </a>
  and
 ^ <a href="http://www.gnuplot.info/demo/discrete.html">
- contours with user defined levels demo (discrete.dem).
+ user defined contour levels (discrete.dem).
 ^ </a>
 3 cornerpoles
 ?command set cornerpoles
@@ -10955,6 +10992,42 @@ Ffigure_colornames
 ?cornerpoles
  By default splot draws a vertical line from each corner of a 3D surface to the
  base plane. These vertical lines can be suppressed using `unset cornerpoles`.
+3 contourfill
+?commands set contourfill
+?commands show contourfill
+?set contourfill
+?show contourfill
+ The 3D plot style `with contourfill` slices a pm3d surface into sections
+ delimited by a set of planes perpendicular to the z axis.   The command
+ `set contourfill` controls placement of these limiting planes and the
+ colors assigned to the individual sections.
+
+ Syntax:
+      set contourfill auto N          # split zrange evenly into N slices
+      set contourfill ztics <level>   # slice at each z axis tick matching level
+      set contourfill cbtics <level>  # slice at each cb axis tick matching level
+      set contourfill {palette | firstlinetype N}
+
+ The default is `set contourfill auto 5 palette`, which splits the current
+ z range into five equal slices (6 bounding planes) and assigns each slice
+ the palette mapped color of its midpoint z value.
+
+ The options `ztics` or `cbtics` place split zrange by slicing at major axis
+ tick (level 0) or minor tick (level 1) or tick at some other level set
+ explicitly by the user.  For example to slice specifically at z=2.5, z=7 and
+ z=10 independent of the major and minor tics you could use the commands below.
+      set ztics add ("floor" 2.5 3, "boundary X" 7 3, "ceiling" 10 3)
+      set contourfill ztics 3
+      set ztics scale 1, 0.5, 0, 0, 0
+
+ If you do not want to use palette coloring for the sections, you can choose
+ any arbitrary range of successive linetypes and assign them the desired color
+ sequence.
+      set for [i=101:110] linetype i lc mycolor[i]
+      set contourfill firstlinetype 101
+ `set contourfill palette` restores palette coloring.
+D contourfill 3
+
 3 dashtype
 ?commands set dashtype
 ?commands show dashtype

@@ -1319,6 +1319,31 @@ if (!strstrt(GPVAL_COMPILE_OPTIONS, "+POLARGRID")) {
 }
 reset
 
+# contourfill
+#
+set output out.'figure_contourfill' . ext
+set title "contourfill + contour lines" offset 0,-0.5
+set bmargin at screen 0.01; set tmargin at screen 0.9
+set xrange [-1:5]; set yrange [-3:3]; set zrange [-25:25]
+set ztics -20, 5, 20
+set contours
+set cntrparam cubic levels incremental -20, 5, 20
+set cntrlabel onecolor
+unset colorbox; unset hidden3d; unset key
+set tics format ""
+set palette viridis
+set contourfill ztics level 0
+set pm3d scansauto border retrace
+set sample 51; set isosample 51
+set view map
+set tics scale 0
+
+g(x,y) = x**2 + y**2 * (1 - x)**3
+splot g(x,y) with contourfill notitle, \
+      g(x,y) nosurface lt black title "Contour levels Δz = 5"
+reset
+
+
 #
 # Extra width figures for some output formats
 #
