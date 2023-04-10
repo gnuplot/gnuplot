@@ -74,8 +74,8 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
-pgf.REVISION = "116"
-pgf.REVISION_DATE = "2023/04/06 18:06:00"
+pgf.REVISION = "117"
+pgf.REVISION_DATE = "2023/04/10 17:10:00"
 
 pgf.styles = {}
 
@@ -1330,9 +1330,9 @@ gfx.format.latex = {
   docheader        = "\\documentclass["..pgf.DEFAULT_FONT_SIZE.."pt]{article}\n"
                       .."\\usepackage[T1]{fontenc}\n"
                       .."\\usepackage{textcomp}\n\n"
-                      .."\\usepackage[utf8x]{inputenc}\n"
                       .."\\usepackage{ucs}\n"
-                      .."\\SetUnicodeOption{mathletters}\n\n"
+                      .."\\SetUnicodeOption{mathletters}\n"
+                      .."\\usepackage[utf8x]{inputenc}\n\n"
                       .."\\usepackage{"..pgf.STYLE_FILE_BASENAME.."}\n"
                       .."\\pagestyle{empty}\n"
                       .."\\usepackage[active,tightpage]{preview}\n"
