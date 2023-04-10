@@ -1,53 +1,75 @@
-% LaTeX2e version
-% add `[a4paper]' before `{article}' to load settings for A4-paper
-% see below if you add 11pt or 12pt
-   \documentclass[twoside]{article}
-   \usepackage{toc_entr}
-   \usepackage{latexsym}
-   \usepackage[utf8x]{inputenc}
-   \usepackage{textgreek}
-   \usepackage{amsfonts}
-   \usepackage{amssymb}
-   \usepackage{nicefrac}
+%          Prolog file for gnuplot user manual
+% This file has alternative sections for use with pdflatex or lualatex.
+% Tested with texlive 2022, 2023
 
-% Use actual backticks in verbatim sections
-   \usepackage{upquote}
+% Add '[a4paper]' before '{article}' to load settings for A4-paper
+% See below if you add 11pt or 12pt
+   \documentclass[10pt,twoside]{article}
+   \usepackage{toc_entr}
 
 % imakeidx must come before hyperref (makeidx doesn't care)
 % \usepackage{makeidx}
   \usepackage[nonewpage]{imakeidx}
   \makeindex
 
+% hyperref must come before the ucs/utf8x encoding mangling
   \usepackage[
-% We've given up trying to understand pdftex vs. normal latex.
-% It'll just have to sort itself out.  If it doesn't, add your
-% own local hyperref options HERE.
         hyperindex,
         bookmarks,
         bookmarksnumbered=true,
-        pdftitle={gnuplot documentation},
+        pdftitle={gnuplot version 6 documentation},
         pdfauthor={gnuplot},
         pdfsubject={see www.gnuplot.info}
-  %     ,pdfcreator={}
-  %     ,pdfkeywords={...}
   ]{hyperref}
+  \hypersetup{
+       colorlinks   = true, %Colours links instead of ugly boxes
+       linkcolor    = blue, %Colour for internal links
+       urlcolor     = blue  %Colour for external hyperlinks
+  }
 
-% This replaces the default ugly red boxes around hyperlinks
-   \hypersetup{
-     colorlinks   = true, %Colours links instead of ugly boxes
-     linkcolor    = blue, %Colour of internal links
-     urlcolor     = blue %Colour for external hyperlinks
-   }
 
-  \usepackage{fancyhdr}
+\usepackage{ifluatex,ifxetex}
+\ifluatex
+    % These commands are for use with lualatex
+    % The default CM fonts are missing many unicode characters
+    \usepackage{fontspec}
+    \setmainfont{Free Serif}
+    \setmonofont{Free Mono}
+    \usepackage{unicode-math}
+\else\ifxetex
+    % These commands are for use with xelatex
+    % The default CM fonts are missing many unicode characters
+    \usepackage{fontspec}
+    \setmainfont{FreeSerif.otf}[
+        BoldFont = FreeSerifBold.otf ,
+        ItalicFont = FreeSerifItalic.otf ,
+        BoldItalicFont = FreeSerifBoldItalic.otf ]
+    \setmonofont{FreeMono.otf}
+    \usepackage{unicode-math}
+\else
+    % These commands are for use with pdflatex
+    \usepackage{ucs}
+    \SetUnicodeOption{mathletters}
+    \usepackage[utf8x]{inputenc}
+    \usepackage{latexsym}
+    \usepackage{textgreek}
+    \usepackage{amsfonts}
+    \usepackage{amssymb}
+\fi\fi
 
-  \usepackage{longtable}
+% These commands are for the tables of functions
+   \usepackage{longtable}
+   \usepackage{nicefrac}
+   \def\gpCX{\footnotesize c}  % our private symbol definition
+
+% Use actual backticks in verbatim sections
+   \usepackage{upquote}
 
   % This is only needed if you want to embed figures
   \input{gpinsetfigure}
 
   % This supposedly discourages section titles from appearing
-  % alone at the bottom of a page.
+  % alone at the bottom of a page. But it doesn't seem to work.
   \clubpenalty=1000
 % \widowpenalty=1000
 
@@ -71,14 +93,14 @@
 \setlength{\parskip}{1ex}
 \setlength{\parindent}{0pt}
 
-% For 11pt/12pt options change `\normalsize' to `\small' in
-% preverbatim
-% every verbatim environment is surrounded by the commands
-\newcommand{\preverbatim}{\normalsize\vspace{-2.2ex}}
+% Every verbatim environment is surrounded by these commands.
+% For 11pt/12pt options change '\normalsize' to '\small'
+% or '\footnotesize' in the preverbatim definition
+\newcommand{\preverbatim}{\footnotesize\vspace{-2.2ex}}
 \newcommand{\postverbatim}{\normalsize\vspace{-0.5ex}}
 
+% apply settings for toc_entr.sty
 \adjustarticle
-
 \setcounter{secnumdepth}{5}
 \setcounter{tocdepth}{5}
 
@@ -90,6 +112,7 @@
 \def\gnuplotVersion{\usebox\GpVersion}
 
 % Layout setup of fancy headings:
+\usepackage{fancyhdr}
 \pagestyle{fancy} \headsep=5.5mm \addtolength{\headheight}{7mm}
 %\setlength{\headrulewidth}{0.4pt}
 \chead{\hyperlink{TableOfContents}{gnuplot \usebox\GpVersion}}
@@ -97,7 +120,6 @@
 \rhead[\leftmark]{\thepage}
 \lhead[\thepage]{\leftmark}
 
-\def\gpCX{${_{\mathbb{^C}} }$}
 
 %
 % Words that may get hyphenated oddly if TeX is allowed to do so
@@ -176,7 +198,7 @@
 
   \vspace{2ex}
 
-%  March 2023  Version 6.0
+%  April 2023  Version 6.0
    Version {\gpVersion} (pre-release alpha)
 
    \end{center}
