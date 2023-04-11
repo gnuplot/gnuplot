@@ -3557,7 +3557,7 @@ Ffigure_newsyntax
 2 linetypes, colors, and styles
 ?linetypes
 ?colors
- In older gnuplot versions, each terminal type provided a set of distinct
+ In very old gnuplot versions, each terminal type provided a set of distinct
  "linetypes" that could differ in color, in thickness, in dot/dash pattern, or
  in some combination of color and dot/dash.  These colors and patterns were not
  guaranteed to be consistent across different terminal types although most
@@ -3759,12 +3759,7 @@ Ffigure_newsyntax
  The dash pattern (`dashtype`) is a separate property associated with each line,
  analogous to `linecolor` or `linewidth`.  It is not necessary to place the
  current terminal in a special mode just to draw dashed lines.
- I.e. the command `set term <termname> {solid|dashed}` is now ignored.
- If backwards compatibility with old scripts written for version 4 is required,
- the following lines can be used instead:
-
-      if (GPVAL_VERSION >= 5.0) set for [i=1:9] linetype i dashtype i
-      if (GPVAL_VERSION < 5.0) set termoption dashed
+ I.e. the old command `set term <termname> {solid|dashed}` is now ignored.
 
  All lines have the property `dashtype solid` unless you specify otherwise.
  You can change the default for a particular linetype using the command
@@ -4076,7 +4071,7 @@ Ffigure_newsyntax
 ?plugins
  The set of functions available for plotting or for evaluating expressions
  can be extended through a plugin mechanism that imports executable functions
- from a shared library.  For example, gnuplot versions through 5.4 do not
+ from a shared library.  For example, gnuplot versions through 5.4 did not
  provide a built-in implementation of the upper incomplete gamma function
  Q(a,x).
 #TeX \\ $Q(a,x)=\frac{1}{\Gamma(x)}\intop_{x}^{\infty}t^{a-1}e^{-t}dt$ .\quad\quad
@@ -4408,8 +4403,7 @@ Ffigure_newsyntax
            This is the first line of text.\nThis is the second line.
 
  Enhanced text processing is performed for both double-quoted text and
- single-quoted text, but only by terminals supporting this mode.
- See `enhanced text`.
+ single-quoted text.  See `enhanced text`.
 
  Back-quotes are used to enclose system commands for substitution into the
  command line.  See `substitution`.
@@ -5190,7 +5184,7 @@ Ffigure_financebars
 ^ <a href="http://www.gnuplot.info/demo/finance.html">
  finance demo.
 ^ </a>
-#TeX \newpage
+
 2 fillsteps
 ?style fillsteps
 ?with fillsteps
@@ -7459,33 +7453,17 @@ Ffigure_zerror
  conditional execution applies to all statements, possibly on multiple input
  lines, until a matching "}" terminates the block.  If commands may be nested.
 
- The old single-line if/else syntax fromm gnuplot version 4 is still supported,
- but cannot be mixed with the new block-structured syntax.  See `if-old`.
-3 if-old
-?if if-old
-?if-old
+ Prior to gnuplot version 5 the scope of if/else commands was limited to a
+ single input line. Now a multi-line clause may be enclosed in curly brackets.
+ The old syntax is still honored but cannot be used inside a bracketed clause.
+ 
  Old syntax:
        if (<condition>) <command-line> [; else if (<condition>) ...; else ...]
-
- Through gnuplot version 4.4, the scope of the if/else commands was limited to
- a single input line. Now a multi-line clause may be enclosed in curly brackets.
- The old syntax is still honored but cannot be used inside a bracketed clause.
-
  If no opening "{" follows the `if` keyword, the command(s) in <command-line>
  will be executed if <condition> is true (non-zero) or skipped if <condition> is
  false (zero). Either case will consume commands on the input line until the
  end of the line or an occurrence of `else`.  Note that use of `;` to allow
  multiple commands on the same line will _not_ end the conditionalized commands.
-
- Examples:
-       pi=3
-       if (pi!=acos(-1)) print "?Fixing pi!"; pi=acos(-1); print pi
- will display:
-       ?Fixing pi!
-       3.14159265358979
- but
-       if (1==2) print "Never see this"; print "Or this either"
- will not display anything.
 
 2 for
 ?for
@@ -8937,8 +8915,8 @@ Ffigure_smooth_path
  By default samples are generated over the range given by `set trange`, or if
  trange has not been set than over the full range of `set xrange`.
 
- Note: The use of trange is a change from previous gnuplot versions. It allows
- the sampling range to differ from the x axis range.
+ Note: The use of trange is a change from some earlier gnuplot versions.
+ It allows the sampling range to differ from the x axis range.
 
        plot '+' using ($1):(sin($1)):(sin($1)**2) with filledcurves
 
@@ -11102,65 +11080,15 @@ D dashtypes 2
  `missing` string.
 
  Conversely `set datafile missing NaN` causes all data or expressions evaluating
- to not-a-number (NaN) to be treated as missing data.
-
- The example below shows differences between gnuplot version 4 and version 5.
-Ffigure_missing
-^<table class="center"><tr><td>
- Example:
-       set style data linespoints
-       plot '-' title "(a)"
-          1 10
-          2 20
-          3 ?
-          4 40
-          5 50
-          e
-       set datafile missing "?"
-       plot '-' title "(b)"
-          1 10
-          2 20
-          3 ?
-          4 40
-          5 50
-          e
-       plot '-' using 1:2 title "(c)"
-          1 10
-          2 20
-          3 NaN
-          4 40
-          5 50
-          e
-       plot '-' using 1:($2) title "(d)"
-          1 10
-          2 20
-          3 NaN
-          4 40
-          5 50
-          e
-^ </td><td><img src="figure_missing.png"></td></tr></table>
-
- Plot (a) differs in gnuplot 4 and gnuplot 5 because the third line contains
- only one valid number.  Version 4 switched to a single-datum-on-a-line
- convention that the line number is "x" and the datum is "y", erroneously
- placing the point at(2,3).
-
- Both the old and new gnuplot versions handle the same data correctly if the
- '?' character is designated as a marker for missing data (b).
-
- Old gnuplot versions handled NaN differently depending of the form of the
- `using` clause, as shown in plots (c) and (d).  Gnuplot now handles NaN the
- same whether the input column was specified as N or ($N).  See also the
-^ <a href="http://www.gnuplot.info/demo/mgr.html">
+ to not-a-number (NaN) to be treated as missing data.  See the
+^ <a href="http://www.gnuplot.info/demo/imageNaN.html">
  imageNaN demo.
 ^ </a>
 
- Starting with version 5.4, gnuplot notices a missing value flag in column N
- when the using specifier in a plot command directly refers to the column as
- `using N`, `using ($N)`, or `using (function($N))`.
- In these cases of direct reference the expression, e.g. func($N), is not
- evaluated at all. This is to forestall floating point errors or other side
- effects that would cause the program to stop with an error.
+ The program notices a missing value flag in column N when the using specifier
+ in a plot command directly refers to the column as `using N`, `using ($N)`,
+ or `using (function($N))`.  In these cases the expression, e.g. func($N),
+ is not evaluated at all.
 
  The current gnuplot version also notices direct references of the form
  (column(N)), and it notices during evaluation if the expression depends
