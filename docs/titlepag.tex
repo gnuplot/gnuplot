@@ -28,29 +28,34 @@
   }
 
 
-%
-%       These commands are for use with pdflatex
-%       comment them out if you are using lualatex
-%
-   \usepackage{ucs}
-   \SetUnicodeOption{mathletters}
-   \usepackage[utf8x]{inputenc}
-   \usepackage{latexsym}
-   \usepackage{textgreek}
-   \usepackage{amsfonts}
-   \usepackage{amssymb}
-
-%
-%       These commands are for use with lualatex or xelatex
-%       comment them out if you are using pdflatex
-%
-% Other usable fonts are Liberation Serif, Arno Pro, Quivira, Times New Roman
-% The default CM fonts are missing too many unicode characters.characters.
-%  \usepackage{fontspec}
-%  \setmainfont{Free Serif}
-%  \setmonofont{Free Mono}[Scale = 1.0]
-%  \usepackage{unicode-math}
-
+\usepackage{ifluatex,ifxetex}
+\ifluatex
+    % These commands are for use with lualatex
+    % The default CM fonts are missing many unicode characters
+    \usepackage{fontspec}
+    \setmainfont{Free Serif}
+    \setmonofont{Free Mono}
+    \usepackage{unicode-math}
+\else\ifxetex
+    % These commands are for use with xelatex
+    % The default CM fonts are missing many unicode characters
+    \usepackage{fontspec}
+    \setmainfont{FreeSerif.otf}[
+        BoldFont = FreeSerifBold.otf ,
+        ItalicFont = FreeSerifItalic.otf ,
+        BoldItalicFont = FreeSerifBoldItalic.otf ]
+    \setmonofont{FreeMono.otf}
+    \usepackage{unicode-math}
+\else
+    % These commands are for use with pdflatex
+    \usepackage{ucs}
+    \SetUnicodeOption{mathletters}
+    \usepackage[utf8x]{inputenc}
+    \usepackage{latexsym}
+    \usepackage{textgreek}
+    \usepackage{amsfonts}
+    \usepackage{amssymb}
+\fi\fi
 
 % These commands are for the tables of functions
    \usepackage{longtable}
