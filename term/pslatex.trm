@@ -525,8 +525,10 @@ EPSLATEX_common_init()
 	    if (ISCAIROTERMINAL)
 		fprintf(gpoutfile, "\\usepackage{transparent}\n");
 
-            if (inputenc)
+            if (inputenc) {
+                fprintf(gpoutfile, "\\usepackage{ucs}\n");
                 fprintf(gpoutfile, "\\usepackage[%s]{inputenc}\n", inputenc);
+	    }
 
             fprintf(gpoutfile, "\
 \\makeatletter\n\

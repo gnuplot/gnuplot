@@ -16,7 +16,7 @@ after downloading:
     git log
 </pre>
 
-Release Notes date:  10-Mar-2023
+Release Notes date:  10-Apr-2023
 
 		Features introduced in version 6
 		================================
@@ -86,6 +86,7 @@ For worked examples see http://gnuplot.info/demo_6.0/
 	o New terminal webp generates a single frame or an animation sequence
 	  using webp encoding. Frames are generated using pngcairo,
 	  then encoded through the WebPAnimEncoder API.
+	o latex terminals standalone mode updated to work with texlive2023
 - Miscellaneous other new features
 	o Time unit settings for major and minor axis tics.  For example,
 	  minor tic marks can be placed at exactly one month intervals.
