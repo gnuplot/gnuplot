@@ -46,7 +46,7 @@ CORETERM = $(T)ai.trm $(T)aquaterm.trm $(T)be.trm $(T)block.trm $(T)caca.trm \
 $(T)cairo.trm $(T)canvas.trm $(T)cgm.trm $(T)context.trm \
 $(T)debug.trm $(T)djsvga.trm $(T)dumb.trm $(T)dxf.trm \
 $(T)emf.trm $(T)epson.trm \
-$(T)estimate.trm $(T)fig.trm $(T)gd.trm $(T)ggi.trm \
+$(T)estimate.trm $(T)fig.trm $(T)gd.trm \
 $(T)gpic.trm $(T)grass.trm $(T)hpgeneric.h $(T)hpgl.trm $(T)imagen.trm \
 $(T)linux-vgagl.trm $(T)latex_old.h \
 $(T)lua.trm $(T)pbm.trm $(T)pict2e.trm \
@@ -57,7 +57,7 @@ $(T)tkcanvas.trm $(T)webp.trm $(T)win.trm $(T)wxt.trm $(T)x11.trm $(T)xlib.trm
 
 LEGACYTERM = $(T)latex.trm $(T)emtex.trm $(T)eepic.trm $(T)tpic.trm \
 $(T)corel.trm $(T)dxy.trm $(T)excl.trm $(T)kyo.trm $(T)mif.trm \
-$(T)metafont.trm $(T)metapost.trm \
+$(T)metafont.trm $(T)metapost.trm $(T)ggi.trm\
 $(T)hp2648.trm $(T)hp26.trm $(T)hp500c.trm $(T)hpljii.trm $(T)hppj.trm \
 $(T)pc.trm $(T)pdf.trm $(T)qms.trm $(T)vws.trm
 
@@ -68,7 +68,7 @@ JATERM = $(TJ)ai.trm $(TJ)aquaterm.trm $(TJ)be.trm $(TJ)block.trm $(TJ)caca.trm 
 $(TJ)cairo.trm $(TJ)canvas.trm $(TJ)cgm.trm $(TJ)context.trm \
 $(TJ)debug.trm $(TJ)djsvga.trm $(TJ)dumb.trm $(TJ)dxf.trm \
 $(TJ)emf.trm $(TJ)epson.trm \
-$(TJ)estimate.trm $(TJ)fig.trm $(TJ)gd.trm $(TJ)ggi.trm \
+$(TJ)estimate.trm $(TJ)fig.trm $(TJ)gd.trm \
 $(TJ)gpic.trm $(TJ)grass.trm $(TJ)hpgeneric.h $(TJ)hpgl.trm $(TJ)imagen.trm \
 $(TJ)linux-vgagl.trm $(TJ)latex_old.h \
 $(TJ)lua.trm $(TJ)pbm.trm $(TJ)pict2e.trm \
