@@ -3,44 +3,34 @@
 % see below if you add 11pt or 12pt
    \documentclass[twoside]{article}
    \usepackage{toc_entr}
-   \usepackage{latexsym}
-   \usepackage[utf8x]{inputenc}
-   \usepackage{textgreek}
 
 % Use actual backticks in verbatim sections
-   \usepackage{upquote}
+  \usepackage{upquote}
+  \usepackage{fancyhdr}
+
+  \usepackage{makeidx}
+  \makeindex
 
   \usepackage[
-% We've given up trying to understand pdftex vs. normal latex.
-% It'll just have to sort itself out.  If it doesn't, add your
-% own local hyperref options HERE.
         hyperindex,
         bookmarks,
         bookmarksnumbered=true,
         pdftitle={gnuplot documentation},
         pdfauthor={gnuplot},
         pdfsubject={see www.gnuplot.info}
-  %     ,pdfcreator={}
-  %     ,pdfkeywords={...}
   ]{hyperref}
+  \hypersetup{
+     colorlinks   = true, %Colour links instead of ugly red boxes
+     linkcolor    = blue, %Colour for internal links
+     urlcolor     = blue  %Colour for external hyperlinks
+  }
 
-% Prevent error/warning message
-% found PDF version '1.7' but at most version '1.5' allowed
-  \pdfinclusionerrorlevel=1
-  \pdfminorversion=7
-  \pdfsuppresswarningpagegroup=1
-
-% This replaces the default ugly red boxes around hyperlinks
-   \hypersetup{
-     colorlinks   = true, %Colours links instead of ugly boxes
-     linkcolor    = blue, %Colour of internal links
-     urlcolor     = blue %Colour for external hyperlinks
-   }
-
-  \usepackage{fancyhdr}
-
-  \usepackage{makeidx}
-  \makeindex
+  % For use with pdflatex
+   \usepackage{ucs}
+   \SetUnicodeOption{mathletters}
+   \usepackage[utf8x]{inputenc}
+   \usepackage{textgreek}
+   \usepackage{latexsym}
 
   \usepackage{longtable}
 

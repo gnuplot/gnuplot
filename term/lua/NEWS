@@ -1,3 +1,11 @@
+2023-04-12
+
+  * For gnuplot 6 (and back-ported to 5.4.7)
+    pgf.REVISION = "118"
+    Output from tikz standalone mode is compatible with texlive2023
+    and includes conditional code to deal with processing by any of
+    pdflatex/lualatex/xelatex
+
 2020-06-02
 
   * For gnuplot version 5.4
