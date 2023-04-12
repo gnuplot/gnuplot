@@ -360,36 +360,6 @@ AC_ARG_WITH(gihdir,dnl
   GIHDIR="$withval",
   GIHDIR="$pkgdatadir/$VERSION_MAJOR")
 
-dnl TODO: simplify, update ggi support
-dnl new ggi driver
-GGI_SUPPORT=no
-AC_ARG_WITH(ggi,dnl
-[  --with-ggi[=DIR]          enable the ggi driver],
-  [if test "$withval" != no; then
-     if test -d $withval/include; then
-       CPPFLAGS="$CPPFLAGS -I$withval/include"
-     fi
-     if test -d $withval/lib; then
-       LDFLAGS="$LDFLAGS -L$withval/lib"
-     fi
-     AC_CHECK_LIB(ggi,ggiInit,
-       [TERMLIBS="-lggi $TERMLIBS"
-        AC_DEFINE(USE_GGI_DRIVER,1,
-                  [ Define this to build the General Graphics Interface (ggi) driver. ])
-        GGI_SUPPORT=yes
-	dnl check for customized libxmi (xmiInit not in normal libxmi)
-        AC_CHECK_LIB(xmi,xmiInit,
-          [TERMLIBS="-lxmi $TERMLIBS"
-           AC_CHECK_HEADERS(ggi/xmi.h)])
-        dnl check if libggiwmh and ggi/wmh.h are found
-        AC_CHECK_LIB(ggiwmh,ggiWmhInit,
-          [TERMLIBS="-lggiwmh $TERMLIBS"
-           AC_CHECK_HEADERS(ggi/wmh.h,,
-             AC_MSG_WARN([found ggiwmh library but not ggi/wmh.h
-please add path to ggi/wmh.h to CPPFLAGS in Makefile]))
-          ])])
-   fi])
-
 dnl Use builtin readline or GNU readline or NetBSD editline
 AC_ARG_WITH(readline,dnl
 [  --with-readline=builtin  use the built-in readline
@@ -1269,16 +1239,6 @@ AC_MSG_RESULT([    sixeltek (not needed for sixel graphics output to vt100-serie
 
 AC_MSG_RESULT([])
 AC_MSG_RESULT([  Platform-specific, legacy, or specialized terminals omitted by default:])
-
-if test "$GGI_SUPPORT" = yes; then
-  if test "$ac_cv_header_ggi_xmi_h" = yes; then
-    AC_MSG_RESULT([    ggi       : yes   (with pm3d support)])
-  else
-    AC_MSG_RESULT([    ggi       : yes   (no pm3d support, requires ggi xmi library)])
-  fi
-else
-  AC_MSG_RESULT([    ggi       :  no   (use --with-ggi to enable, requires libggi)])
-fi
 
 if test "$with_gpic" = yes; then
   AC_MSG_RESULT([    gpic      : yes])
