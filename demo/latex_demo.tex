@@ -36,6 +36,7 @@
 \usepackage{gnuplot-lua-tikz}
 
 % needed for pdflatex but not for xelatex or lualatex
+% \usepacakge{ucs}
 % \usepackage[utf8x]{inputenc}
 % \SetUnicodeOption{mathletters}
 
@@ -63,11 +64,11 @@
 \begin{document}
 
 \title {\vspace{-.75in} \TeX-friendly gnuplot terminals \vspace{-5pt}}
-\author{Ethan A Merritt - January 2022}
+\author{Ethan A Merritt - April 2023}
 \date{}
 \maketitle
 
-This demo shows various options for combining gnuplot graphics with 
+This demo shows various options for combining gnuplot graphics with
 {\LaTeX} processing of text, usually to produce a figure that is to be
 included in a larger {\LaTeX} document.
 You have a choice among several \TeX-friendly gnuplot terminals.
@@ -195,8 +196,8 @@ Load the corresponding style file at the beginning of your document
 \end{verbatim}
 Other common requirements
 \begin{verbatim}
-   \usepackage{latexsym}
    \usepackage{amssymb}
+   \usepackage{ucs}               % needed for pdflatex but not xelatex or lualatex
    \usepackage[utf8x]{inputenc}   % needed for pdflatex but not xelatex or lualatex
    \SetUnicodeOption{mathletters} % needed for pdflatex but not xelatex or lualatex
 \end{verbatim}
@@ -207,7 +208,7 @@ case text is rendered at the time you process the gnuplot output to produce
 a pdf file; i.e. if you intend to include this pdf file in a {\TeX} document
 you must take care to choose the size and font to match the local environment
 of the surrounding document.
-The example below uses pdflatex, but lualatex or xelatex should also work. 
+The example below uses pdflatex, but lualatex or xelatex should also work.
 \begin{verbatim}
    gnuplot> set term tikz standalone size 10cm,7cm font='\small'
    gnuplot> set output 'figure.tex'
@@ -220,7 +221,7 @@ The example below uses pdflatex, but lualatex or xelatex should also work.
 
 \subsection*{context terminal}
 
-The {\em context} terminal produces Metafun code for use by the 
+The {\em context} terminal produces Metafun code for use by the
 ConTeXt macro package. Typically this terminal is selected as part of a stream
 of gnuplot commands generated inside a ConTeXt session; the resulting output
 is then fed back into that session.
