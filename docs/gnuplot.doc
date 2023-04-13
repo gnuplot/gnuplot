@@ -7351,6 +7351,19 @@ Ffigure_zerror
  for many purposes.  If execution speed matters then the function can be
  implemented later as a plugin instead (see `plugins`).
 
+ A second use for function blocks is to allow execution of gnuplot commands in
+ a context they otherwise could not appear.  Suppose for example you want to
+ plot data from two csv files, but one file uses comma-separated fields while
+ the other uses semicolon-separated fields.  Normally this property would have
+ been set by a previous `set datafile` command and would have to match all
+ files used by the plot command.  However we can define a function block to
+ invoke as a definition immediately before each file is referenced in the plot.
+
+      function $set_csv(char) << EOF
+          set datafile separator char
+      EOF
+      plot tmp=$set_csv(",") FILE1, tmp=$set_csv(";") FILE2
+
  A non-trivial example of using function blocks to implement and plot
  a 15-term Lanczos approximation for the complex lngamma function is
  provided in the demo collection as
@@ -7365,6 +7378,8 @@ Ffigure_zerror
 #TeX \begin{center}
 #TeX \begin{minipage}{5in}
 #TeX {
+#TeX \hspace{1.5em}
+#TeX Function block implementation of lngamma by a 15-term Lanczos approximation
 #TeX \hrule
 #TeX ~\newline
 #TeX \small
@@ -9876,7 +9891,7 @@ Ffigure_smooth_path
 
  The following are _not_ affected by `reset`:
       `set term` `set output` `set loadpath` `set linetype` `set fit`
-      `set datafile` `set encoding` `set decimalsign` `set locale` `set psdir`
+      `set encoding` `set decimalsign` `set locale` `set psdir`
       `set overflow` `set multiplot`
 
  Note that `reset` does not necessarily return settings to the state they
@@ -11028,7 +11043,10 @@ D dashtypes 2
 ?show datafile
  The `set datafile` command options control interpretation of fields read from
  input data files by the `plot`, `splot`, and `fit` commands.
- Several options are currently implemented.
+ Several options are currently implemented.  The settings apply uniformly to all
+ data files read by subsequent commands;  however see `functionblocks` for a
+ way to work around this if it is necessary to simultaneously handles files with
+ conflicting formats.
 4 set datafile columnheaders
 ?set datafile columnheaders
 =columnheaders
