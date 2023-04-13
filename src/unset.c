@@ -849,14 +849,15 @@ reset_bars()
 void
 reset_datafile()
 {
-        df_fortran_constants = FALSE;
-        unset_missing();
-        free(df_separators);
-        df_separators = NULL;
-        free(df_commentschars);
-        df_commentschars = gp_strdup(DEFAULT_COMMENTS_CHARS);
-        df_unset_datafile_binary();
-        df_columnheaders = FALSE;
+    df_init();
+    df_fortran_constants = FALSE;
+    unset_missing();
+    free(df_separators);
+    df_separators = NULL;
+    free(df_commentschars);
+    df_commentschars = gp_strdup(DEFAULT_COMMENTS_CHARS);
+    df_unset_datafile_binary();
+    df_columnheaders = FALSE;
 }
 
 /* process 'unset border' command */
@@ -2256,12 +2257,8 @@ reset_command()
     if (multiplot)
 	multiplot_reset();
 
-    unset_missing();
-    free(df_separators);
-    df_separators = NULL;
-    free(df_commentschars);
-    df_commentschars = gp_strdup(DEFAULT_COMMENTS_CHARS);
-    df_init();
+    /* reset everything to do with "set datafile" */
+    reset_datafile();
 
     { /* Preserve some settings for `reset`, but not for `unset fit` */
 	verbosity_level save_verbosity = fit_verbosity;
