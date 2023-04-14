@@ -170,8 +170,15 @@ char *replot_line = NULL;
 int plot_token = 0;		/* start of 'plot' command */
 
 /* flag to disable `replot` when some data are sent through stdin;
- * used by mouse/hotkey capable terminals */
+ * used by mouse/hotkey capable terminals
+ */
 TBOOLEAN replot_disabled = FALSE;
+
+/* flag to show we are inside a plot/splot/replot/refresh/stats
+ * command and therefore should not allow starting another one
+ * e.g. from a function block
+ */
+TBOOLEAN inside_plot_command = FALSE;
 
 /* output file for the print command */
 FILE *print_out = NULL;
@@ -441,9 +448,12 @@ do_line()
     }
 
     /* Leading '!' indicates a shell command that bypasses normal gnuplot
-     * tokenization and parsing.  This doesn't work inside a bracketed clause.
+     * tokenization and parsing.
+     * This doesn't work inside a bracketed clause or in a function block.
      */
     if (is_system(*gp_input_line)) {
+	if (evaluate_inside_functionblock)
+	    int_error(NO_CARET, "bare shell commands not accepted in a function block");
 	do_system(gp_input_line + 1);
 	return (0);
     }
@@ -2121,10 +2131,14 @@ plot_command()
     add_udv_by_name("MOUSE_ALT")->udv_value.type = NOTDEFINED;
     add_udv_by_name("MOUSE_CTRL")->udv_value.type = NOTDEFINED;
 #endif
+    if (evaluate_inside_functionblock && inside_plot_command)
+	int_error(NO_CARET, "plot command not available in this context");
+    inside_plot_command = TRUE;
     plotrequest();
     /* Clear "hidden" flag for any plots that may have been toggled off */
     if (term->modify_plots)
 	term->modify_plots(MODPLOTS_SET_VISIBLE, -1);
+    inside_plot_command = FALSE;
     SET_CURSOR_ARROW;
 }
 
@@ -2361,7 +2375,9 @@ print_command()
 
     } while (!END_OF_COMMAND && equals(c_token, ","));
 
-    if (dataline != NULL) {
+    if (dataline) {
+	if (print_out_var == NULL)
+	    int_error(NO_CARET, "print destination was clobbered");
 	append_multiline_to_datablock(&print_out_var->udv_value, dataline);
     } else {
 	putc('\n', print_out);
@@ -2402,6 +2418,9 @@ void
 refresh_request()
 {
     AXIS_INDEX axis;
+    if (evaluate_inside_functionblock && inside_plot_command)
+	int_error(NO_CARET, "refresh command not available in this context");
+    inside_plot_command = TRUE;
 
     if (   ((first_plot == NULL) && (refresh_ok == E_REFRESH_OK_2D))
 	|| ((first_3dplot == NULL) && (refresh_ok == E_REFRESH_OK_3D))
@@ -2455,6 +2474,7 @@ refresh_request()
     } else
 	int_error(NO_CARET, "Internal error - refresh of unknown plot type");
 
+    inside_plot_command = FALSE;
 }
 
 /* process the 'replot' command */
@@ -2496,7 +2516,8 @@ void
 reread_command()
 {
     FILE *fp = lf_top();
-
+    if (evaluate_inside_functionblock)
+	int_error(NO_CARET, "reread command not possible in a function block");
     if (fp != (FILE *) NULL)
 	rewind(fp);
     c_token++;
@@ -2635,7 +2656,7 @@ void
 shell_command()
 {
     if (evaluate_inside_functionblock)
-	int_error(NO_CARET, "functionblocks are not permitted to spawn a shell");
+	int_error(NO_CARET, "bare shell commands not accepted in a function block");
     do_shell();
 }
 
@@ -2656,10 +2677,14 @@ splot_command()
     add_udv_by_name("MOUSE_Y2")->udv_value.type = NOTDEFINED;
     add_udv_by_name("MOUSE_BUTTON")->udv_value.type = NOTDEFINED;
 #endif
+    if (evaluate_inside_functionblock && inside_plot_command)
+	int_error(NO_CARET, "splot command not available in this context");
+    inside_plot_command = TRUE;
     plot3drequest();
     /* Clear "hidden" flag for any plots that may have been toggled off */
     if (term->modify_plots)
 	term->modify_plots(MODPLOTS_SET_VISIBLE, -1);
+    inside_plot_command = FALSE;
     SET_CURSOR_ARROW;
 }
 
@@ -2668,7 +2693,11 @@ void
 stats_command()
 {
 #ifdef USE_STATS
+    if (evaluate_inside_functionblock && inside_plot_command)
+	int_error(NO_CARET, "stats command not available in this context");
+    inside_plot_command = TRUE;
     statsrequest();
+    inside_plot_command = FALSE;
 #else
     int_error(NO_CARET,"This copy of gnuplot was not configured with support for the stats command");
 #endif

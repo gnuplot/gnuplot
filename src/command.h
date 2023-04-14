@@ -59,8 +59,15 @@ extern int plot_token;
 extern char *replot_line;
 
 /* flag to disable `replot` when some data are sent through stdin;
- * used by mouse/hotkey capable terminals */
+ * used by mouse/hotkey capable terminals
+ */
 extern TBOOLEAN replot_disabled;
+
+/* flag to show we are inside a plot/splot/replot/refresh/stats
+ * command and therefore should not allow starting another one
+ * e.g. from a function block
+ */
+extern TBOOLEAN inside_plot_command;
 
 #ifdef USE_MOUSE
 extern int paused_for_mouse;	/* Flag the end condition we are paused until */

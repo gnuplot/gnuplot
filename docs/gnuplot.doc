@@ -7364,6 +7364,16 @@ Ffigure_zerror
       EOF
       plot tmp=$set_csv(",") FILE1, tmp=$set_csv(";") FILE2
 
+ Limitations:
+#start
+#b Data blocks and function blocks cannot be defined inside a function block.
+#b These commands cannot be executed inside a function block:
+##   `reset`, `shell`, `!<shell command>`.
+#b A `plot`, `replot`, `splot`, `refresh`, or `stats` command is accepted in
+## a function block only if none of those commands is already in progress.
+## E.g. you cannot use `stats` in a function block called by a `plot` command.
+#end
+
  A non-trivial example of using function blocks to implement and plot
  a 15-term Lanczos approximation for the complex lngamma function is
  provided in the demo collection as
@@ -7378,8 +7388,7 @@ Ffigure_zerror
 #TeX \begin{center}
 #TeX \begin{minipage}{5in}
 #TeX {
-#TeX \hspace{1.5em}
-#TeX Function block implementation of lngamma by a 15-term Lanczos approximation
+#TeX Function block implementation of $log\Gamma(z)$ using a 15-term Lanczos approximation
 #TeX \hrule
 #TeX ~\newline
 #TeX \small
