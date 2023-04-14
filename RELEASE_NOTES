@@ -2,10 +2,10 @@
 		=====================================
 
 Version 6.0 will be the first release in a new major stable release series.
-The final release in the previous stable series was 5.4.
+The most recent release in the previous stable series is 5.4.6 (Feb 2023).
 
 Your feedback from testing of this release candidate will contribute to
-the success of a full 6.0 release expected by the end of 2023.
+the success of a full 6.0 release expected near the end of 2023.
 
 Gnuplot development is tracked in a git repository on SourceForge.
 You can generate a complete history of changes using "git log"
@@ -16,7 +16,7 @@ after downloading:
     git log
 </pre>
 
-Release Notes date:  10-Apr-2023
+Release Notes date:  13-Apr-2023
 
 		Features introduced in version 6
 		================================
@@ -177,8 +177,8 @@ Output of inline graphics to terminal emulator or linux console
 The sixel terminal displays graphics in-line with the commands typed on a
 suitable terminal emulator.  For example "xterm -ti 340" emulates a vt340
 with indexed color graphics.  The KDE desktop "konsole" terminal provides
-full RGB color graphics.  The yaft terminal emulator can be run at linux
-console level with no x11 or other windowing system active.
+full RGB color sixel graphics.  The yaft terminal emulator can be run at
+linux console level with no x11 or other windowing system active.
 
 Generating interactive plots for web display
 --------------------------------------------
@@ -211,7 +211,7 @@ install it:
 </PRE>
 
 Pay careful attention to the output of the ./configure script.
-It may indicate that some output drivers have been omitted because the
+It may indicate that some output modes have been omitted because the
 necessary support libraries were not found.  In general you need to have
 previously installed the "*-devel-*" versions of these libraries.
 
@@ -228,5 +228,5 @@ Gnuplot development is ongoing. The development branch contains preliminary
 implementations of new features.  The current development version is 6.1
 (odd minor number) and will eventually be released as version 6.2
 (even minor number).  Bugfixes to version 6.0 will appear in patchlevel
-releases 6.0.1, 6.2.2, etc., approximately twice a year or as needed
+releases 6.0.1, 6.0.2, etc., approximately twice a year or as needed
 to correct a serious regression.
