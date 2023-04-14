@@ -2026,13 +2026,15 @@ reset_command()
 
     c_token++;
 
+    /* This would be asking for trouble */
+    if (evaluate_inside_functionblock)
+	int_error(NO_CARET, "cannot 'reset' during function block evaluation");
+
     /* This is the expression evaluation stack */
     reset_stack();
 
     /* Reset session state as well as internal graphics state */
     if (equals(c_token, "session")) {
-	if (evaluate_inside_functionblock)
-	    int_error(c_token, "cannot reset session during function block evaluation");
 	clear_udf_list();
 	init_constants();
 	init_session();

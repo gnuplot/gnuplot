@@ -291,6 +291,12 @@ static char *get_next_word(char **s, char *subst);
 void
 fit_command()
 {
+    static JMP_BUF fit_jumppoint;
+
+    if (evaluate_inside_functionblock && inside_plot_command)
+	int_error(NO_CARET, "fit command not possible in this context");
+    inside_plot_command = TRUE;
+
     /* Set up an exception handler for errors that occur during "fit".
      * Normally these would return to the top level command parser via
      * a longjmp from int_error() and bail_to_command_line().
@@ -298,7 +304,6 @@ fit_command()
      * always returns to the call point regardless of success or error.
      * The caller must then check for success.
      */
-    static JMP_BUF fit_jumppoint;
     fit_env = &fit_jumppoint;
     if (SETJMP(*fit_env,1)) {
 	fit_env = NULL;
@@ -308,12 +313,14 @@ fit_command()
 	while (!END_OF_COMMAND)
 	    c_token++;
 	Ginteger( &(add_udv_by_name("FIT_ERROR")->udv_value), 1);
+	inside_plot_command = FALSE;
 	return;
     }
 
     fit_main();
     fit_env = NULL;
     Ginteger( &(add_udv_by_name("FIT_ERROR")->udv_value), 0);
+    inside_plot_command = FALSE;
 }
 
 /*****************************************************************
