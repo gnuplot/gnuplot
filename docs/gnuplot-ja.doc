@@ -11182,54 +11182,7 @@ D dashtypes 2
  逆に、`set datafile missing NaN` とすると、数式やデータ中の数値ではな
  い値 (NaN) はすべて欠損データとして扱います。
 
- 以下の例で、gnuplot バージョン 4 とバージョン 5 での違いを示します。
-Ffigure_missing
-^<table class="center"><tr><td>
- 例:
-       set style data linespoints
-       plot '-' title "(a)"
-          1 10
-          2 20
-          3 ?
-          4 40
-          5 50
-          e
-       set datafile missing "?"
-       plot '-' title "(b)"
-          1 10
-          2 20
-          3 ?
-          4 40
-          5 50
-          e
-       plot '-' using 1:2 title "(c)"
-          1 10
-          2 20
-          3 NaN
-          4 40
-          5 50
-          e
-       plot '-' using 1:($2) title "(d)"
-          1 10
-          2 20
-          3 NaN
-          4 40
-          5 50
-          e
-^ </td><td><img src="figure_missing.png"></td></tr></table>
-
- (a) のグラフは、3 行目には有効な値がひとつしかないため、gnuplot 4 と
- gnuplot 5 で違いがあります。バージョン 4 では、そこに 1 行に 1 つしか
- データがなかった場合の規則を適用し、行番号を "x" に、データを "y" と見
- なし、誤ってその点を (2,3) に描画していました。
-
- 文字 '?' が欠損データを意味するものとして指定されている (b) では、古い
- 版の gnuplot でも新しい版でも同じデータを正しく処理します。
-
- (c), (d) のグラフに見られるように、古い gnuplot では NaN を using の指
- 定の仕方によって異なった処理をしていました。現在は、gnuplot は入力列と
- して N と指定されていても ($N) と指定されていても NaN に対しては同じ処
- 理を行います。以下のデモも参照してください。
+ 以下のデモも参照してください。
 ^ <a href="http://www.gnuplot.info/demo/mgr.html">
  imageNaN デモ。
 ^ </a>
