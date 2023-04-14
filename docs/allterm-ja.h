@@ -65,10 +65,6 @@ START_HELP(00psglobal)
 " of the plot is correctly adjusted to contain the resized image.",\
 " Screen coordinates always run from 0.0 to 1.0 along the full length of the",\
 " plot edges as specified by the `size` option.",\
-" NB: `this is a change from the previously recommended method of using the",\
-" set size command prior to setting the terminal type`.  The old method left",\
-" the BoundingBox unchanged and screen coordinates did not correspond to the",\
-" actual limits of the plot.",\
 "",
 ""
 #else /* JAPANESE_DOC */
@@ -191,8 +187,7 @@ START_HELP(aqua)
 "?terminal aqua",
 "?term aqua",
 "?aqua",
-"?Aqua",
-" This terminal relies on AquaTerm.app for display on Mac OS X.",
+" This terminal relies on AquaTerm.app for display on MacOS.",
 "",
 " Syntax:",
 "       set terminal aqua {<n>} {title \"<wintitle>\"} {size <x> <y>}",
@@ -3059,7 +3054,6 @@ START_HELP(epslatex)
 " Syntax:",
 "       set terminal epslatex   {default}",
 "       set terminal epslatex   {standalone | input}",
-"                               {oldstyle | newstyle}",
 PS_COMMON_OPTS1
 "                               {header <header> | noheader}",
 PS_COMMON_OPTS2
@@ -3067,18 +3061,6 @@ PS_COMMON_OPTS2
 " The epslatex terminal prints a plot as `terminal postscript eps`",
 " but transfers the texts to LaTeX instead of including in the PostScript",
 " code. Thus, many options are the same as in the `postscript terminal`.",
-"",
-" The appearance of the epslatex terminal changed between versions 4.0 and 4.2",
-" to reach better consistency with the postscript terminal:",
-" The plot size has been changed from 5 x 3 inches to 5 x 3.5 inches;",
-" the character width is now estimated to be 60% of the font size",
-" while the old epslatex terminal used 50%;  now, the larger number of",
-" postscript linetypes and symbols are used.  To reach an appearance that is",
-" nearly identical to the old one specify the option `oldstyle`. (In fact",
-" some small differences remain: the symbol sizes are slightly different, the",
-" tics are half as large as in the old terminal which can be changed using",
-" `set tics scale`, and the arrows have all features as in the postscript",
-" terminal.)",
 "",
 PS_COMMON_PROLOG_INFO
 PS_COMMON_DOC1
@@ -3612,7 +3594,6 @@ START_HELP(fig)
 "",
 " `pointsmax` sets the maximum number of vertices in a polyline; longer ",
 " polylines will be broken into segments.",
-" (Note: this option was not present in versions 5.2.7 through 5.4.3).",
 "",
 " `font` sets the text font face to <fontname> and its size to <fontsize>",
 " points. Choice is limited to the 35 standard PostScript fonts.",
@@ -3708,79 +3689,6 @@ START_HELP(fig)
 ""
 #endif /* JAPANESE_DOC */
 END_HELP(fig)
-START_HELP(ggi)
-#ifndef JAPANESE_DOC
-"1 ggi",
-"?commands set terminal ggi",
-"?set terminal ggi",
-"?set term ggi",
-"?terminal ggi",
-"?term ggi",
-"?ggi",
-" Legacy terminal driver for the GGI (General Graphics Interface) project."
-"",
-" Syntax:",
-"    set terminal ggi [acceleration <integer>] [[mode] {mode}]",
-"",
-" In X the window cannot be resized using window manager handles, but the",
-" mode can be given with the mode option, e.g.:",
-"  - V1024x768",
-"  - V800x600",
-"  - V640x480",
-"  - V320x200",
-" Please refer to the ggi documentation for other modes. The 'mode' keyword",
-" is optional. It is recommended to select the target by environment variables",
-" as explained in the libggi manual page. To get DGA on X, you should for",
-" example",
-"    bash> export GGI_DISPLAY=DGA",
-"    csh>  setenv GGI_DISPLAY DGA",
-"",
-" 'acceleration' is only used for targets which report relative pointer",
-" motion events (e.g. DGA) and is a strictly positive integer multiplication",
-" factor for the relative distances.  The default for acceleration is 7.",
-"",
-" Examples:",
-"    set term ggi acc 10",
-"    set term ggi acc 1 mode V1024x768",
-"    set term ggi V1024x768"
-#else /* JAPANESE_DOC */
-"1 ggi",
-"?commands set terminal ggi",
-"?set terminal ggi",
-"?set term ggi",
-"?terminal ggi",
-"?term ggi",
-"?ggi",
-" これは GGI (General Graphics Interface) プロジェクト用の古い (legacy) ",
-" 出力ドライバです。",
-"",
-" 書式:",
-"    set terminal ggi [acceleration <integer>] [[mode] {mode}]",
-"",
-" X では、ウィンドウマネージャの機能を使ってウィンドウのサイズを変更する",
-" ことはできませんが、モードを mode オプションを使って、例えば以下のよう",
-" に変更することができます:",
-"  - V1024x768",
-"  - V800x600",
-"  - V640x480",
-"  - V320x200",
-" 他のモードについては、ggi (libggi) のドキュメントを参照してください。",
-" キーワード `mode` は追加してもしなくても結構です。libggi のマニュアル",
-" ページで紹介されているように、環境変数でターゲットを選択することをお勧",
-" めします。X 上で DGA を使うなら、例えば以下のようにしてください。",
-"    bash> export GGI_DISPLAY=DGA",
-"    csh>  setenv GGI_DISPLAY DGA",
-"",
-" `acceleration` は、相対的なポインタ動作イベントを発生するターゲット",
-" (例えば DGA) でのみ使用され、正の整数で相対的な距離に対する倍率 (積因",
-" 子) を表します。デフォルトの acceleration は 7 です。",
-"",
-" 例:",
-"    set term ggi acc 10",
-"    set term ggi acc 1 mode V1024x768",
-"    set term ggi V1024x768"
-#endif /* JAPANESE_DOC */
-END_HELP(ggi)
 START_HELP(gif)
 #ifndef JAPANESE_DOC
 "1 gif",
@@ -4430,7 +4338,7 @@ START_HELP(latex)
 " terminals `latex`, `emtex`, `eepic`, and `tpic` present in older versions",
 " of gnuplot. See `pict2e`.",
 "",
-" (5) Others, see `context`, legacy terminals texdraw and mp (metapost).",
+" (5) Others, see `context` and legacy terminal `texdraw`.",
 "",
 " A summary of TeX-friendly terminals is available here:",
 "^ <a href=\"http://www.gnuplot.info/docs/latex_demo.pdf\">",
@@ -6095,7 +6003,6 @@ START_HELP(pslatex)
 "       set terminal [pslatex | pstex] {default}",
 "       set terminal [pslatex | pstex]",
 "                               {rotate | norotate}",
-"                               {oldstyle | newstyle}",
 "                               {auxfile | noauxfile}",
 PS_COMMON_OPTS1
 "                               {<font_size>}",
@@ -6115,13 +6022,6 @@ PS_COMMON_DOC1
 " is appended.  The `.ps` is included into the `.tex` file by a",
 " \\special{psfile=...} command.  Remember to close the `output file` before",
 " next plot unless in `multiplot` mode.",
-"",
-" Gnuplot versions prior to version 4.2 generated plots of the size",
-" 5 x 3 inches using the ps(la)tex terminal while the current version generates",
-" 5 x 3.5 inches to be consistent with the postscript eps terminal.  In",
-" addition, the character width is now estimated to be 60% of the font size",
-" while the old epslatex terminal used 50%. To reach the old format specify",
-" the option `oldstyle`.",
 "",
 " The pslatex driver offers a special way of controlling text positioning: ",
 " (a) If any text string begins with '{', you also need to include a '}' at the",
@@ -6642,7 +6542,7 @@ START_HELP(sixelgd)
 "              {linewidth <lw>} {dashlength <dl>}",
 "              {tiny | small | medium | large | giant}",
 "              {font \"<face> {,<pointsize>}\"} {fontscale <scale>}",
-"              {size <x>,<y>} {animate} {{no}transparent}",
+"              {size <x>,<y>} {animate|anchor} {{no}transparent}",
 "              {background <rgb_color>}",
 "",
 " The `sixel` output format was originally used by DEC terminals and printers.",
@@ -6686,12 +6586,16 @@ START_HELP(sixelgd)
 "?set terminal sixelgd animate",
 "?set term sixelgd animate",
 "?term sixelgd animate",
+"?set terminal sixelgd anchor",
+"?set term sixelgd anchor",
+"?term sixelgd anchor",
 "      set term sixel animate",
+"      set term sixel anchor",
 "",
 " The `animate` option resets the cursor position to the terminal top left at",
 " the start of every plot so that successive plots overwrite the same area on",
 " the screen rather than having earlier plots scroll off the top. This can be",
-" used to create an in-place animation.",
+" used to create an in-place animation. `anchor` has the same effect.",
 ""
 #else /* JAPANESE_DOC */
 "1 sixelgd",
