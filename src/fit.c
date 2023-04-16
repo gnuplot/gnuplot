@@ -295,6 +295,7 @@ fit_command()
 
     if (evaluate_inside_functionblock && inside_plot_command)
 	int_error(NO_CARET, "fit command not possible in this context");
+    inside_plot_command = TRUE;
 
     /* Set up an exception handler for errors that occur during "fit".
      * Normally these would return to the top level command parser via
@@ -312,12 +313,14 @@ fit_command()
 	while (!END_OF_COMMAND)
 	    c_token++;
 	Ginteger( &(add_udv_by_name("FIT_ERROR")->udv_value), 1);
+	inside_plot_command = FALSE;
 	return;
     }
 
     fit_main();
     fit_env = NULL;
     Ginteger( &(add_udv_by_name("FIT_ERROR")->udv_value), 0);
+    inside_plot_command = FALSE;
 }
 
 /*****************************************************************
