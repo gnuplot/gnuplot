@@ -811,6 +811,7 @@ array_command()
 {
     int nsize = 0;	/* Size of array when we leave */
     int est_size = 0;	/* Estimated size */
+    TBOOLEAN empty_array = FALSE;
     struct udvt_entry *array;
     struct value *A;
     int i;
@@ -828,6 +829,8 @@ array_command()
 	if (!equals(c_token++,"]"))
 	    int_error(c_token-1, "expecting array[size>0]");
     } else if (equals(c_token, "=") && equals(c_token+1, "[")) {
+	if (equals(c_token+2,"]"))
+	    empty_array = TRUE;
 	/* Estimate size of array by counting commas in the initializer */
 	for ( i = c_token+2; i < num_tokens; i++) {
 	    if (equals(i,",") || equals(i,"]"))
@@ -875,7 +878,9 @@ array_command()
 	}
 	c_token++;
 	/* If the size is determined by the number of initializers */
-	if (A[0].v.int_val == 0)
+	if (empty_array)
+	    A[0].v.int_val = 0;
+	else if (A[0].v.int_val == 0)
 	    A[0].v.int_val = initializers;
     }
 
