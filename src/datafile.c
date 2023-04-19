@@ -817,7 +817,7 @@ df_tokenise(char *s)
 	}
 
 	/* skip to 1st character in the next field */
-	if (df_separators != NULL) {
+	if (df_separators != NULL && !df_array) {
 	    /* skip to next separator or end of line */
 	    while ((*s != '\0') && (*s != '\n') && NOTSEP)
 		++s;
@@ -2040,9 +2040,9 @@ df_readascii(double v[], int max)
 	/* Always save the contents of the first row in case it is needed for
 	 * later access via column("header").  However, unless we know for certain that
 	 * it contains headers only, e.g. via parse_1st_row_as_headers or
-	 * (column_for_key_title > 0), also treat it as a data row.
+	 * (column_for_key_title > 0), keep going to also treat it as a data row.
 	 */
-	if (df_datum == 0 && !df_already_got_headers) {
+	if (df_datum == 0 && !df_already_got_headers && !df_array) {
 	    int j;
 	    FPRINTF((stderr, "datafile.c:%d processing %d column headers\n", __LINE__, df_no_cols));
 	    for (j=0; j<df_no_cols; j++) {
@@ -3095,6 +3095,8 @@ df_parse_string_field(char *field)
     } else if (*field == '"') {
 	field++;
 	length = strcspn(field, "\"");
+    } else if (df_array) {
+	length = strcspn(field," ");
     } else if (df_separators != NULL) {
 	length = strcspn(field, df_separators);
 	if (length > strcspn(field, "\""))	/* Why? */
