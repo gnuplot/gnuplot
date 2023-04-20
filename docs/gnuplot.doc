@@ -7369,9 +7369,10 @@ Ffigure_zerror
 #b Data blocks and function blocks cannot be defined inside a function block.
 #b These commands cannot be executed inside a function block:
 ##   `reset`, `shell`, `!<shell command>`.
-#b A `plot`, `replot`, `splot`, `refresh`, `stats`, or `fit` command is accepted
-## in a function block only if none of those commands is already in progress.
-## E.g. you cannot use `stats` in a function block called by a `plot` command.
+#b A `plot`, `replot`, `splot`, `refresh`, `stats`, `vfill`, or `fit` command
+## is accepted in a function block only if none of those commands is already
+## in progress.  E.g. you cannot use `stats` in a function block called by a
+## `plot` command, you cannot invoke `plot` from inside a `fit` command, etc.
 #end
 
  A non-trivial example of using function blocks to implement and plot

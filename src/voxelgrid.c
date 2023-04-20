@@ -436,6 +436,8 @@ unset_vgrid()
 
     if (END_OF_COMMAND || !equals(c_token,"$"))
 	int_error(c_token, "syntax: unset vgrid $<gridname>");
+    if (evaluate_inside_functionblock && inside_plot_command)
+	int_error(c_token, "unset vgrid not possible in this context");
 
     /* Look for a datablock with the requested name */
     name = parse_datablock_name();
@@ -611,7 +613,9 @@ vfill_command()
     TBOOLEAN gridcoordinates = equals(c_token++, "vgfill");
     if (!current_vgrid)
 	int_error(c_token, "No current voxel grid");
+    inside_plot_command = TRUE;	/* Same interlock as plot/splot/stats */
     vfill(current_vgrid->vdata, gridcoordinates);
+    inside_plot_command = FALSE;
 }
 
 static void
