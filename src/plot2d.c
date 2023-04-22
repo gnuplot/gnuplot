@@ -3180,7 +3180,7 @@ eval_plots()
 			int_error(c_token, "Need using spec for y time data");
 		}
 
-		/* NB: df_axis is used only for timedate data and 3D cbticlabels */
+		/* NB: df_axis is used only for timedate data */
 		df_axis[0] = x_axis;
 		df_axis[1] = y_axis;
 

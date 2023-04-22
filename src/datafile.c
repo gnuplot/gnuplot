@@ -134,7 +134,7 @@
 
 enum COLUMN_TYPE { CT_DEFAULT, CT_STRING, CT_KEYLABEL, CT_MUST_HAVE,
 		CT_XTICLABEL, CT_X2TICLABEL, CT_YTICLABEL, CT_Y2TICLABEL,
-		CT_ZTICLABEL, CT_CBTICLABEL };
+		CT_ZTICLABEL };
 
 /*{{{  static fns */
 static int check_missing(char *s);
@@ -1768,8 +1768,6 @@ plot_option_using(int max_using)
 		plot_ticlabel_using(CT_Y2TICLABEL);
 	    } else if (almost_equals(c_token, "ztic$labels")) {
 		plot_ticlabel_using(CT_ZTICLABEL);
-	    } else if (almost_equals(c_token, "cbtic$labels")) {
-		plot_ticlabel_using(CT_CBTICLABEL);
 	    } else if (almost_equals(c_token, "key")) {
 		plot_ticlabel_using(CT_KEYLABEL);
 
@@ -5865,13 +5863,6 @@ axcol_for_ticlabel(enum COLUMN_TYPE type, int *axis)
 	    case CT_ZTICLABEL:
 		*axis = FIRST_Z_AXIS;
 		axcol = 2;
-		break;
-	    case CT_CBTICLABEL:
-		*axis = COLOR_AXIS;
-		if (df_axis[2] == FIRST_Z_AXIS)
-		    axcol = 2;
-		else
-		    axcol = df_no_use_specs - 1;
 		break;
 	}
 

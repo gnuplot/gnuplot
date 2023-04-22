@@ -1798,7 +1798,7 @@ eval_3dplots()
 
 		/* this_plot->token is temporary, for errors in get_3ddata() */
 
-		/* NB: df_axis is used only for timedate data and 3D cbticlabels */
+		/* NB: df_axis is used only for timedate data */
 		if (specs < 3) {
 		    if (axis_array[FIRST_X_AXIS].datatype == DT_TIMEDATE)
 			int_error(c_token, "Need full using spec for x time data");
