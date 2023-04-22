@@ -2671,6 +2671,7 @@ C 4 weekdata_cdc
  EXPERIMENTAL:
  To be replaced by an implementation that handles complex arguments.
 
+??
 4 using specifier functions
  These functions are valid only in the context of data input.  Usually this
  means use in an expression that provides an input field of the `using`
@@ -14663,20 +14664,18 @@ D spotlight 1
 4 position
 ?pm3d position
 ?set pm3d position
- Color surface can be drawn at the base or top (then it is a gray/color planar
- map) or at z-coordinates of surface points (gray/color surface).  This is
- defined by the `at` option with a string of up to 6 combinations of `b`, `t`
- and `s`. For instance, `at b` plots at bottom only, `at st` plots firstly
- surface and then top map, while `at bstbst` will never by seriously used.
+ The pm3d colored surface can be drawn at the true z position of the surface
+ or projected onto the base plane or the top plane.  This is controlled by
+ the `at` option with a string of up to 6 combinations of `b`, `t` and `s`.
+ For instance, `at b` plots at the bottom only, `at st` plots first at the
+ surface and then on the top plane, while `at bstbst` is unlikely to be useful.
 
- Colored quadrangles are plotted one after another.  When plotting surfaces
- (`at s`), the later quadrangles overlap (overdraw) the previous ones.
- (Gnuplot is not virtual reality tool to calculate intersections of filled
- polygon meshes.)  You may try to switch between `scansforward` and
- `scansbackward` to force the first scan of the data to be plotted first or
- last.  The default is `scansautomatic` where gnuplot makes a guess about scans
- order.  On the other hand, the `depthorder` option completely reorders the
- quadrangles. The rendering is performed after a depth sorting, which allows to
+ Colored quadrangles are plotted one after another.  That means later
+ quadrangles can occlude or overlap the previous ones.  You may try to switch
+ between `scansforward` and `scansbackward` to force the first scan of the data
+ to be plotted first or last.  The default is `scansautomatic` where gnuplot
+ makes a guess about scans order.  The `depthorder` option completely reorders
+ the quadrangles by sorting on the distance from the viewpoint.  This allow to
  visualize even complicated surfaces; see `pm3d depthorder` for more details.
 4 scanorder
 ?pm3d scanorder
