@@ -394,7 +394,6 @@ void pm3d_depth_queue_flush(void)
 	    cliptorange(zbase, Z_AXIS.min, Z_AXIS.max);
 
 	for (qp = quadrangles, qe = &quadrangles[current_quadrangle]; qp != qe; qp++) {
-	    double z = 0;
 	    double zmean = 0;
 
 	    if (qp->type == QUAD_TYPE_LARGEPOLYGON) {
@@ -412,8 +411,6 @@ void pm3d_depth_queue_flush(void)
 		else
 		    map3d_xyz(gpdPtr->x, gpdPtr->y, gpdPtr->z, &out);
 		zmean += out.z;
-		if (i == 0 || out.z > z)
-		    z = out.z;
 	    }
 
 	    qp->z = zmean / nv;
@@ -529,7 +526,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 
     scanA = this_plot->iso_crvs;
 
-    pm3d_rearrange_scan_array(this_plot, &scan_array, &scan_array_n, &invert, (struct iso_curve ***) 0, (int *) 0, (int *) 0);
+    pm3d_rearrange_scan_array(this_plot, &scan_array, &scan_array_n, &invert, NULL, NULL, NULL);
 
     interp_i = pm3d.interp_i;
     interp_j = pm3d.interp_j;
@@ -598,8 +595,6 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 	if (needed_quadrangles > 0)
 	    reserve_quadrangles(needed_quadrangles, 0);
     }
-
-    /* pm3d_rearrange_scan_array(this_plot, (struct iso_curve***)0, (int*)0, &scan_array, &invert); */
 
 #if 0
     /* debugging: print scan_array */
@@ -1032,6 +1027,16 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			    }
 			}
 
+			/* FIXME: overwriting the z coordinates loses the option to
+			 * do smooth clipping on z in the top/bottom planes
+			 */
+			if (at_which_z == PM3D_AT_BASE)
+			    corners[0].z = corners[1].z = corners[2].z = corners[3].z
+				= base_z;
+			else if (at_which_z == PM3D_AT_TOP)
+			    corners[0].z = corners[1].z = corners[2].z = corners[3].z
+				= ceiling_z;
+
 			if (pm3d.direction == PM3D_DEPTH) {
 			    /* copy quadrangle */
 			    quadrangle* qp = &quadrangles[current_quadrangle];
@@ -1056,10 +1061,6 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 				set_rgbcolor_var(rgb_from_colormap(gray, private_colormap));
 			    else
 				set_color(gray);
-			    if (at_which_z == PM3D_AT_BASE)
-				corners[0].z = corners[1].z = corners[2].z = corners[3].z = base_z;
-			    else if (at_which_z == PM3D_AT_TOP)
-				corners[0].z = corners[1].z = corners[2].z = corners[3].z = ceiling_z;
 			    filled_polygon(corners, plot_fillstyle, 4);
 			}
 		    }
@@ -1632,11 +1633,23 @@ filled_polygon(gpdPoint *corners, int fillstyle, int nv)
 	clipcorners = gp_realloc( clipcorners, (2*max_vertices) * sizeof(gpdPoint), "filled_polygon");
     }
 
-    if ((pm3d.clip == PM3D_CLIP_Z)
-    &&  (pm3d_plot_at != PM3D_AT_BASE && pm3d_plot_at != PM3D_AT_TOP)) {
-	int new = clip_filled_polygon( corners, clipcorners, nv );
-	if (new < 0)	/* All vertices out of range */
+    /* pm3d_plot_at is always 0 when we are called from pm3d depthorder
+     * processing so it cannot be used to distinguish top/bottom quadrangles
+     * (pm3d at [tb]) from surface quadrangles (pm3d at s).
+     * The original z values have been replaced by base_z or ceiling_z,
+     * so we can identify base plane quadrangles by testing for z == base_z.
+     * FIXME: However that means it is too late to get smooth z clipping for
+     *        the top/bottom plane contents.
+     */
+    if (pm3d.clip == PM3D_CLIP_Z) {
+	int new = 0;
+	if (corners[0].z == base_z)
+	    new = 0;
+	else
+	    new = clip_filled_polygon( corners, clipcorners, nv );
+	if (new < 0) {	/* All vertices out of range */
 	    return;
+	}
 	if (new > 0) {	/* Some got clipped */
 	    nv = new;
 	    corners = clipcorners;
