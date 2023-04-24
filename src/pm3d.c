@@ -1004,6 +1004,16 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			    }
 			}
 
+			/* FIXME: overwriting the z coordinates loses the option to
+			 * do smooth clipping on z in the top/bottom planes
+			 */
+			if (at_which_z == PM3D_AT_BASE)
+			    corners[0].z = corners[1].z = corners[2].z = corners[3].z
+				= base_z;
+			if (at_which_z == PM3D_AT_TOP)
+			    corners[0].z = corners[1].z = corners[2].z = corners[3].z
+				= ceiling_z;
+
 			if (pm3d.direction == PM3D_DEPTH) {
 			    /* copy quadrangle */
 			    quadrangle* qp = quadrangles + current_quadrangle;
@@ -1023,10 +1033,6 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 				set_rgbcolor_var((unsigned int)gray);
 			    else
 				set_color(gray);
-			    if (at_which_z == PM3D_AT_BASE)
-				corners[0].z = corners[1].z = corners[2].z = corners[3].z = base_z;
-			    else if (at_which_z == PM3D_AT_TOP)
-				corners[0].z = corners[1].z = corners[2].z = corners[3].z = ceiling_z;
 			    filled_polygon(corners, plot_fillstyle, 4);
 			}
 		    }
@@ -1584,9 +1590,12 @@ filled_polygon(gpdPoint *corners, int fillstyle, int nv)
 	clipcorners = gp_realloc( clipcorners, (2*max_vertices) * sizeof(gpdPoint), "filled_polygon");
     }
 
-    if ((pm3d.clip == PM3D_CLIP_Z)
-    &&  (pm3d_plot_at != PM3D_AT_BASE && pm3d_plot_at != PM3D_AT_TOP)) {
-	int new = clip_filled_polygon( corners, clipcorners, nv );
+    if (pm3d.clip == PM3D_CLIP_Z) {
+	int new = 0;
+	if (corners[0].z == base_z)
+	    new = 0;
+	else
+	    new = clip_filled_polygon( corners, clipcorners, nv );
 	if (new < 0)	/* All vertices out of range */
 	    return;
 	if (new > 0) {	/* Some got clipped */
