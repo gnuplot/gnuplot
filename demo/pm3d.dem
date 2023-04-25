@@ -20,10 +20,7 @@
 #	- 15. 6. 1999 pm: update for `set pm3d`+`set palette`
 # 	- 29. 4. 1999 pm: the 1st version, directory pm3d/demo
 
-
-# print "WARNING:  This demo works only on terminals supporting pm3d, i.e. on "
-# print "--------  OS/2 Presentation Manager, X11, Linux VGA, Windows. Please use"
-# print "          output to a postscript file otherwise."
+# EAM (v 5.4.7)	added test cases for additional pm3d options
 
 set xlabel "x"
 set ylabel "y"
@@ -51,7 +48,7 @@ pause -1 "Hit return to continue"
 
 set title "pm3d at b (bottom)"
 set pm3d at b
-replot
+splot sin(sqrt(x**2+y**2))/sqrt(x**2+y**2) lc "black"
 pause -1 "Hit return to continue"
 
 set title "unset surface; set pm3d at st (surface and top)"
@@ -62,18 +59,26 @@ pause -1 "Hit return to continue"
 
 unset cblabel
 
-set title "set pm3d at bstbst (funny combination, only for screen or postscript)"
+set title "set pm3d at bst (adding depthorder used to break)"
 set view 50,50
-set pm3d at bstbst
+set pm3d at bst border lt -1 lw .3
+set pm3d depthorder
+set xyplane at -0.26
 replot
 pause -1 "Hit return to continue"
 
+set title "set pm3d at bst (adding interp 2,2 used to break)"
+set pm3d interp 2,2
+replot
+pause -1 "Hit return to continue"
+
+# reset pm3d to default settings
 set title "gray map"
 set view map
-set pm3d at b
+set pm3d
 set palette gray
 set samples 100; set isosamples 100
-replot
+splot sin(sqrt(x**2+y**2))/sqrt(x**2+y**2)
 pause -1 "Hit return to continue"
 
 set title "gray map, negative"
