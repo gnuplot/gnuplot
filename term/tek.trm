@@ -496,8 +496,8 @@ SEL_reset()
 static int SIXEL_findslot(int rgbval);
 static void SIXEL_setfont(void);
 
-#define SIXEL_XMAX  (640)
-#define SIXEL_YMAX  (480)
+#define SIXEL_XMAX  (639)
+#define SIXEL_YMAX  (479)
 #define SIXEL_VCHAR (FNT5X9_VCHAR)
 #define SIXEL_HCHAR (FNT5X9_HCHAR)
 #define SIXEL_VTIC  (FNT5X9_HBITS)
@@ -514,7 +514,8 @@ static int SIXEL_mode = 1;  /* mono=0, color=1 */
 static int SIXEL_font = 1;  /* small=1,medium=2,large=3 */
 static int SIXEL_ncol = 16; /* actual number of colors to be used */
 static int SIXEL_lt;
-static int SIXEL_fp, SIXEL_np;
+static int SIXEL_fp = 0;	/* start of gnuplot palette colors */
+static int SIXEL_np = 0;	/* size of gnuplot palette */
 
 struct SIXEL_colorspec {
     int state;		/* see definitions above */
@@ -710,6 +711,11 @@ SIXEL_text()
     char c, pc;
     unsigned * map;
 
+#if (0)
+    /* place each new plot at upper left of terminal window */
+	fprintf(gpoutfile,"\033[H");
+#endif
+
     /* initialization to Sixel mode and pixel aspect ratio,
        but do not change the background */
     fprintf(gpoutfile,"\033Pq\"1;1\n");
@@ -783,12 +789,8 @@ SIXEL_text()
     free(map);
 
     /* get out of Sixel mode */
-#ifndef VMS
     fputs("\033\\\n", gpoutfile);
-#else
-    fputs("\033\\\n\n", gpoutfile);
-#endif
-    (void) fflush(gpoutfile);	/* finish the graphics */
+    fflush(gpoutfile);
 }
 
 
@@ -819,24 +821,33 @@ TERM_PUBLIC void
 SIXEL_graphics()
 {
     int i;
+    struct linestyle_def *this;
 
-    b_boxfill(FS_EMPTY, 0, 0, b_xsize, b_ysize);
-    for (i = 0; i < SIXEL_ncol; i++) {
-	struct linestyle_def *this;
+    /* palette color 0 is background */
+	SIXEL_palette[0].state = SIXEL_COL_USED;
+	SIXEL_palette[0].rgbval = 0xFFFFFF;
+    /* palette color 1 is foreground */
+	SIXEL_palette[1].state = SIXEL_COL_USED;
+	SIXEL_palette[1].rgbval = 0x000000;
+    /* the rest of the palette starts out undefined */
+    for (i = 2; i < SIXEL_ncol; i++) {
 	SIXEL_palette[i].state = SIXEL_COL_UNDEFINED;
 	SIXEL_palette[i].rgbval = 0;
-	for (this = first_perm_linestyle; this != NULL; this = this->next) {
-	    if (i == this->tag-1) {
-		/* Load color into SIXEL_palette[i] */
-		if (this->lp_properties.pm3d_color.type == TC_RGB) {
-		    int rgbval = this->lp_properties.pm3d_color.lt;
-		    SIXEL_palette[i].state = SIXEL_COL_DEFINED;
-		    SIXEL_palette[i].rgbval = rgbval;
-		}
-		break;
-	    }
+    }
+    /* reserve one palette entry for each permanent line color */
+    i = 2;
+    for (this = first_perm_linestyle; this != NULL; this = this->next) {
+	if (this->lp_properties.pm3d_color.type == TC_RGB) {
+	    int rgbval = this->lp_properties.pm3d_color.lt;
+	    SIXEL_palette[i].state = SIXEL_COL_USED;
+	    SIXEL_palette[i].rgbval = rgbval;
+	    i++;
 	}
     }
+
+    /* background fill */
+    b_setvalue(0);
+    b_boxfill(FS_OPAQUE, 0, 0, b_xsize, b_ysize);
 }
 
 
@@ -845,22 +856,29 @@ SIXEL_linetype(int linetype)
 {
     int i;
 
+    SIXEL_lt = linetype;
+
+    /* monochrome */
     if (SIXEL_mode == 0) {
 	b_setlinetype(linetype);
-    } else {
-	if (linetype < 0) {
-	    if (linetype == LT_AXIS)
-		b_setlinetype(1);
-	    i = SIXEL_findslot(0); /* find slot with black color */
-	    b_setvalue(1 + i);
-	} else if (linetype > 0) {
-	    i = linetype % SIXEL_ncol;
-	    b_setvalue(1 + i);
-	} else {
-	    b_setlinetype(0);
-	}
+	return;
     }
-    SIXEL_lt = linetype;
+
+    if (linetype == LT_AXIS) {
+	b_setlinetype(1);
+	b_setvalue(2);
+    } else if (linetype == LT_BLACK) {
+	b_setlinetype(0);
+	b_setvalue(2);
+    } else if (linetype < 0) {
+	b_setlinetype(0);
+	b_setvalue(0);
+    } else if (linetype > 0) {
+	i = linetype % SIXEL_ncol;
+	b_setvalue(1 + i);
+    } else {
+	b_setlinetype(0);
+    }
 }
 
 
@@ -885,32 +903,50 @@ SIXEL_make_palette(t_sm_palette *palette)
     if (palette == NULL) {
 	/* If we already have a palette, overwrite it */
 	if (SIXEL_fp > 0) {
-	    for (i = SIXEL_fp; i < SIXEL_ncol; i++)
+	    for (i = SIXEL_fp; (i < SIXEL_ncol) && (i < SIXEL_fp + SIXEL_np); i++)
 		SIXEL_palette[i].state = SIXEL_COL_UNDEFINED;
 	}
-
-	SIXEL_np = SIXEL_ncol;
-	for (SIXEL_fp = 0; SIXEL_fp < SIXEL_ncol; SIXEL_fp++) {
-	    if (SIXEL_palette[SIXEL_fp].state != SIXEL_COL_UNDEFINED)
-		SIXEL_np--;
-	    else
+	/* Find the first unused slot */
+	for (i = 0; i < SIXEL_ncol; i++)
+	    if (SIXEL_palette[i].state == SIXEL_COL_UNDEFINED)
 		break;
+	SIXEL_fp = i;
+
+	/* If there is enough space, reserve another few slots for user-defined colors */
+	if (SIXEL_ncol == 256)
+	    SIXEL_fp = 128;
+	else if (SIXEL_ncol - i > 138)
+	    SIXEL_fp += 10;
+
+	/* The remaining contiguous unused space is the new max palette size */
+	SIXEL_np = 0;
+	for (i = SIXEL_fp; i < SIXEL_ncol; i++) {
+	    if (SIXEL_palette[SIXEL_fp].state != SIXEL_COL_UNDEFINED)
+		break;
+	    SIXEL_np++;
 	}
+	FPRINTF((stderr, "SIXEL_make_palette: reporting %d colors available\n", SIXEL_np));
 	return SIXEL_np;
     }
 
-    for (i = 0; i < sm_palette.colors; i++) {
-	SIXEL_palette[SIXEL_fp + i].state = SIXEL_COL_DEFINED;
+    for (i = 0; i < SIXEL_np; i++) {
+	/* Requested palette may be smaller than allocated palette */
+	if (i >= sm_palette.colors) {
+	    SIXEL_palette[SIXEL_fp + i].state = SIXEL_COL_UNDEFINED;
+	    continue;
+	}
+	SIXEL_palette[SIXEL_fp + i].state = SIXEL_COL_USED;
 	SIXEL_palette[SIXEL_fp + i].rgbval = 0;
-	c = GPMIN((int) (palette->color[i].r * 256), 255);
+	c = (int) (palette->color[i].r * 255);
 	SIXEL_palette[SIXEL_fp + i].rgbval |= c << 16;
-	c = GPMIN((int) (palette->color[i].g * 256), 255);
+	c = (int) (palette->color[i].g * 255);
 	SIXEL_palette[SIXEL_fp + i].rgbval |= c << 8;
-	c = GPMIN((int) (palette->color[i].b * 256), 256);
+	c = (int) (palette->color[i].b * 255);
 	SIXEL_palette[SIXEL_fp + i].rgbval |= c;
     }
 
-    return 0;
+    SIXEL_np = sm_palette.colors;
+    return SIXEL_np;
 }
 
 
@@ -930,16 +966,29 @@ SIXEL_set_color(t_colorspec *colorspec)
     default:
 	return;
     case TC_LT:
-	SIXEL_linetype(colorspec->lt);
+	if (colorspec->lt > 0)
+	    SIXEL_linetype(colorspec->lt);
+	else if (colorspec->lt == LT_BLACK)
+	    b_setvalue(2);
+	else if (colorspec->lt == LT_AXIS)
+	    b_setvalue(1);
+	else
+	    b_setvalue(0);
 	return;
     case TC_RGB:
 	i = SIXEL_findslot(colorspec->lt);
 	b_setvalue(1 + i);
 	return;
     case TC_FRAC:
-	i = SIXEL_fp + (int)(colorspec->value * SIXEL_np);
-	SIXEL_palette[i].state = SIXEL_COL_USED;
-	b_setvalue(1 + i);
+	if (CHECK_SMPAL_IS_DISCRETE_GRADIENT) {
+	    i = index_from_gray(colorspec->value);
+	} else {
+	    i = (colorspec->value < 0) ? 0 : (int)(colorspec->value * sm_palette.colors);
+	    if (i >= sm_palette.colors)
+		i = sm_palette.colors - 1;
+	}
+	SIXEL_palette[SIXEL_fp + i].state = SIXEL_COL_USED;
+	b_setvalue(1 + SIXEL_fp + i);
 	return;
     }
 }
