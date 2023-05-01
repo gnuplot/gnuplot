@@ -2405,6 +2405,8 @@ show_palette()
 	else
 	    fputs("ALL remaining", stderr);
 	fputs(" color positions for discrete palette terminals\n", stderr);
+	if (sm_palette.colors > 0)
+	    fprintf(stderr,"\t\t(current terminal has provided %d)\n", sm_palette.colors);
 	fputs( "\tColor-Model: ", stderr );
 	switch( sm_palette.cmodel ) {
 	    default:
