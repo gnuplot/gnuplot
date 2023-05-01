@@ -550,6 +550,7 @@ SIXEL_findslot(int rgbval)
 
     /* if not found, try to find an unused slot */
     dopt = 0x30000; /* max is 3 times 256 squared */
+    iopt = 0;
     for (i = 0; i < SIXEL_ncol; i++) {
 	if (SIXEL_palette[i].state != SIXEL_COL_USED) {
 	    SIXEL_palette[i].state = SIXEL_COL_USED;
@@ -710,6 +711,7 @@ SIXEL_text()
     int i, j, k, l, ic, n, pr, no;
     char c, pc;
     unsigned * map;
+    int *m;
 
 #if (0)
     /* place each new plot at upper left of terminal window */
@@ -740,13 +742,27 @@ SIXEL_text()
 	    pr = 0;
 	    pc = '\0';
 	    n = 0;
+	    m = (int *)(&map[0]);
 	    for (i = 0; i < b_xsize; i++) {
+#if (0)
 		unsigned mask = 0x20;
 		ic = 0;
 		for (l = 0; l < 6; l++) {
 		    ic |= (map[i * 6 + l] == k) ? mask : 0;
 		    mask >>= 1;
 		}
+#else
+		/* The loop above is by far the most exercised bit of code.
+		 * Unrolling it substantially decreases execution time.
+		 */
+		ic = 0;
+		if (*(m++) == k) ic |= 0x20;
+		if (*(m++) == k) ic |= 0x10;
+		if (*(m++) == k) ic |= 0x08;
+		if (*(m++) == k) ic |= 0x04;
+		if (*(m++) == k) ic |= 0x02;
+		if (*(m++) == k) ic |= 0x01;
+#endif
 		c = (char) (ic + 63);
 		if (c == pc && i != b_xsize - 1) {
 		    n++;
@@ -763,7 +779,8 @@ SIXEL_text()
 		    if (n > 3) {
 			no += fprintf(gpoutfile, "!%d%c", n, pc);
 		    } else {
-			for (l = 1; l <= n; l++)
+			int ii;
+			for (ii = 1; ii <= n; ii++)
 			    fputc(pc, gpoutfile);
 			no += n;
 		    }
