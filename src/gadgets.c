@@ -872,9 +872,16 @@ apply_head_properties(struct arrow_style_type *arrow_properties)
 double effective_aspect_ratio(void)
 {
 #ifdef _WIN32
-    if (strcmp(term->name, "windows") == 0)
-	return 1.0;
+    if (strcmp(term->name, "windows") == 0) {
+	double xscale = (axis_array[FIRST_X_AXIS].term_upper - axis_array[FIRST_X_AXIS].term_lower)
+			/ (axis_array[FIRST_X_AXIS].max - axis_array[FIRST_X_AXIS].min);
+	double yscale = (axis_array[FIRST_Y_AXIS].term_upper - axis_array[FIRST_Y_AXIS].term_lower)
+			/ (axis_array[FIRST_Y_AXIS].max - axis_array[FIRST_Y_AXIS].min);
+	double aspect_ratio = fabs(yscale/xscale);
+	return aspect_ratio;
+    }
 #endif
+
     return (double)term->v_tic / (double)term->h_tic;
 }
 
