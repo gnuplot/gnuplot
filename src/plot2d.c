@@ -2682,7 +2682,9 @@ eval_plots()
 	    this_plot->title_is_automated = FALSE;
 	    if (!set_title) {
 		this_plot->title_no_enhanced = TRUE; /* filename or function cannot be enhanced */
-		if (key->auto_titles == FILENAME_KEYTITLES) {
+		if (key->auto_titles == COLUMNHEAD_KEYTITLES) {
+		    this_plot->title_is_automated = TRUE;
+		} else if (key->auto_titles == FILENAME_KEYTITLES) {
 		    m_capture(&(this_plot->title), start_token, end_token);
 		    if (in_parametric)
 			xtitle = this_plot->title;
@@ -3994,6 +3996,12 @@ reevaluate_plot_title(struct curve_points *this_plot)
 		df_plot_title_at = NULL;
 	    }
 	}
+    }
+
+    else if (!this_plot->title && this_plot->title_is_automated
+	 &&  (&keyT)->auto_titles == COLUMNHEAD_KEYTITLES) {
+	this_plot->title = df_key_title;
+	df_key_title = NULL;
     }
 
     if (this_plot->plot_style == PARALLELPLOT
