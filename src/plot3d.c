@@ -2172,7 +2172,9 @@ eval_3dplots()
 	    this_plot->title_is_automated = FALSE;
 	    if (!set_title) {
 		this_plot->title_no_enhanced = TRUE; /* filename or function cannot be enhanced */
-		if (key->auto_titles == FILENAME_KEYTITLES) {
+		if (key->auto_titles == COLUMNHEAD_KEYTITLES) {
+		    this_plot->title_is_automated = TRUE;
+		} else if (key->auto_titles == FILENAME_KEYTITLES) {
 		    m_capture(&(this_plot->title), start_token, end_token);
 		    if (crnt_param == 2)
 			xtitle = this_plot->title;
