@@ -1585,6 +1585,11 @@ change_term(const char *origname, int length)
 	name = "epscairo";
 	length = 8;
     }
+    /* To allow "set term kitty" as short for "set term kittycairo" */
+    if (!strcmp(origname,"kitty")) {
+	name = "kittycairo";
+	length = 10;
+    }
 #endif
 #ifdef HAVE_LIBGD
     /* To allow "set term sixel" as short for "set term sixelgd" */

@@ -271,7 +271,7 @@ TERM_PUBLIC void cairotrm_options()
 	char tmp_term_options[MAX_LINE_LEN+1] = "";
 
 	/* Initialize terminal-dependent values */
-	if (strcmp(term->name, "pngcairo") == 0) {
+	if ((strcmp(term->name, "pngcairo") == 0) || (strcmp(term->name, "kittycairo") == 0)) {
 	    cairo_params = &cairopng_params;
 	    cairo_params_default = &cairopng_params_default;
 	} else if (strcmp(term->name, "epscairo") == 0) {
@@ -341,7 +341,7 @@ TERM_PUBLIC void cairotrm_options()
 			break;
 		case CAIROTRM_SIZE:
 			c_token++;
-			if (!strcmp(term->name,"pngcairo"))
+			if (!strcmp(term->name,"pngcairo") || !strcmp(term->name, "kittycairo"))
 			    cairo_params->explicit_units = parse_term_size(&cairo_params->width, &cairo_params->height, PIXELS);
 #ifdef HAVE_WEBP
 			else if (!strcmp(term->name,"webp"))
@@ -714,7 +714,8 @@ void cairotrm_init()
 
 	/* do a sanity check for once */
 	if (strcmp(term->name, "epscairo") && strcmp(term->name, "cairolatex") &&
-	    strcmp(term->name, "pdfcairo") && strcmp(term->name, "pngcairo"))
+	    strcmp(term->name, "pdfcairo") && strcmp(term->name, "pngcairo") &&
+            strcmp(term->name, "kittycairo"))
 		int_error(c_token,"Unrecognized cairo terminal");
 
 	/* cairolatex requires a file */
@@ -758,7 +759,7 @@ void cairotrm_init()
 		plot.polygons_saturate = FALSE;
 		/* Empirical correction to make pdf output look more like wxt and png */
 		plot.dashlength /= 2;
-	} else if (!strcmp(term->name,"pngcairo")) {
+	} else if (!strcmp(term->name,"pngcairo") || !strcmp(term->name, "kittycairo")) {
 		surface = cairo_image_surface_create( CAIRO_FORMAT_ARGB32,
 				plot.device_xmax /*double width_in_points*/,
 				plot.device_ymax /*double height_in_points*/);
@@ -1073,7 +1074,21 @@ void cairotrm_text()
 			cairo_surface_write_to_png_stream(surface,
 				(cairo_write_func_t)cairostream_write, cairostream_error);
 		}
-	}
+#ifdef HAVE_KITTY_TERM
+        } else if (strcmp(term->name, "kittycairo") == 0) {
+          base64s *b64;
+          cairo_surface_t *surface = cairo_get_target(plot.cr);
+          /* TODO: crop */
+          kitty_init(KITTY_FORMAT_PNG);
+          b64 = gp_alloc(sizeof(base64s), "base64s");
+          init_base64_state_data(b64, kitty_writechar, NULL);
+          cairo_surface_write_to_png_stream(surface, cairo_write_base64_callback, b64);
+          piecemeal_write_base64_data_finish(b64);
+          free(b64);
+          kitty_flush(FALSE);
+          fputc('\n', gpoutfile);
+#endif
+        }
 
 	FPRINTF((stderr,"status = %s\n",cairo_status_to_string(cairo_status(plot.cr))));
 
@@ -1514,6 +1529,36 @@ TERM_TABLE_END (pngcairo_driver)
 #undef LAST_TERM
 #define LAST_TERM pngcairo_driver
 
+#ifdef HAVE_KITTY_TERM
+TERM_TABLE_START (kittycairo_driver)
+    "kittycairo", "kitty in-terminal graphics using cairo",
+    /* the following values are overridden by cairotrm_graphics */
+    1 /* xmax */ , 1 /* ymax */ , 1 /* vchar */ , 1 /* hchar */ ,
+    1 /* vtic */ , 1 /* htic */ ,
+    cairotrm_options, cairotrm_init, cairotrm_reset, cairotrm_text, null_scale, cairotrm_graphics,
+    cairotrm_move, cairotrm_vector, cairotrm_linetype, cairotrm_put_text,
+    cairotrm_text_angle, cairotrm_justify_text,
+    cairotrm_point, do_arrow, cairotrm_set_font,
+    cairotrm_pointsize,
+    TERM_BINARY|TERM_CAN_DASH|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH|TERM_FONTSCALE|TERM_POINTSCALE,
+    0 /* suspend */, 0 /* resume */, cairotrm_fillbox, cairotrm_linewidth
+#ifdef USE_MOUSE
+    , 0, 0, 0, 0, 0
+#endif
+    , cairotrm_make_palette, 0 /* cairotrm_previous_palette */, cairotrm_set_color, cairotrm_filled_polygon
+    , cairotrm_image
+    , cairotrm_enhanced_open, cairotrm_enhanced_flush, cairotrm_enhanced_writec
+    , 0, 0, 1.0
+    , NULL /* hypertext */
+    , cairotrm_boxed_text
+    , NULL /* modify_plots */
+    , cairotrm_dashtype
+TERM_TABLE_END (kittycairo_driver)
+
+#undef LAST_TERM
+#define LAST_TERM kittycairo_driver
+#endif /* HAVE_KITTY_TERM */
+
 #endif /* TERM_TABLE */
 #endif /* TERM_PROTO_ONLY */
 
@@ -1863,5 +1908,22 @@ START_HELP(pngcairo)
 " supported by the cairo and pango libraries.",
 ""
 END_HELP(pngcairo)
+
+#ifdef HAVE_KITTY_TERM
+START_HELP(kittycairo)
+"1 kittycairo",
+"?set terminal kittycairo",
+"?terminal kittycairo",
+"?set term kittycairo",
+"?term kittycairo",
+"?kittycairo",
+" The `kittycairo` terminal device generates output on kitty-compatible terminals",
+" the cairo and pango support libraries.  cairo version >= 1.6 is required.",
+"",
+" Please read the help for the `pdfcairo` terminal."
+""
+END_HELP(kittycairo)
+#endif /* HAVE_KITTY_TERM */
+
 #endif /* TERM_HELP */
 
