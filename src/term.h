@@ -187,10 +187,14 @@
 /* obsolete: use 'set term postscript level1 */
 /* #include "ai.trm" */
 
-/* HTML Canvas terminal */
+/* Support routines requiring gdlib or cairo */
 #if (defined(HAVE_GD_PNG) || defined(HAVE_CAIROPDF))
 # include "write_png_image.c"
+# define HAVE_KITTY_TERM
+# include "kitty.c"
 #endif
+
+/* HTML Canvas terminal */
 #include "canvas.trm"
 
 /* Computer Graphics Metafile (eg ms office) */
