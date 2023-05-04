@@ -3063,3 +3063,151 @@ START_HELP(sixelgd)
 END_HELP(sixelgd)
 #endif /* TERM_HELP */
 #endif /* WITH_GD_SIXEL */
+
+#ifdef HAVE_KITTY_TERM
+#ifdef TERM_REGISTER
+register_term(kittygd)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void KITTYGD_text(void);
+#define GOT_NEXT_PROTO
+#endif
+
+#ifndef TERM_PROTO_ONLY
+
+#ifdef TERM_BODY
+
+/*
+ * All functions except the final write to file
+ * are actually performed by the PNG driver code
+ */
+TERM_PUBLIC void
+KITTYGD_text()
+{
+    base64s *b64;
+    void *pngdata;
+    int pngsize;
+
+    image_do_crop();
+
+    /* The 'animate' option makes each plot write in place rather than scrolling */
+    if (png_state.animate)
+	fprintf(gpoutfile,  "\033[H");
+
+    kitty_init(KITTY_FORMAT_PNG);
+    b64 = gp_alloc(sizeof(base64s), "base64s");
+    init_base64_state_data(b64, kitty_writechar, NULL);
+    pngdata = gdImagePngPtr(png_state.image, &pngsize);
+    piecemeal_write_base64_data(pngdata, pngsize, b64);
+    piecemeal_write_base64_data_finish(b64);
+    free(b64);
+    kitty_flush(FALSE);
+    fputc('\n', gpoutfile);
+    gdImageDestroy(png_state.image);
+}
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(kittygd_driver)
+    "kittygd", "kitty in-terminal graphics using libgd",
+    GREG_XMAX, GREG_YMAX, PNG_VCHAR, PNG_HCHAR,
+    PNG_TICSIZE, PNG_TICSIZE, PNG_options, PNG_init, PNG_reset,
+    KITTYGD_text, null_scale, PNG_graphics, PNG_move, PNG_vector,
+    PNG_linetype, PNG_put_text, PNG_text_angle,
+    PNG_justify_text, PNG_point, do_arrow, PNG_set_font,
+    PNG_pointsize,
+    TERM_CAN_MULTIPLOT|TERM_BINARY|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH|TERM_FONTSCALE,
+    0 /*suspend*/, 0 /*resume*/,
+    PNG_boxfill,
+    PNG_linewidth,
+#ifdef USE_MOUSE
+    0, 0, 0, 0, 0, /* no mouse support */
+#endif
+    PNG_make_palette,
+    0, /* previous_palette() ... no, single array of 256 colours for PNG */
+    PNG_set_color,
+    PNG_filled_polygon,
+    PNG_image,
+    ENHGD_OPEN, ENHGD_FLUSH, do_enh_writec,
+    NULL,		/* layering */
+    NULL,		/* path */
+    0.0,		/* tscale */
+    NULL		/* hypertext */
+    , ENHGD_boxed_text
+TERM_TABLE_END(kittygd_driver)
+
+#undef LAST_TERM
+#define LAST_TERM kittygd_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+
+#ifdef TERM_HELP
+START_HELP(kittygd)
+"1 kittygd",
+"?commands set terminal kittygd",
+"?set terminal kittygd",
+"?set term kittygd",
+"?terminal kittygd",
+"?term kittygd",
+"?kittygd",
+" Syntax:",
+"       set terminal kittygd",
+"              {{no}enhanced} {{no}truecolor} {rounded|butt}",
+"              {linewidth <lw>} {dashlength <dl>}",
+"              {tiny | small | medium | large | giant}",
+"              {font \"<face> {,<pointsize>}\"} {fontscale <scale>}",
+"              {size <x>,<y>} {animate|anchor} {{no}transparent}",
+"              {background <rgb_color>}",
+"",
+" TODO write stuff",
+"",
+" The `linewidth` and `dashlength` options are scaling factors that affect all",
+" lines drawn.  They are multiplied by values requested in drawing commands.",
+"",
+" By default the kitty output uses 16 indexed colors. The `truecolor` option",
+" instead creates a 24-bit RGB png image that is mapped down onto 256 colors",
+" in the output kitty image. Transparent fill styles require the `truecolor`",
+" option. See `fillstyle`.",
+"",
+" `butt` instructs the driver to use a line drawing method that does",
+" not overshoot the desired end point of a line.  This setting is only",
+" relevant for line widths greater than 1.  The alternative is `rounded`,",
+" which produces somewhat more uniform curved lines but can be much slower.",
+"",
+" The details of font selection in the gdlib terminals are complicated.",
+" For more information please see `fonts`.",
+"",
+" The output plot size <x,y> is given in pixels.  It defaults to 640x480,",
+" which is probably smaller than the size of your terminal window.",
+"",
+" `transparent` instructs the driver to make the background color transparent,",
+" but most terminal emulators do not support this. Default is `notransparent`.",
+"",
+" Gnuplot's kittygd output has been successfully tested with terminal",
+" emulators including konsole, mlterm, mintty, and the vt340 mode of xterm",
+" (note that distributed copies of xterm may not have been configured",
+" to support kitty graphics). Sixel support in the KDE konsole terminal",
+" was added in version 22.04.0.",
+"",
+"?set terminal kittygd animate",
+"?set term kittygd animate",
+"?term kittygd animate",
+"?set terminal kittygd anchor",
+"?set term kittygd anchor",
+"?term kittygd anchor",
+"      set term kitty animate",
+"      set term kitty anchor",
+"",
+" The `animate` option resets the cursor position to the terminal top left at",
+" the start of every plot so that successive plots overwrite the same area on",
+" the screen rather than having earlier plots scroll off the top. This can be",
+" used to create an in-place animation. `anchor` has the same effect.",
+""
+END_HELP(kittygd)
+#endif /* TERM_HELP */
+#endif /* WITH_GD_KITTY */
