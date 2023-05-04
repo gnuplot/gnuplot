@@ -3078,6 +3078,25 @@ TERM_PUBLIC void KITTYGD_text(void);
 
 #ifdef TERM_BODY
 
+typedef struct KITTYGD_io_ctx {
+  struct gdIOCtx gdio;
+  base64s *b64;
+} KITTYGD_io_ctx;
+
+static void
+KITTYGD_putc(struct gdIOCtx *ctx, int ch) {
+  unsigned char real_ch = ch;
+  base64s *b64 = ((KITTYGD_io_ctx *)ctx)->b64;
+  piecemeal_write_base64_data(&real_ch, 1, b64);
+}
+
+static int
+KITTYGD_putbuf(struct gdIOCtx *ctx, const void *buf, int n) {
+  base64s *b64 = ((KITTYGD_io_ctx *)ctx)->b64;
+  piecemeal_write_base64_data(buf, n, b64);
+  return n;
+}
+
 /*
  * All functions except the final write to file
  * are actually performed by the PNG driver code
@@ -3086,9 +3105,7 @@ TERM_PUBLIC void
 KITTYGD_text()
 {
     base64s *b64;
-    void *pngdata;
-    int pngsize;
-
+    KITTYGD_io_ctx ioctx;
     image_do_crop();
 
     /* The 'animate' option makes each plot write in place rather than scrolling */
@@ -3098,8 +3115,12 @@ KITTYGD_text()
     kitty_init(KITTY_FORMAT_PNG);
     b64 = gp_alloc(sizeof(base64s), "base64s");
     init_base64_state_data(b64, kitty_writechar, NULL);
-    pngdata = gdImagePngPtr(png_state.image, &pngsize);
-    piecemeal_write_base64_data(pngdata, pngsize, b64);
+
+    ioctx.gdio.putC = KITTYGD_putc;
+    ioctx.gdio.putBuf = KITTYGD_putbuf;
+    ioctx.b64 = b64;
+
+    gdImagePngCtx(png_state.image, &(ioctx.gdio));
     piecemeal_write_base64_data_finish(b64);
     free(b64);
     kitty_flush(FALSE);
