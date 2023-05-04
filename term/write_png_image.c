@@ -7,28 +7,36 @@
 #ifndef WRITE_PNG_IMAGE
 #define WRITE_PNG_IMAGE
 
+typedef int (*writebyte_cb)(void *, unsigned char);
+
 typedef struct base64state {
   int           shift;
   unsigned char bit6;
   unsigned int  byte4;
-  FILE*         out;
+  writebyte_cb  writebyte;
+  void*         out;
 } base64s;
 
 static const unsigned char base64_lut[64] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
+static int
+writebyte_fputc(void *out, unsigned char ch) {
+  return fputc(ch, (FILE *)out);
+}
+
 void
-init_base64_state_data (base64s *b64, FILE *out) {
+init_base64_state_data (base64s *b64, writebyte_cb cb, void *out) {
   b64->shift = 6;
   b64->bit6 = 0;
   b64->byte4 = 0;
   b64->out = out;
+  b64->writebyte = cb;
 }
 
 static int
 piecemeal_write_base64_data_finish (base64s *b64) {
-
   if (b64->shift < 6) {
-    if (fputc(base64_lut[b64->bit6 & 0x3F], b64->out) == EOF)
+    if (b64->writebyte(b64->out, base64_lut[b64->bit6 & 0x3F]) == EOF)
       return 1;
     if (b64->byte4 == 0)
       b64->byte4 = 3;
@@ -36,7 +44,7 @@ piecemeal_write_base64_data_finish (base64s *b64) {
       b64->byte4--;
   }
   while (b64->byte4 > 0) {
-    if (fputc('=', b64->out) == EOF)
+    if (b64->writebyte(b64->out, '=') == EOF)
       return 1;
     b64->byte4--;
   }
@@ -63,7 +71,7 @@ piecemeal_write_base64_data (const unsigned char *data, unsigned int length, bas
           b64->bit6 |= (databyte >> -b64->shift);
       }
     }
-    if (fputc(base64_lut[b64->bit6 & 0x3F], b64->out) == EOF)
+    if (b64->writebyte(b64->out, base64_lut[b64->bit6 & 0x3F]) == EOF)
       return 1;
     b64->shift += 6;
     b64->bit6 = (databyte << b64->shift);
@@ -113,7 +121,7 @@ cairo_write_base64_callback (void *closure, const unsigned char *data, unsigned 
 }
 
 static int 
-write_png_base64_image (unsigned m, unsigned n, coordval *image, t_imagecolor color_mode, FILE *out) {
+write_png_base64_cb (unsigned m, unsigned n, coordval *image, t_imagecolor color_mode, writebyte_cb cb, void *out) {
   cairo_surface_t *image_surface;
   cairo_status_t cairo_stat;
   unsigned int *image255;
@@ -127,7 +135,7 @@ write_png_base64_image (unsigned m, unsigned n, coordval *image, t_imagecolor co
   image255 = gp_cairo_helper_coordval_to_chars(image, m, n, color_mode);
   image_surface = cairo_image_surface_create_for_data((unsigned char*) image255, CAIRO_FORMAT_ARGB32, m, n, 4*m);
 
-  init_base64_state_data (b64, out);
+  init_base64_state_data (b64, cb, out);
   cairo_stat = cairo_surface_write_to_png_stream(image_surface, cairo_write_base64_callback, b64);
   cairo_surface_destroy(image_surface);
   if (cairo_stat != CAIRO_STATUS_SUCCESS) {
@@ -140,6 +148,11 @@ write_png_base64_image (unsigned m, unsigned n, coordval *image, t_imagecolor co
   free(image255);
 
   return retval;
+}
+
+static int
+write_png_base64_image (unsigned m, unsigned n, coordval *image, t_imagecolor color_mode, FILE *out) {
+  return write_png_base64_cb(m, n, image, color_mode, writebyte_fputc, (void *)out);
 }
 
 #else      /* libgd PNG code mainly taken from gd.trm */
@@ -234,7 +247,7 @@ write_png_image (unsigned M, unsigned N, coordval *image, t_imagecolor color_mod
 }
 
 static int
-write_base64_data (const unsigned char *data, unsigned int length, FILE *out) {
+write_base64_data (const unsigned char *data, unsigned int length, writebyte_cb cb, void *out) {
   base64s *b64;
   int retval = 0;
 
@@ -242,7 +255,7 @@ write_base64_data (const unsigned char *data, unsigned int length, FILE *out) {
   if (b64 == NULL)
     return 1;
 
-  init_base64_state_data (b64, out);
+  init_base64_state_data (b64, cb, out);
 
   if (piecemeal_write_base64_data (data, length, b64) != 0)
     retval = 1;
@@ -255,7 +268,7 @@ write_base64_data (const unsigned char *data, unsigned int length, FILE *out) {
 }
 
 static int
-write_png_base64_image (unsigned M, unsigned N, coordval *image, t_imagecolor color_mode, FILE *out) {
+write_png_base64_cb (unsigned M, unsigned N, coordval *image, t_imagecolor color_mode, writebyte_cb cb, void *out) {
   gdImagePtr im;
   void *pngdata;
   int pngsize;
@@ -270,12 +283,17 @@ write_png_base64_image (unsigned M, unsigned N, coordval *image, t_imagecolor co
     return 1;
   }
 
-  retval = write_base64_data (pngdata, pngsize, out);
+  retval = write_base64_data (pngdata, pngsize, cb, out);
 
   gdFree(pngdata);
   gdImageDestroy(im);
 
   return retval;
+}
+
+static int
+write_png_base64_image (unsigned M, unsigned N, coordval *image, t_imagecolor color_mode, FILE *out) {
+  return write_png_base64_cb(M, N, image, color_mode, writebyte_fputc, (void *)out);
 }
 #endif /* HAVE_CAIRO_PDF */
 #endif /* WRITE_PNG_IMAGE */
