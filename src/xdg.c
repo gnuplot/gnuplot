@@ -103,7 +103,17 @@ char *xdg_get_path(XDGVarType idx, const char* fname,
     }
     else {
 	pathname = gp_strdup(xdg_defaults[idx]);    /* use the default */
-	gp_expand_tilde(&pathname);
+	if (strchr(pathname, '~')) {
+	    /* But if we're running anonymously, e.g. from a cgi script
+	     * don't try to access or create any private directories.
+	     */
+	    if (getenv("HOME"))
+		gp_expand_tilde(&pathname);
+	    else {
+		free(pathname);
+		return NULL;
+	    }
+	}
     }
     if (create && !check_dir(pathname)) {
 	free(pathname);
