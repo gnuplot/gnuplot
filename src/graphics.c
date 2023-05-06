@@ -951,6 +951,11 @@ do_plot(struct curve_points *plots, int pcount)
 			memcpy(&this_plot->filledcurves_options,
 				&filledcurves_opts_func, sizeof(filledcurves_opts));
 		}
+
+		if (this_plot->filledcurves_options.closeto == FILLEDCURVES_ATY1
+		&&  this_plot->filledcurves_options.at > axis_array[FIRST_Y_AXIS].max)
+		    this_plot->filledcurves_options.closeto = FILLEDCURVES_X2;
+
 		if (this_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN
 		||  this_plot->filledcurves_options.closeto == FILLEDCURVES_ABOVE
 		||  this_plot->filledcurves_options.closeto == FILLEDCURVES_BELOW) {
