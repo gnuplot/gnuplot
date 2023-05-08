@@ -844,7 +844,7 @@ BLOCK_text()
 		    int r2, g2, b2, m;
 		    int ropt = 0, gopt = 0, bopt = 0;
 		    int r2opt = 0, g2opt = 0, b2opt = 0;
-		    int nopt = 0, mopt = 0, iopt;
+		    int nopt = 0, mopt = 0, iopt = 0;
 
 		    // Find optimum average color combination for fore- and background.
 		    i = 0;
