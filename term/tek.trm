@@ -988,7 +988,7 @@ SIXEL_set_color(t_colorspec *colorspec)
 	else if (colorspec->lt == LT_BLACK)
 	    b_setvalue(2);
 	else if (colorspec->lt == LT_AXIS)
-	    b_setvalue(1);
+	    b_setvalue(2);
 	else
 	    b_setvalue(0);
 	return;
