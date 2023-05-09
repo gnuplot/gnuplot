@@ -1679,8 +1679,10 @@ init_terminal()
 }
 
 
-/* test terminal by drawing border and text */
-/* called from command test */
+/*
+ * test page for terminal capabilities and current properties
+ * (lines, points, fill, test, polygons, text rotation, ...).
+ */
 void
 test_term()
 {
@@ -1693,6 +1695,7 @@ test_term()
     int p_width;
     TBOOLEAN already_in_enhanced_text_mode;
     static t_colorspec black = BLACK_COLORSPEC;
+    struct lp_style_type ls = DEFAULT_LP_STYLE_TYPE;
 
     already_in_enhanced_text_mode = t->flags & TERM_ENHANCED_TEXT;
     if (!already_in_enhanced_text_mode)
@@ -1736,6 +1739,7 @@ test_term()
 	(*t->put_text) (x0 + t->h_char * 2, y0 + ymax_t - t->v_char * 2.25, tbuf);
     }
 
+    /* axis line type (lt 0) used for xzeroaxis, yzeroaxis, should always be dotted */
     (*t->linetype) (LT_AXIS);
     (*t->move) (x0 + xmax_t / 2, y0);
     (*t->vector) (x0 + xmax_t / 2, y0 + ymax_t - 1);
@@ -1788,6 +1792,15 @@ test_term()
 	(*t->set_font)("");
 	if (!already_in_enhanced_text_mode)
 	    do_string("set termopt noenh");
+    } else if (t->flags & TERM_IS_LATEX) {
+	char *tmptext1 =   "\\LaTeX:  $\\int{x_{0}^{n+1}}$";
+	(*t->put_text) (x0 + xmax_t * 0.5, y0 + ymax_t * 0.37, tmptext1);
+    }
+
+    /* Test for UTF8 support */
+    {
+	char *tmptext1 = "utf8: Å→∞";
+	(*t->put_text) (x0 + xmax_t * 0.5, y0 + ymax_t * 0.30, tmptext1);
     }
 
     /* test justification */
@@ -1809,7 +1822,7 @@ test_term()
 			y0 + ymax_t / 2 + t->v_char * 4, str);
 
     /* test tic size */
-    (*t->linetype)(2);
+    (*t->linetype)(LT_BLACK);
     (*t->move) ((unsigned int) (x0 + xmax_t / 2 + t->h_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)), y0 + (unsigned int) ymax_t - 1);
     (*t->vector) ((unsigned int) (x0 + xmax_t / 2 + t->h_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)),
 		  (unsigned int) (y0 + ymax_t - axis_array[FIRST_X_AXIS].ticscale * t->v_tic));
@@ -1821,15 +1834,14 @@ test_term()
 		    y0 + (unsigned int) (ymax_t - t->v_char),
 		    "show ticscale");
     (void) (*t->justify_text) (LEFT);
-    (*t->linetype)(LT_BLACK);
 
-    /* test line and point types */
+    /*
+     * line and point types
+     */
     x = x0 + xmax_t - t->h_char * 7 - p_width;
     y = y0 + ymax_t - key_entry_height;
     (*t->pointsize) (pointsize);
     for (i = -2; y > y0 + key_entry_height; i++) {
-	struct lp_style_type ls = DEFAULT_LP_STYLE_TYPE;
-	ls.l_width = 1;
 	load_linetype(&ls,i+1);
 	term_apply_lp_properties(&ls);
 
@@ -1846,8 +1858,9 @@ test_term()
     }
 
     /* test arrows (should line up with rotated text) */
-    (*t->linewidth) (1.0);
-    (*t->linetype) (0);
+    load_linetype(&ls, 2);
+    ls.l_width = 1;
+    term_apply_lp_properties(&ls);
     (*t->dashtype) (DASHTYPE_SOLID, NULL);
     x = x0 + 2. * t->v_char;
     y = y0 + ymax_t/2;
@@ -1863,7 +1876,6 @@ test_term()
     curr_arrow_headfilled = i;
 
     /* test text angle (should match arrows) */
-    (*t->linetype)(0);
     str = "rotated ce+ntred text";
     if ((*t->text_angle) (TEXT_VERTICAL)) {
 	if ((*t->justify_text) (CENTRE))
@@ -1970,15 +1982,17 @@ test_term()
 		corners[n].x = corners[0].x;
 		corners[n].y = corners[0].y;
 		if (j == 0) {
-		    (*t->linetype)(2);
+		    load_linetype(&ls, 3);
+		    term_apply_lp_properties(&ls);
 		    corners->style = FS_OPAQUE;
 		} else {
-		    (*t->linetype)(1);
+		    load_linetype(&ls, 4);
+		    term_apply_lp_properties(&ls);
 		    corners->style = FS_TRANSPARENT_SOLID + (50<<4);
 		}
 		term->filled_polygon(n+1, corners);
 	    }
-	    str = "filled polygons:";
+	    str = "filled polygons";
 	} else
 	    str = "No filled polygons";
 	(*t->linetype)(LT_BLACK);
