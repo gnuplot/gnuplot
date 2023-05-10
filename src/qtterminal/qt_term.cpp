@@ -95,7 +95,7 @@ struct QtGnuplotState {
      *-------------------------------------------------------*/
 
     bool gnuplot_qtStarted;
-    int  currentFontSize;
+    double currentFontSize;
     QString currentFontName;
     QString localServerName;
     QTextCodec* codec;
@@ -169,7 +169,7 @@ static bool qt_optionReplotOnResize  = true;
 static bool qt_optionDash     = true;
 static int  qt_optionWidth    = 640;
 static int  qt_optionHeight   = 480;
-static int  qt_optionFontSize = 9;
+static double qt_optionFontSize = 10.0;
 static double qt_optionDashLength = 1.0;
 static double qt_optionLineWidth = 1.0;
 
@@ -477,8 +477,8 @@ void qt_sendFont()
 {
 	qt->out << GESetFont << qt->currentFontName << qt->currentFontSize;
 
-	QPair<QString, int> currentFont(qt->currentFontName, qt->currentFontSize);
-	static QPair<QString, int> lastFont("", 0);
+	QPair<QString, double> currentFont(qt->currentFontName, qt->currentFontSize);
+	static QPair<QString, double> lastFont("", 0);
 
 	// The font has not changed
 	if (currentFont == lastFont)
@@ -835,7 +835,7 @@ void qt_dashtype(int type, t_dashtype *custom_dash_type)
 int qt_set_font(const char* font)
 {
 	ensureOptionsCreated();
-	int  qt_previousFontSize = qt->currentFontSize;
+	double qt_previousFontSize = qt->currentFontSize;
 	QString qt_previousFontName = qt->currentFontName;
 
 	if (font && (*font))
@@ -844,7 +844,7 @@ int qt_set_font(const char* font)
 		if (list.size() > 0)
 			qt->currentFontName = list[0];
 		if (list.size() > 1)
-			qt->currentFontSize = list[1].toInt();
+			qt->currentFontSize = list[1].toDouble();
 	} else {
 		qt->currentFontSize = qt_optionFontSize;
 		qt->currentFontName = qt_option->FontName;
@@ -1429,8 +1429,8 @@ void qt_options()
 				QStringList list = fontSettings.split(',');
 				if ((list.size() > 0) && !list[0].isEmpty())
 					qt_option->FontName = list[0];
-				if ((list.size() > 1) && (list[1].toInt() > 0))
-					qt_optionFontSize = list[1].toInt();
+				if ((list.size() > 1) && (list[1].toDouble() > 0))
+					qt_optionFontSize = list[1].toDouble();
 			}
 			free(s);
 			break;
