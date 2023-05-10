@@ -5801,13 +5801,9 @@ set_linestyle(struct linestyle_def **head, lp_class destination_class)
 		break;
 
     if (this_linestyle == NULL || tag != this_linestyle->tag) {
-	/* Default style is based on linetype with the same tag id */
+	/* Initialize to default for the linetype with the same tag id */
 	struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
-	loc_lp.l_type = tag - 1;
-	loc_lp.p_type = tag - 1;
-	loc_lp.d_type = DASHTYPE_SOLID;
-	loc_lp.pm3d_color.type = TC_LT;
-	loc_lp.pm3d_color.lt = tag - 1;
+	load_linetype(&loc_lp, tag);
 
 	new_linestyle = gp_alloc(sizeof(struct linestyle_def), "linestyle");
 	if (prev_linestyle != NULL)
@@ -5820,7 +5816,7 @@ set_linestyle(struct linestyle_def **head, lp_class destination_class)
 	this_linestyle = new_linestyle;
     }
 
-    if (almost_equals(c_token, "def$ault")) {
+    if (destination_class == LP_STYLE && almost_equals(c_token, "def$ault")) {
 	delete_linestyle(head, prev_linestyle, this_linestyle);
 	c_token++;
     } else
