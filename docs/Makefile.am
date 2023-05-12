@@ -87,7 +87,7 @@ TERM_H = $(top_srcdir)/src/term.h
 
 DOCHEADERS = doc2x.h xref.h
 
-EXTRA_DIST = Makefile.in doc2texi.el figure_missing.pdf gnuplot.doc \
+EXTRA_DIST = Makefile.in doc2texi.el gnuplot.doc \
 titlepag.ipf titlepag.tex	\
 toc_entr.sty psdoc gnuplot-ja.doc README.ja	\
 term-ja.diff plotstyles.gnu gnuplot.pdf \
