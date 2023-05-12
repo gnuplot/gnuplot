@@ -5852,7 +5852,7 @@ set_linestyle(struct linestyle_def **head, lp_class destination_class)
 
     if (this_linestyle == NULL || tag != this_linestyle->tag) {
 	/* Initialize to default for the linetype with the same tag id */
-	struct lp_style_type loc_lp;
+	struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
 	load_linetype(&loc_lp, tag);
 
 	new_linestyle = gp_alloc(sizeof(struct linestyle_def), "linestyle");
