@@ -671,33 +671,6 @@ $data3<<EOD
 5 50
 EOD
 
-if (winhelp != 0) {
-set output out . 'figure_missing' . ext
-
-set xrange [0.1:5.9]
-set yrange [1:55]
-set xtics offset 0, graph .09
-
-set multiplot layout 2,4 columnsfirst margins 0.15,.98,0.1,.98 spacing 0.1
-set ylabel "Old"
-set label 1 at .5,45 "(a)"
-plot $data1 w lp pt 7 notitle
-set ylabel "New"
-plot $data2 w lp pt 7 notitle
-unset ylabel
-set label 1 at .5,45 "(b)"
-plot $data2 w lp pt 7 notitle
-plot $data2 w lp pt 7 notitle
-set label 1 at .5,45 "(c)"
-plot $data2 w lp pt 7 notitle
-plot $data3 w lp pt 7 notitle
-set label 1 at .5,45 "(d)"
-plot $data3 w lp pt 7 notitle
-plot $data3 w lp pt 7 notitle
-
-unset multiplot
-}
-
 #
 # New syntax features
 # ===================
