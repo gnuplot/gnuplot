@@ -1342,7 +1342,7 @@ TERM_TABLE_START(block_driver)
 #endif
     0, 0, b_boxfill, NULL,
 #ifdef USE_MOUSE
-    NULL, NULL, NULL, NULL, NULL,
+    term_waitforinput, NULL, NULL, NULL, NULL,
 #endif
     NULL, NULL, BLOCK_set_color,
     b_filled_polygon,
