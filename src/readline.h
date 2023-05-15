@@ -52,6 +52,8 @@
 
 #if defined(READLINE)
 char *readline(const char *);
+void set_termio(void);
+void reset_termio(void);
 
 #elif defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
 int getc_wrapper(FILE* fp);
