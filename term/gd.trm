@@ -2968,7 +2968,7 @@ TERM_TABLE_START(sixelgd_driver)
     PNG_boxfill,
     PNG_linewidth,
 #ifdef USE_MOUSE
-    0, 0, 0, 0, 0, /* no mouse support */
+    term_waitforinput, 0, 0, 0, 0, /* pseudo-mousing during "pause mouse" */
 #endif
     PNG_make_palette,
     0, /* previous_palette() ... no, single array of 256 colours for PNG */
