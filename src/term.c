@@ -1355,12 +1355,16 @@ null_dashtype(int type, t_dashtype *custom_dash_pattern)
  * FIXME:  how to detect shift/control/alt modifiers?
  *	   empirical tests suggests <033><073><065> is control
  *				    <033><073><062> is shift
- * FIXME:  written for libreadline;  modify to support libedit or builtin readline
+ * FIXME:  modify to builtin readline
  */
-#if defined (HAVE_LIBREADLINE)
+#if defined(HAVE_LIBREADLINE)
   #define raw() rl_prep_terminal(1)
   #define cook() rl_deprep_terminal()
   #define nextchar() rl_getc(stdin)
+#elif defined(HAVE_LIBEDITLINE)
+  #define raw() rl_prep_terminal(1)
+  #define cook() rl_deprep_terminal()
+  #define nextchar() fgetc(stdin)
 #endif
 
 int
