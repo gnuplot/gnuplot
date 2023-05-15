@@ -221,6 +221,12 @@ static void do_point(unsigned int x, unsigned int y, int number);
 static void do_pointsize(double size);
 static void do_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int headstyle);
 static void null_dashtype(int type, t_dashtype *custom_dash_pattern);
+#ifdef USE_MOUSE
+static void null_tmptext(int i, const char *s);
+static void null_set_ruler(int x, int y);
+static void null_set_cursor(int c, int x, int y);
+static void null_set_clipboard(const char *s);
+#endif
 
 static int null_text_angle(float ang);
 static int null_justify_text(enum JUSTIFY just);
@@ -1333,6 +1339,105 @@ null_dashtype(int type, t_dashtype *custom_dash_pattern)
     term->linetype(type);
 }
 
+#ifdef USE_MOUSE
+
+/*
+ * This routine dummies up mouse events for terminals that can
+ * plot directly into the console (no separate graphics window).
+ * If "pause mouse" is active, it filters characters from stdin through
+ * the current mouse key bindings.  It attempts to handle arrow keys.
+ * Otherwise it returns the next character read from stdin.
+ *
+ * EAM - May 2023
+ *
+ * FIXME:  handle "pause -1" in additional to "pause mouse"
+ * FIXME:  can we somehow catch actual mouse events?
+ * FIXME:  how to detect shift/control/alt modifiers?
+ *	   empirical tests suggests <033><073><065> is control
+ *				    <033><073><062> is shift
+ */
+#if defined(HAVE_LIBREADLINE)
+  #define raw() rl_prep_terminal(1)
+  #define cook() rl_deprep_terminal()
+  #define nextchar() rl_getc(stdin)
+#elif defined(HAVE_LIBEDITLINE)
+  #define raw() rl_prep_terminal(1)
+  #define cook() rl_deprep_terminal()
+  #define nextchar() fgetc(stdin)
+#elif defined(READLINE)
+  #define raw() set_termio()
+  #define cook() reset_termio()
+  #define nextchar() fgetc(stdin)
+#endif
+
+int
+term_waitforinput(int options)
+{
+    int nextchar;
+
+    if (options == TERM_ONLY_CHECK_MOUSING)
+	return '\0';
+
+    if (paused_for_mouse) {
+	/* Read single character at a time */
+	raw();
+	nextchar = nextchar();
+
+	/* Normal exit from "pause mouse" */
+	if (nextchar == '\n' || nextchar == '\r') {
+	    paused_for_mouse = 0;
+	    cook();
+	    exec_event( GE_reset, 0, 0, 0, 0, 0 );
+	    return nextchar;
+	}
+
+	/* Try to catch arrow key escape sequences */
+	if (nextchar == '\033') {
+	    if ((nextchar = nextchar()) == '[') {
+		nextchar = nextchar();
+		switch (nextchar) {
+		case 'A':	nextchar = GP_Up; break;
+		case 'B':	nextchar = GP_Down; break;
+		case 'C':	nextchar = GP_Right; break;
+		case 'D':	nextchar = GP_Left; break;
+		default:	/* unrecognized */
+				return '\0';
+				break;
+		}
+	    } else {
+		/* Some unrecognized escape sequence */
+	    }
+	}
+
+	/* Feed to active key binding.
+	 * I.e. act as if this key had been pressed while focus was
+	 * in an active plot window (which it is, kind of).
+	 */
+	exec_event( GE_keypress, 0, 0, nextchar, 0, 0 );
+	return '\0';
+    } else {
+	nextchar = getchar();
+    }
+    return nextchar;
+}
+
+static void
+null_tmptext(int i, const char *s)
+{}
+
+static void
+null_set_ruler(int x, int y)
+{}
+
+static void
+null_set_cursor(int c, int x, int y)
+{}
+
+static void
+null_set_clipboard(const char *s)
+{}
+#endif
+
 /* setup the magic macros to compile in the right parts of the
  * terminal drivers included by term.h
  */
@@ -1533,6 +1638,17 @@ change_term(const char *origname, int length)
     }
     if (term->dashtype == 0)
 	term->dashtype = null_dashtype;
+
+#ifdef USE_MOUSE
+    if (term->put_tmptext == NULL)
+	term->put_tmptext = null_tmptext;
+    if (term->set_ruler == NULL)
+	term->set_ruler = null_set_ruler;
+    if (term->set_cursor == NULL)
+	term->set_cursor = null_set_cursor;
+    if (term->set_clipboard == NULL)
+	term->set_clipboard = null_set_clipboard;
+#endif
 
     if (interactive)
 	fprintf(stderr, "\nTerminal type is now '%s'\n", term->name);

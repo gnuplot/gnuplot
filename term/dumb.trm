@@ -1187,7 +1187,7 @@ TERM_TABLE_START(dumb_driver)
 #endif
     NULL, NULL, DUMB_fillbox, NULL,
 #ifdef USE_MOUSE
-    NULL, NULL, NULL, NULL, NULL,
+    term_waitforinput, NULL, NULL, NULL, NULL,
 #endif
     NULL,	/* Color support sets this to DUMB_make_palette */
     NULL, 	/* previous_palette */

@@ -352,8 +352,6 @@ static void clear_line(const char *prompt);
 static void clear_eoline(const char *prompt);
 static void delete_previous_word(void);
 static void copy_line(char *line);
-static void set_termio(void);
-static void reset_termio(void);
 static int user_putc(int ch);
 static int user_puts(char *str);
 static int backspace(void);
@@ -1586,7 +1584,7 @@ os2_getch() {
 
 
   /* set termio so we can do our own input processing */
-static void
+void
 set_termio()
 {
 #if !defined(MSDOS) && !defined(_WIN32)
@@ -1696,7 +1694,7 @@ set_termio()
 #endif /* not MSDOS && not _WIN32 */
 }
 
-static void
+void
 reset_termio()
 {
 #if !defined(MSDOS) && !defined(_WIN32)

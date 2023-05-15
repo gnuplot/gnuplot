@@ -516,6 +516,7 @@ static int SIXEL_ncol = 16; /* actual number of colors to be used */
 static int SIXEL_lt;
 static int SIXEL_fp = 0;	/* start of gnuplot palette colors */
 static int SIXEL_np = 0;	/* size of gnuplot palette */
+static int SIXEL_anchor = 0;	/* Anchor plot at top left */
 
 struct SIXEL_colorspec {
     int state;		/* see definitions above */
@@ -579,7 +580,7 @@ SIXEL_findslot(int rgbval)
 enum SIXEL_id {
     SIXEL_SMALL, SIXEL_MEDIUM, SIXEL_LARGE,
     SIXEL_MONOCHROME, SIXEL_COLOR, SIXEL_COLORS,
-    SIXEL_SIZE,
+    SIXEL_SIZE, SIXEL_ANIMATE, SIXEL_SCROLL,
     SIXEL_OTHER
 };
 
@@ -593,6 +594,8 @@ static struct gen_table SIXEL_opts[] =
     { "c$olour", SIXEL_COLOR },
     { "colors", SIXEL_COLORS },
     { "size", SIXEL_SIZE },
+    { "animate", SIXEL_ANIMATE },
+    { "scroll", SIXEL_SCROLL },
     { NULL, SIXEL_OTHER }
 };
 
@@ -643,9 +646,17 @@ SIXEL_options()
 	    }
 	    break;
 	}
+	case SIXEL_ANIMATE:
+	    SIXEL_anchor = 1;
+	    c_token++;
+	    break;
+	case SIXEL_SCROLL:
+	    SIXEL_anchor = 0;
+	    c_token++;
+	    break;
 	case SIXEL_OTHER:
 	default:
-	    int_error(c_token, "unknown option; expecting: {small, medium, large}, {monochrome, color}, or {size x,y}");
+	    int_warn(c_token, "unknown terminal option");
 	    break;
 	}
     }
@@ -671,6 +682,8 @@ SIXEL_options()
 	strcat(term_options, " monochrome");
     else
 	sprintf(term_options + strlen(term_options), " colors %d", SIXEL_ncol);
+    if (SIXEL_anchor != 0)
+	strcat(term_options, " animate");
     sprintf(term_options + strlen(term_options), " size %d,%d",
 	term->xmax + 1, term->ymax + 1);
 }
@@ -713,10 +726,9 @@ SIXEL_text()
     unsigned * map;
     int *m;
 
-#if (0)
     /* place each new plot at upper left of terminal window */
+    if (SIXEL_anchor)
 	fprintf(gpoutfile,"\033[H");
-#endif
 
     /* initialization to Sixel mode and pixel aspect ratio,
        but do not change the background */
@@ -1384,7 +1396,7 @@ TERM_TABLE_START(sixel_driver)
     b_justify_text, line_and_point, do_arrow, set_font_null,
     0, 0, 0, 0, SIXEL_fillbox, b_linewidth,
 #ifdef USE_MOUSE
-    NULL, NULL, NULL, NULL, NULL,
+    term_waitforinput, NULL, NULL, NULL, NULL,
 #endif
     SIXEL_make_palette, NULL, SIXEL_set_color,
     SIXEL_filled_polygon,
@@ -1474,7 +1486,8 @@ START_HELP(tek40)
 "?term sixeltek",
 "?sixeltek",
 " Syntax:",
-"    set terminal sixeltek {<fontsize>} {color|colors <n>|mono} {size <x>,<y>}",
+"    set terminal sixeltek {<fontsize>} {mono|color|colors <n>} {size <x>,<y>}",
+"                          {animate}",
 "",
 " The `sixel` output format was originally used by DEC terminals and printers.",
 " This driver supports palette images with a maximum of 256 colors. The default",
@@ -1482,9 +1495,11 @@ START_HELP(tek40)
 "",
 " The font size can be specified as `small`, `medium` or `large`.",
 "",
-" For use with xterm emulation, xterm must be compiled/configured with",
+" `animate` causes each new plot to be anchored at the top left of the window",
+" rather than scrolling from the current cursor position.",
+"",
+" For use with xterm, xterm must be compiled/configured with",
 " \"--enable-sixel-graphics\" and started with \"-ti 340\" on the command line.",
-" The menu option \"sixelScrolling\" should be selected.",
 "",
 " Note that gnuplot also supports another sixel output terminal, `sixelgd`,",
 " that offers more options and features."

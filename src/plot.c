@@ -92,14 +92,17 @@ extern smg$create_key_table();
 /* BSD editline
 */
 #ifdef HAVE_LIBEDITLINE
-# include <editline/readline.h>
+#  include <editline/readline.h>
+#  ifdef GNUPLOT_HISTORY
+#    include <histedit.h>
+#  endif
 #endif
 
 /* enable gnuplot history with readline */
 #ifdef GNUPLOT_HISTORY
-# ifndef GNUPLOT_HISTORY_FILE
-#  define GNUPLOT_HISTORY_FILE "~/.gnuplot_history"
-# endif
+#  ifndef GNUPLOT_HISTORY_FILE
+#    define GNUPLOT_HISTORY_FILE "~/.gnuplot_history"
+#  endif
 /*
  * expanded_history_filename points to the value from 'tilde_expand()',
  * which expands '~' to the user's home directory, or $HOME.
