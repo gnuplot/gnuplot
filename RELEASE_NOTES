@@ -16,7 +16,7 @@ after downloading:
     git log
 </pre>
 
-Release Notes date:  13-Apr-2023
+Release Notes date:  01-Jun-2023
 
 		Features introduced in version 6
 		================================
@@ -80,12 +80,15 @@ For worked examples see http://gnuplot.info/demo_6.0/
 		  crosses a threshold value
 		- use the mouse to track values along multiple plots simultaneously
 - New terminals and terminal options
-	o New terminal block for text-mode pseudo-graphics uses Unicode block
-	  or Braille characters to offer improved resolution compared to the
-	  dumb or caca terminals.
+	o Terminals that display graphics in the same window as text entry now
+	  support pseudo-mousing; i.e. they respond to arrow keys and other
+	  hot-key bindings during "pause mouse".
 	o New terminal webp generates a single frame or an animation sequence
 	  using webp encoding. Frames are generated using pngcairo,
 	  then encoded through the WebPAnimEncoder API.
+	o New terminal block for text-mode pseudo-graphics uses Unicode block
+	  or Braille characters to offer improved resolution compared to the
+	  dumb or caca terminals.
 	o latex terminals standalone mode updated to work with texlive2023
 - Miscellaneous other new features
 	o Time unit settings for major and minor axis tics.  For example,
