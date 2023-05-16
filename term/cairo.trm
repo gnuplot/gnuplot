@@ -159,6 +159,7 @@ typedef struct cairo_params_t {
     float ps;
     enum CAIROTRM_id output;	/* format of the graphics produced by cairolatex */
     int resolution;             /* in dpi; CAIROLATEX_PNG only */
+    TBOOLEAN anchor;		/* TRUE = anchor kitty output to top left */
 } cairo_params_t;
 
 #define CAIROEPS_PARAMS_DEFAULT { \
@@ -553,6 +554,20 @@ TERM_PUBLIC void cairotrm_options()
 				break;
 			}
 #endif
+#ifdef HAVE_KITTY_TERM
+			if (strncmp(term->name, "kitty", 5) == 0) {
+			    if (equals(c_token, "animate") || equals(c_token, "anchor")) {
+				c_token++;
+				cairo_params->anchor = TRUE;
+				break;
+			    }
+			    if (equals(c_token, "scroll")) {
+				c_token++;
+				cairo_params->anchor = FALSE;
+				break;
+			    }
+			}
+#endif
 
 		default:
 			int_error(c_token, "unrecognized terminal option");
@@ -612,6 +627,10 @@ TERM_PUBLIC void cairotrm_options()
 
 	if (cairo_params->crop)
 		strncat(term_options, " crop", sizeof(term_options)-strlen(term_options)-1);
+
+	if (strncmp(term->name,"kitty",5) == 0)
+	    strncat(term_options, cairo_params->anchor ? " anchor" : " scroll",
+		sizeof(term_options)-strlen(term_options)-1);
 
 	strncat(term_options, cairo_params->enhanced ? " enhanced" : " noenhanced",
 		sizeof(term_options)-strlen(term_options)-1);
@@ -1079,6 +1098,9 @@ void cairotrm_text()
           base64s *b64;
           cairo_surface_t *surface = cairo_get_target(plot.cr);
           /* TODO: crop */
+	  /* Draw starting at top left of screen */
+	  if (cairo_params->anchor)
+		fprintf(gpoutfile,  "\033[H");
           kitty_init(KITTY_FORMAT_PNG);
           b64 = gp_alloc(sizeof(base64s), "base64s");
           init_base64_state_data(b64, kitty_writechar, NULL);
@@ -1541,11 +1563,11 @@ TERM_TABLE_START (kittycairo_driver)
     cairotrm_point, do_arrow, cairotrm_set_font,
     cairotrm_pointsize,
     TERM_BINARY|TERM_CAN_DASH|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH|TERM_FONTSCALE|TERM_POINTSCALE,
-    0 /* suspend */, 0 /* resume */, cairotrm_fillbox, cairotrm_linewidth
+    0 /* suspend */, 0 /* resume */, cairotrm_fillbox, cairotrm_linewidth,
 #ifdef USE_MOUSE
-    , 0, 0, 0, 0, 0
+    term_waitforinput, 0, 0, 0, 0,
 #endif
-    , cairotrm_make_palette, 0 /* cairotrm_previous_palette */, cairotrm_set_color, cairotrm_filled_polygon
+    cairotrm_make_palette, 0 /* cairotrm_previous_palette */, cairotrm_set_color, cairotrm_filled_polygon
     , cairotrm_image
     , cairotrm_enhanced_open, cairotrm_enhanced_flush, cairotrm_enhanced_writec
     , 0, 0, 1.0

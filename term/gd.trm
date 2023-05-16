@@ -240,7 +240,7 @@ static struct {
     double    dashfraction;	/* Where in a dot-dash pattern we left off */
     /* Variables for animated gif support: */
     TBOOLEAN  animate;		/* Only gif supports animation */
-				/* But sixel treats it as synonym for "anchor" */
+				/* sixel and kitty treat it as synonym for "anchor" */
     int       loop_count;	/* Number of times to repeat sequence */
     int       frame_count;	/* Number of frames in animation */
     int       frame_delay;	/* Time between frames in .01 seconds */
@@ -916,11 +916,18 @@ PNG_options()
 
 	/* parse gif animation options */
 	case GIF_ANIMATE:
-	    if (strncmp("gif",term->name,3) == 0)
-		gif_anim_option = 1;
-	    else if (strncmp("sixel",term->name,5) != 0)
-		int_error(c_token,"This terminal does not support animation");
 	    c_token++;
+	    if (strncmp("gif",term->name,3) == 0) {
+		gif_anim_option = 1;
+	    } else if (strncmp("sixel",term->name,5) == 0) {
+		png_state.animate = TRUE;
+		break;
+	    } else if (strncmp("kitty",term->name,5) == 0) {
+		png_state.animate = TRUE;
+		break;
+	    } else {
+		int_error(c_token,"This terminal does not support animation");
+	    }
 	    png_state.animate = TRUE;
 	    png_state.frame_count = 0;
 	    png_state.frame_delay = 10;
@@ -1109,7 +1116,9 @@ PNG_options()
 	png_state.capbutt ? "butt " : "rounded ");
 
     if (png_state.animate) {
-	if (strncmp("sixel",term->name,5) == 0)
+	if (strncmp("kitty",term->name,5) == 0)
+	    sprintf(term_options + strlen(term_options), "anchor ");
+	else if (strncmp("sixel",term->name,5) == 0)
 	    sprintf(term_options + strlen(term_options), "anchor ");
 	else
 	    sprintf(term_options + strlen(term_options),
@@ -3145,7 +3154,7 @@ TERM_TABLE_START(kittygd_driver)
     PNG_boxfill,
     PNG_linewidth,
 #ifdef USE_MOUSE
-    0, 0, 0, 0, 0, /* no mouse support */
+    term_waitforinput, 0, 0, 0, 0, /* pseudo-mousing */
 #endif
     PNG_make_palette,
     0, /* previous_palette() ... no, single array of 256 colours for PNG */
