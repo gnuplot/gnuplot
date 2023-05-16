@@ -421,6 +421,12 @@ D viridis 1
 #b New terminal `webp` generates a single frame or an animation sequence
 ## using webp encoding.  Frames are generated using pngcairo, then
 ## encoded through the WebPAnimEncoder API exported by libwebp and libwebpmux.
+#b Some terminals that use the same window for text entry and graphical display,
+## including `dumb`, `sixel`, `block`, and `domterm`, now respond to keyboard
+## input during a `pause mouse` command. While paused, they interpret keystrokes
+## in the same way that a mousing terminal would.
+## For example the left/right/up/down arrow keys change the view angle of 3D
+## plots and perform incremental pan/zoom steps for 2D plots.
 #end
 
 3 Watchpoints
@@ -7694,6 +7700,19 @@ Ffigure_zerror
       plot <...whatever...>
       bind all "alt-End" "exit gnuplot"
       pause mouse close
+
+3 pseudo-mousing during pause
+?commands pause pseudo-mousing
+?pseudo-mousing
+ Some terminals use the same window for text entry and graphical display,
+ including terminal types `dumb`, `sixel`, `block`, and `domterm`.  These
+ terminals do not currently support mousing per se, but during a `pause mouse`
+ command they interpret keystrokes in the same way that a mousing terminal
+ would.  I.e. `l` toggles log-scale axes, `a` autoscales the current plot,
+ left/right/up/down arrow keys change the view angle of 3D plots and perform
+ incremental pan/zoom steps for 2D plots.  `h` displays a list of key bindings.
+ A carriage return terminates the `pause` and restores normal command line
+ processing.
 
 2 plot
 ?commands plot
