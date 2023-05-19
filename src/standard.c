@@ -1143,9 +1143,9 @@ f_exists(union argument *arg)
     (void) pop(&a);
 
     if (a.type == STRING) {
-	struct udvt_entry *udv = add_udv_by_name(a.v.string_val);
+	struct udvt_entry *udv = get_udv_by_name(a.v.string_val);
 	gpfree_string(&a);
-	push(Ginteger(&a, udv->udv_value.type == NOTDEFINED ? 0 : 1));
+	push(Ginteger(&a, (udv && (udv->udv_value.type != NOTDEFINED))));
     } else {
 	push(Ginteger(&a, 0));
     }
