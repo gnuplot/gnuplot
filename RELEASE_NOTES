@@ -1,8 +1,9 @@
 		Gnuplot Version 5.4.7 Release Notes
 		===================================
 
-The 5.4.7 patchlevel release contains various non-critical bug fixes.
-The latex terminals have been updated to work with texlive2023.
+The 5.4.7 patchlevel release contains various non-critical bug fixes
+to the current stable version 5.4.
+Also the latex terminals have been updated to work with texlive2023.
 
 Gnuplot development is tracked in a git repository on SourceForge.
 You can generate a complete history of changes using "git log"
@@ -10,13 +11,14 @@ after downloading:
 
 	git clone -b branch-5-4-stable git://git.code.sf.net/p/gnuplot/gnuplot-main
 
-Release Notes date:  16-May-2023
+Release Notes date:  21-May-2023
 
 Changes in 5.4.7
 ================
 
 * FIX	 pseudofiles '+','++' must ignore "set datafile columnheader"  Bug #2585
 * FIX	 data from an array must ignore "set datafile columnheader"    Bug #2585
+* FIX    data from an array must ignore "set datafile separator"
 * FIX	 various problems with unbounded plot iteration                Bug #2589
 * FIX	 allow plot ... smooth acsplines with filledcurves             Bug #2592
 * FIX    "plot title at {end|beginning}" belongs in KEYSAMPLE layer
@@ -27,13 +29,12 @@ Changes in 5.4.7
 * FIX	 cairolatex/epslatex: prevent doubled text in opaque textboxes
 * FIX	 wxt: versions prior to 3.0 do not support XDG                 Bug #2587
 * FIX	 wxt: fontscale and fontsize handling was inconsistent         Bug #2373
-* FIX	 tikz epslatex cairolatex: updated to work with TeXLive2023    Bug #2613
 * FIX	 correctly report cardinality of an empty array is zero        Bug #2616
-* FIX	 ignore datafile separator when plotting from an array
 * FIX	 combination of pm3d options "at b" or "at t" with "depthorder"
 * FIX	 combination of 'autotitle columnhead' and 'using col("key")'  Bug #2620
 * FIX	 do not complain if XDG files are not found because no $HOME   Bug #2623
 * FIX	 windows terminal: arrow length corrected for aspect ratio     Bug #2565
+* tikz epslatex cairolatex terminals updated to work with TeXLive2023
 
 Changes in 5.4.6
 ================
