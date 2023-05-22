@@ -415,6 +415,9 @@ D viridis 1
 3 New terminals and terminal options
 ?new terminals
 #start
+#b New terminals `kittygd` and `kittycairo` provide in-window graphics for
+## terminal emulators that support the kitty protocol.  Kitty is an alternative
+## to sixel graphics that offers full 24-bit RGB color. See `kittycairo`.
 #b New terminal `block` for text-mode pseudo-graphics uses Unicode
 ## block or Braille characters to offer improved resolution compared
 ## to the `dumb` or `caca` terminals.
