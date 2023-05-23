@@ -516,7 +516,7 @@ static int SIXEL_ncol = 16; /* actual number of colors to be used */
 static int SIXEL_lt;
 static int SIXEL_fp = 0;	/* start of gnuplot palette colors */
 static int SIXEL_np = 0;	/* size of gnuplot palette */
-static int SIXEL_anchor = 0;	/* Anchor plot at top left */
+static int SIXEL_anchor = 1;	/* Anchor plot at top left */
 
 struct SIXEL_colorspec {
     int state;		/* see definitions above */
@@ -580,7 +580,7 @@ SIXEL_findslot(int rgbval)
 enum SIXEL_id {
     SIXEL_SMALL, SIXEL_MEDIUM, SIXEL_LARGE,
     SIXEL_MONOCHROME, SIXEL_COLOR, SIXEL_COLORS,
-    SIXEL_SIZE, SIXEL_ANIMATE, SIXEL_SCROLL,
+    SIXEL_SIZE, SIXEL_ANCHOR, SIXEL_SCROLL,
     SIXEL_OTHER
 };
 
@@ -594,7 +594,7 @@ static struct gen_table SIXEL_opts[] =
     { "c$olour", SIXEL_COLOR },
     { "colors", SIXEL_COLORS },
     { "size", SIXEL_SIZE },
-    { "animate", SIXEL_ANIMATE },
+    { "anchor", SIXEL_ANCHOR },
     { "scroll", SIXEL_SCROLL },
     { NULL, SIXEL_OTHER }
 };
@@ -646,7 +646,7 @@ SIXEL_options()
 	    }
 	    break;
 	}
-	case SIXEL_ANIMATE:
+	case SIXEL_ANCHOR:
 	    SIXEL_anchor = 1;
 	    c_token++;
 	    break;
@@ -682,8 +682,8 @@ SIXEL_options()
 	strcat(term_options, " monochrome");
     else
 	sprintf(term_options + strlen(term_options), " colors %d", SIXEL_ncol);
-    if (SIXEL_anchor != 0)
-	strcat(term_options, " animate");
+    if (strncmp(term->name, "sixel", 5) == 0)
+	strcat(term_options, SIXEL_anchor ? " anchor" : " scroll");
     sprintf(term_options + strlen(term_options), " size %d,%d",
 	term->xmax + 1, term->ymax + 1);
 }
@@ -1495,8 +1495,9 @@ START_HELP(tek40)
 "",
 " The font size can be specified as `small`, `medium` or `large`.",
 "",
-" `animate` causes each new plot to be anchored at the top left of the window",
-" rather than scrolling from the current cursor position.",
+" `anchor` causes each new plot to be anchored at the top left of the window.",
+" `scroll` intead draws each plot at the current cursor position and allows it",
+" to scroll with the text.",
 "",
 " For use with xterm, xterm must be compiled/configured with",
 " \"--enable-sixel-graphics\" and started with \"-ti 340\" on the command line.",

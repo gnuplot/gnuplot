@@ -197,7 +197,7 @@ static const cairo_params_t cairopdf_params_default = CAIROPDF_PARAMS_DEFAULT;
 #define CAIROPNG_PARAMS_DEFAULT { \
     CAIROTERM_PNG, PIXELS, FALSE, FALSE, 1.0, {1.,1.,1.}, 0xffffff, \
     FALSE, BUTT, FALSE, FALSE, NULL, \
-    12, 1.0, 640., 480., 1.0, 1.0, 1.0, FALSE \
+    12, 1.0, 640., 480., 1.0, 1.0, 1.0, FALSE, 0, TRUE\
 }
 static cairo_params_t cairopng_params = CAIROPNG_PARAMS_DEFAULT;
 static const cairo_params_t cairopng_params_default = CAIROPNG_PARAMS_DEFAULT;
@@ -1958,11 +1958,11 @@ START_HELP(kittycairo)
 " The option `rounded` sets line caps and line joins to be rounded;",
 " `butt` is the default, producing butt caps and mitered joins.",
 "",
-" The size of the plot is given in screen pixels. By default each plot is",
-" drawn starting at the current cursor position and scrolls with the terminal",
-" text. `anchor` instead pins each plot to the top left of the terminal window.",
-" This is useful for animation or pseudo-mousing using the keyboard",
-" (see `pseudo-mousing`).",
+" The size of the plot is given in screen pixels.  By default (`anchor`) each",
+" plot is drawn at the top left of the terminal window.  This is useful for",
+" animation or pseudo-mousing using the keyboard (see `pseudo-mousing`).",
+" `scroll` instead starts each plot at the current cursor position so that it",
+" scrolls with the terminal text.",
 ""
 END_HELP(kittycairo)
 #endif /* HAVE_KITTY_TERM */
