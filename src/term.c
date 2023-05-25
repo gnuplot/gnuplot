@@ -1586,7 +1586,7 @@ change_term(const char *origname, int length)
 	length = 8;
     }
     /* To allow "set term kitty" as short for "set term kittycairo" */
-    if (!strcmp(origname,"kitty")) {
+    if (!strncmp(origname,"kitty",length)) {
 	name = "kittycairo";
 	length = 10;
     }
