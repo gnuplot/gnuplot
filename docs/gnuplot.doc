@@ -2668,11 +2668,9 @@ C 4 weekdata_cdc
 
  The current implementation is from the Cephes library (Moshier 2000).
  The domain is restricted to real a>0, real x>=0.
- EXPERIMENTAL:
- To be replaced by an implementation that handles complex arguments.
 
-??
 4 using specifier functions
+?
  These functions are valid only in the context of data input.  Usually this
  means use in an expression that provides an input field of the `using`
  specifier in a `plot`, `splot`, `fit`, or `stats` command.  However the
@@ -15930,8 +15928,7 @@ Ffigure_polar_grid
  [EXPERIMENTAL] To select only a subset of the data points for tabulation you
  can provide an input filter condition (`if <expression>`) at the end of the
  command.  Note that the input filter may reference data columns that are not
- part of the output.  This feature may change substantially before appearing in
- a released version of gnuplot.
+ part of the output.  Details of this feature may change in a future version.
 
       plot <file> using 1:2:($4+$5) with table if (strcol(3) eq "Red")
       plot <file> using 1:2:($4+$5) with table if (10. < $1 && $1 < 100.)
