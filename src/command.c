@@ -1969,8 +1969,10 @@ pause_command()
 	    Ginteger(&current->udv_value,-1);
 	    current = add_udv_by_name("MOUSE_BUTTON");
 	    Ginteger(&current->udv_value,-1);
-	} else
+	} else {
 	    int_warn(NO_CARET, "Mousing not active");
+	    while (!END_OF_COMMAND) c_token++;
+	}
     } else
 #endif
 	sleep_time = real_expression();
@@ -2073,8 +2075,20 @@ pause_command()
 #else /* !(_WIN32 || OS2) */
 # ifdef USE_MOUSE
 	if (term && term->waitforinput) {
-	    /* It does _not_ work to do EAT_INPUT_WITH(term->waitforinput()) */
-	    term->waitforinput(0);
+	    int terminating_char = term->waitforinput(0);
+	    if (isalnum(terminating_char)) {
+#if (0)
+		/* It does _not_ work to do EAT_INPUT_WITH(term->waitforinput())
+		 * The question is, do we try to restore a damaged line by pushing
+		 * the previous character back into the stream or do we trash the
+		 * whole line and resume parsing at the next line.
+		 */
+		FPRINTF((stderr,"(eat junk starting with %c)\n", terminating_char));
+		EAT_INPUT_WITH(fgetc(stdin));
+#else
+		ungetc(terminating_char, stdin);
+#endif
+	    }
 	} else
 # endif /* USE_MOUSE */
 # ifdef MSDOS
