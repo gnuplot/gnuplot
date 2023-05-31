@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.789 2023-04-05 19:27:22+09 shige Exp $
-C corresponding original gnuplot.doc at 2023-04-05
+C RCS $Id: gnuplot-ja.doc,v 1.791 2023-05-26 15:16:33+09 shige Exp $
+C corresponding original gnuplot.doc at 2023-05-26
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -357,11 +357,17 @@ C 行が長いのは、できればなんとかしたい
 ## クは関数から標本として取った 2 つの x 座標の間にあるため、出力では不
 ## 完全に切り取られてしまいます。このフィルタは、そのようなピーク点の場
 ## 所に新しい標本点を追加します。以下参照: `filters`。
+#b これは厳密には新しい描画スタイルではありませんが、フィルタ concave
+## hull と領域塗り潰しのパスに沿った平滑化を組み合わせることで、「膨ら
+## んだ領域」グラフの作成が可能になります。これは例えば複数のデータのか
+## たまりが重なっているものの広さを示します。
 #b 3 次元描画スタイル `with pm3d` でオプション修飾子 `zclip [zmin:zmax]`
 ## が使えて、これは曲面全体のひとつの断面のみを選択します。クリッピング
 ## の境界値を増加させて連続描画を行うことで、3 次元では断面切り出しアニ
-## メーションを見るのに使えますし、2 次元射影では間を塗り潰した等高線図
-## を作成するのに使えます。
+## メーションを見るのに使えますし、間を塗り潰した等高線図を作成するのに
+## 使えます。これは、新しい描画スタイル `with contourfill` で自動化でき、
+## それは 2 次元射影で特に有用です。以下参照: `set contourfill`。
+
 #end
 D polargrid 4
 DB
@@ -369,6 +375,9 @@ D windrose 1
 D sectors 4
 DB
 D sharpen 1
+D iris 2
+DB
+D contourfill 4
 
 3 凸包とマスクと平滑化 (Hulls, masks, and smoothing)
 ?new hulls
@@ -471,6 +480,10 @@ D viridis 1
 3 新しい出力形式とオプション (New terminals and terminal options)
 ?new terminals
 #start
+#b 新しい出力形式 `kittygd` と `kittycairo` は、kitty プロトコルをサポ
+## ートする端末エミュレータで、端末ウィンドウ上でのグラフィックを提供し
+## ます。kitty は、sixel グラフィックとは別の選択肢で、24 ビット RGB フ
+## ルカラーを提供します。以下参照: `kittycairo`。
 #b 新しい出力形式 `block` は、疑似グラフィックのテキストモード用のもの
 ## で、`dumb` や `caca` 出力形式に対して改良された解像度を提供するため
 ## に Unicode ブロック、あるいは点字 (Braille 文字) を使用します。
@@ -478,6 +491,13 @@ D viridis 1
 ## ムか、アニメーション列を生成します。各フレームは pngcairo で生成し、
 ## その後 libwebp と libwebpmux による WebPAnimEncoder API を通してエン
 ## コードを行います。
+#b `dumb`, `sixel`, `block`, `domterm` 出力形式のように、文字列出力とグ
+## ラフィック表示を同じウィンドウで行ういくつかの出力形式では、現在はコ
+## マンド `pause mouse` の間はキーボード入力に反応します。その間、それ
+## らの出力形式では、マウス操作が可能な出力形式が行うのと同じ方法でキー
+## 入力を解釈します。
+## 例えば、左/右/上/下矢印キーは、3 次元グラフでは視方向を変え、2 次元
+## グラフでは視点移動/拡大の増分ステップを実行します。
 #end
 
 3 ウォッチポイント (Watchpoints)
@@ -2733,6 +2753,7 @@ C C 4 weekdata_cdc
  試験段階:
  そのうちに複素引数を処理する実装に置き換えられるでしょう。
 
+??
 4 using 指定用関数 (using specifier functions)
  以下の関数は、データ入力時のみ有効です。通常それは、`plot`, `splot`,
  `fit`, `stats` のいずれかのコマンド上の `using` 指定の入力列を使用する
@@ -3619,13 +3640,13 @@ Ffigure_newsyntax
 2 線種、色、スタイル (linetypes)
 ?linetypes
 ?colors
- 古い版の gnuplot では、各出力形式は "線種 (linetype)" をある程度用意し
- ていて、それらは色、太さ、点線/破線のパターン、または色と点線/破線の組
- 合せで違いを表現していました。それらの色、点線/破線のパターンは、出力
- 形式を越えて同じものになるという保証は何もありませんでしたが、多くは同
- じ色の列、赤/緑/青/紫/水色/黄色を使用していました。この古い挙動は、今
- は `set colorsequence classic` で選択できますが、現在の gnuplot のデフ
- ォルトは、出力形式に無関係に共通の 8 色列を使用します。
+ とても古い版の gnuplot では、各出力形式は "線種 (linetype)" をある程度
+ 用意していて、それらは色、太さ、点線/破線のパターン、または色と点線/破
+ 線の組合せで違いを表現していました。それらの色、点線/破線のパターンは、
+ 出力形式を越えて同じものになるという保証は何もありませんでしたが、多く
+ は同じ色の列、赤/緑/青/紫/水色/黄色を使用していました。この古い挙動は、
+ 今は `set colorsequence classic` で選択できますが、現在の gnuplot のデ
+ フォルトは、出力形式に無関係に共通の 8 色列を使用します。
 
  線種 (linetype) の属性の並びは、対話的か初期化ファイルのいずれかによっ
  てさらにカスタマイズ可能です。以下参照: `set linetype`。配布パッケージ
@@ -3824,12 +3845,8 @@ Ffigure_newsyntax
  `linecolor` や `linewidth` と同様に、点線/破線パターン (`dashtype`) が
  各曲線毎の属性として独立しました。従来のような、使用中の出力形式の点線
  を書くための特別なモードとして指定する必要はありません。すなわち、
- `set term <termname> {solid|dashed}` のようなコマンドは現在は無視され
- ます。バージョン 4 用に書いた古いスクリプトへの後方互換性が必要な場合
- は、以下のような書き方で代用できます:
-
-      if (GPVAL_VERSION >= 5.0) set for [i=1:9] linetype i dashtype i
-      if (GPVAL_VERSION < 5.0) set termoption dashed
+ `set term <termname> {solid|dashed}` のような古いコマンドは現在は無視
+ されます。
 
  すべての線は、ほかに指定しなければ、`dashtype solid` という属性を持ち
  ますが、このデフォルト値をコマンド `set linetype` で特定の線種に変更し
@@ -4153,7 +4170,7 @@ Ffigure_newsyntax
  グラフや数式に利用できる関数群は、共有ライブラリから実行可能な関数を取
  り込むプラグインの仕組みにより拡張できます。例えば、gnuplot のバージョ
  ン 5.4 では、上方不完全ガンマ関数 Q(a,x) は組み込み関数としては実装し
- ていません。
+ ていませんでした。
 #TeX \\ $Q(a,x)=\frac{1}{\Gamma(x)}\intop_{x}^{\infty}t^{a-1}e^{-t}dt$ .\quad\quad
  これは、gnuplot 内で直接以下のようにして近似的に定義できます。
        Q(a,x) = 1. - igamma(a,x)
@@ -4486,8 +4503,7 @@ C 変数の有効範囲 (スコープ) (Scope of variables)
            This is the first line of text.\nThis is the second line.
 
  拡張文字列処理 (enhanced text processing) は二重引用符に対しても単一引
- 用符に対しても機能します。しかし、そのモードをサポートしている出力形式
- でのみ働きます。以下参照: `enhanced text`。
+ 用符に対しても機能します。以下参照: `enhanced text`。
 
  逆引用符は,コマンドライン中の置換のためにシステムコマンドを囲むのに使
  います。以下参照: `substitution`。
@@ -5072,6 +5088,33 @@ Ffigure_piechart
      0    0    5  230   360    5
      e
 
+2 contourfill
+?plotting styles contourfill
+?style contourfill
+?with contourfill
+?contourfill
+Ffigure_contourfill
+ contourfill は、3 次元描画スタイルで、pm3d 曲面を z の等高線に沿って切
+ った断片の色付けに使います。これは、2 次元射影 (`set view map`) で、等
+ 高線の間を単色で塗り潰した 2 次元の等高線グラフを作成するのに使えます。
+ 各断片の境界と色の割り当ては、いずれも `set contourfill` で制御できま
+ す。以下も参照: `pm3d`, `zclip`。
+
+ この描画スタイルは、`set contours` と組み合わせて、その断片を切り分け
+ る等高線を重ね描きすることができます。`set contourfill` の断片の境界を
+ `set cntrparam` の等高線境界とを合わせるように注意してください。
+
+      # ztics で定義される断片境界
+      # 断片の z の中央値に割り当てられるパレットで色付け
+      set pm3d border retrace
+      set contourfill ztics
+      set ztics -20, 5, 20
+      set contour
+      set cntrparam cubic levels increment -20, 5, 20
+      set cntrlabel onecolor
+      set view map
+      splot g(x,y) with contourfill, g(x,y) with lines nosurface
+
 2 ellipses
 ?plotting styles ellipses
 ?style ellipses
@@ -5240,7 +5283,7 @@ Ffigure_financebars
 ^ <a href="http://www.gnuplot.info/demo/finance.html">
  金融データデモ。
 ^ </a>
-#TeX \newpage
+
 2 fillsteps
 ?style fillsteps
 ?with fillsteps
@@ -5678,6 +5721,7 @@ Ffigure_scaled_image
  完全な不透明です。すべての出力形式は、これら 2 つの両極端な値をサポー
  トします。0 < alpha < 255 のピクセルは半透明で、半透明をサポートしてい
  ない出力形式では、その値を 0 か 255 のいずれかに丸めます。
+D argb_hexdata 2
 3 image pixels
 ?plotting styles image pixels
 ?style image pixels
@@ -5783,11 +5827,11 @@ Ffigure_lines
  す (以下参照: `rgbcolor variable`)。
 
  2 次元 ("using" 指定なし) の場合
-      1 列:  y       # 行番号による暗黙の x
-      2 列:  x  y
+    1 列:  y     # 行番号による暗黙の x
+    2 列:  x y
  3 次元 ("using" 指定なし) の場合
-      1 列:  z       # x は暗黙の行番号、y は index から
-      3 列:  x  y  z
+    1 列:  z     # x は暗黙の行番号、y は index から
+    3 列:  x y z
 
  以下も参照: `linetypes`, `linewidth`, `linestyle`。
 2 linespoints
@@ -6237,6 +6281,7 @@ Ffigure_vectors
  2 次元描画スタイルの以下も参照: `with arrows`。これは、各矢印を
  x:y:length:angle の形式で指定する以外は `with vectors` と同じです。
 
+#TeX \newpage
 2 xerrorbars
 ?plotting styles xerrorbars
 ?style xerrorbars
@@ -7412,10 +7457,37 @@ Ffigure_zerror
       gnuplot> baz = $max( foo, 100. )
 
  関数ブロックをサポートする一番の目的は、複雑な関数を gnuplot 内部で直
- 接定義できるようにすることです。もちろん、同じ関数を C や Fortran で直
- 接コードした場合よりも実行速度は遅くなりますが、これは色々な目的に答え
- ることを可能にします。実行速度が重要な場合は、代わりにその関数を別にプ
- ラグインとして実装すればいいでしょう (以下参照: `plugins`)。
+ 接定義できるようにすることです。もちろん、同じ関数を C や Fortran でコ
+ ードした場合よりも実行速度は遅くなりますが、これは色々な目的に答えるこ
+ とを可能にします。実行速度が重要な場合は、代わりにその関数を別にプラグ
+ インとして実装すればいいでしょう (以下参照: `plugins`)。
+
+ 関数ブロックを使う 2 つ目の目的は、gnuplot コマンドが、これを使う以外
+ には存在できないような状況でその実行を可能にすることです。例えばあなた
+ が 2 つの CSV ファイルからのデータを描画したいが、一つのファイルはフィ
+ ールドがカンマ区切りで、もう一方はセミコロン区切りであるとします。通常
+ この属性に対しては、事前にコマンド `set datafile` をセットしますが、そ
+ れは plot コマンドが使用するすべてのファイルに適用されてしまいます。し
+ かし我々は、各ファイルが plot コマンドで参照される直前にそれを設定する
+ ように呼びだすような関数ブロックを定義できます。
+
+      function $set_csv(char) << EOF
+          set datafile separator char
+      EOF
+      plot tmp=$set_csv(",") FILE1, tmp=$set_csv(";") FILE2
+
+ 制限:
+#start
+#b 関数ブロック内で、データブロックや関数ブロックを定義することはできま
+## せん。
+#b 以下のコマンドは関数ブロック内で実行できません。
+##   `reset`, `shell`, `!<shell command>`。
+#b コマンド `plot`, `replot`, `splot`, `refresh`, `stats`, `vfill`,
+## `fit` は、そのいずれもが実行中でない場合のみ、関数ブロック内でも使用
+## できます。例えば、コマンド `plot` が呼び出す関数ブロック内で `stats`
+## を使うことはできませんし、コマンド `fit` の中から `plot` を呼び出す
+## ことはできない等々。
+#end
 
  関数ブロックを使う自明でない例として、複素対数ガンマ関数 lngamma に対
  する 15 項 Lanczos 近似の実装とグラフがデモコレクション内にあります。
@@ -7430,6 +7502,7 @@ Ffigure_zerror
 #TeX \begin{center}
 #TeX \begin{minipage}{5in}
 #TeX {
+#TeX 15 項 Lanczos 近似を用いた $log\Gamma(z)$ の関数ブロックによる実装
 #TeX \hrule
 #TeX ~\newline
 #TeX \small
@@ -7517,35 +7590,19 @@ Ffigure_zerror
  終了するブロックまでのすべての文 (複数の入力行も可) に条件的な実行が適
  用されます。if コマンドは入れ子にすることもできます。
 
- バージョン 4 からの古い 1 行形式の if/else 文もまだサポートしています
- が、新しいブロック形式の書式とは混ぜてはいけません。以下参照: `if-old`。
-3 if-old
-?if if-old
-?if-old
+ バージョン 5 より前の gnuplot では、if/else コマンドの通用範囲は 1 行
+ 内に留まっていましたが、現在は複数行を中カッコ { } で囲んで書くことが
+ できます。古い形式も一応残されていますが、それは中カッコのブロック内で
+ 使うことはできません。
+
  以前の書式:
        if (<条件>) <コマンド行> [; else if (<条件>) ...; else ...]
-
- gnuplot バージョン 4.4 までは、if/else コマンドの通用範囲は 1 行内に留
- まっていましたが、現在は複数行を中カッコ { } で囲んで書くことができま
- す。古い形式も一応残されていますが、それは中カッコのブロック内で使うこ
- とはできません。
-
  キーワード `if` が "{" をともなわない場合は、<条件> が真 (ゼロでない)
  ならば <コマンド行> のコマンド (複数も可) が実行され、偽 (ゼロ) ならば
  スキップされます。いずれの場合も入力行の最後になるか、`else` が現れる
  ところまでそれが行われます。`;` を使うと同じ行に複数のコマンド置くこと
  が可能ですが、条件付きのコマンド (`if` の構文自体) はそこでは終らない
  ことに注意してください。
-
- 例:
-       pi=3
-       if (pi!=acos(-1)) print "?Fixing pi!"; pi=acos(-1); print pi
- を実行すると、
-       ?Fixing pi!
-       3.14159265358979
- と表示されますが、
-       if (1==2) print "Never see this"; print "Or this either"
- とすると、何も表示されません。
 
 2 for
 ?for
@@ -7751,6 +7808,19 @@ Ffigure_zerror
       plot <...whatever...>
       bind all "alt-End" "exit gnuplot"
       pause mouse close
+
+3 pause 中の疑似マウス操作 (pseudo-mousing during pause)
+?commands pause pseudo-mousing
+?pseudo-mousing
+ `dumb`, `sixel`, `block`, `domterm` 出力形式のように、文字列出力とグラ
+ フィック表示を同じウィンドウで行う出力形式があります。これらの出力形式
+ では、今のところ実質的にマウス動作をサポートしていませんが、コマンド
+ `pause mouse` の間は、マウス動作が可能な出力形式の場合と同じ仕組みでキ
+ ー操作を解釈します。すなわち、`l` は対数軸のトグル、`a` は現在のグラフ
+ を自動縮尺に、左/右/上/下の矢印キーは、3 次元グラフでは視方向を変化さ
+ せ、2 次元グラフでは視点移動/拡大の増分ステップを実行します。`h` はキ
+ ー割り当ての一覧を表示し、改行キーは `pause` を終了させ、通常のコマン
+ ドライン操作に復帰します。
 
 2 plot
 ?commands plot
@@ -9021,8 +9091,8 @@ Ffigure_smooth_path
  `set trange` で設定した範囲全体に渡りますが、trange が設定されていなけ
  れば `set xrange` の範囲全体に渡ります。
 
- 注意: trange の使用は、以前の版の gnuplot の仕様とは異なりますが、これ
- により x 軸の範囲とは異なる標本範囲が使用できることになります。
+ 注意: trange の使用は、以前のある版の gnuplot の仕様とは異なりますが、
+ これにより x 軸の範囲とは異なる標本範囲が使用できることになります。
 
        plot '+' using ($1):(sin($1)):(sin($1)**2) with filledcurves
 
@@ -10010,8 +10080,8 @@ C using の書式 (format)
 
  以下のものは、`reset` の影響を受けません:
       `set term` `set output` `set loadpath` `set linetype` `set fit`
-      `set datafile` `set encoding` `set decimalsign` `set locale`
-      `set psdir` `set overflow` `set multiplot`
+      `set encoding` `set decimalsign` `set locale` `set psdir`
+      `set overflow` `set multiplot`
 
  `reset` は、必ずしもプログラム立ち上がった初期状態には戻さないことに注
  意してください。それは、初期設定ファイル gnuplotrc や $HOME/.gnuplot、
@@ -11040,10 +11110,15 @@ Ffigure_colornames
 ?contour
 ?contours
 ?nocontour
- コマンド `set contour` は曲面の等高線を引くことを指示します。このオプ
- ションは `splot` でのみ有効です。これは、格子状データ (grid data) を必
- 要とします。詳細は、以下参照: `grid_data`。非格子状データで等高線を描
- きたい場合は、格子を生成するために `set dgrid3d` を使用します。
+ コマンド `set contour` で 3 次元曲面に等高線を置くことができます。この
+ オプションは `splot` でのみ有効です。これは、格子状データ (grid data)
+ を必要とします。すなわち、一つの y-孤立線に対するすべての点が並べられ、
+ その次に次の y-孤立線に対するすべての点が並び、以下同様に続くデータの
+ ファイルです。y-孤立線同士を分離するのは単一の空行 (空白以外の文字を一
+ 切含まない行) です。詳細は以下参照: `grid_data`。
+
+ データが格子状になっていない場合、`set dgrid3d` を使って最初に適切な格
+ 子を生成し、その格子にデータを当てはめることができます。
 
  書式:
        set contour {base | surface | both}
@@ -11059,27 +11134,10 @@ Ffigure_colornames
  `set cntrparam`。等高線のラベルの制御に関しては、以下参照:
  `set cntrlabel`。
 
- 等高線のみのグラフを得るために、曲面自身の描画をしないようにすることも
- できます (以下参照: `unset surface`)。`set size` を使って、グラフを画
- 面一杯に描画することも可能ですが、そういった出力形式よりも、等高線のデ
- ータをデータブロックに書き出し、それを再び 2 次元データとして読み込ん
- で描画すればよりよい制御が可能になります:
-
-       unset surface
-       set contour
-       set cntrparam ...
-       set table $datablock
-       splot ...
-       unset table
-       # 等高線の情報は今 $datablock の中にある
-       set term <whatever>
-       plot $datablock
-
- 等高線を描くためには、データは格子状データ ("grid data") である必要が
- あります。そのようなファイルでは、一つの y-孤立線上の全ての点が順に
- 並べられていきます。そして隣の y-孤立線上の点が順に並べられ、そして隣、
- と続いていきます。y-孤立線同士を分離するには一行の空行 (空白、復帰、改
- 行以外の文字を含まない行) を挟みます。
+ このオプションは、線やラベルを配置するもので、曲面自身のその他の見た目
+ は変えないことに注意してください。曲面の色付けを、等高線で区切られた領
+ 域が他と区別できるような色に割り当てたい場合は、代わりに描画スタイル
+ contourfill を使用してくだささい。以下参照: `contourfill`。
 
  `set contour` が有効な場合、`splot with <style>` で points, lines,
  impulses, labels 等の描画要素を等高線に沿って配置できます。`with pm3d`
@@ -11088,22 +11146,74 @@ Ffigure_colornames
  ルなどのその他の描画要素も混ぜたい場合は、splot コマンド内のその命令の
  後ろにキーワード `nocontours` を追加しないといけません。
 
- 以下参照: `splot datafile`。
+ 曲面をスイッチオフ (以下参照: `unset surface`) にして、等高線のみのグ
+ ラフにすることも可能です。等高線の 2 次元射影とオプションのラベルは以
+ 下のようにして生成できます:
 
- 以下も参照してください。
-^ <a href="http://www.gnuplot.info/demo/contours.html">
+      set view map
+      splot DATA with lines nosurface, DATA with labels
+
+ 以前のバージョンの gnuplot では、以下のように、代わりとなる多段階の方
+ 法を使って 3 次元の等高線をファイルやデータブロックに保存し、その後で
+ それを 2 次元の plot コマンドを使用してそれを描画していました。
+
+       set contour
+       set table $datablock
+       splot DATA with lines nosurface
+       unset table
+       # 等高線は $datablock に、1 つの等高線が 1 つの index で 
+       plot for [level=0:*] $datablock index level with lines
+
+ 以下も参照: `splot datafile`。また、
+ ^ <a href="http://www.gnuplot.info/demo/contours.html">
  等高線のデモ (contours.dem)
-^ </a>
- および
-^ <a href="http://www.gnuplot.info/demo/discrete.html">
- ユーザ定義レベルの等高線のデモ (discrete.dem).
-^ </a>
+ ^ </a>
+ と
+ ^ <a href="http://www.gnuplot.info/demo/discrete.html">
+ 等高線レベルのユーザ定義のデモ (discrete.dem)
+ ^ </a>
+ も参照。
 3 グラフ角の支柱 (cornerpoles)
 ?command set cornerpoles
 ?set cornerpoles
 ?cornerpoles
  デフォルトで、splot は 3 次元曲面のそれぞれの角から床面への鉛直線を描
  画します。これらの鉛直線は、`unset cornerpoles` で消すことができます。
+3 等高線間の塗り潰し (contourfill)
+?commands set contourfill
+?commands show contourfill
+?set contourfill
+?show contourfill
+ 3 次元描画スタイル `with contourfill` は、1 つの pm3d 曲面を、z 軸に垂
+ 直な平面群で区切られる断片に切り分けます。コマンド `set contourfill`
+ は、区切る平面群の配置と個々の断片に割り当てる色を制御します。
+
+ 書式:
+      set contourfill auto N          # zrange を N 等分した断片に
+      set contourfill ztics <level>   # 各 z 軸刻みの位置で切り分け
+      set contourfill cbtics <level>  # 各 cb 軸刻みの位置で切り分け
+      set contourfill {palette | firstlinetype N}
+
+ デフォルトは `set contourfill auto 5 palette` で、これは現在の z 軸の
+ 範囲を 5 等分し (6 つの平面で区切る)、各断片にその z の中点に対応する
+ パレットの色を割り当てます。
+
+ オプション `ztics`, `cbtics` は、zrange の分割を、主目盛り (レベル 0)
+ による切り分け、または副目盛り (レベル 1)、またはユーザが明示して指定
+ する他のレベルの目盛りの集合による切り分けに配置します。例えば、主目盛
+ り、副目盛りとは独立に z=2.5, z=7, z=10 に指定して切り分けるには、以下
+ のコマンドを使用します。
+      set ztics add ("floor" 2.5 3, "boundary X" 7 3, "ceiling" 10 3)
+      set contourfill ztics 3
+      set ztics scale 1, 0.5, 0, 0, 0
+
+ 断片の色付けにパレットを使いたくない場合は、任意連続する線種の範囲を選
+ 択し、それらに望む色の列を割り当てることができます。
+      set for [i=101:110] linetype i lc mycolor[i]
+      set contourfill firstlinetype 101
+ `set contourfill palette` でパレットによる色付けに復帰できます。
+D contourfill 3
+
 3 点線/破線設定 (dashtype)
 ?commands set dashtype
 ?commands show dashtype
@@ -11127,7 +11237,10 @@ D dashtypes 2
  コマンド `set datafile` は、`plot`, `splot`, `fit` コマンドで入力デー
  タを読む場合に、その列 (field) の解釈の仕方を制御するオプションを持ち
  ます。
- 現在は、そのようなオプションがいくつか実装されています。
+ 現在は、そのようなオプションがいくつか実装されています。その設定は、そ
+ の後のコマンドで読み出されるすべてのデータファイルに一様に適用しますが、
+ それとは矛盾する書式でファイルを同時に操作しなければいけない場合、これ
+ を回避する方法に関しては、以下参照: `functionbocks`。
 4 set datafile columnheaders
 ?set datafile columnheaders
 =columnheaders
@@ -11181,18 +11294,15 @@ D dashtypes 2
 
  逆に、`set datafile missing NaN` とすると、数式やデータ中の数値ではな
  い値 (NaN) はすべて欠損データとして扱います。
-
- 以下のデモも参照してください。
-^ <a href="http://www.gnuplot.info/demo/mgr.html">
- imageNaN デモ。
+^ <a href="http://www.gnuplot.info/demo/imageNaN.html">
+ imageNaN デモ
 ^ </a>
+ を参照してください。
 
- gnuplot バージョン 5.4 より、plot コマンドで using 指定が直接列の値を
- `using N`, `using ($N)`, `using (function($N))` のように参照した場合は
- 列 N に欠損値フラグを通知します。直接参照におけるそのような場合は、数
- 式、例えば func($N) は一切評価されません。これは、浮動小数点エラーや他
- の副作用により gnuplot がエラー停止してしまいかねないことを未然に防ぐ
- ためのものです。
+ gnuplot は plot コマンドで using 指定が直接列の値を `using N`,
+ `using ($N)`, `using (function($N))` のように参照した場合は列 N に欠損
+ 値フラグを通知します。これらの場合は、数式、例えば func($N) は一切評価
+ されません。
 
  現在のバージョンの gnuplot は、(column(N)) の形式の直接参照も通知しま
  すが、式が "missing" (欠損値) のフラグがついた列の値に間接的に依存する
@@ -14770,6 +14880,7 @@ D viridis 1
 
  書式
       splot DATA using (x):(y):(z){:(color)} with pm3d
+                 { at <position>}
                  {fs|fillstyle <fillstyle>} {fc|fillcolor <colorspec>}
                  {zclip [zmin:zmax]}
 
@@ -14908,23 +15019,20 @@ D spotlight 1
 4 pm3d の位置 (position)
 ?pm3d position
 ?set pm3d position
- 色の曲面は底面か天井 (この場合は灰色/カラーの平面地図) か曲面上の点の
- z 座標 (灰色/カラー曲面) に描くことができます。その選択は、オプション
- `at` に、`b`, `t`, `s` の 6 つまでの組合せの文字列をつけて指定すること
- で行えます。例えば `at b` は底面のみに描画しますし、`at st` は最初に曲
- 面に描いて次に天井面に色地図を描きますし、`at bstbst` は ... 真面目な
- 話、こんなものは使いません。
+ pm3d の色付け曲面は、その曲面の本当の z の位置、または底面か天井の平面
+ に射影を描くことができます。これは、オプション `at` に、`b`, `t`, `s`
+ の 6 つまでの組合せの文字列をつけて指定することで制御できます。例えば
+ `at b` は底面のみに描画しますし、`at st` は最初に曲面に描いてそれから
+ 天井面に描きますし、`at bstbst` は ... 役には立たないでしょう。
 
- 塗られた四角形は、次から次へと描画されて行きます。曲面を描画する場合
- (`at s`)、後の四角形が前のものに重なり (上書きし) ます (gnuplot は塗ら
- れた多角形の網の重なりの相互作用を計算するような仮想現実ツールではあり
- ません)。 最初に走査されるデータを最初に描くか最後に描くかを切替えるス
- イッチオプション `scansforward` と `scansbackward` を試してみてくださ
- い。デフォルトは `scansautomatic` で、これは gnuplot 自身に走査の順を
- 推測させます。一方で、オプション `depthorder` は四角形の順序を完全に再
- 構成します。塗りつぶしは深さ順に並び変えされた後で行われ、これによりか
- なり複雑な曲面でも視覚的なものにすることができます。詳細は、以下参照:
- `pm3d depthorder`。
+ 塗られた四角形は、次から次へと描画されて行きます。これは、後に描く四角
+ 形が、以前に描いた四角形を覆ったり、重なったりします。最初に走査される
+ データを最初に描くか最後に描くかを切り替えるスイッチオプション
+ `scansforward` と `scansbackward` を試してみてください。デフォルトは
+ `scansautomatic` で、これは gnuplot 自身に走査の順を推測させます。オプ
+ ション `depthorder` は四角形の順序を視点からの距離でソートすることで完
+ 全に再構成します。これによりかなり複雑な曲面でも視覚的なものにすること
+ ができます。詳細は、以下参照: `pm3d depthorder`。
 4 走査の順番 (scanorder)
 ?pm3d scanorder
 ?pm3d depthorder
