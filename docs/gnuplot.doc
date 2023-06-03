@@ -72,7 +72,7 @@ C
 ?introduction
 ?
  `Gnuplot` is a portable command-line driven graphing utility for Linux, OS/2,
- MS Windows, OSX, VMS, and many other platforms. The source code is copyrighted
+ MS Windows, maxOS, VMS, and many other platforms. The source code is copyrighted
  but freely distributed (i.e., you don't have to pay for it). It was originally
  created to allow scientists and students to visualize mathematical functions
  and data interactively, but has grown to support many non-interactive uses
@@ -406,6 +406,9 @@ D viridis 1
 3 New terminals and terminal options
 ?new terminals
 #start
+#b New terminals `kittygd` and `kittycairo` provide in-window graphics for
+## terminal emulators that support the kitty protocol.  Kitty is an alternative
+## to sixel graphics that offers full 24-bit RGB color. See `kittycairo`.
 #b New terminal `block` for text-mode pseudo-graphics uses Unicode
 ## block or Braille characters to offer improved resolution compared
 ## to the `dumb` or `caca` terminals.
@@ -7666,7 +7669,7 @@ Ffigure_zerror
 ?commands pause pseudo-mousing
 ?pseudo-mousing
  Some terminals use the same window for text entry and graphical display,
- including terminal types `dumb`, `sixel`, `block`, and `domterm`.  These
+ including terminal types `dumb`, `sixel`, `kitty`, and `domterm`.  These
  terminals do not currently support mousing per se, but during a `pause mouse`
  command they interpret keystrokes in the same way that a mousing terminal
  would.  E.g. left/right/up/down arrow keys change the view angle of 3D plots

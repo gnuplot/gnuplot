@@ -17,7 +17,7 @@
 #define KITTY_FORMAT_PNG 100
 
 static unsigned char kitty_format;
-static unsigned char kitty_buf[KITTY_BUFSIZ];
+static unsigned char *kitty_buf = NULL;	/* Will be initialized to kitty_buf[KITTY_BUFSIZ] */
 static unsigned char *kitty_writepos;
 static TBOOLEAN kitty_init_sent;
 
@@ -25,6 +25,8 @@ static void
 kitty_init(unsigned char format)
 {
     kitty_format = format;
+    if (!kitty_buf)
+	kitty_buf = gp_alloc(sizeof(unsigned char) * KITTY_BUFSIZ, "kitty buffer");
     kitty_writepos = kitty_buf;
     kitty_init_sent = FALSE;
 }
