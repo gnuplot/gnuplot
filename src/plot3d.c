@@ -1285,6 +1285,7 @@ get_3ddata(struct surface_points *this_plot)
 		cp->CRD_COLOR = (pm3d_color_from_column) ? color : z;
 	    } else {
 		coord_type dummy_type;
+		TBOOLEAN noautoscale_color;
 
 		/* Without this,  z=Nan or z=Inf or DF_MISSING fails to set
 		 * CRD_COLOR at all, since the z test bails to a goto.
@@ -1353,9 +1354,14 @@ get_3ddata(struct surface_points *this_plot)
 		    color = z;
 		}
 
+		/* lc rgb variable cannot be used to autoscale cbrange */
+		noautoscale_color = this_plot->noautoscale;
+		if (this_plot->lp_properties.pm3d_color.type == TC_RGB
+		&&  this_plot->lp_properties.pm3d_color.value < 0.0)
+		    noautoscale_color = TRUE;
 		dummy_type = cp->type;
 		STORE_AND_UPDATE_RANGE(cp->CRD_COLOR, color, dummy_type,
-			    COLOR_AXIS, this_plot->noautoscale,
+			    COLOR_AXIS, noautoscale_color,
 			    goto come_here_if_undefined);
 	    }
 
