@@ -1,9 +1,14 @@
-		Gnuplot Version 5.4.7 Release Notes
+		Gnuplot Version 5.4.8 Release Notes
 		===================================
 
-The 5.4.7 patchlevel release contains various non-critical bug fixes
+The 5.4.8 patchlevel release contains various non-critical bug fixes
 to the current stable version 5.4.
 Also the latex terminals have been updated to work with texlive2023.
+
+Note: Version reporting in the Windows binaries for 5.4.7 was incorrect.
+Rather than letting the generic source distribution get out of sync with
+the binaries, the version has been bumped to 5.4.8 in both.
+There are no other changes between patchlevels 7 and 8.
 
 Gnuplot development is tracked in a git repository on SourceForge.
 You can generate a complete history of changes using "git log"
@@ -11,7 +16,13 @@ after downloading:
 
 	git clone -b branch-5-4-stable git://git.code.sf.net/p/gnuplot/gnuplot-main
 
-Release Notes date:  21-May-2023
+Release Notes date:  01-Jun-2023
+
+Changes in 5.4.8
+================
+* FIX	 version reporting in Windows binaries
+	 No other changes
+
 
 Changes in 5.4.7
 ================
