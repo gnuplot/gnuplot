@@ -115,7 +115,7 @@ windows/*.png gnuplot.htb gnuplot.texi gnuplot-eldoc.el $(ELCS)
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(DOCHEADERS) $(EXTRA_DIST)
 
-BUILT_SOURCES = allterm.h
+BUILT_SOURCES = allterm.h allterm-ja.h
 
 GNUPLOT_EXE = ../src/gnuplot$(EXEEXT)
 
