@@ -4747,7 +4747,7 @@ process_event(XEvent *event)
 #endif	/* DISABLE_SPACE_RAISES_CONSOLE */
 
 	    case 'm': /* Toggle mouse display, but only if we control the window here */
-		if (((plot != current_plot) && (!modifier_mask))
+		if ((plot && (plot != current_plot) && (!modifier_mask))
 #ifdef PIPE_IPC
 		    || pipe_died
 #endif
@@ -4783,7 +4783,7 @@ process_event(XEvent *event)
 	    gp_exec_event(GE_keypress,                               \
 		(int)RevX(event->xkey.x), (int)RevY(event->xkey.y),  \
 		gp_keysym, 0, plot->plot_number);                    \
-	} else {                                                     \
+	} else if (plot) {                                                     \
 	    gp_exec_event(GE_keypress_old,                              \
 		(int)RevX(event->xkey.x), (int)RevY(event->xkey.y),  \
 		gp_keysym, 0, plot->plot_number);                    \
