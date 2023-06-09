@@ -478,13 +478,13 @@ void qt_sendFont()
 	qt->out << GESetFont << qt->currentFontName << qt->currentFontSize;
 
 	QPair<QString, double> currentFont(qt->currentFontName, qt->currentFontSize);
-	static QPair<QString, double> lastFont("", 0);
+	static QPair<QString, double> lastFont("", 0.0);
 
 	// The font has not changed
 	if (currentFont == lastFont)
 		return;
 
-	static QMap<QPair<QString, int>, QPair<int, int> > fontMetricCache;
+	static QMap< QPair<QString, double>, QPair<int, int> > fontMetricCache;
 	QPair<int, int> metric;
 
 	// Try to find the font metric in the cache or ask the GUI for the font metrics
