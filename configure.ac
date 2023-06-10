@@ -718,15 +718,6 @@ if test "$enable_chi_shapes" != no; then
               [ Define to support Delaunay triangulation and chi-shapes ])
 fi
 
-dnl Whether we want to create the LaTeX tutorial
-dnl TUTORIAL=notutorial
-dnl AC_ARG_WITH(tutorial,dnl
-dnl [  --with-tutorial         process the LaTeX tutorial when building])
-dnl dnl only if latex/2e is found
-dnl if test "$with_latex" != no -a "$with_tutorial" = yes ; then
-dnl   TUTORIAL=tutorial
-dnl fi
-
 dnl enable multi-byte font support in x11 terminal
 AC_ARG_ENABLE(x11-mbfonts,dnl
 [  --disable-x11-mbfonts   disable multi-byte font support for x11 ],,
@@ -763,13 +754,6 @@ AC_ARG_ENABLE(raise-console,dnl
                 [ Define to treat spacebar like any other keystroke. ])
   fi
 
-
-dnl
-dnl if test ! -f src/graphics.c ; then
-dnl   AC_MSG_RESULT([Compiling outside source directory - copying needed files])
-dnl   mkdir tutorial >/dev/null 2>&1
-dnl   cp ${srcdir}/tutorial/eg3.dat tutorial
-dnl fi
 
 dnl  wxWidgets terminal
 
@@ -1180,7 +1164,7 @@ AC_CONFIG_FILES([Makefile
            src/wxterminal/Makefile
            src/qtterminal/Makefile
            term/Makefile
-           tutorial/Makefile])
+           ])
 AC_CONFIG_COMMANDS([default],[test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h],[])
 AC_OUTPUT
 
@@ -1273,9 +1257,9 @@ else
 fi
 
 if test "$gnuplot_framework_AquaTerm" = yes; then
-  AC_MSG_RESULT([    aqua (OSX): yes])
+  AC_MSG_RESULT([    aqua      : yes   (macOS only)])
 else
-  AC_MSG_RESULT([    aqua (OSX):  no])
+  AC_MSG_RESULT([    aqua      :  no   (macOS only)])
 fi
 
 AC_MSG_RESULT([])
