@@ -590,3 +590,14 @@ done(int status)
     gp_exit(status);
 }
 
+void
+vms_init_screen()
+{
+    /* initialise screen management routines for command recall */
+    unsigned int ierror;
+    if (ierror = smg$create_virtual_keyboard(&vms_vkid) != SS$_NORMAL)
+	done(ierror);
+    if (ierror = smg$create_key_table(&vms_ktid) != SS$_NORMAL)
+	done(ierror);
+}
+
