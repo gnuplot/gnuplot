@@ -196,6 +196,9 @@ int mono_recycle_count = 0;
 
 /* Internal variables */
 
+/* cleared on entry when terminal is first initialised */
+TBOOLEAN term_on_entry = TRUE;
+
 /* true if terminal is in graphics mode */
 static TBOOLEAN term_graphics = FALSE;
 
@@ -1657,7 +1660,7 @@ change_term(const char *origname, int length)
 	term->set_clipboard = null_set_clipboard;
 #endif
 
-    if (interactive)
+    if (interactive && !term_on_entry)
 	fprintf(stderr, "\nTerminal type is now '%s'\n", term->name);
 
     /* Invalidate any terminal-specific structures that may be active */
@@ -1699,6 +1702,7 @@ init_terminal()
 	free(set_term_command);
 	/* replicate environmental variable GNUTERM for internal use */
 	Gstring(&(add_udv_by_name("GNUTERM")->udv_value), gp_strdup(gnuterm));
+	term_on_entry = FALSE;
 	return;
 
     } else {
@@ -1794,11 +1798,13 @@ init_terminal()
 	if (change_term(term_name, namelength)) {
 	    if (strcmp(term->name,"x11"))
 		term->options();
+	    term_on_entry = FALSE;
 	    return;
 	}
 	fprintf(stderr, "Unknown or ambiguous terminal name '%s'\n", term_name);
     }
     change_term("unknown", 7);
+    term_on_entry = FALSE;
 }
 
 
