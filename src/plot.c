@@ -62,17 +62,6 @@
 # include <io.h>
 #endif
 
-#ifdef VMS
-# include "vms.h"
-# ifndef __GNUC__
-#  include <unixio.h>
-# endif
-# include <smgdef.h>
-# include <ssdef.h>
-extern smg$create_virtual_keyboard();
-extern smg$create_key_table();
-#endif /* VMS */
-
 #ifdef _WIN32
 # include <windows.h>
 # include "win/winmain.h"
@@ -465,14 +454,7 @@ main(int argc_orig, char **argv)
     update_gpval_variables(3);  /* update GPVAL_ variables available to user */
 
 #ifdef VMS
-    /* initialise screen management routines for command recall */
-    {
-    unsigned int ierror;
-    if (ierror = smg$create_virtual_keyboard(&vms_vkid) != SS$_NORMAL)
-	done(ierror);
-    if (ierror = smg$create_key_table(&vms_ktid) != SS$_NORMAL)
-	done(ierror);
-    }
+    vms_init_screen();
 #endif /* VMS */
 
     if (!SETJMP(command_line_env, 1)) {

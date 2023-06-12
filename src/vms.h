@@ -31,6 +31,16 @@ extern int vms_vkid;	/* Virtual keyboard id */
 extern int vms_ktid;	/* key table id, for translating keystrokes */
 
 /*
+ * Jun 2023: moved from plot.c when vms_init_screen moved to vms.c
+ */
+# ifndef __GNUC__
+#  include <unixio.h>
+# endif
+# include <smgdef.h>
+extern smg$create_virtual_keyboard();
+extern smg$create_key_table();
+
+/*
  * vms-specific prototypes
  */
 char *vms_init();
@@ -41,6 +51,7 @@ void term_pasthru();
 void term_nopasthru();
 void fflush_binary();
 void done(int);
+void vms_init_screen();
 
 #ifdef PIPES
   FILE *popen(char *, char *);
