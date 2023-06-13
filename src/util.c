@@ -1050,7 +1050,7 @@ print_line_with_error(int t_num)
 	/* Print problem line from data file to the terminal */
 	df_showdata();
 
-    } else {
+    } else if (gp_input_line) {
 
 	/* If the current line was built by concatenation of lines inside */
 	/* a {bracketed clause}, try to reconstruct the true line number  */
