@@ -337,6 +337,17 @@ draw_inside_color_smooth_box_postscript()
 }
 
 
+static int colorbox_steps()
+{
+    if ( sm_palette.use_maxcolors != 0 )
+        return sm_palette.use_maxcolors;
+    if ( sm_palette.gradient_num > 128 )
+        return sm_palette.gradient_num;
+
+    /* I think that nobody can distinguish more colours drawn in the palette */
+    return 128;
+}
+
 /* plot a colour smooth box bounded by the terminal's integer coordinates
    [x_from,y_from] to [x_to,y_to].
    This routine is for non-postscript files and for the Mixed color gradient type
@@ -344,19 +355,12 @@ draw_inside_color_smooth_box_postscript()
 static void
 draw_inside_colorbox_bitmap_mixed()
 {
-    int steps;
     int i, j, xy, xy2, xy_from, xy_to;
     int jmin = 0;
     double xy_step, gray, range;
     gpiPoint corners[4];
 
-    steps = 128; /* I think that nobody can distinguish more colours drawn in the palette */
-
-    if ( sm_palette.use_maxcolors != 0 ) {
-        steps = sm_palette.use_maxcolors;
-    } else if ( sm_palette.gradient_num > 128 ) {
-	steps = sm_palette.gradient_num;
-    }
+    const int steps = colorbox_steps();
 
     if (color_box.rotation == 'v') {
 	corners[0].x = corners[3].x = color_box.bounds.xleft;
@@ -492,20 +496,11 @@ draw_inside_colorbox_bitmap_discrete ()
 static void
 draw_inside_colorbox_bitmap_smooth()
 {
-    int steps;
     int i, xy, xy2, xy_from, xy_to;
     double xy_step, gray;
     gpiPoint corners[4];
 
-    /* Determins the steps for rectangles boxes from palette's color number specification. */
-
-    steps = 128; /* I think that nobody can distinguish more colours drawn in the palette */
-
-    if ( sm_palette.use_maxcolors != 0 ) {
-        steps = sm_palette.use_maxcolors;
-    } else if ( sm_palette.gradient_num > 128 ) {
-	steps = sm_palette.gradient_num;
-    }
+    const int steps = colorbox_steps();
 
     if (color_box.rotation == 'v') {
 	corners[0].x = corners[3].x = color_box.bounds.xleft;
