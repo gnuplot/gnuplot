@@ -376,6 +376,30 @@ colorbox_bounds( // out
     }
 }
 
+static void
+colorbox_draw_polygon(// output
+                      gpiPoint* corners,
+                      // input
+                      const int xy,
+                      const int xy2,
+                      const int xy_to)
+{
+    if (color_box.rotation == 'v') {
+        corners[0].y = corners[1].y = xy;
+        corners[2].y = corners[3].y = GPMIN(xy_to,xy2+1);
+    } else {
+        corners[0].x = corners[3].x = xy;
+        corners[1].x = corners[2].x = GPMIN(xy_to,xy2+1);
+    }
+
+    /* print the rectangle with the given colour */
+    if (default_fillstyle.fillstyle == FS_EMPTY)
+        corners->style = FS_OPAQUE;
+    else
+        corners->style = style_from_fill(&default_fillstyle);
+    term->filled_polygon(4, corners);
+}
+
 /* plot a colour smooth box bounded by the terminal's integer coordinates
    [x_from,y_from] to [x_to,y_to].
    This routine is for non-postscript files and for the Mixed color gradient type
@@ -432,19 +456,8 @@ draw_inside_colorbox_bitmap_mixed()
 		    break;
 	    }
 
-	if (color_box.rotation == 'v') {
-	    corners[0].y = corners[1].y = xy;
-	    corners[2].y = corners[3].y = GPMIN(xy_to,xy2+1);
-	} else {
-	    corners[0].x = corners[3].x = xy;
-	    corners[1].x = corners[2].x = GPMIN(xy_to,xy2+1);
-	}
-	/* print the rectangle with the given colour */
-	if (default_fillstyle.fillstyle == FS_EMPTY)
-	    corners->style = FS_OPAQUE;
-	else
-	    corners->style = style_from_fill(&default_fillstyle);
-	term->filled_polygon(4, corners);
+	colorbox_draw_polygon(corners,
+	                      xy,xy2,xy_to);
     }
 }
 
@@ -491,19 +504,8 @@ draw_inside_colorbox_bitmap_discrete ()
         gray = sm_palette.gradient[i1].pos;
         set_color(gray);
 
-	if (color_box.rotation == 'v') {
-	    corners[0].y = corners[1].y = xy;
-	    corners[2].y = corners[3].y = GPMIN(xy_to,xy2+1);
-	} else {
-	    corners[0].x = corners[3].x = xy;
-	    corners[1].x = corners[2].x = GPMIN(xy_to,xy2+1);
-	}
-	/* print the rectangle with the given colour */
-	if (default_fillstyle.fillstyle == FS_EMPTY)
-	    corners->style = FS_OPAQUE;
-	else
-	    corners->style = style_from_fill(&default_fillstyle);
-	term->filled_polygon(4, corners);
+	colorbox_draw_polygon(corners,
+	                      xy,xy2,xy_to);
     }
 }
 
@@ -542,19 +544,8 @@ draw_inside_colorbox_bitmap_smooth()
 	    gray = 1 - gray;
         set_color(gray);
 
-	if (color_box.rotation == 'v') {
-	    corners[0].y = corners[1].y = xy;
-	    corners[2].y = corners[3].y = GPMIN(xy_to,xy2+1);
-	} else {
-	    corners[0].x = corners[3].x = xy;
-	    corners[1].x = corners[2].x = GPMIN(xy_to,xy2+1);
-	}
-	/* print the rectangle with the given colour */
-	if (default_fillstyle.fillstyle == FS_EMPTY)
-	    corners->style = FS_OPAQUE;
-	else
-	    corners->style = style_from_fill(&default_fillstyle);
-	term->filled_polygon(4, corners);
+	colorbox_draw_polygon(corners,
+	                      xy,xy2,xy_to);
     }
 }
 
