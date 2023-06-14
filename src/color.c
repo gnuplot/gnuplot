@@ -348,6 +348,34 @@ static int colorbox_steps()
     return 128;
 }
 
+
+static void
+colorbox_bounds( // out
+                 gpiPoint* corners,
+                 int*      xy_from,
+                 int*      xy_to,
+                 double*   xy_step,
+                 // in
+                 const int steps)
+{
+    if (color_box.rotation == 'v') {
+	corners[0].x = corners[3].x = color_box.bounds.xleft;
+	corners[1].x = corners[2].x = color_box.bounds.xright;
+	*xy_from = color_box.bounds.ybot;
+	*xy_to = color_box.bounds.ytop;
+
+        if(xy_step)
+            *xy_step = (color_box.bounds.ytop - color_box.bounds.ybot) / (double)steps;
+    } else {
+	corners[0].y = corners[1].y = color_box.bounds.ybot;
+	corners[2].y = corners[3].y = color_box.bounds.ytop;
+	*xy_from = color_box.bounds.xleft;
+	*xy_to = color_box.bounds.xright;
+        if(xy_step)
+            *xy_step = (color_box.bounds.xright - color_box.bounds.xleft) / (double)steps;
+    }
+}
+
 /* plot a colour smooth box bounded by the terminal's integer coordinates
    [x_from,y_from] to [x_to,y_to].
    This routine is for non-postscript files and for the Mixed color gradient type
@@ -362,19 +390,13 @@ draw_inside_colorbox_bitmap_mixed()
 
     const int steps = colorbox_steps();
 
-    if (color_box.rotation == 'v') {
-	corners[0].x = corners[3].x = color_box.bounds.xleft;
-	corners[1].x = corners[2].x = color_box.bounds.xright;
-	xy_from = color_box.bounds.ybot;
-	xy_to = color_box.bounds.ytop;
-	xy_step = (color_box.bounds.ytop - color_box.bounds.ybot) / (double)steps;
-    } else {
-	corners[0].y = corners[1].y = color_box.bounds.ybot;
-	corners[2].y = corners[3].y = color_box.bounds.ytop;
-	xy_from = color_box.bounds.xleft;
-	xy_to = color_box.bounds.xright;
-	xy_step = (color_box.bounds.xright - color_box.bounds.xleft) / (double)steps;
-    }
+    colorbox_bounds( // out
+                     corners,
+                     &xy_from,
+                     &xy_to,
+                     &xy_step,
+                     // in
+                     steps);
 
     range = (xy_to - xy_from);
 
@@ -439,18 +461,14 @@ draw_inside_colorbox_bitmap_discrete ()
     gpiPoint corners[4];
 
     steps = sm_palette.gradient_num;
+    colorbox_bounds( // out
+                     corners,
+                     &xy_from,
+                     &xy_to,
+                     NULL,
+                     // in
+                     steps);
 
-    if (color_box.rotation == 'v') {
-	corners[0].x = corners[3].x = color_box.bounds.xleft;
-	corners[1].x = corners[2].x = color_box.bounds.xright;
-	xy_from = color_box.bounds.ybot;
-	xy_to = color_box.bounds.ytop;
-    } else {
-	corners[0].y = corners[1].y = color_box.bounds.ybot;
-	corners[2].y = corners[3].y = color_box.bounds.ytop;
-	xy_from = color_box.bounds.xleft;
-	xy_to = color_box.bounds.xright;
-    }
     range = (xy_to - xy_from);
 
     for (i = 0; i < steps-1; i++) {
@@ -502,19 +520,13 @@ draw_inside_colorbox_bitmap_smooth()
 
     const int steps = colorbox_steps();
 
-    if (color_box.rotation == 'v') {
-	corners[0].x = corners[3].x = color_box.bounds.xleft;
-	corners[1].x = corners[2].x = color_box.bounds.xright;
-	xy_from = color_box.bounds.ybot;
-	xy_to = color_box.bounds.ytop;
-	xy_step = (color_box.bounds.ytop - color_box.bounds.ybot) / (double)steps;
-    } else {
-	corners[0].y = corners[1].y = color_box.bounds.ybot;
-	corners[2].y = corners[3].y = color_box.bounds.ytop;
-	xy_from = color_box.bounds.xleft;
-	xy_to = color_box.bounds.xright;
-	xy_step = (color_box.bounds.xright - color_box.bounds.xleft) / (double)steps;
-    }
+    colorbox_bounds( // out
+                     corners,
+                     &xy_from,
+                     &xy_to,
+                     &xy_step,
+                     // in
+                     steps);
 
     for (i = 0, xy2 = xy_from; i < steps; i++) {
 
