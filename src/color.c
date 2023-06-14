@@ -400,6 +400,20 @@ colorbox_draw_polygon(// output
     term->filled_polygon(4, corners);
 }
 
+
+static void colorbox_next_step(// output
+                               int* xy,
+                               int* xy2,
+                               // input
+                               const int xy_from,
+                               const int i,
+                               const double xy_step)
+{
+    /* Start from one pixel beyond the previous box */
+    *xy = *xy2;
+    *xy2 = xy_from + (int) (xy_step * (i + 1));
+}
+
 /* plot a colour smooth box bounded by the terminal's integer coordinates
    [x_from,y_from] to [x_to,y_to].
    This routine is for non-postscript files and for the Mixed color gradient type
@@ -426,9 +440,8 @@ draw_inside_colorbox_bitmap_mixed()
 
     for (i = 0, xy2 = xy_from; i < steps; i++) {
 
-	/* Start from one pixel beyond the previous box */
-	xy = xy2;
-	xy2 = xy_from + (int) (xy_step * (i + 1));
+	colorbox_next_step(&xy,&xy2,
+	                   xy_from,i,xy_step);
 
 	/* Set the colour for the next range increment */
 	/* FIXME - The "1 +" seems wrong, yet it improves the placement in gd */
@@ -532,8 +545,8 @@ draw_inside_colorbox_bitmap_smooth()
 
     for (i = 0, xy2 = xy_from; i < steps; i++) {
 
-	xy = xy2;
-	xy2 = xy_from + (int) (xy_step * (i + 1));
+	colorbox_next_step(&xy,&xy2,
+	                   xy_from,i,xy_step);
 
 	gray = i / (double)steps;
 
