@@ -527,7 +527,7 @@ draw_inside_colorbox_bitmap_discrete ()
    This routine is for non-postscript files and for the Smooth color gradient type
  */
 static void
-draw_inside_colorbox_bitmap_smooth()
+draw_inside_colorbox_bitmap_smooth__discrete_slices()
 {
     int i, xy, xy2, xy_from, xy_to;
     double xy_step, gray;
@@ -561,6 +561,64 @@ draw_inside_colorbox_bitmap_smooth()
 	                      xy,xy2,xy_to);
     }
 }
+
+static void
+draw_inside_colorbox_bitmap_smooth__image()
+{
+    gpiPoint corners[4] = {
+         {.x = color_box.bounds.xleft,  .y = color_box.bounds.ytop},
+         {.x = color_box.bounds.xright, .y = color_box.bounds.ybot},
+         {.x = color_box.bounds.xleft,  .y = color_box.bounds.ytop},
+         {.x = color_box.bounds.xright, .y = color_box.bounds.ybot}
+    };
+
+    const int steps = colorbox_steps();
+
+    coordval image[3*steps];
+
+    for (int i = 0; i < steps; i++) {
+
+        double gray = (double)i / (double)(steps-1);
+
+	if ( sm_palette.use_maxcolors != 0 ) {
+	    gray = quantize_gray(gray);
+	}
+	if (sm_palette.positive == SMPAL_NEGATIVE)
+	    gray = 1 - gray;
+
+        // Need to unconditionally invert this for some reason
+        if (color_box.rotation == 'v')
+            gray = 1 - gray;
+
+	rgb_color rgb1;
+        rgb1maxcolors_from_gray( gray, &rgb1 );
+        image[3*i + 0] = rgb1.r;
+        image[3*i + 1] = rgb1.g;
+        image[3*i + 2] = rgb1.b;
+    }
+
+
+    if (color_box.rotation == 'v')
+        term->image(1, steps,
+                    image,
+                    corners,
+                    IC_RGB);
+    else
+        term->image(steps, 1,
+                    image,
+                    corners,
+                    IC_RGB);
+}
+
+static void
+draw_inside_colorbox_bitmap_smooth()
+{
+    if(term->image != NULL)
+        draw_inside_colorbox_bitmap_smooth__image();
+    else
+        draw_inside_colorbox_bitmap_smooth__discrete_slices();
+}
+
 
 static void
 cbtick_callback(
