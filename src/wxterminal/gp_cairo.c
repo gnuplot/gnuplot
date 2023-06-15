@@ -463,7 +463,7 @@ void gp_cairo_end_polygon(plot_struct *plot)
 
 	/* if there's only one polygon, draw it directly */
 	if (path->previous == NULL) {
-		FPRINTF((stderr,"processing one polygon\n"));
+		FPRINTF((stderr,"processing one saturated polygon\n"));
 		cairo_move_to(plot->cr, path->corners[0].x, path->corners[0].y);
 		for (i=1;i<path->n;++i)
 			cairo_line_to(plot->cr, path->corners[i].x, path->corners[i].y);
@@ -478,19 +478,16 @@ void gp_cairo_end_polygon(plot_struct *plot)
 		return;
 	}
 
-	FPRINTF((stderr,"processing several polygons\n"));
+	FPRINTF((stderr,"processing multiple saturated polygons\n"));
 
-/* this is meant to test Full-Scene-Anti-Aliasing by supersampling,
- * in association with CAIRO_ANTIALIAS_NONE a few lines below */
-#define SCALE 1
-
-	/* otherwise, draw front-to-back to a separate context,
-	 * using CAIRO_OPERATOR_SATURATE */
+	/* otherwise draw front-to-back to a separate context
+	 * using CAIRO_OPERATOR_SATURATE
+	 */
 	context_sav = plot->cr;
 	surface = cairo_surface_create_similar(cairo_get_target(plot->cr),
                                              CAIRO_CONTENT_COLOR_ALPHA,
-                                             plot->device_xmax*plot->upsampling_rate*SCALE,
-                                             plot->device_ymax*plot->upsampling_rate*SCALE);
+                                             plot->device_xmax*plot->upsampling_rate,
+                                             plot->device_ymax*plot->upsampling_rate);
 	context = cairo_create(surface);
 	cairo_set_operator(context,CAIRO_OPERATOR_SATURATE);
 	if (plot->antialiasing)
@@ -500,9 +497,9 @@ void gp_cairo_end_polygon(plot_struct *plot)
 
 	/* transformation matrix between gnuplot and cairo coordinates */
 	cairo_matrix_init(&matrix,
-			plot->xscale/SCALE/plot->oversampling_scale,
+			plot->xscale/plot->oversampling_scale,
 			0,0,
-			plot->yscale/SCALE/plot->oversampling_scale,
+			plot->yscale/plot->oversampling_scale,
 			0.5,0.5);
 	cairo_set_matrix(context, &matrix);
 
@@ -536,9 +533,9 @@ void gp_cairo_end_polygon(plot_struct *plot)
 
 	/* compensate the transformation matrix of the main context */
 	cairo_matrix_init(&matrix2,
-			plot->xscale*SCALE/plot->oversampling_scale,
+			plot->xscale/plot->oversampling_scale,
 			0,0,
-			plot->yscale*SCALE/plot->oversampling_scale,
+			plot->yscale/plot->oversampling_scale,
 			0.5,0.5);
 	cairo_pattern_set_matrix( pattern, &matrix2 );
 
@@ -1720,7 +1717,7 @@ void gp_cairo_fill(plot_struct *plot, int fillstyle, int fillpar)
 				blue  += (1 - blue) * fact;
 			}
 			cairo_set_source_rgb(plot->cr, red, green, blue);
-			FPRINTF((stderr,"transparent solid %lf %lf %lf\n",red, green, blue));
+			FPRINTF((stderr,"faded solid %lf %lf %lf\n",red, green, blue));
 			return;
 		}
 	case FS_TRANSPARENT_SOLID:
@@ -1728,6 +1725,7 @@ void gp_cairo_fill(plot_struct *plot, int fillstyle, int fillpar)
 		green = plot->color.g;
 		blue  = plot->color.b;
 		cairo_set_source_rgba(plot->cr, red, green, blue, (double)fillpar/100.);
+		FPRINTF((stderr,"transparent solid %lf %lf %lf\n",red, green, blue));
 		return;
 	case FS_PATTERN: /* pattern fill */
 	case FS_TRANSPARENT_PATTERN:

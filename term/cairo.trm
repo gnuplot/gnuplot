@@ -723,6 +723,24 @@ TERM_PUBLIC void cairotrm_options()
 #endif
 }
 
+#ifdef HAVE_CAIROEPS
+/*
+ * Helper routine for eps output
+ */
+static void add_BoundingBox(cairo_surface_t *surface)
+{
+    /* Early cairo versions did not allow an explicit bounding box */
+    #if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1,11,1)
+    char bb[100];
+	sprintf(bb, "%%%%BoundingBox: 0 0 %i %i", plot.device_xmax, plot.device_ymax);
+	cairo_ps_surface_dsc_comment(surface, bb);
+	cairo_ps_surface_dsc_begin_page_setup(surface);
+	sprintf(bb, "%%%%PageBoundingBox: 0 0 %i %i", plot.device_xmax, plot.device_ymax);
+	cairo_ps_surface_dsc_comment(surface, bb);
+    #endif /* CAIRO_VERSION >= 1.11.1 */
+}
+#endif /* HAVE_CAIROEPS */
+
 /* "Called once, when the device is first selected."
  * Is the 'main' function of the terminal. */
 void cairotrm_init()
@@ -752,29 +770,32 @@ void cairotrm_init()
 	plot.dashlength = cairo_params->dash_length;
 
 	if (!strcmp(term->name,"pdfcairo")) {
-		/* Output can either be a file or stdout */
-#ifndef _WIN32
-		if (!outstr) {
-#endif
+	    #ifdef _WIN32
 		/* Redirection to a printer on Windows requires the use of gpoutfile
-		   via the cairostream_write callback.
-		*/
+		 * via the cairostream_write callback.
+		 */
 		    surface = cairo_pdf_surface_create_for_stream(
 			(cairo_write_func_t)cairostream_write, cairostream_error,
 				plot.device_xmax /*double width_in_points*/,
 				plot.device_ymax /*double height_in_points*/);
-#ifndef _WIN32
-		} else {
+	    #else
+		/* Output can either be a file or stdout */
+		if (outstr) {
 		    surface = cairo_pdf_surface_create(outstr,
-				plot.device_xmax /*double width_in_points*/,
-				plot.device_ymax /*double height_in_points*/);
+				plot.device_xmax, plot.device_ymax);
+		} else {
+		    surface = cairo_pdf_surface_create_for_stream(
+			(cairo_write_func_t)cairostream_write, cairostream_error,
+				plot.device_xmax, plot.device_ymax);
 		}
-#endif
+	    #endif /* _WIN32 */
 		/* it is up to the pdf viewer to do the hinting */
 		plot.hinting = 0;
-		/* disable OPERATOR_SATURATE, not implemented in cairo pdf backend.
-		 * Unfortunately the can result in noticeable seams between adjacent
-		 * polygons. */
+		/* Cairo at least through version 16 fails to handle OPERATOR_SATURATE
+		 * when applied to pdf surfaces;  it degrades the rendering of all text.
+		 * Unfortunately, without it there may be visible artifacts at the
+		 * boundary between filled polygons (viewer-dependent).
+		 */
 		plot.polygons_saturate = FALSE;
 		/* Empirical correction to make pdf output look more like wxt and png */
 		plot.dashlength /= 2;
@@ -784,11 +805,9 @@ void cairotrm_init()
 				plot.device_ymax /*double height_in_points*/);
 		/* png is bitmapped, let's do the full hinting */
 		plot.hinting = 100;
-		/* png is produced by cairo "image" backend, which has full support
-		 * of OPERATOR_SATURATE */
 		plot.polygons_saturate = TRUE;
 	}
-#ifdef HAVE_CAIROEPS
+	#ifdef HAVE_CAIROEPS
 	else if (!strcmp(term->name,"epscairo")) {
 		/* Output can either be a file or stdout */
 		if (!outstr) {
@@ -802,30 +821,17 @@ void cairotrm_init()
 				plot.device_ymax /*double height_in_points*/);
 		}
 		cairo_ps_surface_set_eps(surface, TRUE);
-#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1,11,1)
-		if (!cairo_params->crop) {
-			/* Normally, cairo clips the bounding box of eps files, but
-			   newer versions of Cairo let us enforce the bounding box. See
-			   http://old.nabble.com/EPS-target%3A-force-boundingbox-td29050435.html */
-			char bb[100];
- 			sprintf(bb, "%%%%BoundingBox: 0 0 %i %i", plot.device_xmax, plot.device_ymax);
-			cairo_ps_surface_dsc_comment(surface, bb);
-			cairo_ps_surface_dsc_begin_page_setup(surface);
-			sprintf(bb, "%%%%PageBoundingBox: 0 0 %i %i", plot.device_xmax, plot.device_ymax);
-			cairo_ps_surface_dsc_comment(surface, bb);
-		}
-#endif
-		/* it is up to the pdf viewer to do the hinting */
+		if (!cairo_params->crop)
+			add_BoundingBox(surface);
+		/* it is up to the eps viewer to do the hinting */
 		plot.hinting = 0;
-		/* disable OPERATOR_SATURATE, not implemented in cairo pdf backend,
-		 * results in bitmap fallback. However, polygons are drawn with seams
-		 * between each other. */
 		plot.polygons_saturate = FALSE;
-		/* Empirical correction to make pdf output look more like wxt and png */
+		/* Empirical correction to make eps output look more like wxt and png */
 		plot.dashlength /= 2;
 	}
-#endif /* HAVE_CAIROEPS */
-#ifdef PSLATEX_DRIVER
+	#endif /* HAVE_CAIROEPS */
+
+	#ifdef PSLATEX_DRIVER
 	else if (ISCAIROLATEX) {
 		/* Output can only go to a stream */
 		switch (cairo_params->output) {
@@ -842,10 +848,10 @@ void cairotrm_init()
 			/* We manually scale up to 300 dpi instead of the default 72 dpi */
 			plot.upsampling_rate = cairo_params->resolution / 72.;
 			surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
-					(int)floor(plot.device_xmax * plot.upsampling_rate) /*double width_in_points*/,
-					(int)floor(plot.device_ymax * plot.upsampling_rate) /*double height_in_points*/);
+					(int)floor(plot.device_xmax * plot.upsampling_rate),
+					(int)floor(plot.device_ymax * plot.upsampling_rate));
 			break;
-#ifdef HAVE_CAIROEPS
+		#ifdef HAVE_CAIROEPS
 		case CAIROLATEX_EPS:
 			EPSLATEX_reopen_output("eps");
 			surface = cairo_ps_surface_create_for_stream(
@@ -853,42 +859,29 @@ void cairotrm_init()
 				    plot.device_xmax /*double width_in_points*/,
 				    plot.device_ymax /*double height_in_points*/);
 			cairo_ps_surface_set_eps(surface, TRUE);
-#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1,11,1)
-			{
-				/* Always enforce the bounding box. */
-				char bb[100];
- 				sprintf(bb, "%%%%BoundingBox: 0 0 %i %i", plot.device_xmax, plot.device_ymax);
-				cairo_ps_surface_dsc_comment(surface, bb);
-				cairo_ps_surface_dsc_begin_page_setup(surface);
-				sprintf(bb, "%%%%PageBoundingBox: 0 0 %i %i", plot.device_xmax, plot.device_ymax);
-				cairo_ps_surface_dsc_comment(surface, bb);
-			}
-#endif
-		    break;
-#endif
+			add_BoundingBox(surface);
+			break;
+		#endif /* HAVE_CAIROEPS */
 		}
 
 		switch (cairo_params->output) {
 		case CAIROLATEX_PNG:
 			/* png is bitmapped, let's do the full hinting */
 			plot.hinting = 100;
-			/* png is produced by cairo "image" backend, which has full support
-			 * of OPERATOR_SATURATE */
+			/* png uses the cairo "image" backend so OPERATOR_SATURATE is fine */
 			plot.polygons_saturate = TRUE;
 			break;
 		default:
 			/* it is up to the pdf viewer to do the hinting */
 			plot.hinting = 0;
-			/* disable OPERATOR_SATURATE, not implemented in cairo pdf backend,
-			 * results in bitmap fallback. However, polygons are drawn with seams
-			 * between each other. */
+			/* disable OPERATOR_SATURATE for the cairo pdf backend */
 			plot.polygons_saturate = FALSE;
 			/* Empirical correction to make pdf output look more like wxt and png */
 			plot.dashlength /= 2;
 			break;
 		}
 	}
-#endif
+	#endif /* PSLATEX_DRIVER */
 
 	plot.cr = cairo_create(surface);
 	cairo_surface_destroy( surface );
@@ -961,7 +954,7 @@ void cairotrm_graphics()
 		EPSLATEX_common_init();
 #endif
 
-#if CAIRO_VERSION < CAIRO_VERSION_ENCODE(1,11,1)
+	#if CAIRO_VERSION < CAIRO_VERSION_ENCODE(1,11,1)
 	/* Put "invisible" points in two corners to enforce bounding box. */
 	if ((ISCAIROLATEX) || ((cairo_params->terminal == CAIROTERM_EPS) && !cairo_params->crop)) {
 		cairo_set_line_width(plot.cr, 1);
@@ -973,7 +966,7 @@ void cairotrm_graphics()
 		cairo_line_to(plot.cr, plot.xmax, plot.ymax);
 		cairo_stroke(plot.cr);
 	}
-#endif
+	#endif
 
 	FPRINTF((stderr,"Graphics xmax %d ymax %d v_char %d h_char %d\n",
 		term->xmax, term->ymax, term->v_char, term->h_char));
@@ -1512,7 +1505,8 @@ TERM_TABLE_START (pdfcairo_driver)
     , cairotrm_make_palette, 0 /* cairotrm_previous_palette */, cairotrm_set_color, cairotrm_filled_polygon
     , cairotrm_image
     , cairotrm_enhanced_open, cairotrm_enhanced_flush, cairotrm_enhanced_writec
-    , 0, 0, 1.0
+    , NULL /* layer */, NULL /* path */
+    , 1.0
     , NULL /* hypertext */
     , cairotrm_boxed_text
     , NULL /* modify_plots */
@@ -1944,7 +1938,7 @@ START_HELP(kittycairo)
 "                      {{no}enhanced} {mono|color}",
 "                      {font <font>} {fontscale <scale>}",
 "                      {linewidth <lw>} {rounded|butt|square} {dashlength <dl>}",
-"                      {background <rgbcolor>}",
+"                      {transparent | background <rgbcolor>}",
 "                      {size <XX>,<YY>} {anchor|scroll}",
 "",
 " This terminal processes labels and other text using enhanced formatting",
