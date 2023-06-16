@@ -338,7 +338,8 @@ draw_inside_color_smooth_box_postscript()
 }
 
 
-static int colorbox_steps()
+static int
+colorbox_steps()
 {
     if ( sm_palette.use_maxcolors != 0 )
         return sm_palette.use_maxcolors;
@@ -523,12 +524,12 @@ draw_inside_colorbox_bitmap_discrete ()
     }
 }
 
-/* plot a colour smooth box bounded by the terminal's integer coordinates
-   [x_from,y_from] to [x_to,y_to].
-   This routine is for non-postscript files and for the Smooth color gradient type
+/* plot a single gradient to the colorbox at [x_from,y_from] to [x_to,y_to].
+ * This routine is for non-postscript files and for the Smooth color gradient type.
+ * It uses term->filled_polygon() to build the gradient, one box per color segment.
  */
 static void
-draw_inside_colorbox_bitmap_smooth__discrete_slices()
+draw_inside_colorbox_bitmap_smooth__filled_polygon()
 {
     int i, xy, xy2, xy_from, xy_to;
     double xy_step, gray;
@@ -558,11 +559,14 @@ draw_inside_colorbox_bitmap_smooth__discrete_slices()
 	    gray = 1 - gray;
         set_color(gray);
 
-	colorbox_draw_polygon(corners,
-	                      xy,xy2,xy_to);
+	colorbox_draw_polygon(corners, xy,xy2,xy_to);
     }
 }
 
+/* plot a single gradient to the colorbox at [x_from,y_from] to [x_to,y_to].
+ * This routine is for non-postscript files and for the Smooth color gradient type.
+ * It uses term->image() render the gradient, one pixel per color segment.
+ */
 static void
 draw_inside_colorbox_bitmap_smooth__image()
 {
@@ -572,52 +576,55 @@ draw_inside_colorbox_bitmap_smooth__image()
          {.x = color_box.bounds.xleft,  .y = color_box.bounds.ytop},
          {.x = color_box.bounds.xright, .y = color_box.bounds.ybot}
     };
+    coordval *image;
+    int steps;
 
-    const int steps = colorbox_steps();
+    if (0 < sm_palette.use_maxcolors && sm_palette.use_maxcolors <= 128)
+	steps = floor(1000.0/sm_palette.use_maxcolors) * sm_palette.use_maxcolors;
+    else
+	steps = colorbox_steps();
 
-    coordval image[3*steps];
+    image = gp_alloc(sizeof(coordval)*3*steps, "colorbox");
+
+    FPRINTF((stderr, "...using draw_inside_colorbox_bitmap_smooth__image\n"));
 
     for (int i = 0; i < steps; i++) {
-
+	rgb_color rgb1;
         double gray = (double)i / (double)(steps-1);
 
-	if ( sm_palette.use_maxcolors != 0 ) {
+	if ( sm_palette.use_maxcolors != 0 )
 	    gray = quantize_gray(gray);
-	}
 	if (sm_palette.positive == SMPAL_NEGATIVE)
 	    gray = 1 - gray;
 
-        // Need to unconditionally invert this for some reason
+        /* y axis terminal coordinates run top-to-bottom */
         if (color_box.rotation == 'v')
             gray = 1 - gray;
 
-	rgb_color rgb1;
         rgb1maxcolors_from_gray( gray, &rgb1 );
         image[3*i + 0] = rgb1.r;
         image[3*i + 1] = rgb1.g;
         image[3*i + 2] = rgb1.b;
     }
 
-
     if (color_box.rotation == 'v')
-        term->image(1, steps,
-                    image,
-                    corners,
-                    IC_RGB);
+        term->image(1, steps, image, corners, IC_RGB);
     else
-        term->image(steps, 1,
-                    image,
-                    corners,
-                    IC_RGB);
+        term->image(steps, 1, image, corners, IC_RGB);
+
+    free(image);
 }
 
 static void
 draw_inside_colorbox_bitmap_smooth()
 {
-    if(term->image != NULL)
+    /* The primary beneficiary of the image variant is cairo + pdf,
+     * since it avoids banding artifacts in the filled_polygon variant.
+     */
+    if ((term->flags & TERM_COLORBOX_IMAGE))
         draw_inside_colorbox_bitmap_smooth__image();
     else
-        draw_inside_colorbox_bitmap_smooth__discrete_slices();
+        draw_inside_colorbox_bitmap_smooth__filled_polygon();
 }
 
 
@@ -837,20 +844,14 @@ draw_color_smooth_box(int plot_mode)
 
     if (sm_palette.gradient_type == SMPAL_GRADIENT_TYPE_DISCRETE) {
         draw_inside_colorbox_bitmap_discrete();
-    } 
-    else {
+    } else {
         /* The PostScript terminal has an Optimized version */
-        if ((term->flags & TERM_IS_POSTSCRIPT) != 0) {
+        if ((term->flags & TERM_IS_POSTSCRIPT) != 0)
             draw_inside_color_smooth_box_postscript();
-        }
-        else {
-            if (sm_palette.gradient_type == SMPAL_GRADIENT_TYPE_SMOOTH) {
-                draw_inside_colorbox_bitmap_smooth();
-            }
-            else {
-                draw_inside_colorbox_bitmap_mixed();
-            }
-        }
+        else if (sm_palette.gradient_type == SMPAL_GRADIENT_TYPE_SMOOTH)
+	    draw_inside_colorbox_bitmap_smooth();
+	else
+	    draw_inside_colorbox_bitmap_mixed();
     }
 
     term->layer(TERM_LAYER_END_COLORBOX);
