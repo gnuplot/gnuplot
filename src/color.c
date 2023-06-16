@@ -522,12 +522,12 @@ draw_inside_colorbox_bitmap_discrete ()
     }
 }
 
-/* plot a colour smooth box bounded by the terminal's integer coordinates
-   [x_from,y_from] to [x_to,y_to].
-   This routine is for non-postscript files and for the Smooth color gradient type
+/* plot a single gradient to the colorbox at [x_from,y_from] to [x_to,y_to].
+ * This routine is for non-postscript files and for the Smooth color gradient type.
+ * It uses term->filled_polygon() to build the gradient, one box per color segment.
  */
 static void
-draw_inside_colorbox_bitmap_smooth__discrete_slices()
+draw_inside_colorbox_bitmap_smooth__filled_polygon()
 {
     int i, xy, xy2, xy_from, xy_to;
     double xy_step, gray;
@@ -562,6 +562,10 @@ draw_inside_colorbox_bitmap_smooth__discrete_slices()
     }
 }
 
+/* plot a single gradient to the colorbox at [x_from,y_from] to [x_to,y_to].
+ * This routine is for non-postscript files and for the Smooth color gradient type.
+ * It uses term->image() render the gradient, one pixel per color segment.
+ */
 static void
 draw_inside_colorbox_bitmap_smooth__image()
 {
@@ -576,8 +580,10 @@ draw_inside_colorbox_bitmap_smooth__image()
 
     coordval image[3*steps];
 
-    for (int i = 0; i < steps; i++) {
+    FPRINTF((stderr, "...using draw_inside_colorbox_bitmap_smooth__image\n"));
 
+    for (int i = 0; i < steps; i++) {
+	rgb_color rgb1;
         double gray = (double)i / (double)(steps-1);
 
 	if ( sm_palette.use_maxcolors != 0 ) {
@@ -590,7 +596,6 @@ draw_inside_colorbox_bitmap_smooth__image()
         if (color_box.rotation == 'v')
             gray = 1 - gray;
 
-	rgb_color rgb1;
         rgb1maxcolors_from_gray( gray, &rgb1 );
         image[3*i + 0] = rgb1.r;
         image[3*i + 1] = rgb1.g;
@@ -599,24 +604,23 @@ draw_inside_colorbox_bitmap_smooth__image()
 
 
     if (color_box.rotation == 'v')
-        term->image(1, steps,
-                    image,
-                    corners,
-                    IC_RGB);
+        term->image(1, steps, image, corners, IC_RGB);
     else
-        term->image(steps, 1,
-                    image,
-                    corners,
-                    IC_RGB);
+        term->image(steps, 1, image, corners, IC_RGB);
 }
 
 static void
 draw_inside_colorbox_bitmap_smooth()
 {
-    if(term->image != NULL)
+    /* The primary beneficiary of the image variant is cairo + pdf,
+     * since it avoids banding artifacts in the filled_polygon variant.
+     * FIXME: if this causes problems for other terminal types we can
+     *        switch the condition to if (!strcmp(term->name,"pdfcairo"))
+     */
+    if ((term->flags & TERM_COLORBOX_IMAGE))
         draw_inside_colorbox_bitmap_smooth__image();
     else
-        draw_inside_colorbox_bitmap_smooth__discrete_slices();
+        draw_inside_colorbox_bitmap_smooth__filled_polygon();
 }
 
 
@@ -843,20 +847,14 @@ draw_color_smooth_box(int plot_mode)
 
     if (sm_palette.gradient_type == SMPAL_GRADIENT_TYPE_DISCRETE) {
         draw_inside_colorbox_bitmap_discrete();
-    } 
-    else {
+    } else {
         /* The PostScript terminal has an Optimized version */
-        if ((term->flags & TERM_IS_POSTSCRIPT) != 0) {
+        if ((term->flags & TERM_IS_POSTSCRIPT) != 0)
             draw_inside_color_smooth_box_postscript();
-        }
-        else {
-            if (sm_palette.gradient_type == SMPAL_GRADIENT_TYPE_SMOOTH) {
-                draw_inside_colorbox_bitmap_smooth();
-            }
-            else {
-                draw_inside_colorbox_bitmap_mixed();
-            }
-        }
+        else if (sm_palette.gradient_type == SMPAL_GRADIENT_TYPE_SMOOTH)
+	    draw_inside_colorbox_bitmap_smooth();
+	else
+	    draw_inside_colorbox_bitmap_mixed();
     }
 
     term->layer(TERM_LAYER_END_COLORBOX);
