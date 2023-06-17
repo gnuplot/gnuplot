@@ -1766,6 +1766,8 @@ transmit_gradient(gradient_struct *gradient, int cnt, int type)
 TERM_PUBLIC int
 X11_make_palette(t_sm_palette *palette)
 {
+    char colorMode;
+
     if(!palette) {
         return 0;
     }
@@ -1775,8 +1777,12 @@ X11_make_palette(t_sm_palette *palette)
 	    return -1;
 	}
 
+    colorMode = palette->colorMode;
+    if (colorMode == SMPAL_COLOR_MODE_VIRIDIS)
+	colorMode = SMPAL_COLOR_MODE_GRADIENT;
+
     fprintf(X11_ipc, "%c %c %c %c %d\n",
-	     X11_GR_MAKE_PALETTE, (char)(palette->colorMode),
+	     X11_GR_MAKE_PALETTE, colorMode,
 	     (char)(palette->positive), (char)(palette->cmodel),
 	     palette->use_maxcolors);
 
@@ -1789,6 +1795,7 @@ X11_make_palette(t_sm_palette *palette)
 		 palette->formulaG, palette->formulaB);
 	break;
     case SMPAL_COLOR_MODE_GRADIENT:
+    case SMPAL_COLOR_MODE_VIRIDIS:
         transmit_gradient(palette->gradient, palette->gradient_num, palette->gradient_type);
 	break;
     case SMPAL_COLOR_MODE_CUBEHELIX:

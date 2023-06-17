@@ -853,8 +853,9 @@ set isosamples %d, %d",
     fprintf( fp, "gamma %g ", sm_palette.gamma );
     if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) {
       fputs( "gray\n", fp );
-    }
-    else {
+    } else if (sm_palette.colorMode == SMPAL_COLOR_MODE_VIRIDIS) {
+      fputs( "viridis\n", fp );
+    } else {
       fputs( "color model ", fp );
       switch( sm_palette.cmodel ) {
 	default:
