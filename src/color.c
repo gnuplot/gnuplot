@@ -152,7 +152,8 @@ make_palette()
     if (CHECK_SMPAL_IS_DISCRETE_GRADIENT) {
 	sm_palette.colors = sm_palette.gradient_num;
     } else if (sm_palette.use_maxcolors > 0) {
-	if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRADIENT)
+	if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRADIENT
+	||  sm_palette.colorMode == SMPAL_COLOR_MODE_VIRIDIS)
 	    sm_palette.colors = i;	/* EAM Sep 2010 - could this be a constant? */
 	else if (i > sm_palette.use_maxcolors)
 	    sm_palette.colors = sm_palette.use_maxcolors;
@@ -1512,9 +1513,9 @@ set_palette()
 	    case S_PALETTE_VIRIDIS: {
 		CHECK_TRANSFORM;
 		set_palette_by_name(VIRIDIS);
-		sm_palette.colorMode = SMPAL_COLOR_MODE_GRADIENT;
+		sm_palette.colorMode = SMPAL_COLOR_MODE_VIRIDIS;
                 sm_palette.gradient_type = SMPAL_GRADIENT_TYPE_SMOOTH;
-		pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_GRADIENT;
+		pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_VIRIDIS;
 		continue;
 	    }
 	    case S_PALETTE_COLORMAP: { /* colormap */
