@@ -626,9 +626,7 @@ pipes: $(TARGETS_PIPES)
 
 console: $(TARGETS_CONSOLE)
 
-docs: gnuplot.pdf ps_symbols.pdf ps_fontfile_doc.pdf ps_guide.pdf faq.pdf
-
-faq: faq.pdf
+docs: gnuplot.pdf ps_symbols.pdf ps_fontfile_doc.pdf ps_guide.pdf
 
 helpfile: $(HELPFILE)
 
@@ -1058,11 +1056,6 @@ ps_fontfile_doc.pdf: $(D)psdoc/ps_fontfile_doc.tex
 ps_guide.pdf: $(D)psdoc/ps_guide.ps
 	ps2pdf $(D)psdoc/ps_guide.ps ps_guide.pdf
 
-faq.pdf: $(TOP)/faq/faq.tex
-	pdflatex $<
-	pdflatex $<
-	pdflatex $<
-
 latex_demo.pdf: gnuplot.exe $(M)/latex_demo.dem $(M)/latex_demo.tex
 	GNUTERM="dumb noenhanced" GNUPLOT_LIB=$(M) GNUPLOT_PS_DIR=$(T)/PostScript ./gnuplot latex_demo.dem
 	latex epslatex.tex
@@ -1101,7 +1094,6 @@ veryclean: clean
 	-$(RM) $(HELPFILE) $(HELPFILEJA) wgnuplot.chw wgnuplot.gid wgnuplot.mnu
 	$(RM) gnuplot.ps gnuplot.pdf
 	-$(RM) gnuplot-ja.pdf
-	-$(RM) faq.pdf
 	$(RM) ps_fontfile_doc.pdf ps_fontfile_doc.ps ps_guide.pdf
 	$(RM) ps_symbols.ps ps_symbols.pdf
 	$(RM) $(M)binary[123] $(M)fit.log $(M)soundfit.par

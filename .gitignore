@@ -46,6 +46,7 @@ make.log
 docs/figures.*
 docs/pdf_figures
 share/Gnuplot
+faq
 tutorial
 FAQ.pdf
 build*
