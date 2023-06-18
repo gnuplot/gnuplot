@@ -443,6 +443,9 @@ extern const char *encoding_names[];
 /* parsing table for encodings */
 extern const struct gen_table set_encoding_tbl[];
 
+/* cleared on entry when terminal is first initialized */
+extern TBOOLEAN term_on_entry;
+
 /* mouse module needs this */
 extern TBOOLEAN term_initialised;
 

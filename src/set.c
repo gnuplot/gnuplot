@@ -4867,7 +4867,7 @@ set_terminal()
      */
     *term_options = 0;
     term->options();
-    if (interactive && *term_options)
+    if (interactive && *term_options && !term_on_entry)
 	fprintf(stderr,"Options are '%s'\n",term_options);
     if ((term->flags & TERM_MONOCHROME))
 	init_monochrome();

@@ -357,7 +357,6 @@ X11_args(int argc, char *argv[])
 		    nx11++;
 		}
 		if (i >= (sizeof(optvec) / sizeof(char *))) {
-		    fprintf(stderr, "warning: X11 options will be truncated\n");
 		    free(xargv_orig);
 		    return nx11;	/* optvec is full */
 		}
@@ -1048,6 +1047,13 @@ TERM_PUBLIC void
 X11_init()
 {
     static int been_here = 0;
+
+    /* If the program started with some other terminal driver
+     * and is only now changing to x11, more setup is needed.
+     * In particular we need to start the outboard driver gnuplot_x11.
+     */
+    if (!X11_full_command_path)
+	parse_driver(X11_command);
 
     if (!X11_ipc) {
 	/* first time through or after a reset */
