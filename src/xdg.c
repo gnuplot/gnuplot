@@ -53,21 +53,6 @@ existdir(const char *name)
 #endif
 }
 
-#if (0)		/* Not used */
-#if defined(_MSC_VER)
-# include <io.h>		/* for _access */
-#endif
-static TBOOLEAN
-existfile(const char *name)
-{
-#ifdef _MSC_VER
-    return (_access(name, 0) == 0);
-#else
-    return (access(name, F_OK) == 0);
-#endif
-}
-#endif
-
 /* helper function: return TRUE if dirname exists or can be created */
 
 static TBOOLEAN check_dir(const char *dirname) {

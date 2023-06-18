@@ -906,16 +906,12 @@ draw3d_point_unconditional(p_vertex v, struct lp_style_type *lp)
     int x, y;
 
     TERMCOORD(v, x, y);
-    /* Jul 2010 EAM - is it safe to overwrite like this? Make a copy instead? */
     lp->pm3d_color.value = v->real_z;
     term_apply_lp_properties(lp);
     if (!clip_point(x, y))
 	(term->point) (x, y, lp->p_type);
 }
 
-/* Moved this upward, to make optional inlining in draw3d_line easier
- * for compilers */
-/* HBB 20021128: removed GP_INLINE qualifier to avoid MSVC++ silliness */
 void
 draw3d_line_unconditional(
     p_vertex v1, p_vertex v2,

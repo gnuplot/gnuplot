@@ -111,7 +111,6 @@ TERM_PUBLIC void SVG_hypertext(int, const char *);
 
 #ifdef WRITE_PNG_IMAGE
 TERM_PUBLIC void SVG_image(unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode);
-static int SVG_imageno = 0;
 #endif
 
 #define SVG_SCALE	100.	/* Coordinate accuracy is 1/SVG_SCALE pixel */
@@ -1881,15 +1880,17 @@ SVG_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
 	    PREC, X(corner[1].x) - X(corner[0].x), PREC, Y(corner[1].y) - Y(corner[0].y));
 
     /* Feb 2017 - always embed images */
-    if (TRUE || SVG_standalone || SVG_domterm) {
+    #if (1)
 	/* Embed the PNG file in SVG by converting to base64 */
 	fprintf(gpoutfile, "xlink:href='data:image/png;base64,");
 	if (write_png_base64_image(m, n, image, color_mode, gpoutfile))
 	    os_error(NO_CARET, "SVG_image: could not write to gnuplot output file.");
 	fprintf(gpoutfile, "'/>\n");
 
-    } else {
+    #else
+	{
         /* Write the image to a png file */
+	static int SVG_imageno = 0;
 	char *image_file;
         char *base_name = SVG_name ? SVG_name : "gp";
 	int wpiresult;
@@ -1906,7 +1907,8 @@ SVG_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
 
 	if (wpiresult != 0)
 	    os_error(NO_CARET, "SVG_image: could not write to PNG reference file.");
-    }
+	}
+    #endif
 }
 #endif
 

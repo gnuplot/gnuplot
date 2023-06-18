@@ -2076,19 +2076,8 @@ pause_command()
 # ifdef USE_MOUSE
 	if (term && term->waitforinput) {
 	    int terminating_char = term->waitforinput(0);
-	    if (isalnum(terminating_char)) {
-#if (0)
-		/* It does _not_ work to do EAT_INPUT_WITH(term->waitforinput())
-		 * The question is, do we try to restore a damaged line by pushing
-		 * the previous character back into the stream or do we trash the
-		 * whole line and resume parsing at the next line.
-		 */
-		FPRINTF((stderr,"(eat junk starting with %c)\n", terminating_char));
-		EAT_INPUT_WITH(fgetc(stdin));
-#else
+	    if (isalnum(terminating_char))
 		ungetc(terminating_char, stdin);
-#endif
-	    }
 	} else
 # endif /* USE_MOUSE */
 # ifdef MSDOS
