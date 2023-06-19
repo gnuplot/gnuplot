@@ -41,6 +41,7 @@ plot sum = init(0), \
      '' using 0:(avg5($2)) title "running mean over previous 5 points" pt 7 ps 0.5 lw 1 lc rgb "blue", \
      '' using 0:(sum = sum + $2, sum/($0+1)) title "cumulative mean" pt 1 lw 1 lc rgb "dark-red"
 
+if (exists("MANUAL_FIGURES")) exit
 pause -1 "Hit return to continue"
 
 reset

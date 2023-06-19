@@ -225,9 +225,12 @@ C
 ## function.  Anywhere outside a function block `return` acts like `exit`.
 #end
 
- Please see `function_block.dem` for an example of using this mechanism
- to define and plot a non-trivial function that is too complicated for a
- simple one-line definition `f(x) = ...`.
+ For an example of using this mechanism to define and plot a non-trivial
+ function that is too complicated for a simple one-line definition `f(x) = ...`
+ please see
+^ <a href="http://www.gnuplot.info/demo_6.0/function_block.html">
+ `function_block.dem`
+^ </a>
 
 3 Special and complex-valued functions
 ?new math
@@ -287,7 +290,7 @@ C
 ## the use of `dgrid3d` and style `with pm3d` to produce a 3D gridded surface.
 ## See `set polar grid` and `polar heatmap`.
 #b New 2D plot style `with sectors` is an alternative to generating a full
-## polar gridded surface.  For each input data points it generates a single
+## polar gridded surface.  For each input data point it generates a single
 ## annular wedge in a conceptual polar grid.  Unlike polar mode `with surface`
 ## it can be used in either a polar or cartesian coordinate graph.
 #b Plot style `with lines` now has a filter option `sharpen`.  This filter
@@ -416,7 +419,7 @@ D viridis 1
 ## using webp encoding.  Frames are generated using pngcairo, then
 ## encoded through the WebPAnimEncoder API exported by libwebp and libwebpmux.
 #b Terminals that use the same window for text entry and graphical display,
-## including `dumb`, `sixel`, `block`, and `domterm`, now respond to keyboard
+## including `dumb`, `sixel`, `kitty`, and `block` now respond to keyboard
 ## input during a `pause mouse` command. While paused, they interpret keystrokes
 ## in the same way that a mousing terminal would. See `pseudo-mousing`.
 ## For example the left/right/up/down arrow keys change the view angle of 3D
@@ -441,10 +444,10 @@ D viridis 1
 
 3 Week-date time support
 ?new week-date time
- The Covid-19 pandemic of 2020/2021 generated increased interest in plotting
- epidemiological data, which is often tabulated using a "week date" reporting
- convention.  Deficiencies with gnuplot support for this convention were
- remedied and the support for week-date time was extended.
+ The Covid-19 pandemic that began in 2020 generated increased interest in
+ plotting epidemiological data, which is often tabulated using a "week date"
+ reporting convention.  Deficiencies with gnuplot support for this convention
+ were remedied and the support for week-date time was extended.
 #start
 #b Time specifier format %W has been brought into accord with the
 ## ISO 8601 week date standard.
@@ -467,9 +470,10 @@ D epi_data 1
 ## See `set xtics`, `set mxtics time`.
 #b The character sequence $# in a `using` specifier evaluates to the total
 ## number of columns available in the current line of data.  For example
-## "plot FOO using 0:(column($# - 1))" plots the last-but-one field of each row.
-#b keyword `binvalue=avg` plots average, rather than sum, of binned data.
-#b `set colorbox bottom` places the color box underneath the plot.
+## `plot FOO using 0:(column($# - 1))` plots the last-but-one field of each row.
+#b keyword `binvalue=avg` plots the average, rather than the sum, of binned data.
+#b `set colorbox bottom` places a horizontal color box underneath the plot
+## rather than a vertical box on the right.
 #b `set colorbox cbtics <linestyle>` affects cbtics but not other tics.
 #b Improved rendering of intersecting pm3d surfaces - overlapping surface tiles
 ## are split into two pieces along the line of intersection so that tiles
@@ -480,7 +484,7 @@ D epi_data 1
 #b `set pm3d border retrace` draws a border around each pm3d quadrangle in the
 ## same color as the filled area.  In principle this should have no visible
 ## effect, but it prevents some display modes like glitchy pdf or postscript
-## viewers from introducing antialiasing artifacts.
+## viewers from introducing aliasing artifacts.
 #b `set isotropic` adjusts the axis scaling in both 2D and 3D plots such that
 ## the x, y, and z axes all have the same scale.
 #b Change: Text rotation angle is not limited to integral degrees.
@@ -507,7 +511,7 @@ D epi_data 1
 #b Data preprocessing filter `zsort`
 #b Construction of customized keys using `keyentry`
 #b New LaTeX terminal pict2e supersedes older terminals `latex`, `emtex`, `eepic`,
-## and `tpic`, which are no longer built by default
+## and `tpic`.  The older terminals are no longer built by default
 #b `set pixmap` imports a png/jpeg/gif image as a pixmap that can be scaled and
 ## positioned anywhere in a plot or on the page
 #b Enhanced text mode accepts \U+xxxx (xxxx is a 4 or 5 character hexadecimal)
@@ -527,7 +531,7 @@ D epi_data 1
 #b 3D plot style `zerrorfill`
 #b 3D lighting model provides shading and specular highlighted (see `lighting`).
 #b Array data type, associated commands and operators. See `arrays`.
-#b New terminals `sizelgd`, `domterm`
+#b New terminals `sixelgd`, `domterm`
 #b New format descriptors tH tM tS handle relative times (interval lengths).
 ## See `time_specifiers`.
 #end
@@ -1142,7 +1146,7 @@ C  need @ in table, so end and restart the table !
  arguments.  Complex constants are expressed as {<real>,<imag>}, where <real>
  and <imag> must be numerical constants.  Thus {0,1} represents 'i'.
  The program predefines a variable I = {0,1} on entry that can be used to
- generate complex values in terms of other variables. 
+ generate complex values in terms of other variables.
  Thus `x + y*I` is a valid expression but `{x,y}` is not.
  The real and imaginary components of complex value z can be extracted as
  real(z) and imag(z). The modulus is given by abs(z).
@@ -6417,7 +6421,7 @@ Ffigure_zerror
  or from a script.
 
  Several non-mousing terminals also support some form of animation.
- See `term sixelgd animate`, `term domterm animate`.
+ See `term sixelgd`, `term kittycairo`.
 
  Two terminals can save an animation to a file for later playback locally
  or by embedding it a web page.  See `term gif animate`, `term webp`.
@@ -10865,8 +10869,9 @@ D discrete 3
  for drawing the border. `bdefault` (which is the default) will use the default
  border line style for drawing the border of the color box.
 
- `cbtics` allows you to specify a line style for the colorbox tics (cbtics)
- different from the line style of the border.
+ [EXPERIMENTAL - may change before next stable release]
+ `cbtics` allows you to specify a numerical line style for the colorbox tics
+ (cbtics) that is different from the line style used for the border.
 
  The axis of the color box is called `cb` and it is controlled by means of the
  usual axes commands, i.e. `set/unset/show` with `cbrange`, `[m]cbtics`,
@@ -14261,7 +14266,7 @@ D viridis 1
 ?commands set palette colormap
 ?palette colormap
  `set palette colormap <name>` loads a defined gradient that was previously
- saved to a colormap. Alpha channel information in the colormap, if any, 
+ saved to a colormap. Alpha channel information in the colormap, if any,
  will be lost when the color values are copied into the palette definition.
  See `colormap`.
 4 file
@@ -14339,7 +14344,7 @@ D viridis 1
 ?commands set palette maxcolors
 ?set palette maxcolors
 ?palette maxcolors
- `set palette maxcolors <N>` limits the palette to N discrete colors 
+ `set palette maxcolors <N>` limits the palette to N discrete colors
  selected from a continuous palette sampled at equally spaced intervals.
  If you want unequal spacing of N discrete colors, use `set palette defined`
  instead of a single continuous palette.
@@ -14523,11 +14528,22 @@ D viridis 1
 4 pixmap from colormap
 ?pixmap colormap
 ?set pixmap colormap
- Another use of pixmaps is to create a colorbox for a named palette,
- separate from the colorbox that is automatically generated for the active
- main palette
+?gradient
+ Syntax:
+      set pixmap <index> colormap <name>
 
-      set pixmap <index> colormap <name> at <position> size <width>, <height>
+Ffigure_gradient
+
+ Another use of pixmaps is to store a gradient described by a named palette.
+ This is an easy way to specify gradient fill for a rectangular area.
+ It could be used to draw a separate colorbox for that named palette,
+ or even as a background for the entire plot or the entire canvas.
+      set palette defined (0 "beige", 1 "light-cyan")
+      set colormap new Gradient
+      set pixmap 1 colormap Gradient behind
+      set pixmap 1 at screen 0,0 size screen 1,1
+      plot <something>
+
 3 pm3d
 ?commands set pm3d
 ?commands show pm3d

@@ -6,7 +6,6 @@ if (!strstrt(GPVAL_COMPILE_OPTIONS,"+GD_PNG")) \
     print "This copy of gnuplot was built without support for loading png images" ;\
     exit ;
 
-reset
 set title "Building Code Height Limits"
 unset key
 

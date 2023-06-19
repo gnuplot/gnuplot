@@ -1246,6 +1246,19 @@ unset multiplot
 reset
 
 #
+# Use of colormap as a gradient
+#
+set output out.'figure_gradient' . ext
+set palette defined (0 "beige", 1 "light-cyan")
+set colormap new Gradient
+set pixmap 1 colormap Gradient behind
+set pixmap 1 at screen 0,0 size screen 1,1
+set title offset 0,-4
+set tmargin 1
+load 'running_avg.dem'
+reset
+
+#
 # watchpoint support might not be present
 #
 set output out.'figure_watchpoints' . ext
