@@ -10838,7 +10838,7 @@ D discrete 3
                   { origin x, y }
                   { size x, y }
                   { front | back }
-                  { noborder | bdefault | border <linestyle> } {cbtics <linestyle>}
+                  { noborder | bdefault | border [line style] }
                 }
        show colorbox
        unset colorbox
@@ -10868,10 +10868,6 @@ D discrete 3
  will use line style `2604`, a thin line with the default border color (-1)
  for drawing the border. `bdefault` (which is the default) will use the default
  border line style for drawing the border of the color box.
-
- [EXPERIMENTAL - may change before next stable release]
- `cbtics` allows you to specify a numerical line style for the colorbox tics
- (cbtics) that is different from the line style used for the border.
 
  The axis of the color box is called `cb` and it is controlled by means of the
  usual axes commands, i.e. `set/unset/show` with `cbrange`, `[m]cbtics`,
