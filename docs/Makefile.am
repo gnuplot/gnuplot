@@ -106,7 +106,7 @@ gnuplot.ps gnuplot.gih gnuplot.hlp gnuplot.info* gnuplot.ipf 		\
 gnuplot.rtf gnuplot.tmp VERSION gnuplot.4tc gnuplot.4ct			\
 gnuplot.idv gnuplot.xref gnuplot.lg gnuplot.pdf				\
 ja.doc gnuplot-ja.ind gnuplot-ja.ilg gnuplot-ja.aux gnuplot-ja.toc	\
-gnuplot-ja.log gnuplot-ja.idx gnuplot-ja.out gnuplot-ja.tex		\
+gnuplot-ja.log gnuplot-ja.idx gnuplot-ja.out gnuplot-ja.tex allterm-ja.h \
 wxhelp_figures wxhelp/*.html wxhelp/wgnuplot.hhc wxhelp/wgnuplot.hhk	\
 wxhelp/wgnuplot.htc wxhelp/doc2html$(EXEEXT) windows/wgnuplot.htk	\
 svg_figures html/*.html html/*.svg html/*.hhc html/*.hhk                \
@@ -237,9 +237,9 @@ gnuplot.ps: gnuplot.dvi
 allterm-ja.h: $(CORETERM) $(LUA_HELP)
 	-mkdir ja
 	-mkdir ja/docs;
-	cp doc2rtf.c ja/docs
+	cp $(top_srcdir)/docs/doc2rtf.c ja/docs
 	cp -r $(top_srcdir)/term $(TJ)
-	-( cd ja ; patch -p0 < ../term-ja.diff )
+	-( cd ja ; patch -p0 < $(top_srcdir)/docs/term-ja.diff )
 	$(AM_V_GEN) for e in `grep -E "^[ 	]*START_HELP" $(JATERM) |\
 	     LC_ALL=C sort -f -t':' -k2` ; do \
 	  f=`echo $$e |cut -d\: -f1` ; s=`echo $$e | cut -d\: -f2` ;\
@@ -247,6 +247,7 @@ allterm-ja.h: $(CORETERM) $(LUA_HELP)
 	done >allterm.tmp
 	iconv -f EUC-JP -t UTF-8 < allterm.tmp >$@
 	rm allterm.tmp
+	-chmod -R +w $(TJ)
 	rm -rf $(TJ)
 
 gnuplot-ja.pdf: gnuplot-ja.doc title-ja.tex pdf_figures allterm-ja.h doc2tex$(EXEEXT)
