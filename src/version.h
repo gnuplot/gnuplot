@@ -35,6 +35,7 @@
 
 #include "syscfg.h"
 
+extern const double gnuplot_ver;
 extern const char gnuplot_version[];
 extern const char gnuplot_patchlevel[];
 extern const char gnuplot_date[];
