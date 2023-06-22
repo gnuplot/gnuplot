@@ -8,7 +8,12 @@ enum DATA_TYPES {
 	CMPLX,
 	STRING,
 	DATABLOCK,
+	FUNCTIONBLOCK,
 	ARRAY,
+	COLORMAP_ARRAY,
+	TEMP_ARRAY,
+	LOCAL_ARRAY,
+	VOXELGRID,
 	NOTDEFINED,	/* exists, but value is currently undefined */
 	INVALID_VALUE,	/* used only for error return by external functions */
 	INVALID_NAME	/* used only to trap errors in linked axis function definition */
