@@ -1,6 +1,7 @@
 /*
  * DATA_TYPES and struct value must match definitions in
- * #include <gp_types.h>
+ *	#include <gp_types.h>
+ * This file matches the source for gnuplot version 6.0
  */
 #include <inttypes.h>		/* C99 type definitions */
 enum DATA_TYPES {
@@ -8,7 +9,12 @@ enum DATA_TYPES {
 	CMPLX,
 	STRING,
 	DATABLOCK,
+	FUNCTIONBLOCK,
 	ARRAY,
+	COLORMAP_ARRAY,
+	TEMP_ARRAY,
+	LOCAL_ARRAY,
+	VOXELGRID,
 	NOTDEFINED,	/* exists, but value is currently undefined */
 	INVALID_VALUE,	/* used only for error return by external functions */
 	INVALID_NAME	/* used only to trap errors in linked axis function definition */
