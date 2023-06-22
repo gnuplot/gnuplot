@@ -23,12 +23,12 @@ build command is
 
 Under Windows + mingw it is
 
-    gcc -shared -lm -o newprogram.dll newprogram.c
+    gcc -shared -lm -fPIC -o newprogram.dll newprogram.c
 
 An equivalent build command should work for the uigamma plugin or
 one you have created yourself.
 
-    gcc -shared -lm -o uigamma_plugin.so uigamma_plugin.c
+    gcc -shared -lm -fPIC -o uigamma_plugin.so uigamma_plugin.c
 
 Type "help import" in a gnuplot session for examples of how to
 load a function from a plugin library.  The suggested sequence

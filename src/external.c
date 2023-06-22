@@ -59,6 +59,7 @@
 ]*/
 
 #include "external.h"
+#include "version.h"
 
 #ifdef HAVE_EXTERNAL_FUNCTIONS
 
@@ -75,6 +76,7 @@
 typedef struct value (*exfn_t)(int, struct value *, void *);
 typedef void * (*infn_t)(exfn_t);
 typedef void   (*fifn_t)(void *);
+typedef double (*vfn_t)(void);
 
 struct exft_entry {
     exfn_t exfn;
@@ -108,11 +110,18 @@ dll_open_w(const char *f)
 
 
 /*
-  Parse the string argument for a dll filename and function.  Create a
-  one-item action list that calls a plugin function.  Call the _init,
-  if present.  _init may return a pointer to private data that is
-  handed over to the external function for each call.
-*/
+ * 1) Parse the string argument for a dll filename and function.
+ * 2) Create a one-item action list that calls a plugin function.
+ * 3) Check the gnuplot version number reported by the plugin.
+ * 4) Call the _init function if present; this is exported by the
+ *    plugin as gnuplot_init().
+ *    This function may return a pointer to private data that is
+ *    handed over to the external function for each call.
+ * 5) Save the destructor function if present; this is exported by
+ *    the plugin as gnuplot_fini().  This function is called
+ *    if and when the user function name associated with the
+ *    plugin function is reassign to something else.
+ */
 
 struct at_type *
 external_at(const char *func_name)
@@ -123,6 +132,7 @@ external_at(const char *func_name)
     exfn_t exfn;
     infn_t infn;
     fifn_t fifn;
+    vfn_t vfn;
     struct at_type *at = NULL;
 
     if (!isstring(c_token))
@@ -168,6 +178,7 @@ external_at(const char *func_name)
 		strcat(nfile, DLL_EXT);
 		/* 2nd try:  "file.so" */
 		dl = DLL_OPEN(nfile);
+		err = DLL_ERROR(dl);
 	    }
 #endif
 #ifdef DLL_PATHSEP
@@ -176,11 +187,13 @@ external_at(const char *func_name)
 		strcat(nfile, file);
 		/* 3rd try:  "./file" */
 		dl = DLL_OPEN(nfile);
+		err = DLL_ERROR(dl);
 #ifdef DLL_EXT
 		if (!dl && no_ext) {
 		    strcat(nfile, DLL_EXT);
 		    /* 4th try:  "./file.so" */
 		    dl = DLL_OPEN(nfile);
+		    err = DLL_ERROR(dl);
 		}
 #endif
 	    }
@@ -208,6 +221,7 @@ external_at(const char *func_name)
     
     infn = (infn_t)DLL_SYM(dl, "gnuplot_init");
     fifn = (fifn_t)DLL_SYM(dl, "gnuplot_fini");
+    vfn  = (vfn_t)DLL_SYM(dl, "gnuplot_version");
     
     if (!(at = gp_alloc(sizeof(struct at_type), "external_at")))
 	goto bailout;
@@ -231,6 +245,15 @@ external_at(const char *func_name)
 	at->actions[0].arg.exf_arg->private = 0x0;
     else
 	at->actions[0].arg.exf_arg->private = (*infn)(exfn);
+
+    /* Check for version compatibility */
+    if (!vfn)
+	int_warn(NO_CARET, "plugin provides no version information");
+    else {
+	double plugin_version = (*vfn)();
+	if (plugin_version != gnuplot_ver)
+	    int_warn(NO_CARET, "plugin built for version %.1f", plugin_version);
+    }
     
   bailout:
     c_token++;

@@ -35,12 +35,13 @@
 #include "syscfg.h"		/* for FAQ_LOCATION */
 
 
+const double gnuplot_ver = 6.1;
 const char gnuplot_version[] = "6.1";
 const char gnuplot_patchlevel[] = "0";
 #ifdef DEVELOPMENT_VERSION
 #include "timestamp.h"
 #else
-const char gnuplot_date[] = "2023-03-14 ";
+const char gnuplot_date[] = "2023-06-22 ";
 #endif
 const char gnuplot_copyright[] = "Copyright (C) 1986-1993, 1998, 2004, 2007-2023";
 
