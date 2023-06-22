@@ -1,7 +1,10 @@
 /*
  * DATA_TYPES and struct value must match definitions in
- * #include <gp_types.h>
+ *    #include <gp_types.h>
+ * This version matches gnuplot 5.4
  */
+#define PLUGIN_VERSION 5.4
+
 #include <inttypes.h>		/* C99 type definitions */
 enum DATA_TYPES {
 	INTGR=1,
@@ -9,6 +12,7 @@ enum DATA_TYPES {
 	STRING,
 	DATABLOCK,
 	ARRAY,
+	VOXELGRID,
 	NOTDEFINED,	/* exists, but value is currently undefined */
 	INVALID_VALUE,	/* used only for error return by external functions */
 	INVALID_NAME	/* used only to trap errors in linked axis function definition */
@@ -45,6 +49,9 @@ typedef struct value {
 /* prototype for a plugin function */
 DLLEXPORT void *gnuplot_init(struct value(*)(int, struct value *, void *));
 DLLEXPORT void gnuplot_fini(void *);
+
+/* report gnuplot version number that this plugin was built for */
+DLLEXPORT double gnuplot_version(void) {return PLUGIN_VERSION;}
 
 /* Check that the number of parameters declared in the gnuplot import
  * statement matches the actual number of parameters in the exported
