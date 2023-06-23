@@ -1186,6 +1186,7 @@ AC_CONFIG_FILES([Makefile
            docs/Makefile
            m4/Makefile
            man/Makefile
+           man/ja/Makefile
            share/Makefile
            share/LaTeX/Makefile
            src/Makefile
