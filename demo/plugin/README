@@ -19,11 +19,11 @@ you and "make" should be sufficient to build the demo plugin.
 If you are building _only_ this plugin demo, under linux a minimal
 build command is
 
-    gcc -shared -lm -o demo_plugin.so demo_plugin.c
+    gcc -shared -lm -fPIC -o demo_plugin.so demo_plugin.c
 
 Under Windows + mingw it is
 
-    gcc -shared -lm -fPIC -o newprogram.dll newprogram.c
+    gcc -shared -lm -o newprogram.dll newprogram.c
 
 An equivalent build command should work for the uigamma plugin or
 one you have created yourself.
