@@ -1519,9 +1519,9 @@ store2d_point(
     case YERRORLINES:		/* auto-scale ylow yhigh */
 	cp->xlow = xlow;	/* really theta if polar; CRD_PTSIZE otherwise */
 	cp->xhigh = xhigh;	/* really theta if polar; CRD_PTTYPE otherwise */
-	STORE_AND_UPDATE_RANGE(cp->ylow, ylow, dummy_type, current_plot->y_axis,
+	STORE_AND_UPDATE_RANGE(cp->ylow, ylow, cp->type, current_plot->y_axis,
 				current_plot->noautoscale, cp->ylow = -VERYLARGE);
-	STORE_AND_UPDATE_RANGE(cp->yhigh, yhigh, dummy_type, current_plot->y_axis,
+	STORE_AND_UPDATE_RANGE(cp->yhigh, yhigh, cp->type, current_plot->y_axis,
 				current_plot->noautoscale, cp->yhigh = -VERYLARGE);
 	break;
     case BOXES:			/* auto-scale to xlow xhigh */
