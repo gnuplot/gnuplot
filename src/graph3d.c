@@ -3464,10 +3464,12 @@ map3d_getposition(
 	plot_coords = TRUE;
 	break;
     case screen:
-	screen_coords = TRUE;
+	if (!splot_map)
+	    screen_coords = TRUE;
 	break;
     case character:
-	char_coords = TRUE;
+	if (!splot_map)
+	    char_coords = TRUE;
 	break;
     }
 
