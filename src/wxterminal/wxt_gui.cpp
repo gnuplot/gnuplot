@@ -3023,6 +3023,7 @@ void wxtPanel::wxt_cairo_refresh()
 	wxt_in_key_sample = FALSE;
 #ifdef USE_MOUSE
 	wxt_initialize_key_boxes(0);
+	wxt_initialize_hidden(0);
 #endif
 
 	/* Initialize the hypertext tracking mechanism */
