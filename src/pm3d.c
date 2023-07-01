@@ -1701,6 +1701,9 @@ filled_polygon(struct surface_points *from_plot, int index, gpdPoint *corners, i
 	clip_polygon( ocorners, icorners, nv, &nv );
     }
 
+    if (nv <= 0)
+	return;
+
     /* If this polygon came from an object, the "index" is really a fill style.
      * If it came from a plot, retrieve the style from the plot header.
      */
