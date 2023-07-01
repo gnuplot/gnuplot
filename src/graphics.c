@@ -4674,7 +4674,7 @@ do_sector(
 
 	clip_polygon(vertex, fillarea, points, &in);
 	fillarea[0].style = style;
-	if (term->filled_polygon)
+	if ((in > 1 ) && term->filled_polygon)
 	    term->filled_polygon(in, fillarea);
 
     } else { /* Draw the sector */
@@ -5597,6 +5597,8 @@ process_image(void *plot, t_procimg_action action)
 			for (k=0; k<N_corners; k++)
 			    clipped[k] = corners[k];
 			clip_polygon(clipped, corners, N_corners, &N_corners);
+			if (N_corners <= 0)
+			    continue;
 		    }
 
 		    /* Apply mask */

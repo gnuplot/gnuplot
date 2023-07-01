@@ -463,14 +463,15 @@ void gp_cairo_end_polygon(plot_struct *plot)
 
 	/* if there's only one polygon, draw it directly */
 	if (path->previous == NULL) {
-		FPRINTF((stderr,"processing one polygon\n"));
-		cairo_move_to(plot->cr, path->corners[0].x, path->corners[0].y);
-		for (i=1;i<path->n;++i)
-			cairo_line_to(plot->cr, path->corners[i].x, path->corners[i].y);
-		cairo_close_path(plot->cr);
-		plot->color = path->color;
-		gp_cairo_fill( plot, path->corners->style & 0xf, path->corners->style >> 4 );
-		cairo_fill(plot->cr);
+		if (path->n > 0) {
+		    cairo_move_to(plot->cr, path->corners[0].x, path->corners[0].y);
+		    for (i = 1; i < path->n; i++)
+			    cairo_line_to(plot->cr, path->corners[i].x, path->corners[i].y);
+		    cairo_close_path(plot->cr);
+		    plot->color = path->color;
+		    gp_cairo_fill( plot, path->corners->style & 0xf, path->corners->style >> 4 );
+		    cairo_fill(plot->cr);
+		}
 		free(path->corners);
 		free(path);
 		plot->polygon_path_last = NULL;
