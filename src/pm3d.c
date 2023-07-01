@@ -1617,6 +1617,9 @@ filled_polygon(gpdPoint *corners, int fillstyle, int nv)
 	clip_polygon( ocorners, icorners, nv, &nv );
     }
 
+    if (nv <= 0)
+	return;
+
     if (fillstyle)
 	icorners[0].style = fillstyle;
     else if (default_fillstyle.fillstyle == FS_EMPTY)

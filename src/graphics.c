@@ -5246,6 +5246,8 @@ process_image(void *plot, t_procimg_action action)
 			    for (k=0; k<N_corners; k++)
 				clipped[k] = corners[k];
 			    clip_polygon(clipped, corners, N_corners, &N_corners);
+			    if (N_corners <= 0)
+				continue;
 			}
 
 			if (rectangular_image && term->fillbox
