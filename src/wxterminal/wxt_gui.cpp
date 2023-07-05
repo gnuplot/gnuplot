@@ -1557,11 +1557,12 @@ static void wxt_initialize_hidden(int i)
 static void wxt_update_key_box( unsigned int x, unsigned int y )
 {
 	if (wxt_max_key_boxes <= wxt_cur_plotno) {
+		int first_new_keybox = wxt_max_key_boxes;
 		wxt_max_key_boxes = wxt_cur_plotno + 10;
 		wxt_key_boxes = (wxtBoundingBox *)realloc(wxt_key_boxes,
 				wxt_max_key_boxes * sizeof(wxtBoundingBox));
-		wxt_initialize_key_boxes(wxt_cur_plotno);
-		wxt_initialize_hidden(wxt_cur_plotno);
+		wxt_initialize_key_boxes(first_new_keybox);
+		wxt_initialize_hidden(first_new_keybox);
 	}
 	wxtBoundingBox *bb = &(wxt_key_boxes[wxt_cur_plotno]);
 	y = term->ymax - y;
