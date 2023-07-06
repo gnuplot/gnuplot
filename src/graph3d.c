@@ -1167,23 +1167,6 @@ do_3dplot(
 		}
 	    }
 
-	    if (lkey
-	    &&  (!this_plot->title_position || this_plot->title_position->scalex != character)) {
-		char *title = this_plot->title;
-
-		if (this_plot->title_is_automated && (term->flags & TERM_IS_LATEX))
-		    title = texify_title(title, this_plot->plot_type);
-
-		if (key->textcolor.type != TC_DEFAULT)
-		    /* Draw key text in same color as key title */
-		    apply_pm3dcolor(&key->textcolor);
-		else
-		    /* Draw key text in black */
-		    (*t->linetype)(LT_BLACK);
-		ignore_enhanced(this_plot->title_no_enhanced);
-		key_text(xl, yl, title);
-		ignore_enhanced(FALSE);
-	    }
 	    term_apply_lp_properties(&(this_plot->lp_properties));
 
 	    /* Voxel data is a special case.
@@ -1351,102 +1334,125 @@ do_3dplot(
 
 	    /* Next draw the key sample */
 	    if (lkey
-	    &&  (!this_plot->title_position || this_plot->title_position->scalex != character))
-	    switch (this_plot->plot_style) {
-	    case FILLEDCURVES:
-	    case IMPULSES:
-		if (!(hidden3d && draw_this_surface))
-		    key_sample_line(xl, yl);
-		break;
-	    case STEPS:	/* HBB: I think these should be here */
-	    case FILLSTEPS:
-	    case FSTEPS:
-	    case HISTEPS:
-	    case SURFACEGRID:
-	    case LINES:
-		/* Normal case (surface) */
-		if (draw_this_surface)
-		    key_sample_line_pm3d(this_plot, xl, yl);
-		/* Contour plot with no surface, all contours use the same linetype */
-		else if (this_plot->contours != NULL && clabel_onecolor) {
-		    key_sample_line(xl, yl);
-		}
-		break;
-	    case YERRORLINES:	/* ignored; treat like points */
-	    case XERRORLINES:	/* ignored; treat like points */
-	    case XYERRORLINES:	/* ignored; treat like points */
-	    case YERRORBARS:	/* ignored; treat like points */
-	    case XERRORBARS:	/* ignored; treat like points */
-	    case XYERRORBARS:	/* ignored; treat like points */
-	    case BOXXYERROR:	/* HBB: ignore these as well */
-	    case BOXERROR:
-	    case CANDLESTICKS:	/* HBB: ditto */
-	    case BOXPLOT:
-	    case FINANCEBARS:
-	    case ELLIPSES:
-	    case POINTSTYLE:
-		if (this_plot->plot_type == VOXELDATA) {
-		    if (this_plot->lp_properties.pm3d_color.type == TC_Z)
-			set_color(0.5);
-		    key_sample_point(this_plot, xl, yl, this_plot->lp_properties.p_type);
-		} else
+	    &&  (!this_plot->title_position || this_plot->title_position->scalex != character)) {
+		char *title = this_plot->title;
+		term->layer(TERM_LAYER_BEGIN_KEYSAMPLE);
 
-		if (draw_this_surface)
-		    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
-		break;
+		/* Key title text */
+		if (this_plot->title_is_automated && (term->flags & TERM_IS_LATEX))
+		    title = texify_title(title, this_plot->plot_type);
 
-	    case LABELPOINTS:
-		if ((this_plot->labels->lp_properties.flags & LP_SHOW_POINTS)) {
-		    term_apply_lp_properties(&this_plot->labels->lp_properties);
-		    key_sample_point(this_plot, xl, yl, this_plot->labels->lp_properties.p_type);
-		}
-		break;
+		if (key->textcolor.type != TC_DEFAULT)
+		    /* Draw key text in same color as key title */
+		    apply_pm3dcolor(&key->textcolor);
+		else
+		    /* Draw key text in black */
+		    (*t->linetype)(LT_BLACK);
+		ignore_enhanced(this_plot->title_no_enhanced);
+		key_text(xl, yl, title);
+		ignore_enhanced(FALSE);
 
-	    case LINESPOINTS:
-		if (draw_this_surface) {
-		    if (this_plot->lp_properties.l_type != LT_NODRAW)
-			key_sample_line_pm3d(this_plot, xl, yl);
-		    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
-		}
-		break;
-
-	    case DOTS:
-		if (draw_this_surface)
-		    key_sample_point_pm3d(this_plot, xl, yl, -1);
-		break;
-
-	    case VECTOR:
-		key_sample_line_pm3d(this_plot, xl, yl);
-		break;
-
-	    case ZERRORFILL:
-		/* zerrorfill colors are weird (as in "backwards") */
-		apply_pm3dcolor(&this_plot->lp_properties.pm3d_color);
-		key_sample_fill(xl, yl, this_plot);
+		/* Draw sample in same style and color as the corresponding plot  */
 		term_apply_lp_properties(&this_plot->lp_properties);
-		apply_pm3dcolor(&this_plot->fill_properties.border_color);
-		key_sample_line(xl, yl);
-		break;
 
-	    case BOXES:
-	    case CIRCLES:
-		apply_pm3dcolor(&this_plot->lp_properties.pm3d_color);
-		if (this_plot->iso_crvs)
-		    check3d_for_variable_color(this_plot, this_plot->iso_crvs->points);
-		key_sample_fill(xl, yl, this_plot);
-		break;
+		switch (this_plot->plot_style) {
+		case FILLEDCURVES:
+		case IMPULSES:
+		    if (!(hidden3d && draw_this_surface))
+			key_sample_line(xl, yl);
+		    break;
+		case STEPS:	/* HBB: I think these should be here */
+		case FILLSTEPS:
+		case FSTEPS:
+		case HISTEPS:
+		case SURFACEGRID:
+		case LINES:
+		    /* Normal case (surface) */
+		    if (draw_this_surface)
+			key_sample_line_pm3d(this_plot, xl, yl);
+		    /* Contour plot with no surface, all contours use the same linetype */
+		    else if (this_plot->contours != NULL && clabel_onecolor) {
+			key_sample_line(xl, yl);
+		    }
+		    break;
+		case YERRORLINES:	/* ignored; treat like points */
+		case XERRORLINES:	/* ignored; treat like points */
+		case XYERRORLINES:	/* ignored; treat like points */
+		case YERRORBARS:	/* ignored; treat like points */
+		case XERRORBARS:	/* ignored; treat like points */
+		case XYERRORBARS:	/* ignored; treat like points */
+		case BOXXYERROR:	/* HBB: ignore these as well */
+		case BOXERROR:
+		case CANDLESTICKS:	/* HBB: ditto */
+		case BOXPLOT:
+		case FINANCEBARS:
+		case ELLIPSES:
+		case POINTSTYLE:
+		    if (this_plot->plot_type == VOXELDATA) {
+			if (this_plot->lp_properties.pm3d_color.type == TC_Z)
+			    set_color(0.5);
+			key_sample_point(this_plot, xl, yl, this_plot->lp_properties.p_type);
+		    } else
 
-	    case ISOSURFACE:
-		apply_pm3dcolor(&this_plot->fill_properties.border_color);
-		key_sample_fill(xl, yl, this_plot);
-		break;
+		    if (draw_this_surface)
+			key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
+		    break;
 
-	    case PLOT_STYLE_NONE:
-		/* cannot happen */
-	    default:
-		break;
+		case LABELPOINTS:
+		    if ((this_plot->labels->lp_properties.flags & LP_SHOW_POINTS)) {
+			term_apply_lp_properties(&this_plot->labels->lp_properties);
+			key_sample_point(this_plot, xl, yl, this_plot->labels->lp_properties.p_type);
+		    }
+		    break;
 
-	    }			/* switch(plot-style) key sample */
+		case LINESPOINTS:
+		    if (draw_this_surface) {
+			if (this_plot->lp_properties.l_type != LT_NODRAW)
+			    key_sample_line_pm3d(this_plot, xl, yl);
+			key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
+		    }
+		    break;
+
+		case DOTS:
+		    if (draw_this_surface)
+			key_sample_point_pm3d(this_plot, xl, yl, -1);
+		    break;
+
+		case VECTOR:
+		    key_sample_line_pm3d(this_plot, xl, yl);
+		    break;
+
+		case ZERRORFILL:
+		    /* zerrorfill colors are weird (as in "backwards") */
+		    apply_pm3dcolor(&this_plot->lp_properties.pm3d_color);
+		    key_sample_fill(xl, yl, this_plot);
+		    term_apply_lp_properties(&this_plot->lp_properties);
+		    apply_pm3dcolor(&this_plot->fill_properties.border_color);
+		    key_sample_line(xl, yl);
+		    break;
+
+		case BOXES:
+		case CIRCLES:
+		    apply_pm3dcolor(&this_plot->lp_properties.pm3d_color);
+		    if (this_plot->iso_crvs)
+			check3d_for_variable_color(this_plot, this_plot->iso_crvs->points);
+		    key_sample_fill(xl, yl, this_plot);
+		    break;
+
+		case ISOSURFACE:
+		    apply_pm3dcolor(&this_plot->fill_properties.border_color);
+		    key_sample_fill(xl, yl, this_plot);
+		    break;
+
+		case PLOT_STYLE_NONE:
+		    /* cannot happen */
+		default:
+		    break;
+
+		}			/* switch(plot-style) key sample */
+
+		term->layer(TERM_LAYER_END_KEYSAMPLE);
+	    }
 
 	    /* If the title went somewhere other than the key,
 	     * restore the previous key position.
@@ -1471,11 +1477,7 @@ do_3dplot(
 
 		while (cntrs) {
 		    if (!clabel_onecolor && cntrs->isNewLevel) {
-			if (key->visible && !this_plot->title_is_suppressed
-			&&  this_plot->plot_style != LABELPOINTS) {
-			    (*t->linetype)(LT_BLACK);
-			    key_text(xl, yl, cntrs->label);
-			}
+
 			if (thiscontour_lp_properties.pm3d_color.type == TC_Z)
 			    set_color( cb2gray(cntrs->z) );
 			else {
@@ -1501,11 +1503,22 @@ do_3dplot(
 							      * this_plot->lp_properties.l_width;
 			    thiscontour_lp_properties.d_type = ls.d_type;
 			    thiscontour_lp_properties.custom_dash_pattern = ls.custom_dash_pattern;
-			    term_apply_lp_properties(&thiscontour_lp_properties);
+//			    term_apply_lp_properties(&thiscontour_lp_properties);
 			}
 
+			/* Key entry */
 			if (key->visible && !this_plot->title_is_suppressed
 			&& !(this_plot->plot_style == LABELPOINTS)) {
+
+			    term->layer(TERM_LAYER_BEGIN_KEYSAMPLE);
+
+			    /* Contour label always black; restore color afterwards */
+			    (*t->linetype)(LT_BLACK);
+			    key_text(xl, yl, cntrs->label);
+			    if (thiscontour_lp_properties.pm3d_color.type == TC_Z)
+				set_color( cb2gray(cntrs->z) );
+			    else
+				term_apply_lp_properties(&thiscontour_lp_properties);
 
 			    switch (this_plot->plot_style) {
 			    case IMPULSES:
@@ -1529,9 +1542,16 @@ do_3dplot(
 				break;
 			    }	/* switch */
 
+			    term->layer(TERM_LAYER_END_KEYSAMPLE);
+
 			    NEXT_KEY_LINE();
 
-			} /* key */
+			} else /* No key entry */ {
+			    if (thiscontour_lp_properties.pm3d_color.type == TC_Z)
+				set_color( cb2gray(cntrs->z) );
+			    else
+				term_apply_lp_properties(&thiscontour_lp_properties);
+			}
 		    } /* clabel_onecolor */
 
 		    /* now draw the contour */
@@ -3614,7 +3634,6 @@ key_text(int xl, int yl, char *text)
     if (key->invert)
 	INVERT_KEY();
 
-    (term->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
     if (key->just == GPKEY_LEFT) {
 	write_multiline(xl + key_text_left, yl, text, LEFT, JUST_TOP, 0, key->font);
     } else {
@@ -3625,7 +3644,6 @@ key_text(int xl, int yl, char *text)
 	    write_multiline(x, yl, text, LEFT, JUST_TOP, 0, key->font);
 	}
     }
-    (term->layer)(TERM_LAYER_END_KEYSAMPLE);
 }
 
 static void
@@ -3643,10 +3661,7 @@ key_sample_line(int xl, int yl)
     if (key->invert)
 	INVERT_KEY();
 
-    (term->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
     draw_clip_line(xl + key_sample_left, yl, xl + key_sample_right, yl);
-    (term->layer)(TERM_LAYER_END_KEYSAMPLE);
-
     clip_area = clip_save;
 }
 
@@ -3666,7 +3681,6 @@ key_sample_point(struct surface_points *this_plot, int xl, int yl, int pointtype
     if (key->invert)
 	INVERT_KEY();
 
-    (term->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
     if (!clip_point(xl + key_point_offset, yl)) {
 	if (pointtype == PT_CHARACTER && this_plot) {
 	    apply_pm3dcolor(&(this_plot->labels->textcolor));
@@ -3677,8 +3691,6 @@ key_sample_point(struct surface_points *this_plot, int xl, int yl, int pointtype
 	    (*term->point) (xl + key_point_offset, yl, pointtype);
 	}
     }
-    (term->layer)(TERM_LAYER_END_KEYSAMPLE);
-
     clip_area = clip_save;
 }
 
@@ -3700,7 +3712,6 @@ key_sample_fill(int xl, int yl, struct surface_points *this_plot)
 
     if (!(term->fillbox))
 	return;
-    (term->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
 
     if (this_plot->plot_style == CIRCLES) {
 	do_arc(x+w/2, yl, key_entry_height/4, 0., 360., style, FALSE);
@@ -3722,8 +3733,6 @@ key_sample_fill(int xl, int yl, struct surface_points *this_plot)
 	    closepath();
 	}
     }
-
-    (term->layer)(TERM_LAYER_END_KEYSAMPLE);
 }
 
 
