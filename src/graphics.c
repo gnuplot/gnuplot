@@ -2202,17 +2202,16 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			for (nextdef = i+1; nextdef < plot->p_count; nextdef++)
 			    if (plot->points[nextdef].type != UNDEFINED)
 				break;
-			if (nextdef == plot->p_count)	/* i is the last non-UNDEFINED point */
-			    nextdef = i;
-			if (boxwidth < 0)
-			    dxr = (plot->points[nextdef].x - plot->points[i].x) / 2.0;
-			else if (!boxwidth_is_absolute)
-			    dxr = (plot->points[nextdef].x - plot->points[i].x) * boxwidth / 2.0;
-			else /* Hits here on 3 column BOXERRORBARS */
-			    dxr = boxwidth / 2.0;
-
-			if (plot->points[nextdef].type == UNDEFINED)
+			if (nextdef < plot->p_count) {
+			    if (boxwidth < 0)
+			        dxr = (plot->points[nextdef].x - plot->points[i].x) / 2.0;
+			    else if (!boxwidth_is_absolute)
+			        dxr = (plot->points[nextdef].x - plot->points[i].x) * boxwidth / 2.0;
+			    else /* Hits here on 3 column BOXERRORBARS */
+			        dxr = boxwidth / 2.0;
+		        } else { /* i is the last non-UNDEFINED point */
 			    dxr = -dxl;
+		        }
 
 		    } else {
 			dxr = -dxl;
