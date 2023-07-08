@@ -1,11 +1,16 @@
 		Gnuplot Version 6.0 rc1 Release Notes
 		=====================================
 
-Version 6.0 will be the first release in a new major stable release series.
-The most recent release in the previous stable series is 5.4.8 (June 2023).
+Version 6.0 will be the first release in a new stable release series.
+Work on gnuplot 6 has proceeded in parallel with the incremental updates to
+version 5.4 over the past three years.  The new version introduces extensions
+to the gnuplot command language, support for new output protocols, and
+additional plotting styles.  Backwards compatibility is given high priority
+in gnuplot development, so users should find no significant changes required
+for techniques or code they are currently using with gnuplot 5.
 
 Your feedback from testing of this release candidate will contribute to
-the success of a full 6.0 release expected near the end of 2023.
+the success of a full 6.0 release expected later this year.
 
 Gnuplot development is tracked in a git repository on SourceForge.
 You can generate a complete history of changes using "git log"
@@ -16,7 +21,7 @@ after downloading:
     git log
 </pre>
 
-Release Notes date:  12-Jun-2023
+Release Notes date:  08-Jul-2023
 
 		Features introduced in version 6
 		================================
@@ -179,11 +184,13 @@ are also still available. These include, among many more obscure options:
 Output of inline graphics to terminal emulator or linux console
 ---------------------------------------------------------------
 
-The sixel terminal displays graphics in-line with the commands typed on a
-suitable terminal emulator.  For example "xterm -ti 340" emulates a vt340
-with indexed color graphics.  The KDE desktop "konsole" terminal provides
-full RGB color sixel graphics.  The yaft terminal emulator can be run at
-linux console level with no x11 or other windowing system active.
+The sixel and kitty terminals display graphics in-line with the commands
+typed in a suitable terminal emulator window.  For example "xterm -ti 340"
+emulates a vt340 with indexed color sixel graphics.
+The KDE desktop konsole terminal provides RGB color sixel graphics
+and 32-bit color + alpha channel graphics using the kitty protocol.
+The yaft terminal emulator can provide sixel graphics at linux console
+level with no x11 or other windowing system active.
 
 Generating interactive plots for web display
 --------------------------------------------

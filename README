@@ -6,16 +6,15 @@ The Gnuplot Plotting Utility
 for linux, OSX, MSWin, VMS, and many other platforms.  The software is
 copyrighted but freely distributed (i.e., you don't have to pay for it).
 It was originally written to allow scientists and students to visualize
-mathematical functions and data.  Gnuplot supports many different types
-of terminals, plotters, and printers (including pseudo-devices like
-LaTeX) and is easily extensible to include new devices.  
+mathematical functions and data.  Gnuplot supports output to many types
+of terminals, printers, and file formats.  It is easily extensible to
+include new devices.
 
- The "GNU" in gnuplot is NOT related to the Free Software Foundation,
-the naming is just a coincidence (and a long story; see the gnuplot FAQ
+ The "gnu" in gnuplot is NOT related to the Free Software Foundation.
+The naming is just a coincidence (and a long story; see the gnuplot FAQ
 for details). Thus gnuplot is not covered by the GPL (GNU Public License)
 copyleft, but rather by its own copyright statement, included in all source
-code files. However, some of the associated drivers and support utilities
-are dual-licensed.
+code files. Some code modules are dual-licensed.
 
  Gnuplot handles both curves (2 dimensions) and surfaces (3 dimensions).
 Surfaces can be plotted as a mesh fitting the specified function, floating
@@ -41,8 +40,6 @@ Copyright and Porting
 
  See the Copyright file for copyright conditions.
 
- See the ChangeLog and docs/old/History.old file for changes to gnuplot.
-
  Build instructions are in the INSTALL file.  Some additional
 information needed to port gnuplot to new platforms not covered by
 GNU autoconf can be found in the PORTING file. 
@@ -52,9 +49,8 @@ run on an amazing variety of operating systems and hardware over the years.
 However, the current code has not been tested on all those older platforms
 and some of the conditional code to support quirks of obsolete compilers
 and OS features has been removed.  You can expect that gnuplot will compile
-more or less out of the box on any system which has the GNU C compiler gcc
-or other ANSI-compliant C compiler.  Some specific [optional] drivers are
-written in C++ or lua.
+more or less out of the box on any system which has a C compiler compliant
+with the c99 standard.  Some optional drivers are written in C++ or lua.
 
 Help and Bug Reports
 ====================

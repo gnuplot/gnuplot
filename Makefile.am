@@ -22,6 +22,7 @@ dist-hook:
 
 ReleaseNotes.html: RELEASE_NOTES
 	txt2html -pm --style_url ReleaseNotes.css RELEASE_NOTES \
+	         --bold_delimiter "" \
 	         --bullets "-=o*\\044" --outfile ReleaseNotes.html
 
 gnuplot:
