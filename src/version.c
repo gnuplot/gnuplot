@@ -37,11 +37,11 @@
 
 const double gnuplot_ver = 6.0;
 const char gnuplot_version[] = "6.0";
-const char gnuplot_patchlevel[] = "1";
+const char gnuplot_patchlevel[] = "rc1";
 #ifdef DEVELOPMENT_VERSION
 #include "timestamp.h"
 #else
-const char gnuplot_date[] = "2023-06-22 ";
+const char gnuplot_date[] = "2023-07-08 ";
 #endif
 const char gnuplot_copyright[] = "Copyright (C) 1986-1993, 1998, 2004, 2007-2023";
 

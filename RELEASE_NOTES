@@ -1,8 +1,8 @@
-		Gnuplot Version 6.0-rc0 Release Notes
+		Gnuplot Version 6.0 rc1 Release Notes
 		=====================================
 
 Version 6.0 will be the first release in a new major stable release series.
-The most recent release in the previous stable series is 5.4.6 (Feb 2023).
+The most recent release in the previous stable series is 5.4.8 (June 2023).
 
 Your feedback from testing of this release candidate will contribute to
 the success of a full 6.0 release expected near the end of 2023.
@@ -16,7 +16,7 @@ after downloading:
     git log
 </pre>
 
-Release Notes date:  01-Jun-2023
+Release Notes date:  12-Jun-2023
 
 		Features introduced in version 6
 		================================
@@ -208,7 +208,7 @@ file of the source package; the short version for linux/unix-like
 systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-6.0.0 ; ./configure ; make
+      cd gnuplot-6.0.rc1 ; ./configure ; make
 test it:
       make check
 install it:
@@ -230,8 +230,7 @@ on SourceForge:
 Development
 -----------
 Gnuplot development is ongoing. The development branch contains preliminary
-implementations of new features.  The current development version is 6.1
-(odd minor number) and will eventually be released as version 6.2
-(even minor number).  Bugfixes to version 6.0 will appear in patchlevel
-releases 6.0.1, 6.0.2, etc., approximately twice a year or as needed
-to correct a serious regression.
+implementations of new features.  The current development version is 6.1.
+Once version 6.0 is released, bugfixes will appear in patchlevel releases
+6.0.1, 6.0.2, etc., approximately twice a year or as needed to correct a
+serious regression.
