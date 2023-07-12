@@ -59,10 +59,6 @@ terminal support files          PREFIX/share/gnuplot/$VERSION/js
                                 PREFIX/share/gnuplot/$VERSION/qt
 
 
-   The only files where the runtime location is defined at compile time are
-gnuplot.gih and show.c. This is important if gnuplot is not installed
-by running 'make install'.
-
    The default path for the help library, gnuplot.gih, can be controlled in
 several different ways:
 
@@ -105,21 +101,21 @@ different ways:
    make bindir='/gnuplot/bin'
    gnuplot will be installed as /gnuplot/bin/gnuplot.
 
-   The default location of the additional executable, like gnuplot_x11,
-can be controlled in different ways:
+   The default location of the additional executables, including gnuplot_x11
+   and gnuplot_qt, can be controlled in different ways:
 
  o with configure's --prefix= option, eg.
    ./configure --prefix=/gnuplot
-   gnuplot_x11 will be installed as /gnuplot/libexec/gnuplot/4.0/gnuplot_x11.
+   gnuplot_x11 will be installed as /gnuplot/libexec/gnuplot/6.0/gnuplot_x11.
    Attention: This affects the location of *all* installed files!
 
  o with configure's --libexecdir= option, eg.
    ./configure --libexecdir='/gnuplot/lib'
-   gnuplot_x11 will be installed as /gnuplot/lib/gnuplot/4.0/gnuplot_x11
+   gnuplot_x11 will be installed as /gnuplot/lib/gnuplot/6.0/gnuplot_x11
 
  o at make time, eg.
-   make X11_DRIVER_DIR='/gnuplot/lib/4.0'
-   gnuplot_x11 will be installed as /gnuplot/lib/4.0/gnuplot_x11
+   make X11_DRIVER_DIR='/gnuplot/lib/6.0'
+   gnuplot_x11 will be installed as /gnuplot/lib/6.0/gnuplot_x11
 
    If you don't install the program at the place chosen by ./configure,
 e.g. by overriding the "prefix" at "make install" time, files written
@@ -565,11 +561,6 @@ variable but are not saved with the `save` and `save set` commands.
 GNUFITLOG holds the name of a file that saves fit results. The default
 is fit.log. If the name ends with a "/" or "\", it is treated as a
 directory name, and "fit.log" will be created as a file in that directory.
-
-The CGI drivers need the CGIPATH environment variable to set the path
-to the CGI agents, and the CGIDISP and/or CGIPRNT environment variables
-to the CGI agents, and the CGIDISP and/or CGIPRNT environment variables
-to set the output devices.
 
 
 How to test gnuplot

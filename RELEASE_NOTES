@@ -1,7 +1,7 @@
 		Gnuplot Version 6.0 rc1 Release Notes
 		=====================================
 
-Version 6.0 will be the first release in a new stable release series.
+Version 6.0 is the start of a new stable release series.
 Work on gnuplot 6 has proceeded in parallel with the incremental updates to
 version 5.4 over the past three years.  The new version introduces extensions
 to the gnuplot command language, support for new output protocols, and
@@ -10,7 +10,7 @@ in gnuplot development, so users should find no significant changes required
 for techniques or code they are currently using with gnuplot 5.
 
 Your feedback from testing of this release candidate will contribute to
-the success of a full 6.0 release expected later this year.
+the success of a full 6.0 release expected later in 2023.
 
 Gnuplot development is tracked in a git repository on SourceForge.
 You can generate a complete history of changes using "git log"
@@ -21,13 +21,15 @@ after downloading:
     git log
 </pre>
 
-Release Notes date:  08-Jul-2023
+Release Notes date:  17-Jul-2023
 
 		Features introduced in version 6
 		================================
-For a more detailed list of new features see http://gnuplot.info/docs_6.0/NewFeatures.html
+For a detailed list of new features, with illustrations, see
+  http://gnuplot.info/docs_6.0/NewFeatures.html
 
-For worked examples see http://gnuplot.info/demo_6.0/
+For more example plots see
+  http://gnuplot.info/demo_6.0/
 
 - Function blocks and scoped variables
 - Larger collection of special and complex-valued functions
@@ -130,9 +132,6 @@ built by default.  Their closest equivalent is the new pict2e terminal, but
 LaTeX users who want support for the full range of gnuplot plot styles are
 recommended to use the cairolatex or tikz terminals.
 
-The Japanese man page is provided both in eucJP and UTF-8 encodings.
-Installation into appropriate directories is left to packagers.
-
 Configuration options for interactive use
 -----------------------------------------
 
@@ -149,7 +148,7 @@ modes in addition to several platform-specific modes.
    To disable this terminal or force use of Qt4 even if Qt5 is present
 	$ ./configure --with-qt=qt4
 	$ ./configure --without-qt
-	
+	   
 2) Cairo/pango/wxWidgets
 
    This set of terminals includes pngcairo, pdfcairo, epscairo, and cairolatex
@@ -161,7 +160,7 @@ modes in addition to several platform-specific modes.
    To disable these terminals:
        $ ./configure --without-cairo
        $ ./configure --with-cairo --disable-wxwidgets
-	
+       
 3) X11 (the "classic" interactive interface)
    This used to be the preferred interactive interface, but the newer
    wxt and qt terminals offer nicer output and a wider range of features.
@@ -173,9 +172,11 @@ Output to files
 Of course the terminals (output modes) present in previous gnuplot versions
 are also still available. These include, among many more obscure options:
 
-- png/jpeg/gif output via libgd
 - PostScript (*.ps or *.eps)
-- Many flavors of TeX/LaTeX output, including TikZ and ConTeXt
+- svg
+- png/jpeg/gif output via libgd graphics library
+- png/pdf/eps output via cairo graphics library
+- TeX/LaTeX including TikZ and ConTeXt
 - Bitmapped output to support older devices (e.g. HP deskjet, epson, and
   seiko printers, pbm bitmapped graphics files) is available if needed
   but is no longer configured in by default.

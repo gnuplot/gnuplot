@@ -72,7 +72,7 @@ C
 ?introduction
 ?
  `Gnuplot` is a portable command-line driven graphing utility for Linux, OS/2,
- MS Windows, maxOS, VMS, and many other platforms. The source code is copyrighted
+ MS Windows, macOS, VMS, and many other platforms. The source code is copyrighted
  but freely distributed (i.e., you don't have to pay for it). It was originally
  created to allow scientists and students to visualize mathematical functions
  and data interactively, but has grown to support many non-interactive uses
@@ -18556,10 +18556,13 @@ D viridis 1
 3 warnings
 ?unset warnings
 ?set warnings
- Warning messages (non-fatal errors) are normally printed to stderr after
+      set warnings
+      unset warnings
+
+ Warning messages for non-fatal errors are normally printed to stderr after
  echoing the command line that triggered the warning.
- Warnings may be suppressed by the command `unset warnings`, and remain
- suppressed until explicitly reenabled by `set warnings`.
+ Warnings may be suppressed by the command `unset warnings`.
+ They remain suppressed until explicitly reenabled by `set warnings`.
 2 update
 ?commands update
 ?update
