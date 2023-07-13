@@ -338,7 +338,8 @@ draw_inside_color_smooth_box_postscript()
 }
 
 
-static int colorbox_steps()
+static int
+colorbox_steps()
 {
     if ( sm_palette.use_maxcolors != 0 )
         return sm_palette.use_maxcolors;
@@ -558,8 +559,7 @@ draw_inside_colorbox_bitmap_smooth__filled_polygon()
 	    gray = 1 - gray;
         set_color(gray);
 
-	colorbox_draw_polygon(corners,
-	                      xy,xy2,xy_to);
+	colorbox_draw_polygon(corners, xy,xy2,xy_to);
     }
 }
 
@@ -576,10 +576,15 @@ draw_inside_colorbox_bitmap_smooth__image()
          {.x = color_box.bounds.xleft,  .y = color_box.bounds.ytop},
          {.x = color_box.bounds.xright, .y = color_box.bounds.ybot}
     };
+    coordval *image;
+    int steps;
 
-    const int steps = colorbox_steps();
+    if (0 < sm_palette.use_maxcolors && sm_palette.use_maxcolors <= 128)
+	steps = floor(1000.0/sm_palette.use_maxcolors) * sm_palette.use_maxcolors;
+    else
+	steps = colorbox_steps();
 
-    coordval image[3*steps];
+    image = gp_alloc(sizeof(coordval)*3*steps, "colorbox");
 
     FPRINTF((stderr, "...using draw_inside_colorbox_bitmap_smooth__image\n"));
 
@@ -587,13 +592,12 @@ draw_inside_colorbox_bitmap_smooth__image()
 	rgb_color rgb1;
         double gray = (double)i / (double)(steps-1);
 
-	if ( sm_palette.use_maxcolors != 0 ) {
+	if ( sm_palette.use_maxcolors != 0 )
 	    gray = quantize_gray(gray);
-	}
 	if (sm_palette.positive == SMPAL_NEGATIVE)
 	    gray = 1 - gray;
 
-        // Need to unconditionally invert this for some reason
+        /* y axis terminal coordinates run top-to-bottom */
         if (color_box.rotation == 'v')
             gray = 1 - gray;
 
@@ -603,11 +607,12 @@ draw_inside_colorbox_bitmap_smooth__image()
         image[3*i + 2] = rgb1.b;
     }
 
-
     if (color_box.rotation == 'v')
         term->image(1, steps, image, corners, IC_RGB);
     else
         term->image(steps, 1, image, corners, IC_RGB);
+
+    free(image);
 }
 
 static void
@@ -615,8 +620,6 @@ draw_inside_colorbox_bitmap_smooth()
 {
     /* The primary beneficiary of the image variant is cairo + pdf,
      * since it avoids banding artifacts in the filled_polygon variant.
-     * FIXME: if this causes problems for other terminal types we can
-     *        switch the condition to if (!strcmp(term->name,"pdfcairo"))
      */
     if ((term->flags & TERM_COLORBOX_IMAGE))
         draw_inside_colorbox_bitmap_smooth__image();
