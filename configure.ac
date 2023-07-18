@@ -1003,10 +1003,12 @@ AC_ARG_ENABLE(watchpoints,dnl
 dnl Enable callable blocks of gnuplot code treated as functions
 AC_ARG_ENABLE(function-blocks,dnl
 [  --enable-function-blocks include support for defining a function as a here document],
-  [if test "$enableval" = yes; then
+  [if test "$enableval" != no; then
     AC_DEFINE(USE_FUNCTIONBLOCKS, 1,
                [ Define to support defining a function as a here document])
-   fi]
+   fi],
+    AC_DEFINE(USE_FUNCTIONBLOCKS, 1,
+               [ Define to support defining a function as a here document])
    )
 
 dnl Enable parsing of deprecated syntax
@@ -1435,7 +1437,7 @@ else
   AC_MSG_RESULT([  Support for polar gridded surfaces:              no (--enable-polar-grid to enable)])
 fi
 
-if test "$enable_function_blocks" = yes; then
+if test "$enable_function_blocks" != no; then
   AC_MSG_RESULT([  Support function blocks:                         yes])
 else
   AC_MSG_RESULT([  Support function blocks:                         no (--enable-function-blocks to enable)])
