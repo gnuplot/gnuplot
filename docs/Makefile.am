@@ -101,12 +101,12 @@ gnuplot.ind gpinsetfigure.aux gpinsetfigure.tex figurestyle \
 no_figures tikz_figures pdf_figures \
 wxhelp/doc2html.o
 
-CLEANFILES = allterm.h gnuplot.dvi gnuplot.tex gnuplot.idx gnuplot.ilg	\
+CLEANFILES = gnuplot.dvi gnuplot.tex gnuplot.idx gnuplot.ilg		\
 gnuplot.ps gnuplot.gih gnuplot.hlp gnuplot.info* gnuplot.ipf 		\
 gnuplot.rtf gnuplot.tmp VERSION gnuplot.4tc gnuplot.4ct			\
 gnuplot.idv gnuplot.xref gnuplot.lg gnuplot.pdf				\
 ja.doc gnuplot-ja.ind gnuplot-ja.ilg gnuplot-ja.aux gnuplot-ja.toc	\
-gnuplot-ja.log gnuplot-ja.idx gnuplot-ja.out gnuplot-ja.tex allterm-ja.h \
+gnuplot-ja.log gnuplot-ja.idx gnuplot-ja.out gnuplot-ja.tex		\
 wxhelp_figures wxhelp/*.html wxhelp/wgnuplot.hhc wxhelp/wgnuplot.hhk	\
 wxhelp/wgnuplot.htc wxhelp/doc2html$(EXEEXT) windows/wgnuplot.htk	\
 svg_figures html/*.html html/*.svg html/*.hhc html/*.hhk                \
@@ -183,7 +183,7 @@ tikz: tikz_figures gnuplot.pdf figurestyle
 pdf_nofig: no_figures gnuplot.pdf figurestyle
 	rm -f tikz_figures pdf_figures
 
-gnuplot.pdf: gnuplot.tex $(srcdir)/titlepag.tex $(srcdir)/toc_entr.sty figurestyle
+gnuplot.pdf: gnuplot.tex $(srcdir)/titlepag.tex $(srcdir)/toc_entr.sty pdf_figures
 	$(AM_V_GEN)if test $(PDFLATEX) != no ; then \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) $< ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) $< ; \
@@ -402,5 +402,8 @@ clean-local:
 	 done
 	$(AM_V_at)rm -f pdf_figures
 	$(AM_V_at)rm -rf ja
+
+distclean: clean
+	-rm -f $(BUILT_SOURCES)
 
 #the end
