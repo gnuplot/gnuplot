@@ -2256,7 +2256,7 @@ C 4 weekdata_cdc
  See `splot voxel-grids`, `vgrid`.
 @end table
 
-4 integer conversion functions: int floor ceil round
+4 integer conversion functions (int floor ceil round)
 ?integer conversion
 ?integer
 ?precision
