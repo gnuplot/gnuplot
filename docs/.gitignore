@@ -3,6 +3,7 @@ Makefile
 Makefile.in
 alldoc2gih
 allterm.h
+allterm-ja.h
 checkdoc
 doc2gih
 doc2hlp

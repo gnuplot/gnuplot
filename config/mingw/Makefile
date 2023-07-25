@@ -277,6 +277,8 @@ endif
 # to see their output during make.
 TARGET=gnuplot.exe
 
+BUILT_SOURCES = allterm.h allterm-ja.h
+
 ifdef MINGW64
 ifdef M32
 CFLAGS += -m32
@@ -633,7 +635,7 @@ pipes: $(TARGETS_PIPES)
 
 console: $(TARGETS_CONSOLE)
 
-docs: gnuplot.pdf ps_symbols.pdf ps_fontfile_doc.pdf ps_guide.pdf faq.pdf
+docs: $(BUILT_SOURCES) gnuplot.pdf ps_symbols.pdf ps_fontfile_doc.pdf ps_guide.pdf faq.pdf
 
 faq: faq.pdf
 
@@ -953,7 +955,7 @@ allterm.h: $(CORETERM) $(LUA_HELP)
 	  sed '/^ *$$/d;/^#/d' > allterm.h
 	@rm -f allterm.c
 endif
-doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c allterm.h $(CORETERM) $(LUA_HELP)
+doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c allterm.h allterm-ja.h $(CORETERM) $(LUA_HELP)
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI -DALL_TERM_DOC $(CFLAGS) \
 	  -I. -I$(D) -I$(T) $(D)doc2tex.c $(D)termdoc.c
 else
@@ -972,7 +974,7 @@ allterm-ja.h: $(JASRC) $(LUA_HELP)
 	iconv -f EUC-JP -t UTF-8 allterm-jp.h > allterm-ja.h
 	rm allterm-jp.h
 
-doc2tex-ja.exe: allterm-ja.h $(D)doc2tex.c $(D)termdoc.c
+doc2tex-ja.exe: allterm-ja.h allterm.h $(D)doc2tex.c $(D)termdoc.c
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI \
 	    -DALL_TERM_DOC \
 	    -DVERSION_MAJOR='"$(MAINVERSION)"' -DPATCHLEVEL='"$(PATCHLEVEL)"' \
