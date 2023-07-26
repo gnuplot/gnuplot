@@ -318,11 +318,10 @@ D iris 2
 ## new filter `convexhull`.  A path-smoothed bounding curve can be plotted
 ## as a filled area using "convexhull smooth path with filledcurves".
 ## See `convexhull`.
-#b An alternative experimental filter `concavehull` generates a bounding
-## polygon that is not necessarily convex; instead it forms a χ-shape
-## determined by a characteristic length parameter that controls the degree
-## of concavity.  This essentially draws a blob around the data points.
-## See `concavehull`.
+#b An alternative filter `concavehull` generates a bounding polygon that
+## is not necessarily convex; instead it forms a χ-shape determined by a
+## characteristic length parameter that controls the degree of concavity.
+## This essentially draws a blob around the data points. See `concavehull`.
 #b A convex hull or other polygon can be used as a mask to display only
 ## selected portions of a pm3d surface or an image plot.
 ## See new plot style `with mask` (defines a mask) and keyword `mask`
@@ -8398,7 +8397,6 @@ Ffigure_convex_hull
 ?filters concavehull
 ?concavehull
 
- EXPERIMENTAL (implementation details may change in a future release).
  Present only if your copy of gnuplot was configured --enable-chi-shapes.
 
  Concavehull is not a plot style. It is a filter that finds a bounding

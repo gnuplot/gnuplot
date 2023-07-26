@@ -3414,7 +3414,6 @@ set_parametric()
 
 
 /*
- * V5.5 EXPERIMENTAL
  * set colormap new <colormap-name>
  * set colormap <colormap-name> range [min:max]
  */
