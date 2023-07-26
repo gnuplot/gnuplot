@@ -472,19 +472,6 @@ term_hidden_line_removal()
 #endif
 }
 
-
-#if 0 /* UNUSED ! */
-/* Do we see the top or bottom of the polygon, or is it 'on edge'? */
-#define GET_SIDE(vlst,csign)						\
-do {									\
-    double ctmp =							\
-	vlist[vlst[0]].x * (vlist[vlst[1]].y - vlist[vlst[2]].y) +	\
-	vlist[vlst[1]].x * (vlist[vlst[2]].y - vlist[vlst[0]].y) +	\
-	vlist[vlst[2]].x * (vlist[vlst[0]].y - vlist[vlst[1]].y);	\
-    csign = SIGN (ctmp);						\
-} while (0)
-#endif /* UNUSED */
-
 static long int
 store_vertex (
     struct coordinate * point,
