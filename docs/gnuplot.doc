@@ -480,7 +480,6 @@ D epi_data 1
 #b keyword `binvalue=avg` plots the average, rather than the sum, of binned data.
 #b `set colorbox bottom` places a horizontal color box underneath the plot
 ## rather than a vertical box on the right.
-#b `set colorbox cbtics <linestyle>` affects cbtics but not other tics.
 #b Improved rendering of intersecting pm3d surfaces - overlapping surface tiles
 ## are split into two pieces along the line of intersection so that tiles
 ## from one surface do not incorrectly protrude though the other surface.
@@ -10883,7 +10882,7 @@ D discrete 3
                   { origin x, y }
                   { size x, y }
                   { front | back }
-                  { noborder | bdefault | border <linestyle> } {cbtics <linestyle>}
+                  { noborder | bdefault | border <linestyle> }
                 }
        show colorbox
        unset colorbox
@@ -10913,9 +10912,6 @@ D discrete 3
  will use line style `2604`, a thin line with the default border color (-1)
  for drawing the border. `bdefault` (which is the default) will use the default
  border line style for drawing the border of the color box.
-
- `cbtics` allows you to specify a line style for the colorbox tics (cbtics)
- different from the line style of the border.
 
  The axis of the color box is called `cb` and it is controlled by means of the
  usual axes commands, i.e. `set/unset/show` with `cbrange`, `[m]cbtics`,

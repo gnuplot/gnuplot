@@ -914,7 +914,6 @@ set isosamples %d, %d",
 	fputs("noborder", fp);
     else
 	fprintf(fp, "border %d", color_box.border_lt_tag);
-    fprintf(fp, " cbtics %d", color_box.cbtics_lt_tag);
     if (color_box.where == SMCOLOR_BOX_NO) fputs("\nunset colorbox\n", fp);
 	else fputs("\n", fp);
 

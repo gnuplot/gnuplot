@@ -3610,28 +3610,17 @@ set_colorbox()
 		continue;
 	    /* border of the color box */
 	    case S_COLORBOX_BORDER: /* "bo$rder" */
-
 		color_box.border = 1;
-		c_token++;
-
-		if (!END_OF_COMMAND) {
-		    /* expecting a border line type */
+		if (equals(c_token+1,"-") || isanumber(c_token+1)) {
+		    c_token++;
 		    color_box.border_lt_tag = int_expression();
 		    if (color_box.border_lt_tag <= 0)
 			color_box.border_lt_tag = -1;
-		    --c_token;
+		    c_token--;
 		}
-		continue;
-	    case S_COLORBOX_CBTICS: /* "cbtics" */
-		c_token++;
-		color_box.cbtics_lt_tag = int_expression();
-		if (color_box.cbtics_lt_tag <= 0)
-		    color_box.cbtics_lt_tag = -1;
-		--c_token;
 		continue;
 	    case S_COLORBOX_BDEFAULT: /* "bd$efault" */
 		color_box.border_lt_tag = -1; /* use default border */
-		color_box.cbtics_lt_tag = 0;  /* and cbtics */
 		continue;
 	    case S_COLORBOX_NOBORDER: /* "nobo$rder" */
 		color_box.border = 0;
@@ -3665,7 +3654,7 @@ set_colorbox()
 		color_box.invert = FALSE;
 		continue;
 	    } /* switch over colorbox lookup table */
-	    int_error(c_token,"invalid colorbox option");
+	    int_warn(c_token,"invalid colorbox option");
 	} /* end of while !end of command over colorbox options */
     if (color_box.where == SMCOLOR_BOX_NO) /* default: draw at default position */
 	color_box.where = SMCOLOR_BOX_DEFAULT;
