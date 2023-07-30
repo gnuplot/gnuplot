@@ -440,6 +440,7 @@ D viridis 1
 ## crosses a threshold value
 #b Use the mouse to track values along multiple plots simultaneously
 #end
+D watchpoints 2
 
 3 Week-date time support
 ?new week-date time
@@ -4573,6 +4574,7 @@ Ffigure_watchpoints
       set y2tics format "%.2f°"
       set style watchpoint labels point pt 6
       plot FOO axes x1y2 watch mouse
+D watchpoints 2
 
 1 Plotting styles
 ?plotting styles

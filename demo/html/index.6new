@@ -115,6 +115,11 @@
     <li>٭<a href="animation.html">Embedded webp animation</a></li>
     </ul>
 
+    <h4 align=left>Watchpoints</h4>
+    <ul align=left>
+    <li>٭<a href="watchpoints.html">Watchpoints</a></li>
+    </ul>
+
     <h4 align=left>Hulls and Masks</h4>
     <ul align=left>
     <li>٭<a href="convex_hull.html">convex hulls</a></li>
@@ -285,7 +290,7 @@
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated April 2023</i>
+    <i>This page generated July 2023</i>
     </td>
 
     <td>
