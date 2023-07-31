@@ -1046,8 +1046,11 @@ if test "${enable_qt}" = yes ; then
   fi
 
   if test "x${with_qt}" != "xqt4"; then
-    AC_MSG_CHECKING([Checking for Qt6 support libraries])
-    PKG_CHECK_MODULES_NOFAIL(QT, [Qt6Core Qt6Gui Qt6Network Qt6Svg Qt6PrintSupport Qt6Core5Compat])
+    pkg_failed="not_tried"
+    if test "x${with_qt}" != "xqt5"; then
+      AC_MSG_CHECKING([Checking for Qt6 support libraries])
+      PKG_CHECK_MODULES_NOFAIL(QT, [Qt6Core Qt6Gui Qt6Network Qt6Svg Qt6PrintSupport Qt6Core5Compat])
+    fi
     if test $pkg_failed = no; then
       QT6LOC=`$PKG_CONFIG --variable=host_bins Qt6Core`
       if test "x${QT6LOC}" != "x"; then
@@ -1359,7 +1362,7 @@ if test "$enable_qt_ok" = yes; then
       AC_MSG_RESULT([  Qt                   : yes (qt6)])
   fi
 else
-  AC_MSG_RESULT([  Qt                   : no (use --with-qt or --with-qt=qt4 to enable])
+  AC_MSG_RESULT([  Qt                   : no (use --with-qt or --with-qt=qt4 or --with-qt=qt5 to enable])
 fi
 
 AC_MSG_RESULT([])
