@@ -200,8 +200,7 @@ if test $pkg_failed = yes; then
 	echo "$$1[]_PKG_ERRORS" >&AS_MESSAGE_LOG_FD
 
 	ifelse([$4], , [AC_MSG_WARN(dnl
-[
-Package requirements ($2) were not met:
+[Package requirements ($2) were not met:
 
 $$1_PKG_ERRORS
 

@@ -41,6 +41,15 @@
  * under either the GPL or the gnuplot license.
 ]*/
 
+/*
+ * Qt6 no longer supports other 8-bit encodings natively, relegating the
+ * QTextCodec functions to a compatibility module Core5Compat.
+ * FIXME: roll our own?
+ */
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    #include <QTextCodec>
+#endif
+
 static QColor qt_colorList[12] =
 {
 	Qt::white,

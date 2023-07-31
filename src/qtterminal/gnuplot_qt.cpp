@@ -88,13 +88,20 @@ int main(int argc, char* argv[])
 
 	// Load translations for the qt library
 	QTranslator qtTranslator;
-	qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-	application.installTranslator(&qtTranslator);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	if (qtTranslator.load("qt_" + QLocale::system().name(),
+		QLibraryInfo::path(QLibraryInfo::TranslationsPath)))
+		application.installTranslator(&qtTranslator);
+#else
+	if (qtTranslator.load("qt_" + QLocale::system().name(),
+		QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+		application.installTranslator(&qtTranslator);
+#endif
 
 	// Load translations for the qt terminal
 	QTranslator translator;
-	translator.load("qtgnuplot_" + QLocale::system().name(), qt_gnuplot_data_dir);
-	application.installTranslator(&translator);
+	if (translator.load("qtgnuplot_" + QLocale::system().name(), qt_gnuplot_data_dir))
+		application.installTranslator(&translator);
 
 	// Start
 	application.exec();
