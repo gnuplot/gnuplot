@@ -990,29 +990,58 @@ if test "${enable_qt}" = yes ; then
       enable_qt_ok=no
   fi
 
-  dnl First check for Qt5
-  if test "x${with_qt}" = "xqt5"; then
-    try_qt4=no
-  else
+  dnl Qt4 only by special request
+  if test "x${with_qt}" = "xqt4"; then
     try_qt4=yes
+  else
+    try_qt4=no
   fi
+
   if test "x${with_qt}" != "xqt4"; then
-    PKG_CHECK_MODULES_NOFAIL(QT, [Qt5Core Qt5Gui Qt5Network Qt5Svg Qt5PrintSupport])
-    if test $pkg_failed = no; then
-      try_qt4=no
-      QT5LOC=`$PKG_CONFIG --variable=host_bins Qt5Core`
-      if test "x${QT5LOC}" != "x"; then
-        UIC=${QT5LOC}/uic
-        MOC=${QT5LOC}/moc
-        RCC=${QT5LOC}/rcc
-        LRELEASE=${QT5LOC}/lrelease
+    pkg_failed="not_tried"
+    if test "x${with_qt}" != "xqt5"; then
+      PKG_CHECK_MODULES_NOFAIL(QT, [Qt6Core])
+      if test $pkg_failed = no; then
+        AC_MSG_CHECKING([Checking for Qt6 support libraries])
+        PKG_CHECK_MODULES_NOFAIL(QT, [Qt6Gui Qt6Network Qt6Svg Qt6PrintSupport Qt6Core5Compat])
       fi
+    fi
+    if test $pkg_failed = no; then
+      QT6LOC=`$PKG_CONFIG --variable=libexecdir Qt6Core`
+      if test "x${QT6LOC}" != "x"; then
+          UIC=${QT6LOC}/uic
+          MOC=${QT6LOC}/moc
+          RCC=${QT6LOC}/rcc
+      else
+          UIC=uic-qt6
+          MOC=moc-qt6
+          RCC=rcc-qt6
+      fi
+      LRELEASE=lrelease-qt6
       CXXFLAGS="$CXXFLAGS -fPIC"
+      AC_MSG_RESULT([The Qt terminal will use Qt6.])
+      QTVER="6"
+    else
+      AC_MSG_CHECKING([Checking for Qt5 support libraries])
+      PKG_CHECK_MODULES_NOFAIL(QT, [Qt5Core Qt5Gui Qt5Network Qt5Svg Qt5PrintSupport])
+      if test $pkg_failed = no; then
+        QT5LOC=`$PKG_CONFIG --variable=host_bins Qt5Core`
+        if test "x${QT5LOC}" != "x"; then
+          UIC=${QT5LOC}/uic
+          MOC=${QT5LOC}/moc
+          RCC=${QT5LOC}/rcc
+          LRELEASE=${QT5LOC}/lrelease
+        fi
+        CXXFLAGS="$CXXFLAGS -fPIC"
+        AC_MSG_RESULT([The Qt terminal will use Qt5.])
+        QTVER="5"
+      fi
     fi 
   fi
 
-  dnl No Qt5, check for Qt4.5 or greater
-  if test ${try_qt4} != no; then
+  dnl Explicit request for qt4 
+  if test ${try_qt4} = yes; then
+    AC_MSG_CHECKING([Checking for Qt4 support])
     PKG_CHECK_MODULES_NOFAIL(QT, [QtCore >= 4.5 QtGui >= 4.5 QtNetwork >= 4.5 QtSvg >= 4.5])
     if test $pkg_failed != no; then
       enable_qt_ok=no
@@ -1026,9 +1055,6 @@ if test "${enable_qt}" = yes ; then
       AC_MSG_RESULT([The Qt terminal will use Qt4.])
       QTVER="4"
     fi
-  else
-    AC_MSG_RESULT([The Qt terminal will use Qt5.])
-    QTVER="5"
   fi
 fi
 
@@ -1283,8 +1309,11 @@ if test "$enable_qt_ok" = yes; then
   if test "$QTVER" = 5; then
       AC_MSG_RESULT([  Qt terminal: yes (qt5)])
   fi
+  if test "$QTVER" = 6; then
+      AC_MSG_RESULT([  Qt                   : yes (qt6)])
+  fi
 else
-  AC_MSG_RESULT([  Qt terminal: no (use --with-qt or --with-qt=qt4 to enable])
+  AC_MSG_RESULT([  Qt                   : no (use --with-qt or --with-qt=qt4 or --with-qt=qt5 to enable])
 fi
 
 AC_MSG_RESULT([])

@@ -45,6 +45,10 @@
 
 #include <QtGui>
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 11, 0)
+  #define horizontalAdvance width
+#endif
+
 /////////////////////////////
 // QtGnuplotEnhanced
 
@@ -111,7 +115,7 @@ QRectF QtGnuplotEnhancedFragment::boundingRect() const
 qreal QtGnuplotEnhancedFragment::width() const
 {
 	QFontMetricsF metrics(m_font);
-	return metrics.width(m_text);
+	return metrics.horizontalAdvance(m_text);
 }
 
 void QtGnuplotEnhancedFragment::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
