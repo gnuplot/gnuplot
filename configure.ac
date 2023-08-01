@@ -1079,13 +1079,17 @@ if test "${enable_qt}" = yes ; then
       PKG_CHECK_MODULES_NOFAIL(QT, [Qt6Core Qt6Gui Qt6Network Qt6Svg Qt6PrintSupport Qt6Core5Compat])
     fi
     if test $pkg_failed = no; then
-      QT6LOC=`$PKG_CONFIG --variable=host_bins Qt6Core`
+      QT6LOC=`$PKG_CONFIG --variable=libexecdir Qt6Core`
       if test "x${QT6LOC}" != "x"; then
-        UIC=${QT6LOC}/uic
-        MOC=${QT6LOC}/moc
-        RCC=${QT6LOC}/rcc
-        LRELEASE=${QT6LOC}/lrelease
+          UIC=${QT6LOC}/uic
+          MOC=${QT6LOC}/moc
+          RCC=${QT6LOC}/rcc
+      else
+          UIC=uic-qt6
+          MOC=moc-qt6
+          RCC=rcc-qt6
       fi
+      LRELEASE=lrelease-qt6
       CXXFLAGS="$CXXFLAGS -fPIC"
       AC_MSG_RESULT([The Qt terminal will use Qt6.])
       QTVER="6"
