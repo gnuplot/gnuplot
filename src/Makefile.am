@@ -126,7 +126,7 @@ if BUILD_QT
 
 GNUPLOT_QT = `echo gnuplot_qt | sed '$(transform)'`$(EXEEXT)
 
-AM_CPPFLAGS += -DGNUPLOT_QT=\"$(GNUPLOT_QT)\"
+AM_CPPFLAGS += $(QT_CFLAGS) -DGNUPLOT_QT=\"$(GNUPLOT_QT)\"
 
 # Call the moc preprocessor
 qtterminal/moc_%.cpp : qtterminal/%.h
