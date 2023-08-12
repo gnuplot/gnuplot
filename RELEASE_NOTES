@@ -1,4 +1,4 @@
-		Gnuplot Version 6.0 rc1 Release Notes
+		Gnuplot Version 6.0 rc2 Release Notes
 		=====================================
 
 Version 6.0 is the start of a new stable release series.
@@ -21,7 +21,7 @@ after downloading:
     git log
 </pre>
 
-Release Notes date:  17-Jul-2023
+Release Notes date:  12-Aug-2023
 
 		Features introduced in version 6
 		================================
@@ -115,6 +115,20 @@ For more example plots see
 	  that x, y, and z axes all have the same scale.
 	o Text rotation angles are not limited to integral degree values.
 	o Data-driven color assignments in plot style "histograms".
+
+
+		Changes between 6.0 -rc1 and -rc2
+		=================================
+* Japanese documentation updated
+	- added missing file title-ja.tex, build dependencies for mingw
+* Support building against Qt6
+	- ./configure falls back to Qt5 if the Qt6 libraries are not found
+* New configure option --enable-stable-sort
+	- Use mergesort rather than qsort if the system provides it.
+	- If neither mergesort nor glibc stabe qsort is available,
+	  modify internal gnuplot structures to contain a secondary sort key
+* Render color gradient in colorbox as a pixel array
+	- cairo, qt terminals
 
 
 		Notes for packagers and testers
@@ -216,7 +230,7 @@ file of the source package; the short version for linux/unix-like
 systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-6.0.rc1 ; ./configure ; make
+      cd gnuplot-6.0.rc2 ; ./configure ; make
 test it:
       make check
 install it:

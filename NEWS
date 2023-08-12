@@ -1,6 +1,19 @@
+Changes between 6.0-rc1 and -rc2
+================================
+* Japanese documentation updated
+	(missing file title-ja.tex, build dependencies for mingw)
+* Support building against Qt6
+	(./configure falls back to Qt5 if the Qt6 libraries are not found)
+* New configure option --enable-stable-sort
+	1) Use mergesort rather than qsort if the system provides it.
+	2) If neither mergesort nor glibc stable qsort is available,
+	   modify internal gnuplot structures to contain a secondary sort key
+* Render color gradient in colorbox as a pixel array (cairo, qt terminals)
+
 Version 6.0
 ==================
-  Too many changes to list here.  See Release Notes.
+  Too many changes between version 5 and version 6 to list here.
+  See Release Notes.
 
 Changes in 5.4
 ==============
