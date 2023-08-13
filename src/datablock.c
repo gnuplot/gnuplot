@@ -134,6 +134,9 @@ new_block( enum DATA_TYPES type )
     if (!isletter(c_token+1))
 	int_error(c_token, "illegal block name");
 
+    if (!equals(num_tokens-2, "<<") || !isletter(num_tokens-1))
+	int_error(c_token, "block definition line must end with << EODmarker");
+
     /* Create or recycle a datablock with the requested name */
     name = parse_datablock_name();
     datablock = add_udv_by_name(name);
@@ -157,16 +160,15 @@ new_block( enum DATA_TYPES type )
 		int_error(c_token, "expecting ')'");
 	    c_token++;
 	}
-    } else {
-	/* Must be a datablock */
+    } else { /* Must be a datablock */
 	datablock->udv_value.type = DATABLOCK;
 	datablock->udv_value.v.data_array = NULL;
     }
 
-    if (!equals(c_token, "<<") || !isletter(c_token+1))
-	int_error(c_token, "block definition line must end with << EODmarker");
+    if (c_token != num_tokens-2)
+	int_error(c_token, "garbage preceding << EODmarker");
     c_token++;
-    eod = (char *) gp_alloc(token[c_token].length +2, "datablock");
+    eod = (char *) gp_alloc(token[c_token].length + 2, "datablock");
     copy_str(&eod[0], c_token, token[c_token].length + 2);
     c_token++;
 
