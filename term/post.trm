@@ -3441,7 +3441,7 @@ write_png_image_to_buffer(unsigned M, unsigned N, coordval *image, t_imagecolor 
 {
     gdImagePtr png_img;
     int m, n, pixel;
-    if (color_mode == IC_RGB) {
+    if (color_mode == IC_RGB || color_mode == IC_RGBA) {
 	png_img = gdImageCreateTrueColor(M, N);
     } else {
 	/* we would need a gray scale image, but libgd does not support
@@ -3453,7 +3453,7 @@ write_png_image_to_buffer(unsigned M, unsigned N, coordval *image, t_imagecolor 
 	int_error(NO_CARET, "GNUPLOT (post.trm): failed to create libgd image structure");
     }
 
-    if (color_mode == IC_RGB) {
+    if (color_mode == IC_RGB || color_mode == IC_RGBA) {
         rgb_color rgb1;
         rgb255_color rgb255;
 	for (n = 0; n < N; n++) {
@@ -3464,6 +3464,9 @@ write_png_image_to_buffer(unsigned M, unsigned N, coordval *image, t_imagecolor 
 		rgb255_from_rgb1(rgb1, &rgb255);
 		pixel = gdImageColorResolve(png_img, (int)rgb255.r, (int)rgb255.g, (int)rgb255.b);
 		gdImageSetPixel(png_img, m, n, pixel);
+		if (color_mode == IC_RGBA) {
+		    image++;	/* ignore alpha channel */
+		}
 	    }
 	}
     } else {
@@ -3548,7 +3551,7 @@ write_png_image_to_buffer(unsigned M, unsigned N, coordval *image, t_imagecolor 
     int m, n;
 
 
-    if (color_mode == IC_RGB) {
+    if (color_mode == IC_RGB || color_mode == IC_RGBA) {
 	format = CAIRO_FORMAT_RGB24;
     } else {
 	format = CAIRO_FORMAT_A8;
@@ -3556,7 +3559,7 @@ write_png_image_to_buffer(unsigned M, unsigned N, coordval *image, t_imagecolor 
     stride = cairo_format_stride_for_width(format, M);
     image255 = (unsigned char *) gp_alloc(N * stride, "Postscript image bytes");
 
-    if (color_mode == IC_RGB) {
+    if (color_mode == IC_RGB || color_mode == IC_RGBA) {
 	/* Adapted from gp_cairo_helpers.c (use unsigned int to respect endianess of the platform). */
 	rgb_color rgb1;
         rgb255_color rgb255;
@@ -3569,6 +3572,9 @@ write_png_image_to_buffer(unsigned M, unsigned N, coordval *image, t_imagecolor 
 		rgb1.b = *image++;
 		rgb255_from_rgb1(rgb1, &rgb255);
 		*image255_ptr++ = (0xFF<<24) + (rgb255.r<<16) + (rgb255.g<<8) + rgb255.b;
+		if (color_mode == IC_RGBA) {
+		    image++;	/* ignore alpha channel */
+		}
 	    }
 	}
     } else {
@@ -3715,14 +3721,22 @@ PS_encode_image(unsigned int M, unsigned int N, coordval *image, t_imagecolor co
     unsigned char tuple5[5];
     int max_encoded_bytes;
     char *encoded_image, *encoded_image_ptr;
+    unsigned ncomponents;
     unsigned long total_bits;
+    int current_channel;
 
 #define ASCII_PER_LINE 78
 
     /* 18.1.2009 RGB images ("plot ... with rgbimage") are drawn always in color,
      * i.e. for both "set term post color" and "set term post mono".
      */
-    total_bits = bits_per_component*M*N*((color_mode == IC_RGB /* && ps_params->color */) ? 3 : 1);
+    if (color_mode == IC_RGB)
+	ncomponents = 3;
+    else if (color_mode == IC_RGBA)	/* alpha channel will be ignored */
+	ncomponents = 3;
+    else
+	ncomponents = 1;
+    total_bits = bits_per_component * ncomponents * M * N;
 
     /* At the end of each image line, data is aligned to the nearest 8 bits,
      * which means potentially adding 7 bits per line.
@@ -3751,24 +3765,30 @@ PS_encode_image(unsigned int M, unsigned int N, coordval *image, t_imagecolor co
     i_line = ASCII_PER_LINE;
     i_element = 0;
     coord_remaining = M*N;
-    if (color_mode == IC_RGB /* && ps_params->color */) {
+    if (color_mode == IC_RGB) {
+	end_of_line *= 3;
+	coord_remaining *= 3;
+    }
+    if (color_mode == IC_RGBA) {
 	end_of_line *= 3;
 	coord_remaining *= 3;
     }
     bits_remaining = 32;
     bits_start = 0;
     tuple4 = 0;
+    current_channel = 0;
 
     while (coord_remaining) {
-	unsigned short us_tmp;
-	if (0 /* color_mode == IC_RGB && !ps_params->color */) {
-	    coordval c_tmp;
-	    c_tmp = *coord_ptr++;
-	    c_tmp += *coord_ptr++;
-	    c_tmp += *coord_ptr++;
-	    us_tmp = (unsigned short) (c_tmp*(max_colors-1)/3.0 + 0.5);
-	} else
-	    us_tmp = (unsigned short) ((*coord_ptr++) * max_colors);
+	unsigned short us_tmp = (*coord_ptr++) * max_colors;
+
+	/* Ignore alpha channel */
+	if (color_mode == IC_RGBA) {
+	    current_channel++;
+	    if (current_channel == 4) {
+		current_channel = 0;
+		continue;
+	    }
+	}
 
 	if (us_tmp > (max_colors-1)) us_tmp = max_colors-1;
 
@@ -3897,15 +3917,18 @@ print_five_operand_image(unsigned int M, unsigned int N, gpiPoint *corner, t_ima
     fprintf(gppsfile, "%s[ %d 0 0 %d 0 0 ]\n", space, M, N);
     if (ps_params->level1) {
 	fprintf(gppsfile, "/imagebuf %d string def\n",
-		(M*N*bits_per_component*((color_mode == IC_RGB /* && ps_params->color */) ? 3 : 1) + 7)/8);
+		(M*N*bits_per_component*((color_mode == IC_RGB || color_mode == IC_RGBA) ? 3 : 1) + 7)/8);
 	fputs("{currentfile imagebuf readhexstring pop}\n", gppsfile);
     } else if (ps_params->level3) {
 	fprintf(gppsfile, "  currentfile /ASCII85Decode filter << /Predictor 15 /BitsPerComponent %d /Colors %d /Columns %d  >> /FlateDecode filter\n",
-		bits_per_component, (color_mode == IC_RGB) ? 3 : 1, M);
+		bits_per_component, (color_mode == IC_RGB || color_mode == IC_RGBA) ? 3 : 1, M);
     } else {
 	fprintf(gppsfile, "  currentfile /ASCII85Decode filter\n");
     }
-    if (color_mode == IC_RGB /* && ps_params->color */) {
+    if (color_mode == IC_RGB) {
+	fprintf(gppsfile, "%sfalse 3\n"
+			  "%scolorimage\n", space, space);
+    } else if (color_mode == IC_RGBA) {
 	fprintf(gppsfile, "%sfalse 3\n"
 			  "%scolorimage\n", space, space);
     } else
@@ -3958,14 +3981,10 @@ PS_image (unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_i
     /* Color and gray scale images do not need a palette and can use
      * the 5 operand form of the image routine.
      */
-#if 0
-    /* 18.1.2009 It was decided to use the custom palette (i.e. colours) also
-       for the monochrome postscript output.
-    */
-    if ((color_mode == IC_RGB) || (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) || !ps_params->color)
-#else
-    if ((color_mode == IC_RGB) || (sm_palette.colorMode == SMPAL_COLOR_MODE_RGB && !ps_params->color) || (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY))
-#endif
+    if ((color_mode == IC_RGB)
+    ||  (color_mode == IC_RGBA)
+    ||  (sm_palette.colorMode == SMPAL_COLOR_MODE_RGB && !ps_params->color)
+    ||  (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY))
 	five_operand_image = TRUE;
     else
 	five_operand_image = FALSE;
@@ -3981,15 +4000,17 @@ PS_image (unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_i
 	cscale = 1.0;
 
 #ifdef HAVE_DEFLATE_ENCODER
-    if (ps_params->level3)
+    if (ps_params->level3) {
 	encoded_image = (void *)PS_encode_png_image(M, N, image, color_mode,
 					    bits_per_component, max_colors, cscale,
 					    &num_encoded_bytes);
-    else
+    } else {
 #endif
 	encoded_image = PS_encode_image(M, N, image, color_mode,
 					bits_per_component, max_colors, cscale,
-					(ps_params->level1 ? PS_ASCII_HEX : PS_ASCII85), &num_encoded_bytes);
+					(ps_params->level1 ? PS_ASCII_HEX : PS_ASCII85),
+					&num_encoded_bytes);
+    }
 
 
     fputs("%%%%BeginImage\n", gppsfile);
@@ -4064,7 +4085,7 @@ PS_image (unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_i
 	} else if (ps_params->level3) {
 	    fprintf(gppsfile, "  /DataSource currentfile /ASCII85Decode filter ");
 	    fprintf(gppsfile, "<< /Predictor 15 /BitsPerComponent %d /Colors %d /Columns %d >> /FlateDecode filter\n",
-		    bits_per_component, (color_mode == IC_RGB) ? 3 : 1, M);
+		    bits_per_component, (color_mode == IC_RGB || color_mode == IC_RGBA) ? 3 : 1, M);
 	} else {
 	    fputs("  /DataSource currentfile /ASCII85Decode filter\n", gppsfile);
 	}
