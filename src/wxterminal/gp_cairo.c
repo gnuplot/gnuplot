@@ -401,6 +401,9 @@ void gp_cairo_draw_polygon(plot_struct *plot, int n, gpiPoint *corners)
 	/* begin by stroking any open path */
 	gp_cairo_stroke(plot);
 
+	if (n <= 0)
+	    return;
+
 	if (plot->polygons_saturate) {
 		int i;
 		path_item *path;
