@@ -1361,17 +1361,20 @@ void cairotrm_set_color(t_colorspec *colorspec)
 /* here we send the polygon command */
 void cairotrm_filled_polygon(int n, gpiPoint *corners)
 {
-	gpiPoint *mirrored_corners = (gpiPoint*) gp_alloc(n*sizeof(gpiPoint),"mirrored_corners");
+	gpiPoint *corners_copy;
+
+	if (n <= 0)
+		return;
+
 	/* can't use memcpy() here, as we have to mirror the y axis */
-	gpiPoint *corners_copy = mirrored_corners;
-	while (corners_copy < (mirrored_corners + n)) {
-		*corners_copy = *corners++;
-		corners_copy->y = term->ymax - corners_copy->y;
-		++corners_copy;
+	corners_copy = gp_alloc(n*sizeof(gpiPoint),"mirrored_corners");
+	for (int i=0; i < n; i++) {
+		corners_copy[i] = corners[i];
+		corners_copy[i].y = term->ymax - corners_copy[i].y;
 	}
 
-	gp_cairo_draw_polygon(&plot, n, mirrored_corners);
-	free(mirrored_corners);
+	gp_cairo_draw_polygon(&plot, n, corners_copy);
+	free(corners_copy);
 }
 
 void cairotrm_image(unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, t_imagecolor color_mode)
