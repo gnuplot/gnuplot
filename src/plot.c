@@ -746,6 +746,10 @@ init_session()
 	/* Undefine any previously-used variables */
 	del_udv_by_name("",TRUE);
 
+	/* Clear any previous customization of linetypes */
+	while (first_perm_linestyle != NULL)
+	    delete_linestyle(&first_perm_linestyle, NULL, first_perm_linestyle);
+
 	/* Restore default colors before loading local preferences */
 	set_colorsequence(1);
 
