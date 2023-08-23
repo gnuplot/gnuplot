@@ -2976,8 +2976,6 @@ autoscale_one_point(struct axis *axis, double x)
     }
 }
 
-#ifdef USE_POLAR_GRID
-
 /*
  * read one of the limiting values in a range of the form:
  *    [min:max] [*:*] [*:max] [min:*]
@@ -2998,6 +2996,4 @@ parse_one_range_limit( double default_value )
 
     return limit;
 }
-
-#endif /* USE_POLAR_GRID */
 	
