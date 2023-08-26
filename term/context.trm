@@ -1610,6 +1610,7 @@ CONTEXT_write_palette(t_sm_palette *palette)
 			break;
 		/* interpolated table: explicitly defined or read from file */
 		case SMPAL_COLOR_MODE_GRADIENT:
+		case SMPAL_COLOR_MODE_VIRIDIS:
 			fprintf(gpoutfile, "color_mode(gradient);");
 			CONTEXT_write_palette_gradient(palette->gradient, palette->gradient_num);
 			break;
