@@ -2869,9 +2869,10 @@ eval_plots()
 		    if (equals(c_token,"fs") || almost_equals(c_token,"fill$style")) {
 			if (this_plot->plot_style == SPIDERPLOT)
 			    this_plot->fill_properties = spiderplot_style.fillstyle;
-			else
+			else {
 			    this_plot->fill_properties = default_fillstyle;
-			this_plot->fill_properties.fillpattern = pattern_num;
+			    this_plot->fill_properties.fillpattern = pattern_num;
+			}
 			parse_fillstyle(&this_plot->fill_properties);
 			set_fillstyle = TRUE;
 		    }
@@ -3017,9 +3018,10 @@ eval_plots()
 		if (!set_fillstyle) {
 		    if (this_plot->plot_style == SPIDERPLOT)
 			this_plot->fill_properties = spiderplot_style.fillstyle;
-		    else
+		    else {
 			this_plot->fill_properties = default_fillstyle;
-		    this_plot->fill_properties.fillpattern = pattern_num;
+			this_plot->fill_properties.fillpattern = pattern_num;
+		    }
 		    parse_fillstyle(&this_plot->fill_properties);
 		}
 		if ((this_plot->fill_properties.fillstyle == FS_PATTERN)
