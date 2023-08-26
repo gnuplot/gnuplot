@@ -5,7 +5,7 @@ dnl NB: Change version/patchlevel immediately below
 dnl     and also in PATCHLEVEL and src/version.c
 dnl
 
-AC_INIT(gnuplot, 5.4.8)
+AC_INIT(gnuplot, 5.4.9)
 
 AC_CONFIG_SRCDIR(src/graphics.c)
 AC_PREREQ([2.69])
@@ -1000,11 +1000,8 @@ if test "${enable_qt}" = yes ; then
   if test "x${with_qt}" != "xqt4"; then
     pkg_failed="not_tried"
     if test "x${with_qt}" != "xqt5"; then
-      PKG_CHECK_MODULES_NOFAIL(QT, [Qt6Core])
-      if test $pkg_failed = no; then
-        AC_MSG_CHECKING([Checking for Qt6 support libraries])
-        PKG_CHECK_MODULES_NOFAIL(QT, [Qt6Gui Qt6Network Qt6Svg Qt6PrintSupport Qt6Core5Compat])
-      fi
+      AC_MSG_CHECKING([Checking for Qt6 support libraries])
+      PKG_CHECK_MODULES_NOFAIL(QT, [Qt6Core Qt6Gui Qt6Network Qt6Svg Qt6PrintSupport Qt6Core5Compat])
     fi
     if test $pkg_failed = no; then
       QT6LOC=`$PKG_CONFIG --variable=libexecdir Qt6Core`
