@@ -3138,6 +3138,7 @@ PS_make_header(t_sm_palette *palette)
 	break;
     }
     case SMPAL_COLOR_MODE_GRADIENT:
+    case SMPAL_COLOR_MODE_VIRIDIS:
 	fputs("/InterpolatedColor true def\n", gppsfile);
 	make_interpolation_code();
 	write_gradient_definition(palette->gradient, palette->gradient_num);
