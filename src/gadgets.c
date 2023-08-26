@@ -545,16 +545,22 @@ vertex_is_inside(gpiPoint test_vertex, gpiPoint *clip_boundary)
 void
 intersect_polyedge_with_boundary(gpiPoint first, gpiPoint second, gpiPoint *intersect, gpiPoint *clip_boundary)
 {
-    /* this routine is called only if one point is outside and the other
-       is inside, which implies that clipping is needed at a horizontal
-       boundary, that second.y is different from first.y and no division
-       by zero occurs. Same for vertical boundary and x coordinates. */
+    /* This routine is called only if one point is outside and the other
+     * is inside, which implies that clipping is needed at a horizontal
+     * boundary, that second.y is different from first.y and no division
+     * by zero occurs. Same for vertical boundary and x coordinates.
+     * Conversion to double is needed to prevent integer overflow.
+     */
+    double dx = (second.x - first.x);
+    double dy = (second.y - first.y);
     if (clip_boundary[0].y == clip_boundary[1].y) { /* horizontal */
 	(*intersect).y = clip_boundary[0].y;
-	(*intersect).x = first.x + (clip_boundary[0].y - first.y) * (second.x - first.x)/(second.y - first.y);
+	(*intersect).x = first.x
+			+ (double)(clip_boundary[0].y - first.y) * dx/dy;
     } else { /* vertical */
 	(*intersect).x = clip_boundary[0].x;
-	(*intersect).y = first.y + (clip_boundary[0].x - first.x) * (second.y - first.y)/(second.x - first.x);
+	(*intersect).y = first.y
+			+ (double)(clip_boundary[0].x - first.x) * dy/dx;
     }
 }
 
