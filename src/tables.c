@@ -741,6 +741,7 @@ const struct gen_table plotstyle_tbl[] =
     { "fillst$eps", FILLSTEPS },
     { "fs$teps", FSTEPS },
     { "his$teps", HISTEPS },
+    { "hs$teps", HSTEPS },
     { "vec$tors", VECTOR },
     { "arrow$s", ARROWS },
     { "fin$ancebars", FINANCEBARS },

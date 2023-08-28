@@ -330,6 +330,15 @@ typedef struct textbox_style {
 } textbox_style;
 #define DEFAULT_TEXTBOX_STYLE { FALSE, FALSE, 1.0, 1.0, 1.0, BLACK_COLORSPEC, BACKGROUND_COLORSPEC }
 
+typedef struct hsteps_options {
+    double offset;
+    int    direction;
+    TBOOLEAN baseline;
+    TBOOLEAN link;
+    TBOOLEAN split;
+} hsteps_opts;
+#define DEFAULT_HSTEPS_OPTS { 0, HSTEPS_DIR_BOTHSIDES, TRUE, TRUE, FALSE }
+
 /*
  * Used by dgrid3d in 3D gridding
  * and polar_grid in 2D polar gridding

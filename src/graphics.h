@@ -78,6 +78,7 @@ typedef struct curve_points {
     double smooth_parameter;	/* e.g. optional bandwidth for smooth kdensity */
     double smooth_period;	/* e.g. 2pi for a circular function */
     int boxplot_factors;	/* Only used if plot_style == BOXPLOT */
+    hsteps_opts hsteps_options;
     int p_max;			/* how many points are allocated */
     int p_count;		/* count of points in points */
     AXIS_INDEX x_axis;		/* FIRST_X_AXIS or SECOND_X_AXIS */
@@ -131,5 +132,11 @@ void place_pixmaps(int layer, int dimensions);
 
 int filter_boxplot(struct curve_points *);
 void attach_title_to_plot(struct curve_points *this_plot, legend_key *key);
+
+/* Only used in hsteps style */
+
+#define HSTEPS_DIR_BOTHSIDES	0
+#define HSTEPS_DIR_FORWARD	  1
+#define HSTEPS_DIR_BACKWARD	  2
 
 #endif /* GNUPLOT_GRAPHICS_H */

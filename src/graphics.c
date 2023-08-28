@@ -121,17 +121,20 @@ static void place_parallel_axes(struct curve_points *plots, int layer);
 static void place_spiderplot_axes(struct curve_points *plots, int layer);
 static void plot_polar_grid(struct curve_points *plot);
 
+#if (0)		/* STEPS FILLSTEPS FSTEPS HISTEPS now emulated by HSTEPS */
 static void plot_steps(struct curve_points * plot);	/* JG */
 static void plot_fsteps(struct curve_points * plot);	/* HOE */
 static void plot_histeps(struct curve_points * plot);	/* CAC */
+static int histeps_compare(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
+#endif		/* STEPS FILLSTEPS FSTEPS HISTEPS now emulated by HSTEPS */
+
+static void plot_hsteps(struct curve_points * plot);
 
 static void ytick2d_callback(struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels);
 static void xtick2d_callback(struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels);
 static void ttick_callback(struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels);
 
 static void spidertick_callback(struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels);
-
-static int histeps_compare(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
 
 static void get_arrow(struct arrow_def* arrow, double* sx, double* sy, double* ex, double* ey);
 static void map_position_double(struct position* pos, double* x, double* y, const char* what);
@@ -881,13 +884,19 @@ do_plot(struct curve_points *plots, int pcount)
 		break;
 	    case STEPS:
 	    case FILLSTEPS:
-		plot_steps(this_plot);
+/*		plot_steps(this_plot);*/
+		plot_hsteps(this_plot);
 		break;
 	    case FSTEPS:
-		plot_fsteps(this_plot);
+/*		plot_fsteps(this_plot); */
+	        plot_hsteps(this_plot);
 		break;
 	    case HISTEPS:
-		plot_histeps(this_plot);
+/*		plot_histeps(this_plot); */
+	        plot_hsteps(this_plot);
+		break;
+	    case HSTEPS:
+		plot_hsteps(this_plot);
 		break;
 	    case POINTSTYLE:
 		plot_points(this_plot);
@@ -1711,6 +1720,7 @@ plot_betweencurves(struct curve_points *plot)
     }
 }
 
+#if (0)		/* STEPS FILLSTEPS FSTEPS HISTEPS now emulated by HSTEPS */
 
 /* plot_steps:
  * Plot the curves in STEPS or FILLSTEPS style
@@ -1933,6 +1943,348 @@ plot_histeps(struct curve_points *plot)
 
     free(gl);
 }
+
+#endif		/* STEPS FILLSTEPS FSTEPS HISTEPS now emulated by HSTEPS */
+
+/* plot_hsteps:
+ * Plot the curves in HSTEPS style
+ * Also handles emulation of older plot styles STEPS FSTEPS FILLSTEPS HISTEPS
+ */
+
+#define HSTEPS_POINT_VALID	  1
+#define HSTEPS_POINT_NAN	  0
+#define HSTEPS_POINT_UNDEFINED	 -1
+#define HSTEPS_GAP_POINT	  (1<<0)
+#define HSTEPS_GAP_COLOR	  (1<<1)
+#define interpolate_xl(p, k, a)	  ((a)*p[k-1].x + (1.0-(a))*p[k].x)	    /* for k >= 1 */
+#define interpolate_xr(p, k, a)	  ((a)*p[k].x + (1.0-(a))*p[k+1].x)	    /* for k <= np -2 */
+#define extrapolate_xl(p, k, a)	  ((1.0+(a))*p[k].x - (a)*p[k+1].x)	    /* for k >= np -2 */
+#define extrapolate_xr(p, k, a)	  ((1.0+(1.0-a))*p[k].x - (1.0-a)*p[k-1].x) /* for k >= 1 */
+
+static void
+plot_hsteps (struct curve_points *plot)
+{
+    int i, k;				    /* misc counters */
+    double xl, xr, yc;			    /* temporary coordinate variables */
+    int count		  = 0;
+    int goodcount	  = 0;
+    double anchor;			    /* data point position in horizontal segment */
+    double y_null, ymax, ymin;		    /* y coordinate of baseline, maximum, minimum */
+    int ybase		  = 0;		    /* y coordinate of baseline in terminal coordinates */
+    int np		  = plot->p_count;  /* number of points */
+    coordinate *points	  = plot->points;   /* point data (coordinate) */
+    double *varcolor	  = plot->varcolor; /* point data (varcolor) */
+    int *state		  = NULL;	    /* point data (state) */
+    int *gap		  = NULL;	    /* point data (gap) */
+    int direction	  = plot->hsteps_options.direction; /* hsteps direction */
+    double offset	  = plot->hsteps_options.offset;    /* y-axis offset */
+    TBOOLEAN has_baseline = plot->hsteps_options.baseline;  /* flag for existence of baseline */
+    TBOOLEAN has_link	  = plot->hsteps_options.link;      /* flag for existence of link */
+    TBOOLEAN opt_split	  = plot->hsteps_options.split;     /* flag for splitting */
+    TBOOLEAN opt_above	  = (plot->filledcurves_options.oneside > 0) ? TRUE : FALSE;
+    TBOOLEAN opt_below	  = (plot->filledcurves_options.oneside < 0) ? TRUE : FALSE;
+    int fill_style	  = 0;		    /* fill style */
+    TBOOLEAN has_border   = FALSE;
+    gpiPoint *nodes	  = NULL;	    /* node data of polygon */
+    gpiPoint *fillarea	  = NULL;	    /* fillarea data of polygon */
+    int in;				    /* number of nodes on fillarea */
+    BoundingBox *clip_save = clip_area;
+
+    /*********************************************************/
+    /* Setting for drawing				     */
+    /*********************************************************/
+
+    /* Setting: canvas range  */
+    ymin = ( Y_AXIS.min < Y_AXIS.max ) ? Y_AXIS.min : Y_AXIS.max;
+    ymax = ( Y_AXIS.min < Y_AXIS.max ) ? Y_AXIS.max : Y_AXIS.min;
+
+    /* Setting: direction */
+    anchor = ( direction == HSTEPS_DIR_FORWARD )  ? 0 :  /* forward */
+	     ( direction == HSTEPS_DIR_BACKWARD ) ? 1 :  /* backward */
+					            0.5; /* default (bothsides) */
+
+    /* Setting: baseline (y_null, ybase) */
+    if (plot->filledcurves_options.closeto == FILLEDCURVES_ATY1)
+	y_null = plot->filledcurves_options.at + offset;
+    else if (Y_AXIS.log)	    /* log y axis must treat 0.0 as -infinity */
+	y_null = Y_AXIS.min;
+    else
+	y_null = offset;	    /* default baseline (y=0) */
+
+    if (has_baseline)
+	cliptorange(y_null, ymin, ymax);
+
+    ybase = map_y(y_null);
+
+    /* Setting fill_style */
+    fill_style = (has_baseline) ? style_from_fill(&plot->fill_properties) : FS_EMPTY;
+
+    /*
+     * Prepare data for drawing
+     */
+
+    /* Allocating 'state' and 'gap' array */
+    state    = gp_alloc(np * sizeof(int), "hsteps data point state");
+    gap	     = gp_alloc(np * sizeof(int), "hsteps data gap");
+
+    /* Initializing 'state' and 'gap' array */
+    for (i=0; i<np; i++) {
+	gap[i] = 0;
+	if (isnan(points[i].x)	     /* treating point includes NaN x-value as empty line */
+	||  ((!isnan(points[i].y)) && (points[i].type == UNDEFINED)) ) {
+					     /* treating empty line as separator */
+	    state[i] = HSTEPS_POINT_UNDEFINED;
+	    count = 0;
+	    continue;
+	} else if (isnan(points[i].y) /* treating point includes NaN y-value */
+	       ||  (opt_above && (points[i].y + offset < y_null))
+	       ||  (opt_below && (points[i].y + offset > y_null))) {
+	    state[i] = HSTEPS_POINT_NAN;
+	    count = 0;
+	} else {		      /* well-defined point */
+	    state[i] = HSTEPS_POINT_VALID;
+	    count++;
+	}
+
+	goodcount = (count > goodcount) ? count : goodcount;
+    }
+
+    /* Checking number of good points */
+    if (goodcount < 1
+    ||  (np == 1 && points[0].z < 0)) {
+	free(state);
+	free(gap);
+	return;
+    }
+
+    /* Setting xlow/xhigh member of 'points' array according to anchor value */
+    /* For variable width (3rd column), xlow/xhigh is already set in plot2d.c:get_data() */
+    for (i=0; i<np; i++) {
+        if (points[i].z >= 0.0)
+	    continue;
+	/* anchor */
+	/*	  0 : xl = x - 0.0*w, xr = x + 1.0*w */
+	/*	0.5 : xl = x - 0.5*w, xr = x + 0.5*w */
+	/*	  1 : xl = x - 1.0*w, xr = x + 0.0*w */
+	if (i == 0) {
+	    points[i].xlow  = extrapolate_xl(points, i, anchor);
+	    points[i].xhigh = interpolate_xr(points, i, anchor);
+	} else if (i == np - 1) {
+	    points[i].xlow  = interpolate_xl(points, i, anchor);
+	    points[i].xhigh = extrapolate_xr(points, i, anchor);
+	} else {
+	    points[i].xlow  = interpolate_xl(points, i, anchor);
+	    points[i].xhigh = interpolate_xr(points, i, anchor);
+	}
+    }
+
+    /* Checking derived undefined points and treating extrapolation around undefined points */
+
+    /* first point: UNDEFINED if next point is UNDEFINED */
+    if (points[0].z < 0.0 && state[1] == HSTEPS_POINT_UNDEFINED)
+	state[0] = HSTEPS_POINT_UNDEFINED;
+
+    for (i=1; i<np-1; i++) {
+
+	if (points[i].z >= 0)                           /* skip if variable width */
+	    continue;
+
+	if (state[i] == HSTEPS_POINT_UNDEFINED)        /* skip if UNDEFINED */
+	    continue;
+
+	if (state[i-1] == HSTEPS_POINT_UNDEFINED
+	&&  state[i+1] == HSTEPS_POINT_UNDEFINED) {    /* UNDEFINED if both sides are UNDEFINED */
+	    state[i] = HSTEPS_POINT_UNDEFINED;
+	    continue;
+	}
+
+	if (state[i-1] == HSTEPS_POINT_UNDEFINED)      /* recalculate xlow if previous point is UNDEFINED */
+	   points[i].xlow = extrapolate_xl(points, i, anchor);
+	else if (state[i+1] == HSTEPS_POINT_UNDEFINED) /* recalculate xhigh if next point is UNDEFINED */
+	   points[i].xhigh = extrapolate_xr(points, i, anchor);
+    }
+
+    /* last point: UNDEFINED if previous point is UNDEFINED */
+    if (points[np-1].z < 0.0 && state[np-2] == HSTEPS_POINT_UNDEFINED)
+	state[np-1] = HSTEPS_POINT_UNDEFINED;
+
+    /* Emulation of steps/fsteps/fillsteps */
+
+    if (plot->plot_style == STEPS || plot->plot_style == FILLSTEPS) {
+	points[np-1].xhigh = points[np-1].xlow;
+	for (i=1; i<np-1; i++)
+	    if (state[i+1] != HSTEPS_POINT_VALID)
+		points[i].xhigh = points[i].xlow;
+    } else if (plot->plot_style == FSTEPS) {
+	points[0].xlow = points[0].xhigh;
+	for (i=1; i<np-1; i++)
+	    if (state[i-1] != HSTEPS_POINT_VALID)
+		points[i].xlow = points[i].xhigh;
+    }
+
+    /* Special treatment of fillstyle in the 'fillsteps' emulation */
+    if (plot->plot_style == FILLSTEPS)
+	fill_style = style_from_fill(&plot->fill_properties);
+
+    /* Checking gaps between points */
+    for (i=0; i<np-1; i++) {
+	if (state[i] == HSTEPS_POINT_VALID) {
+	    if (state[i+1] != HSTEPS_POINT_VALID) { /* point and color gap if next is not valid */
+		gap[i] |= (HSTEPS_GAP_POINT|HSTEPS_GAP_COLOR);
+		continue;
+	    }
+	    if (varcolor && (varcolor[i] != varcolor[i+1])) /* checking color gap */
+		gap[i] |= HSTEPS_GAP_COLOR;
+	    if (points[i].xhigh != points[i+1].xlow)        /* checking point gap */
+		gap[i] |= HSTEPS_GAP_POINT;
+	} else 				            /* point and color gap if point is not valid */
+	    gap[i] |= (HSTEPS_GAP_POINT|HSTEPS_GAP_COLOR);
+    }
+
+    /* Allocating polygon nodes */
+    nodes    = gp_alloc((4*np+3)*sizeof(gpiPoint), "hsteps polygon");
+    fillarea = gp_alloc((4*np+3)*sizeof(gpiPoint), "hsteps polygon");
+
+    /*********************************************************/
+    /* Drawing filled polygon				     */
+    /*********************************************************/
+    if (term->filled_polygon && fill_style != FS_EMPTY) {
+
+	clip_save = clip_area;
+	clip_area = &plot_bounds;
+
+	term_apply_lp_properties(&plot->lp_properties);
+
+	k = 0;
+	for (i=0; i<np; i++) {	/* loop over all points */
+
+	    xl = map_x(points[i].xlow);	      /* mapped x coordinate value of 'left' side of bin */
+	    xr = map_x(points[i].xhigh);      /* mapped x coordinate value of 'right' side of bin */
+	    yc = map_y(points[i].y + offset); /* mapped y coordinate value of 'current' point */
+
+	    /* Constructing polygon */
+	    if (state[i] == HSTEPS_POINT_VALID) {
+		if (k == 0) {			   /* first point of polygon */
+		    nodes[0].x = xl;
+		    nodes[0].y = ybase;
+		    if (varcolor)
+		      check_for_variable_color(plot, &varcolor[i]);
+		} else if (points[i].z >= 0 && (gap[i-1] & HSTEPS_GAP_POINT)) {
+		    nodes[2*k+1].x = nodes[2*k].x;	/* bottom line in pulse */
+		    nodes[2*k+1].y = ybase;
+		    nodes[2*k+2].x = xl;
+		    nodes[2*k+2].y = ybase;
+		    k += 1;
+		}
+		nodes[2*k+1].x = xl;			/* hline + connectors */
+		nodes[2*k+1].y = yc;
+		nodes[2*k+2].x = xr;
+		nodes[2*k+2].y = yc;
+		k += 1;
+	    }
+
+	    /* Rendering filled polygon */
+	    if (i == np - 1		      /* last point */
+	    ||  gap[i]			      /* has point or color gap	 */
+	    ||  state[i] != HSTEPS_POINT_VALID) { /* not valid point */
+		if (k > 0) {
+		    nodes[2*k+1].x = nodes[2*k].x;
+		    nodes[2*k+1].y = ybase;
+		    nodes[2*k+2].x = nodes[0].x;
+		    nodes[2*k+2].y = nodes[0].y;
+		    clip_polygon(nodes, fillarea, 2*k+3, &in);
+		    if (in > 0) {
+			fillarea[0].style = fill_style;
+			(term->filled_polygon)(in, fillarea);
+		    }
+		}
+
+		/* Resetting construction of polygon */
+		k = 0;
+	    }
+	}
+	clip_area = clip_save;
+    }
+
+    /*********************************************************/
+    /* Drawing line or border 			             */
+    /*********************************************************/
+    if (fill_style != FS_EMPTY) {
+	if (plot->plot_style == FILLSTEPS)
+	    has_border = FALSE;
+	else
+	    has_border = need_fill_border(&plot->fill_properties);
+    }
+
+    if (!has_border)
+       term_apply_lp_properties(&plot->lp_properties);
+
+    if (fill_style == FS_EMPTY || has_border) {
+
+	k = 0;
+	for (i=0; i<np; i++) {	/* loop over all points */
+	    xl = map_x(points[i].xlow);	      /* mapped x coordinate value of 'left' side of bin */
+	    xr = map_x(points[i].xhigh);      /* mapped x coordinate value of 'right' side of bin */
+	    yc = map_y(points[i].y + offset); /* mapped y coordinate value of 'current' point */
+
+	    /* Constructing polygon */
+	    if (state[i] == HSTEPS_POINT_VALID) {
+		if (k == 0) {				      /* first point of polygon */
+		    nodes[0].x = xl;
+		    nodes[0].y = (has_baseline) ? ybase : yc;
+		    if (varcolor)
+			check_for_variable_color(plot, &varcolor[i]);
+		} else if (has_baseline && has_link && (gap[i-1] & HSTEPS_GAP_POINT)) {
+		    nodes[2*k+1].x = nodes[2*k].x;	      /* bottom line in pulse */
+		    nodes[2*k+1].y = ybase;
+		    nodes[2*k+2].x = xl;
+		    nodes[2*k+2].y = ybase;
+		    k += 1;
+		}
+		nodes[2*k+1].x = xl;			       /* hline + connectors */
+		nodes[2*k+1].y = yc;
+		nodes[2*k+2].x = xr;
+		nodes[2*k+2].y = yc;
+		k += 1;
+	    }
+
+	    /* Rendering polygon */
+	    if (i == np - 1				       /* last point */
+	    ||  !has_link 			               /* nolink */
+	    ||  opt_split                                      /* split */
+	    ||  state[i] != HSTEPS_POINT_VALID) {	       /* not valid point */
+		if (k > 0) {
+		    nodes[2*k+1].x = nodes[2*k].x;
+		    nodes[2*k+1].y = (has_baseline) ? ybase : nodes[2*k].y;
+
+		    /* drawing ENVELOPE */
+		    if (has_baseline && has_link)	    /* with edges */
+			draw_clip_polygon(2*k+2, nodes);
+		    else				    /* without edges */
+			draw_clip_polygon(2*k, nodes+1);
+		}
+
+		/* Resetting construction of polygon */
+		k = 0;
+	    }
+	}
+    }
+
+    free(fillarea);
+    free(nodes);
+    free(gap);
+    free(state);
+}
+
+#undef HSTEPS_POINT_VALID
+#undef HSTEPS_POINT_NAN
+#undef HSTEPS_POINT_UNDEFINED
+#undef HSTEPS_GAP_POINT
+#undef HSTEPS_GAP_COLOR
+#undef interpolate_xl
+#undef interpolate_xr
+#undef extrapolate_xl
+#undef extrapolate_xr
 
 /* plot_bars:
  * Plot the curves in ERRORBARS style

@@ -534,6 +534,7 @@ get_data(struct curve_points *current_plot)
 	break;
 
     case BOXES:
+    case HSTEPS:
 	min_cols = 1;
 	max_cols = 4;
 
@@ -1109,6 +1110,35 @@ get_data(struct curve_points *current_plot)
 	    }
 	    store2d_point(current_plot, i++, v[0], v[1],
 			xlow, xhigh, v[1], v[1], width);
+	    break;
+	}
+
+	case HSTEPS:
+	{
+	   /* 2 columns: x y
+	    * 3 columns: x y width
+	    */
+	    coordval xlow  = v[0];
+	    coordval xhigh = v[0];
+	    coordval ylow  = v[1] + current_plot->hsteps_options.offset;
+	    coordval yhigh = v[1] + current_plot->hsteps_options.offset;
+	    coordval width = -1.0;
+	    if (j == 2) {
+		/* We cannot calculate xlow/xhigh yet since they
+		 * depend on both adjacent segments.
+		 */
+	    } else if ( j == 3 && v[2] >= 0 ) {
+		/* Setting: direction */
+		int hsteps_type = current_plot->hsteps_options.direction;
+		double anchor = ( hsteps_type == HSTEPS_DIR_FORWARD )  ? 0 :
+				( hsteps_type == HSTEPS_DIR_BACKWARD ) ? 1 :
+					                                0.5;
+		width = v[2];
+		xlow  = v[0] - anchor*width;
+		xhigh = v[0] + (1.0-anchor)*width;
+	    }
+	    store2d_point(current_plot, i++, v[0], v[1],
+			    xlow, xhigh, ylow, yhigh, width);
 	    break;
 	}
 
@@ -2670,14 +2700,21 @@ eval_plots()
 			int_error(c_token, "\"with\" allowed only after parametric function fully specified");
 		    this_plot->plot_style = get_style();
 
-		    if (this_plot->plot_style == FILLEDCURVES
-		    ||  this_plot->plot_style == FILLSTEPS) {
+		    if (this_plot->plot_style == FILLEDCURVES) {
 			/* read a possible option for 'with filledcurves' */
 			get_filledcurves_style_options(&this_plot->filledcurves_options);
 			if ((this_plot->plot_filter == FILTER_CONVEX_HULL)
 			||  (this_plot->plot_filter == FILTER_CONCAVE_HULL))
 			    this_plot->filledcurves_options.closeto = FILLEDCURVES_CLOSED;
 		    }
+
+		    if (this_plot->plot_style == HSTEPS
+		    ||  this_plot->plot_style == STEPS
+		    ||  this_plot->plot_style == FSTEPS
+		    ||  this_plot->plot_style == FILLSTEPS
+		    ||  this_plot->plot_style == HISTEPS)
+			parse_hsteps(this_plot->plot_style, &(this_plot->hsteps_options),
+					&(this_plot->filledcurves_options));
 
 		    if (this_plot->plot_style == IMAGE
 		    ||  this_plot->plot_style == RGBIMAGE
@@ -2896,6 +2933,18 @@ eval_plots()
 		break; /* unknown option */
 
 	    } /* while (!END_OF_COMMAND) */
+
+	    /* This allows substitution of HSTEPS for older step modes that
+	     * were set by default with "set style {data|func}"
+	     */
+	    if (!set_with) {
+		if (this_plot->plot_style == STEPS
+		||  this_plot->plot_style == FSTEPS
+		||  this_plot->plot_style == FILLSTEPS
+		||  this_plot->plot_style == HISTEPS)
+		    parse_hsteps(this_plot->plot_style, &(this_plot->hsteps_options),
+					&(this_plot->filledcurves_options));
+	    }
 
 	    if (duplication)
 		int_error(c_token, "duplicated or contradicting arguments in plot options");

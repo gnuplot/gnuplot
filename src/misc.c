@@ -1768,3 +1768,101 @@ pixmap_from_colormap(t_pixmap *pixmap)
     pixmap->ncols = 1;
     pixmap->nrows = size;
 }
+
+
+/*
+ * Parse hsteps/steps/fsteps/histeps/fillsteps plot options
+ */
+
+void
+parse_hsteps (enum PLOT_STYLE plot_style, hsteps_opts *hso, filledcurves_opts *fco)
+{
+    *fco = (filledcurves_opts) EMPTY_FILLEDCURVES_OPTS;
+    *hso = (hsteps_opts) DEFAULT_HSTEPS_OPTS;
+
+    /* Setting options for steps/fsteps/histeps/fillsteps emulation */
+    if (plot_style == STEPS) {
+	hso->direction = HSTEPS_DIR_FORWARD;
+	hso->baseline  = FALSE;
+	return;
+    } else if (plot_style == FSTEPS) {
+	hso->direction = HSTEPS_DIR_BACKWARD;
+	hso->baseline  = FALSE;
+	return;
+    } else if (plot_style == HISTEPS) {
+	return;
+    } else if (plot_style == FILLSTEPS) {
+	hso->direction = HSTEPS_DIR_FORWARD;
+	hso->baseline  = FALSE;
+	get_filledcurves_style_options(fco);
+	return;
+    }
+
+    /* Setting options for hsteps */
+
+    while (TRUE) {
+
+	get_filledcurves_style_options(fco);
+
+	/* direction */
+	if (almost_equals(c_token, "fo$rward")) {
+	    c_token++;
+	    hso->direction = HSTEPS_DIR_FORWARD;
+	    continue;
+	}
+
+	if (almost_equals(c_token, "ba$ckward")) {
+	    c_token++;
+	    hso->direction = HSTEPS_DIR_BACKWARD;
+	    continue;
+	}
+
+	/* connecting lines */
+	if (almost_equals(c_token, "base$line")) {
+	    c_token++;
+	    hso->baseline = TRUE;
+	    hso->link     = TRUE;
+	    hso->split    = FALSE;
+	    continue;
+	}
+
+	if (almost_equals(c_token, "pillar$s")) {
+	    c_token++;
+	    hso->baseline = TRUE;
+	    hso->link     = TRUE;
+	    hso->split    = TRUE;
+	    continue;
+	}
+
+	if (equals(c_token, "link")) {
+	    c_token++;
+	    hso->baseline = FALSE;
+	    hso->link     = TRUE;
+	    hso->split    = FALSE;
+	    continue;
+	}
+
+	if (equals(c_token, "nolink")) {
+	    c_token++;
+	    hso->baseline = FALSE;
+	    hso->link     = FALSE;
+	    hso->split    = FALSE;
+	    continue;
+	}
+
+	/* offset */
+	if (equals(c_token, "offset")) {
+	    c_token++;
+	    hso->offset = real_expression();
+	    continue;
+	}
+
+	break;
+    }
+
+    /* The 'link/nolink' should ignore the 'above/below' and 'y=<baseline>' */
+    if (!hso->baseline)
+	*fco = (filledcurves_opts) EMPTY_FILLEDCURVES_OPTS;
+
+    return;
+}

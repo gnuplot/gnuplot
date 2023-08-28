@@ -3502,6 +3502,7 @@ df_bin_default_columns default_style_cols[] = {
     {FSTEPS, 1, 1},
     {FILLSTEPS, 1, 1},
     {HISTEPS, 1, 1},
+    {HSTEPS, 1, 1},
     {VECTOR, 2, 2},
     {CANDLESTICKS, 4, 1},
     {FINANCEBARS, 4, 1},

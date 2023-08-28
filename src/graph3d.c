@@ -1202,6 +1202,7 @@ do_3dplot(
 	    case FILLSTEPS:
 	    case FSTEPS:
 	    case HISTEPS:
+	    case HSTEPS:
 	    case SURFACEGRID:
 	    case LINES:
 		if (draw_this_surface) {
@@ -1365,6 +1366,7 @@ do_3dplot(
 		case FILLSTEPS:
 		case FSTEPS:
 		case HISTEPS:
+		case HSTEPS:
 		case SURFACEGRID:
 		case LINES:
 		    /* Normal case (surface) */
