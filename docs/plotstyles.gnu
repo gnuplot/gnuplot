@@ -394,6 +394,150 @@ plot $data using (22.5*($2-1-0.5)):(0.01):(22.5):($3/STATS_sum_y) with sectors \
 
 reset
 
+##########################################################
+#     hsteps
+##########################################################
+$data <<EOD
+1 5
+2 8
+3 10
+4 7
+5 5
+6 3
+EOD
+
+set tics scale 0 format ""
+set title offset 0,-1.5
+set lmargin 0.1; set rmargin 1; set tmargin 1; set bmargin 1
+set style line 11 lw 2 lc "gold"
+set style line 12 lw 2 lc "black"
+set style fill solid 0.25 border lc "black"
+
+# hsteps forward/backward + width
+#
+set output out . 'figure_hsteps_nolink' . ext
+unset title
+
+  unset border
+  set key top left Left reverse
+  set xrange [-2:7]
+  set yrange [0:13]
+  plot $data using 1:($2+.2) lt 1 lw 2 with hsteps nolink title "default", \
+       $data using 1:($2-.2) lt 2 lw 2 with hsteps forward nolink title "forward", \
+       $data using 1:($2-.6) lt 3 lw 2 with hsteps backward nolink title "backward", \
+       $data using 1:($2-.1) with points pt '|' tc black notitle
+
+# hstep style variants
+#
+unset key
+set border 3
+set xrange [-1:7]
+set yrange [-1:13]
+
+# hsteps baseline
+#
+set output out . 'figure_hsteps_baseline' . ext
+set multiplot layout 2,2 columnsfirst
+
+  set title offset 0,-1.5
+  set xzeroaxis
+
+  set title "baseline (full width)" 
+  plot $data using 1:2 ls 11 with hsteps 
+
+  set title "baseline (narrow width)"
+  plot $data using 1:2:(0.6) ls 11 with hsteps
+
+  set title "" 
+  plot $data using 1:2 ls 12 with hsteps fs empty
+
+  set title ""
+  plot $data using 1:2:(0.6) ls 12 with hsteps fs empty
+
+unset multiplot
+
+# hsteps pillar
+#
+set output out . 'figure_hsteps_pillar' . ext
+set multiplot layout 2,2 columnsfirst
+
+  set title offset 0,-1.5
+  set style fill solid 0.25 border lc "black"
+  unset xzeroaxis
+  set yrange [-3:13]
+
+  set title "pillar (full width)" 
+  plot $data using 1:2 ls 11 with hsteps pillar
+
+  set title "pillar (narrow width)"
+  plot $data using 1:2:(0.6) ls 11 with hsteps pillar
+
+  # this sub-plot changes size/range/etc
+  set title "above/below baseline" offset 0,0
+  set yrange [*:*]
+  unset border
+  set origin 0.5, 0.1; set size 0.5, 0.8
+  plot $data using 1:2:(0.6) ls 11 with hsteps pillar above y=0 fc "blue", \
+       $data using 1:(-$2):(0.6) ls 11 with hsteps pillar below y=0 fc "red"
+
+unset multiplot
+
+# hsteps link
+#
+set output out . 'figure_hsteps_link' . ext
+reset
+
+$data <<EOD
+1 2018 60 30
+2 2019 65 35
+3 2020 61 25
+4 2021 57 33
+5 2022 65 40
+6 2023 62 20
+EOD
+
+set xrange [0:7]
+set yrange [0:80]
+unset ytics
+set xtics scale 0
+set border 3 lw 2 front
+unset key
+
+set style line 11 linecolor 'gray50' linewidth 2 dashtype (4,10) 
+set style line 12 linecolor variable linewidth 2 dashtype solid
+
+plot $data using 1:3:(0.5):xtic(2) ls 11 with hsteps link, \
+     $data using 1:3:(0.5):1       ls 12 with hsteps pillar fs solid 0.5 border, \
+     $data using 1:4:(0.5)         ls 11 with hsteps link, \
+     $data using 1:4:(0.5):1       ls 12 with hsteps pillar fs transparent pattern 1 border
+
+reset
+
+# hsteps offset
+#
+set output out . 'figure_hsteps_offset' . ext
+set title "bit pattern of ASCII characters" offset 0,-1
+set tmargin 1; set bmargin 2
+
+set yrange [0:9]
+set xrange [0.5:8]
+unset border
+unset tics
+set ytics 1,1,8 scale 0 format "bit %.0g" offset 0,0.3
+unset key
+
+set style fill solid 0.2 border lc "black"
+
+array DATA = [ 0x67, 0x6e, 0x75, 0x70, 0x6c, 0x6f, 0x74 ]
+bit(i)  = (DATA[column(1)] >> (i-1)) & 0x1
+char(i) = sprintf( "%c", DATA[i] )
+
+plot for [k=1:8] \
+        DATA using 1:(0.8 * bit(k)):(0.5) with hsteps offset k lw 2 fc black, \
+     DATA using 1:(0.5):(char($1)) with labels font ",16" tc 'red'
+
+reset
+
 #
 # 3D Plot styles
 # ==============

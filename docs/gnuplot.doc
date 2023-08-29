@@ -290,6 +290,9 @@ C
 ## polar gridded surface.  For each input data point it generates a single
 ## annular wedge in a conceptual polar grid.  Unlike polar mode `with surface`
 ## it can be used in either a polar or cartesian coordinate graph.
+#b New 2D plot style `with hsteps` allows construction of step-like plots with
+## a variety of representations in addition to those offered by existing styles
+## `steps`, `histeps`, `fsteps`, and `fillsteps`.  See `hsteps`.
 #b Plot style `with lines` now has a filter option `sharpen`.  This filter
 ## detects spikes in a function plot that appear truncated in the output
 ## because the peak lies between two x-coordinates at which the function has
@@ -5546,6 +5549,125 @@ Ffigure_newhist
  histogram_colors.dem
 ^ </a>
 D histogram_colors 1
+
+2 hsteps
+?plotting styles hsteps
+?style hsteps
+?with hsteps
+?hsteps
+ The 2D plotting style `with hsteps` renders a horizontal line segment ("step")
+ for each data point.  The step may extend to the left, to the right, or to
+ both sides of the point's x-coordinate.
+ Additional keywords control the lines connecting adjacent steps and option
+ area fill between the step and a baseline y value.
+
+ Syntax:
+      plot <data> with hsteps
+                          {forward|backward}
+                          {baseline|pillars|link|nolink}
+                          {{above|below} y=<baseline>}
+                          {offset <y-offset>}
+
+      2 columns:  x  y
+      3 columns:  x  y  width
+
+ This plot style requires 2 or 3 columns of data.  Additional input columns can
+ be used to provide variable line or fill colors (see `rgbcolor variable`).
+
+ If the width of each step is not explicitly given through a third input
+ column, each segment’s width is calculated so that it abuts the adjacent
+ horizontal segments. The `forward` and `backward` keywords can be used to
+ specify the direction in which the horizontal segment extends from the given
+ x coordinate.  If neither is specified, the horizontal segment extends on both
+ sides of the given x-value halfway to the x-value of the next adjacent point.
+ However, for the first and last points, where there are no corresponding outer
+ adjacent points, the horizontal segments are extrapolated using distances to
+ the adjacent inner points (see `histeps`, `boxes`).
+
+ The default (`baseline`) and `pillar` variants employ a baseline y value.
+ If not provided in the plot command, the baseline is take to be y=0.
+ If the plot command uses a fill style, the baseline also serves to 
+ delimit one boundary of the fill area.
+ Four style variants are possible.
+
+Ffigure_hsteps_baseline
+ `baseline` (default): If there is no gap along x between adjacent steps,
+ they are connected by a vertical line segment between them.  This produces
+ a curve like the `steps`, `histeps`, or `fsteps` styles.  If there is a gap
+ between steps, usually because the width is less than the point spacing,
+ the connecting line drops to the baseline and continues along it before
+ rising again.  This produces a sequence of rectangular pulses.
+
+      set xzeroaxis
+      plot $data using 1:2 with hsteps
+      plot $data using 1:2:(0.5) with hsteps
+
+Ffigure_hsteps_pillar
+ `pillar`: At each end of each step a vertical line is drawn to the baseline.
+ Note that no horizontal line segments are drawn at the baseline.
+
+      set style data hsteps pillar y=0
+      plot $data using 1:2
+      plot $data using 1:2:(0.5)
+      plot $data using 1:2:(0.5) above fc "blue", \
+           $data using 1:2:(0.5) below fc "red"
+
+#TeX \vspace{6ex}
+
+Ffigure_hsteps_nolink
+ `nolink`: No connecting line is drawn between adjacent steps.
+ Baseline and fill properties are not relevant to this variant.
+
+     plot $data using 1:2 with hsteps nolink, \
+          $data using 1:2 with hsteps nolink forward, \
+          $data using 1:2 with hsteps nolink backward, \
+          $data using 1:2 with points pt "|"
+
+#TeX \vspace{9ex}
+
+Ffigure_hsteps_link
+ `link`: Adjacent steps steps are connected by a single straight line segment.
+ Depending on the step widths, this line may be vertical or diagonal.
+
+ Example:
+
+ The `link` variant can be superimposed onto the `pillar` variant to produce
+ a stacked histogram plot in which category boundaries are connected.
+
+      set style line 11 lw 2 lc "gray" dt "."
+      set style line 12 lw 2 lc variable
+      plot $data using 1:3:(0.5)   ls 11 with hsteps link, \
+           $data using 1:3:(0.5):1 ls 12 with hsteps pillar fs solid 0.7 border, \
+           $data using 1:4:(0.5)   ls 11 with hsteps link, \
+           $data using 1:4:(0.5):1 lt -1 with hsteps pillar fs transparent pattern 1 border
+
+3 offset
+Ffigure_hsteps_offset
+?with hsteps offset
+?hsteps offset
+ The offset value modifies any of the `with hsteps` variants by adding an
+ increment to the y value of both the data point itself (column 2) and the
+ baseline of the plot it appears in.  An example of use is to draw a logic
+ circuit timing chart in which pulse waveforms are aligned vertically.
+ In general the offset can be used to stack plots from multiple data sets
+ that share a common range of y values.
+
+      # bit(k,char) is a function that returns 0 or 1
+      # for the state of bit k in an ASCII character
+      set style fill solid 0.2 border
+      plot for [k=1:8] STR using 1:(bit(k,STR[$1])):(0.5) \
+           with hsteps fillcolor "black" offset k
+
+3 missing data
+?with hsteps missing-data
+?hsteps missing-data
+ In the hsteps style, empty lines, NaN values, and missing data have distinct
+ meanings.  If an empty line is present in the data, the data series is reset
+ at that point.  This is analogous to a blank line causing a break to start a
+ new curve in the case of `with lines`.  If an x-value contains NaN, it is
+ processed in the same manner as an empty line.  If the x-value is valid but
+ the y-value contains NaN, no horizontal line is drawn for that particular data
+ point but the x-value is still used if needed to estimate the step width.
 
 2 image
 ?plotting styles image
