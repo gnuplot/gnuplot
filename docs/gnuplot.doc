@@ -5047,6 +5047,7 @@ Ffigure_ellipses
 
  See also `set object ellipse`, `set style ellipse` and `fillstyle`.
 
+#TeX \newpage
 2 dots
 ?plotting styles dots
 ?style dots
@@ -5952,6 +5953,8 @@ Ffigure_polygons
 ?style rgbimage
 ?with rgbimage
  See `image`.
+
+#TeX \newpage
 2 sectors
 ?plotting styles sectors
 ?with sectors
@@ -6192,7 +6195,6 @@ Ffigure_xyerrorbars
  An additional input column (5th or 7th) may be used to provide variable color.
  This style does not permit variable point properties.
 
-#TeX \newpage
 2 xerrorlines
 ?plotting styles xerrorlines
 ?style xerrorlines
@@ -6212,6 +6214,7 @@ Ffigure_xerrorlines
  An additional input column (4th or 5th) may be used to provide variable color.
  This style does not permit variable point properties.
 
+#TeX \newpage
 2 xyerrorlines
 ?plotting styles xyerrorlines
 ?style xyerrorlines
