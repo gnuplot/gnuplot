@@ -96,8 +96,9 @@
 % Every verbatim environment is surrounded by these commands.
 % For 11pt/12pt options change '\normalsize' to '\small'
 % or '\footnotesize' in the preverbatim definition
-\newcommand{\preverbatim}{\small\vspace{-2.2ex}}
-\newcommand{\postverbatim}{\normalsize\vspace{-0.5ex}}
+\newcommand{\preverbatim}{\par\footnotesize\vspace{-3ex}}
+\newcommand{\postverbatim}{\vspace{-1.5ex}\par\normalsize}
+
 
 % apply settings for toc_entr.sty
 \adjustarticle
