@@ -20,7 +20,8 @@
     <li><a href="fillbetween.html">fill&nbsp;between&nbsp;curves</a></li>
     <li><a href="candlesticks.html">candlesticks</a></li>
     <li><a href="errorbars.html">error bars</a></li>
-    <li><a href="steps.html">step functions</a></li>
+    <li><a href="steps.html">simple step functions</a></li>
+    <li><a href="hsteps.html">hsteps</a></li>
     <li><a href="multiaxis.html">multiple axis scales</a></li>
     <li><a href="using.html">mixing styles</a></li>
     <li><a href="pointsize.html">variable size points</a></li>
@@ -86,6 +87,7 @@
     <li><a href="surface2.html">surfaces 2</a></li>
     <li><a href="contours.html">contours</a></li>
     <li><a href="custom_contours.html">custom contour lines</a></li>
+    <li><a href="contourfill.html">filled contours</a></li>
     <li><a href="singulr.html">singularities</a></li>
     <li><a href="hidden.html">hidden surfaces</a></li>
     <li><a href="pm3d.html">pm3d coloring</a></li>
@@ -186,6 +188,8 @@
     <li><a href="violinplot.html">violin plot</a></li>
     <li><a href="windrose.html">wind rose</a></li>
     <li><a href="iris.html">overlapping categories</a></li>
+    <li><a href="logic_timing.html">logic timing diagram</a></li>
+    <li><a href="rank_sequence.html">sequential ranking</a></li>
     </ul>
 
     <h4>Text options</h4>
@@ -283,7 +287,7 @@
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated March 2023</i>
+    <i>This page generated August 2023</i>
     </td>
 
     <td>
