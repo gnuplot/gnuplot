@@ -1,0 +1,28 @@
+#
+# Logic timing diagram constructed with hsteps
+#
+set title "Logic timing of bits in sequential ASCII characters"
+set title font ":Bold"
+set tmargin 4
+
+set yrange [0:9]
+set xrange [0.5:8]
+unset border
+unset tics
+set ytics 1,1,8 scale 0 format "bit %.0g" offset 0,0.3
+unset key
+
+set style fill solid 0.2 border lc "black"
+
+array DATA = [ 0x67, 0x6e, 0x75, 0x70, 0x6c, 0x6f, 0x74 ]
+bit(i)  = (DATA[column(1)] >> (i-1)) & 0x1
+char(i) = sprintf( "%c", DATA[i] )
+
+plot for [k=1:8] \
+        DATA using 1:(0.8 * bit(k)):(0.5) with hsteps offset k lw 2 fc black, \
+     for [k=1:8] \
+        DATA using 1:(k):(bit(k)?"1":"0") with labels offset 0,1 font ",9", \
+     DATA using 1:(0.5):(char($1)) with labels font ",16" tc 'blue'
+
+pause -1 "<cr> to continue"
+reset

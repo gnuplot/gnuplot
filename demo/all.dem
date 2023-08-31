@@ -206,8 +206,11 @@ print "******************** file binary.dem ********************"
 load "binary.dem"
 reset
 
-print "******************** file steps.dem ********************"
+print "******************** hsteps demos ********************"
 load "steps.dem"
+load "hsteps.dem"
+load "rank_sequence.dem"
+load "logic_timing.dem"
 reset
 
 print "******************** file scatter.dem ********************"

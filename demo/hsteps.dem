@@ -1,0 +1,116 @@
+#
+# 2D plot style "with hsteps"
+#	1) variations of connecting line shape
+#
+
+$data <<EOD
+1 5
+2 8
+3 10
+4 7
+5 5
+6 3
+EOD
+
+set border 3 lw 2 lc 'gray'
+set style line 1 lw 2 lc "goldenrod"
+set style line 2 lw 3 lc "red"
+set xrange [ 0:10]
+set yrange [-2:13]
+unset tics
+set key top right reverse Left samplen 2
+set key offset 2,1
+
+set multiplot layout 3,2
+
+  set title offset 0,-1.5
+  set label 1 "baseline" at 7, first 0 offset 0,0.5 
+  set xzeroaxis
+
+  set key title "full width"
+  plot $data using 1:2 ls 1 with hsteps title "default", \
+       $data using 1:2 ls 2 with hsteps nolink title "nolink"
+
+  set key title "narrow width"
+  plot $data using 1:2:(0.7) ls 1 with hsteps title "default", \
+       $data using 1:2:(0.7) ls 2 with hsteps nolink  title "nolink"
+
+  set key title "full width"
+  plot $data using 1:2 ls 1 with hsteps pillar title "pillar", \
+       $data using 1:2 ls 2 with hsteps nolink title "nolink"
+
+  set key title "narrow width"
+  plot $data using 1:2:(0.7) ls 1 with hsteps pillar title "pillar", \
+       $data using 1:2:(0.7) ls 2 with hsteps nolink title "nolink"
+
+  unset label 1
+  unset xzeroaxis
+
+  set key title "full width"
+  plot $data using 1:2 ls 1 with hsteps link title "link", \
+       $data using 1:2 ls 2 with hsteps nolink title "nolink"
+
+  set key title "narrow width"
+  plot $data using 1:2:(0.7) ls 1 with hsteps link title "link", \
+       $data using 1:2:(0.7) ls 2 with hsteps nolink title "nolink"
+
+unset multiplot
+pause -1 "<cr> to continue"
+
+
+#
+# 2D plot style "with hsteps"
+#	1) variations of connecting line shape
+#
+unset key
+set xrange [0:7]
+
+set multiplot layout 3,3 columnsfirst offset 0,0 scale 1.1,1.1
+
+  set title "full width"
+  plot $data using 1:2 ls 1 with hsteps, \
+       $data using 1:2 with points pt 7 ps 1 lc black
+
+  set title "width 0.8"
+  plot $data using 1:2:(0.8) ls 1 with hsteps, \
+       $data using 1:2 with points pt 7 ps 1 lc black
+
+  set title "width 0.4"
+  plot $data using 1:2:(0.4) ls 1 with hsteps, \
+       $data using 1:2 with points pt 7 ps 1 lc black
+
+  set title "forward"
+  plot $data using 1:2 ls 1 with hsteps forward, \
+       $data using 1:2 with points pt 7 ps 1 lc black
+
+  set title "forward"
+  plot $data using 1:2:(0.8) ls 1 with hsteps forward, \
+       $data using 1:2 with points pt 7 ps 1 lc black
+
+  set title "forward"
+  plot $data using 1:2:(0.4) ls 1 with hsteps forward, \
+       $data using 1:2 with points pt 7 ps 1 lc black
+
+  set title "backward"
+  plot $data using 1:2 ls 1 with hsteps backward, \
+       $data using 1:2 with points pt 7 ps 1 lc black
+
+  set title "backward"
+  plot $data using 1:2:(0.8) ls 1 with hsteps backward, \
+       $data using 1:2 with points pt 7 ps 1 lc black
+
+  set title "backward"
+  plot $data using 1:2:(0.4) ls 1 with hsteps backward, \
+       $data using 1:2 with points pt 7 ps 1 lc black
+
+unset multiplot
+
+pause -1 "<cr> to continue"
+
+set yrange [-1:13]
+set title "hsteps with variable fill color"
+set style fill solid 0.5 border lc "black"
+plot $data using 1:2:(0.7):1 with hsteps fc variable
+
+pause -1 "<cr> to continue"
+reset

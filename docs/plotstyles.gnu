@@ -501,6 +501,7 @@ set yrange [0:80]
 unset ytics
 set xtics scale 0
 set border 3 lw 2 front
+set bmargin 4
 unset key
 
 set style line 11 linecolor 'gray50' linewidth 2 dashtype (4,10) 

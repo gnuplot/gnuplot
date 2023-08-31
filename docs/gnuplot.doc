@@ -319,6 +319,9 @@ D sharpen 1
 D iris 2
 DB
 D contourfill 4
+DB
+D logic_timing 1
+D rank_sequence 1
 
 3 Hulls, masks, and smoothing
 ?new hulls
@@ -5573,19 +5576,23 @@ D histogram_colors 1
 
  This plot style requires 2 or 3 columns of data.  Additional input columns can
  be used to provide variable line or fill colors (see `rgbcolor variable`).
+ The x values of the input data are assumed to be monotonic.
 
  If the width of each step is not explicitly given through a third input
  column, each segment’s width is calculated so that it abuts the adjacent
- horizontal segments. The `forward` and `backward` keywords can be used to
- specify the direction in which the horizontal segment extends from the given
- x coordinate.  If neither is specified, the horizontal segment extends on both
- sides of the given x-value halfway to the x-value of the next adjacent point.
+ horizontal segments.  A negative value in column 3 will be treated as a
+ request for a full-width step.
+
+ The `forward` and `backward` keywords can be used to specify the direction
+ in which the horizontal segment extends from the given x coordinate.
+ If neither is specified, the horizontal segment extends on both sides
+ of the given x-value halfway to the x-value of the next adjacent point.
  However, for the first and last points, where there are no corresponding outer
  adjacent points, the horizontal segments are extrapolated using distances to
  the adjacent inner points (see `histeps`, `boxes`).
 
  The default (`baseline`) and `pillar` variants employ a baseline y value.
- If not provided in the plot command, the baseline is take to be y=0.
+ If not provided in the plot command, the baseline is taken to be y=0.
  If the plot command uses a fill style, the baseline also serves to 
  delimit one boundary of the fill area.
  Four style variants are possible.
@@ -5606,11 +5613,12 @@ Ffigure_hsteps_pillar
  `pillar`: At each end of each step a vertical line is drawn to the baseline.
  Note that no horizontal line segments are drawn at the baseline.
 
-      set style data hsteps pillar y=0
-      plot $data using 1:2
-      plot $data using 1:2:(0.5)
-      plot $data using 1:2:(0.5) above fc "blue", \
-           $data using 1:2:(0.5) below fc "red"
+      plot $data using 1:2       with hsteps pillar
+      plot $data using 1:2:(0.5) with hsteps pillar
+      plot $data using 1:2:(0.5) \
+                 with hsteps pillar above fc "blue", \
+           $data using 1:2:(0.5) \
+                 with hsteps pillar below fc "red"
 
 #TeX \vspace{6ex}
 
@@ -5627,19 +5635,17 @@ Ffigure_hsteps_nolink
 
 Ffigure_hsteps_link
  `link`: Adjacent steps steps are connected by a single straight line segment.
- Depending on the step widths, this line may be vertical or diagonal.
+ Depending on the step widths, this line may be diagonal rather than vertical.
 
- Example:
-
- The `link` variant can be superimposed onto the `pillar` variant to produce
- a stacked histogram plot in which category boundaries are connected.
+ Example: The `link` variant can be superimposed onto the `pillar` variant to
+ produce a stacked histogram plot in which category boundaries are connected.
 
       set style line 11 lw 2 lc "gray" dt "."
       set style line 12 lw 2 lc variable
       plot $data using 1:3:(0.5)   ls 11 with hsteps link, \
            $data using 1:3:(0.5):1 ls 12 with hsteps pillar fs solid 0.7 border, \
            $data using 1:4:(0.5)   ls 11 with hsteps link, \
-           $data using 1:4:(0.5):1 lt -1 with hsteps pillar fs transparent pattern 1 border
+           $data using 1:4:(0.5):1 ls 12 with hsteps pillar fs transparent pattern 1 border
 
 3 offset
 Ffigure_hsteps_offset
