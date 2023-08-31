@@ -1,5 +1,6 @@
 #
 # Draw a table of named colors
+# Note: These names and values must match those in .../src/tables.c
 #
 unset tics
 unset border
@@ -92,7 +93,7 @@ plot 0 lt nodraw notitle,\
  keyentry w boxes title "sienna1"            lc rgb 0xff8040, \
  keyentry w boxes title "sienna4"            lc rgb 0x804014, \
  keyentry w boxes title "skyblue"            lc rgb 0x87ceeb, \
- keyentry w boxes title "slateblue1"         lc rgb 0x8060ff, \
+ keyentry w boxes title "slateblue"          lc rgb 0x8060ff, \
  keyentry w boxes title "slategray"          lc rgb 0xa0b6cd, \
  keyentry w boxes title "spring-green"       lc rgb 0x00ff7f, \
  keyentry w boxes title "steelblue"          lc rgb 0x306080, \
