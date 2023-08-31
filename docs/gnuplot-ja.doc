@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.791 2023-05-26 15:16:33+09 shige Exp $
-C corresponding original gnuplot.doc at 2023-05-26
+C RCS $Id: gnuplot-ja.doc,v 1.795 2023-08-29 12:50:16+09 shige Exp $
+C corresponding original gnuplot.doc at 2023-08-28
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -360,7 +360,7 @@ C 行が長いのは、できればなんとかしたい
 #b これは厳密には新しい描画スタイルではありませんが、フィルタ concave
 ## hull と領域塗り潰しのパスに沿った平滑化を組み合わせることで、「膨ら
 ## んだ領域」グラフの作成が可能になります。これは例えば複数のデータのか
-## たまりが重なっているものの広さを示します。
+## たまりが重なっているものの広さを示します。以下参照: `concavehull`。
 #b 3 次元描画スタイル `with pm3d` でオプション修飾子 `zclip [zmin:zmax]`
 ## が使えて、これは曲面全体のひとつの断面のみを選択します。クリッピング
 ## の境界値を増加させて連続描画を行うことで、3 次元では断面切り出しアニ
@@ -491,11 +491,11 @@ D viridis 1
 ## ムか、アニメーション列を生成します。各フレームは pngcairo で生成し、
 ## その後 libwebp と libwebpmux による WebPAnimEncoder API を通してエン
 ## コードを行います。
-#b `dumb`, `sixel`, `block`, `domterm` 出力形式のように、文字列出力とグ
-## ラフィック表示を同じウィンドウで行ういくつかの出力形式では、現在はコ
-## マンド `pause mouse` の間はキーボード入力に反応します。その間、それ
-## らの出力形式では、マウス操作が可能な出力形式が行うのと同じ方法でキー
-## 入力を解釈します。
+#b `dumb`, `sixel`, `kitty`, `block`, 出力形式のように、文字列出力とグ
+## ラフィック表示を同じウィンドウで行う出力形式では、現在はコマンド
+## `pause mouse` の間はキーボード入力に反応します。その間、それらの出力
+## 形式では、マウス操作が可能な出力形式が行うのと同じ方法でキー入力を解
+## 釈します。以下参照: `pseudo-mousing`。
 ## 例えば、左/右/上/下矢印キーは、3 次元グラフでは視方向を変え、2 次元
 ## グラフでは視点移動/拡大の増分ステップを実行します。
 #end
@@ -544,7 +544,8 @@ D epi_data 1
 ## します。例えば、"plot FOO using 0:(column($# - 1))" は、各行の最後か
 ## ら一つ手前の列を描画します。
 #b bin (箱) 用データの和でなく平均を描画するキーワード `binvalue=avg`
-#b `set colorbox bottom` は、カラーボックスをグラフの下に配置します。
+#b `set colorbox bottom` は、垂直なカラーボックスをグラフの右に配置する
+## 代わりに、水平なカラーボックスをグラフの下に配置します。
 #b cbtics 以外の軸には影響しない `set colorbox cbtics <linestyle>`
 #b 交差する pm3d 曲面のレンダリングの改良 - 重なる曲面のタイルを、交差
 ## 曲線に沿って 2 つの部分に分割し、一方の曲面のタイルが他方の曲面を通
@@ -555,7 +556,7 @@ D epi_data 1
 #b `set pm3d border retrace` は、各 pm3d 四辺形の周りに、塗り潰し領域と
 ## 同じ色で境界を描きます。これは、原理的に視覚効果はありませんが、あま
 ## りよくない pdf や postscript ビューワのようなディスプレイモードで、
-## アンチエイリアスによる副産物が導入されないようにします。
+## エイリアスによる副産物が導入されないようにします。
 #b `set isotropic` は、2 次元グラフと 3 次元グラフの両方で、x, y, z 軸
 ## のすべてのスケールが同じになるようにスケールを合わせます。
 #b 変更: 文字の回転角が整数という制限はなくなりました。
@@ -582,8 +583,9 @@ D epi_data 1
 ## してその他ボクセル格子データの表現
 #b データ前処理フィルタ `zsort`
 #b カスタマイズした凡例 (key) を作成する `keyentry`
-#b もはやデフォルトではビルドしない古い LaTeX 系出力形式 `latex`,
-## `emtex`, `eepic`, `tpic` の代わりの出力形式 pict2e
+#b 新しい LaTeX 系出力形式 pict2e は、古い出力形式 `latex`, `emtex`,
+## `eepic`, `tpic` の代わりです。古い出力形式はもはやデフォルトではビル
+## ドしません。
 #b `set pixmap` は、png/jpeg/gif 画像をピクスマップ画像として取り込み、
 ## グラフやページの任意の位置に配置しスケール変換も可能
 #b 拡張文字列モードで \U+xxxx (xxxx は 16 進値の 4 または 5 文字) で
@@ -603,7 +605,7 @@ D epi_data 1
 #b 3 次元描画スタイル `zerrorfill`
 #b 3 次元光源モデルで陰影と反射光ハイライトを提供 (以下参照: `lighting`)
 #b 配列データ型と関連するコマンドや演算子。以下参照: `arrays`。
-#b 新しい出力形式 `sizelgd`, `domterm`
+#b 新しい出力形式 `sixelgd`, `domterm`
 #b 相対時間 (間隔長) を処理する新しい書式指定子 tH tM tS。
 ## 以下参照: `time_specifiers`。
 #end
@@ -2327,7 +2329,7 @@ C C 4 weekdata_cdc
  以下参照: `splot voxel-grids`, `vgrid`。
 @end table
 
-4 整数変換関数 (integer conversion functions): int floor ceil round
+4 整数変換関数 (int floor ceil round) (integer conversion functions)
 ?integer conversion
 ?integer
 ?precision
@@ -6567,7 +6569,7 @@ Ffigure_zerror
  ョンを表示することができます。
 
  マウスが使えない出力形式でも、ある種のアニメーションをサポートするもの
- があります。以下参照: `term sixelgd animate`, `term domterm animate`。
+ があります。以下参照: `term sixelgd`, `term kittycairo`。
 
  アニメーションをファイルとして保存して、後で手元で再生したり Web ペー
  ジに埋め込んだりできる出力形式が 2 つあります。以下参照:
@@ -7812,7 +7814,7 @@ Ffigure_zerror
 3 pause 中の疑似マウス操作 (pseudo-mousing during pause)
 ?commands pause pseudo-mousing
 ?pseudo-mousing
- `dumb`, `sixel`, `block`, `domterm` 出力形式のように、文字列出力とグラ
+ `dumb`, `sixel`, `kitty`, `domterm` 出力形式のように、文字列出力とグラ
  フィック表示を同じウィンドウで行う出力形式があります。これらの出力形式
  では、今のところ実質的にマウス動作をサポートしていませんが、コマンド
  `pause mouse` の間は、マウス動作が可能な出力形式の場合と同じ仕組みでキ
@@ -11039,7 +11041,6 @@ D discrete 3
                   { size x, y }
                   { front | back }
                   { noborder | bdefault | border <linestyle> }
-                    {cbtics <linestyle>}
                 }
        show colorbox
        unset colorbox
@@ -11072,9 +11073,6 @@ D discrete 3
  は line style `2604`、すなわち細い線のデフォルトの境界色 (-1) で境界を
  描画します。`bdefault` (デフォルト) は、カラーボックスの境界の描画にデ
  フォルトの境界の line style を使います。
-
- `cbtics` は、カラーボックスの目盛り (cbtics) に対して、境界のラインス
- タイルとは異なる線種を指定するのに使えます。
 
  カラーボックスの軸は `cb` と呼ばれ、通常の軸のコマンドで制御されます。
  すなわち `set/unset/show` で `cbrange`, `[m]cbtics`, `format cb`,
@@ -11161,7 +11159,7 @@ Ffigure_colornames
        set table $datablock
        splot DATA with lines nosurface
        unset table
-       # 等高線は $datablock に、1 つの等高線が 1 つの index で 
+       # 等高線は $datablock に、1 つの等高線が 1 つの index で
        plot for [level=0:*] $datablock index level with lines
 
  以下も参照: `splot datafile`。また、
@@ -11240,7 +11238,7 @@ D dashtypes 2
  現在は、そのようなオプションがいくつか実装されています。その設定は、そ
  の後のコマンドで読み出されるすべてのデータファイルに一様に適用しますが、
  それとは矛盾する書式でファイルを同時に操作しなければいけない場合、これ
- を回避する方法に関しては、以下参照: `functionbocks`。
+ を回避する方法に関しては、以下参照: `functionblocks`。
 4 set datafile columnheaders
 ?set datafile columnheaders
 =columnheaders
@@ -13096,7 +13094,7 @@ Ffigure_multiple_keys
  を再定義することを可能にします。このコマンドのオプションは、
  "set style line" のものと全く同じです。ラインスタイルと違うところは、
  `set linetype` による再定義は永続的なことで、これは `reset` の影響を受
- けません。
+ けません。しかし、`reset session` で初期線種の属性を復帰します。
 
  例えば、線種 1 と 2 を以下のように再定義してみます:
 
@@ -14903,7 +14901,7 @@ D viridis 1
       set style line 102 lc "blue"
       set pm3d depthorder
       do for [i=0:N] {
-          splot f(x,y) with pm3d fillcolor ls 101 zclip [* : zmax-(i*delta)] 
+          splot f(x,y) with pm3d fillcolor ls 101 zclip [* : zmax-(i*delta)]
           pause 0.2  # アニメーションフレーム間隔は 1/5 秒
       }
 
@@ -18385,12 +18383,12 @@ Ffigure_sparsematrix
  す。matrix データの行と列の番号は、0 から始まり、よって番号 N の列は、
  (N+1) 番目であることに注意してください。
  書式:
-       plot 'file' every {<column_incr>}
-                           {:{<row_incr>}
-                             {:{<start_column>}
-                               {:{<start_row>}
-                                 {:{<end_column>}
-                                   {:<end_row>}}}}}
+       plot 'file' matrix every {<column_incr>}
+                                {:{<row_incr>}
+                                  {:{<start_column>}
+                                    {:{<start_row>}
+                                      {:{<end_column>}
+                                        {:<end_row>}}}}}
  例:
        plot 'file' matrix every :::N::N   # N 番の行のすべての値を描画
        plot 'file' matrix every ::3::7    # すべての行の 3-7 列を描画
@@ -18944,10 +18942,13 @@ D viridis 1
 3 warnings
 ?unset warnings
 ?set warnings
- 警告メッセージ (致命的なエラーではない) は、通常はその警告を引き起こす
- コマンドラインをエコーした後で stderr に出力されます。この警告は、コマ
- ンド `unset warnings` で抑制でき、明示的に `set warnings` で有効にされ
- るまで抑制され続けます。
+      set warnings
+      unset warnings
+
+ 致命的ではないエラーに対する警告メッセージは、通常はその警告を引き起こ
+ すコマンドラインをエコーした後で stderr に出力します。この警告は、コマ
+ ンド `unset warnings` で抑制できます。それは明示的に `set warnings` で
+ 有効にするまで抑制し続けます。
 2 update
 ?commands update
 ?update
