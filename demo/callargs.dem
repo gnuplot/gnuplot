@@ -11,7 +11,7 @@ $DATA << EOD
 1 2
 3 4
 EOD
-set table
+set table $OUT
 
 print "\nEntering ", ARG0, " with ", ARGC, " parameters"
 if (ARGC == 0) {
