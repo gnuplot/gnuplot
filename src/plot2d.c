@@ -535,9 +535,12 @@ get_data(struct curve_points *current_plot)
 
     case BOXES:
     case HSTEPS:
+	/* 1 column: y coordinate only */
+	/* 2 columns: x and y coordinates */
+	/* 3 columns: x and y coordinates and width */
+	/* extra columns allow variable colors */
 	min_cols = 1;
 	max_cols = 4;
-
 	break;
 
     case FILLEDCURVES:
@@ -547,6 +550,8 @@ get_data(struct curve_points *current_plot)
 	break;
 
     case IMPULSES:	/* 2 + possible variable color */
+    case HISTEPS:
+    case FILLSTEPS:
     case POLYGONS:
     case LINES:
     case DOTS:

@@ -2168,7 +2168,7 @@ plot_hsteps (struct curve_points *plot)
 		    nodes[0].x = xl;
 		    nodes[0].y = ybase;
 		    if (varcolor)
-		      check_for_variable_color(plot, &varcolor[i]);
+			check_for_variable_color(plot, &varcolor[i]);
 		} else if (points[i].z >= 0 && (gap[i-1] & HSTEPS_GAP_POINT)) {
 		    nodes[2*k+1].x = nodes[2*k].x;	/* bottom line in pulse */
 		    nodes[2*k+1].y = ybase;
@@ -2217,7 +2217,7 @@ plot_hsteps (struct curve_points *plot)
     }
 
     if (!has_border)
-       term_apply_lp_properties(&plot->lp_properties);
+	term_apply_lp_properties(&plot->lp_properties);
 
     if (fill_style == FS_EMPTY || has_border) {
 
@@ -2234,6 +2234,8 @@ plot_hsteps (struct curve_points *plot)
 		    nodes[0].y = (has_baseline) ? ybase : yc;
 		    if (varcolor)
 			check_for_variable_color(plot, &varcolor[i]);
+		    if (has_border)
+			need_fill_border(&plot->fill_properties);
 		} else if (has_baseline && has_link && (gap[i-1] & HSTEPS_GAP_POINT)) {
 		    nodes[2*k+1].x = nodes[2*k].x;	      /* bottom line in pulse */
 		    nodes[2*k+1].y = ybase;
