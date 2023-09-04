@@ -1129,27 +1129,6 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     /* Perhaps it should be a parameter to df_readline? */
     df_current_plot = plot;
 
-    /* If either 'set datafile columnhead' or 'set key autotitle columnhead'
-     * is in effect we always treat the * first data row as non-data
-     * (df_readline() will return DF_COLUMN_HEADERS rather than the column count).
-     * This is true even if the key is off or the data is read from 'stats'
-     * or from 'fit' rather than plot.
-     */
-    column_for_key_title = NO_COLUMN_HEADER;
-    df_already_got_headers = FALSE;
-    if ((&keyT)->auto_titles == COLUMNHEAD_KEYTITLES)
-	parse_1st_row_as_headers = TRUE;
-    else if (df_columnheaders)
-	parse_1st_row_as_headers = TRUE;
-    else
-	parse_1st_row_as_headers = FALSE;
-    /* Pseudofiles '+' and '++' can never have column headers */
-    if (df_pseudodata > 0)
-	parse_1st_row_as_headers = FALSE;
-    /* Data pulled from an array also cannot have column headers  */
-    if (df_array)
-	parse_1st_row_as_headers = FALSE;
-
     if (!cmd_filename)
 	int_error(c_token, "missing filename");
     if (!cmd_filename[0]) {
@@ -1165,9 +1144,27 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	df_filename = gp_strdup(cmd_filename);
     }
 
-    /* defer opening until we have parsed the modifiers... */
+    /* If either 'set datafile columnhead' or 'set key autotitle columnhead'
+     * is in effect we always treat the * first data row as non-data
+     * (df_readline() will return DF_COLUMN_HEADERS rather than the column count).
+     * This is true even if the key is off or the data is read from 'stats'
+     * or from 'fit' rather than plot.
+     */
+    column_for_key_title = NO_COLUMN_HEADER;
+    df_already_got_headers = FALSE;
+    if ((&keyT)->auto_titles == COLUMNHEAD_KEYTITLES)
+	parse_1st_row_as_headers = TRUE;
+    else if (df_columnheaders)
+	parse_1st_row_as_headers = TRUE;
+    else
+	parse_1st_row_as_headers = FALSE;
+    /* arrays or internally generated data ('+' or '++') never have column headers */
+    if (df_array || (df_filename[0] == '+'))
+	parse_1st_row_as_headers = FALSE;
 
-    /* pm 25.11.2001 allow any order of options */
+    /*
+     * Defer opening the input file until we have parsed the modifiers
+     */
     while (!END_OF_COMMAND) {
 
 	/* look for binary / matrix */
