@@ -1,0 +1,35 @@
+#
+# Two plot style options "with hsteps link" and "with hsteps pillar"
+# can be combined to create a stacked histogram with connecting lines
+# between category boundaries.
+#
+
+set title "Stacked histogram constructed from plot style hsteps"
+
+$data <<EOD
+1 2018 60 30
+2 2019 65 35
+3 2020 61 25
+4 2021 57 33
+5 2022 65 40
+6 2023 62 20
+EOD
+
+set xrange [0:7]
+set yrange [0:80]
+unset ytics
+set xtics scale 0
+set border 3 lw 2 front
+set bmargin 4
+unset key
+
+set style line 11 linecolor 'gray50' linewidth 2 dashtype (4,10) 
+set style line 12 linecolor variable linewidth 2 dashtype solid
+
+plot $data using 1:3:(0.5):xtic(2) ls 11 with hsteps link, \
+     $data using 1:3:(0.5):1       ls 12 with hsteps pillar fs solid 0.5 border, \
+     $data using 1:4:(0.5)         ls 11 with hsteps link, \
+     $data using 1:4:(0.5):1       ls 12 with hsteps pillar fs transparent pattern 1 border
+
+pause -1 "<cr> to continue"
+reset

@@ -166,6 +166,7 @@
     <li><a href="histerror.html">histogram + errorbars</a></li>
     <li><a href="boxclusters.html">make-your-own with boxes</a>
     <li><a href="bins.html">automatic binning</a></li>
+    <li><a href="hsteps_histogram.html">linked stacks</li>
     </ul>
 
     <h4>Sample Applications</h4>

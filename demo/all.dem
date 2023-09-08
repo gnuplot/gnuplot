@@ -209,6 +209,7 @@ reset
 print "******************** hsteps demos ********************"
 load "steps.dem"
 load "hsteps.dem"
+load "hsteps_histogram.dem"
 load "rank_sequence.dem"
 load "logic_timing.dem"
 reset
