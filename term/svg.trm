@@ -132,6 +132,8 @@ static unsigned char SVG_green = 0;
 static unsigned char SVG_blue = 0;
 static double SVG_alpha = 0.0;
 static unsigned char SVG_color_mode = TC_DEFAULT;
+static unsigned int SVG_rgb = 0;
+static unsigned int SVG_patterncolor[8];
 static char *SVG_linecolor = NULL;
 static char *SVG_name = NULL;
 static char *SVG_scriptdir = NULL;
@@ -436,10 +438,18 @@ SVG_DefineFillPattern(int fillpat)
 {
     char *path;
     char *style="stroke";
+    unsigned int newcolor;
 
     fillpat %= 8;
-    if (fillpat != SVG_fillPattern) {
+
+    if (SVG_color_mode == TC_RGB || SVG_color_mode == TC_LT)
+	newcolor = SVG_rgb;
+    else
+	newcolor = SVG_patterncolor[fillpat];
+
+    if (fillpat != SVG_fillPattern || newcolor != SVG_patterncolor[fillpat]) {
 	SVG_fillPattern = fillpat;
+	SVG_patterncolor[fillpat] = newcolor;
 	SVG_PathClose();
 	SVG_fillPatternIndex++;
 
@@ -478,12 +488,11 @@ SVG_DefineFillPattern(int fillpat)
 	if (*path) {
 	    char *figure = "fill:none;";
 	    if (!strcmp(style,"fill")) figure = "stroke:none;";
-	    if (SVG_color_mode == TC_RGB)
+	    if (SVG_color_mode == TC_RGB || SVG_color_mode == TC_LT)
 		fprintf(gpoutfile,"\t\t\t<path style='%s %s:rgb(%d,%d,%d)' d='%s'/>\n",
-			figure, style, SVG_red, SVG_green, SVG_blue, path);
-	    else if (SVG_color_mode == TC_LT)
-		fprintf(gpoutfile, "\t\t\t<path style = '%s %s:%s' d= '%s'/>\n",
-			figure, style, SVG_linecolor, path);
+			figure, style,
+			(newcolor >> 16) & 0xff, (newcolor >> 8) & 0xff, newcolor & 0xff,
+			path);
 	    else
 		fprintf(gpoutfile, "\t\t\t<path style = '%s %s:currentColor' d='%s'/>\n",
 			figure, style, path);
@@ -829,6 +838,9 @@ SVG_init ()
 		(SVG_background)&0xff);
 
     SVG_LineType = LT_NODRAW;
+
+    for (int i=0; i<8; i++)
+	SVG_patterncolor[i] = 0xff000000;
 
 /* set xmax, ymax*/
 
@@ -1690,6 +1702,7 @@ SVG_set_color(t_colorspec *colorspec)
 {
     rgb255_color rgb255;
     SVG_alpha = 0.0;
+    SVG_rgb = rgb_from_colorspec(colorspec);
 
     if (colorspec->type == TC_LT) {
         if (SVG_linecolor != SVG_pens[SVG_Pen_RealID (colorspec->lt)].color) {
